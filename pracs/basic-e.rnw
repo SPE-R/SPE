@@ -1,0 +1,881 @@
+\SweaveOpts{results=hide}
+
+\section{Practice with basic \R}
+
+The main purpose of this session is to give participants who have not
+had much (or any) experience with using \textsf{R} a chance to
+practice the basics and to ask questions. For others, it should serve
+as a reminder of some of the basic features of the language.
+
+R can be installed on all major platforms ({\em i.e.} Windows, macOS,
+Linux).  We do not assume in this exercise that you are using any
+particular platform. Many people like to use the RStudio graphical
+user interface (GUI), which gives the same look and feel across all
+platforms.
+
+\subsection{The working directory}
+\label{subsection:workingdir}
+
+A key concept in \textsf{R} is the {\em working directory} (or {\em
+  folder} in the terminology of Windows). The working directory is
+where \textsf{R} looks for data files that you may want to read in and
+where \textsf{R} will write out any files you create.  It is a good
+idea to keep separate working directories for different projects. In
+this course we recommend that you keep a separate working directory
+for each exercise.
+
+If you are working on the command line in a terminal, then you can
+change to the correct working directory and then launch \textsf{R} by
+typing ``R''.
+
+If you are using a GUI then you will typically need to change to the
+correct working directory after starting \textsf{R}. In RStudio, you
+can change directory from the ``Session'' menu. However it is much
+more useful to create a new {\em project} to keep your source files
+and data. When you open a project in the RStudio GUI, your working
+directory is automatically changed to the directory associated with
+the project.
+
+
+You can quit \textsf{R} by typing
+\begin{verbatim}
+q()
+\end{verbatim}
+at the \textsf{R} command prompt. You will be asked if you want to
+save your workspace. We recommend that you answer ``no'' to this
+question. If you answer ``yes'' then R will write a file named
+\texttt{.RData} into the working directory containing all the objects
+you created during your session so that they will be available next
+time you start \textsf{R}. This may seem convenient but you will soon
+find that your workspace becomes cluttered with old objects.
+
+You can display the current working directory with the {\tt getwd()}
+function and set it with the {\tt setwd()} function. The function {\tt
+  dir()} can be used to see what files you have in the working
+directory.
+
+\subsection{Read-evaluate-print}
+
+The simplest use of \textsf{R} is interactively. \textsf{R} will read
+in the command you type, evaluate them, then print out the
+answer. This is called the {\em read-eval-print loop}, or REPL for
+people who don't like words. In this exercise, we recommend that you
+work interactively. As the course evolves you will find that you need
+to switch to {\em script files}. We come back to this issue at the end
+of the exercise.
+
+It is important to remember that R is case sensitive, so that
+\texttt{A} is different from \texttt{a}. Commands in R are generally
+separated by a newline, although a semi-colon can also be used.
+
+\subsection{Using R as a calculator}
+
+Try using R as a calculator by typing different arithmetic expressions
+on the command line.  Note that R allows you to recall previous
+commands using the vertical arrow key. You can edit a recalled command
+and then resubmit it by pressing the return key. Keeping that in
+mind, try the following:
+\begin{verbatim}
+ 12+16
+ (12+16)*5
+ sqrt((12+16)*5)  # square root
+ round(sqrt((12+16)*5),2)  # round to two decimal places
+\end{verbatim}
+The hash symbol \verb+#+ denotes the start of a {\em comment}. 
+Anything after the hash is ignored by R.
+
+Round braces are used a lot in R. In the above expressions, they are
+used in two different ways. Firstly, they can be used to establish the
+order of operations. In the example
+<<results=verbatim>>=
+(12+16)*5
+@ 
+they ensure that 12 is added to 16 before the result is multiplied by 5.
+If you omit the braces then you get a different answer
+<<results=verbatim>>=
+12+16*5
+@ 
+because multiplication has higher {\em precedence} than addition. The
+second use of round braces is in a function call (e.g. {\tt sqrt},
+{\tt round}). To call a function in R, type the name followed by the
+arguments inside round braces. Some functions take multiple arguments,
+and in this case they are separated by commas.
+
+You can see that complicated expressions in R can have several levels
+of nested braces.  To keep track of these, it helps to use a
+syntax-highlighting editor. For example, in RStudio, when you type an
+opening bracket ``('', RStudio will automatically add a closing
+bracket ``)'', and when the cursor moves past a closing bracket,
+RStudio will automatically highlight the corresponding opening bracket
+(in grey). Features like this can make it much easier to write R
+code free from syntax errors.
+
+Instead of printing the result you can store it in an object, say
+\begin{verbatim}
+ a <-  round(sqrt((12+16)*5),2)
+\end{verbatim}
+In this case \textsf{R} does not print anything to the screen. You can
+see the results of the calculation, stored in the object \texttt{a},
+by typing \texttt{a} and also use \texttt{a} for further calculations,
+e.g:
+\begin{verbatim}
+exp(a)
+log(a)     # natural logarithm
+log10(a)   # log to the base 10
+\end{verbatim}
+The left arrow expression {\verb+ <-+}, pronounced ``gets'', is called
+the assignment operator, and is obtained by typing \verb+<+ followed
+by \verb+-+ (with no space in between).  It is also possible to use
+the equals sign \verb+=+ for assignment. Note that some \textsf{R}
+experts do not like this and recommend to use only ``gets'' for
+assignment, reserving \verb+=+ for function arguments,
+
+You can also use a right arrow, as in
+\begin{verbatim}
+ round(sqrt((12+16)*5),2) -> a
+\end{verbatim}
+
+\subsection{Vectors}
+
+All commands in R are {\em functions} which act on {\em objects}.  One
+important kind of object is a {\em vector}, which is an ordered
+collection of numbers, or character strings (e.g. ``Charles Darwin'') ,
+or logical values ({\tt TRUE} or {\tt FALSE}). The components of a
+vector must be of the same type (numeric, character, or logical).  The
+combine function {\tt c()}, together with the assignment operator, is
+used to create vectors. Thus
+<<>>=
+v <- c(4, 6, 1, 2.2)
+@
+creates a vector {\tt v} with components 4, 6, 1, 2.2 and assigns the
+result to the vector {\tt v}.
+
+A key feature of the R language is that many operations are {\em
+  vectorized}, meaning that you can carry out the same operation on
+each element of a vector in a single operation. Try
+<<>>=
+v
+3+v
+3*v
+@
+and you will see that R understands what to do in each case. 
+
+R extends ordinary arithmetic with the concept of a {\em missing
+  value} represented by the symbol {\tt NA} (Not Available). Any
+operation on a missing value creates another missing value. You can
+see this by repeating the same operations on a vector containing a
+missing value:
+<<>>=
+v <- c(4, 6, NA)
+3 + v
+3 * v
+@
+The fact that every operation on a missing value produces a missing value
+can be a nuisance when you want to create a summary statistic for a vector:
+<<results=verbatim>>=
+mean(v)
+@
+While it is true that the mean of {\tt v} is unknown because the value
+of the third element is missing, we normally want the mean of the
+non-missing elements. Fortunately the {\tt mean} function has an
+optional argument called {\tt na.rm} which can be used for this.
+<<results=verbatim>>=
+mean(v, na.rm=TRUE)
+@
+Many functions in R have optional arguments that can be omitted, in which
+case they take their default value (in this case {\tt na.rm=FALSE}), or can be
+explicitly given in the function call to override the default behaviour.
+
+You can get a description of the structure of any object using the
+function {\tt str()}. For example, \texttt{str(v)} shows that {\tt v}
+is numeric with 4 components. If you just want to know the length of a
+vector then it is much easier to use the {\tt length} function.
+<<>>=
+length(v)
+@
+
+\subsection{Sequences}
+
+There are short-cut functions for creating vectors with a regular
+structure. For example, if you want a vector containing the sequence of
+integers from 1 to 10, you can use
+<<>>=
+1:10
+@
+The \texttt{seq()} function allows the creation of more general
+sequences. For example, the vector (15, 20, 25, ... ,85) can be created
+with
+<<>>=
+seq(from=15, to=85, by=5)
+@
+The objects created by the ``:'' operator and the \texttt{seq()} function
+are ordinary vectors, and can be combined with other vectors using the
+combine function:
+<<>>=
+c(5, seq(from=20, to=85, by=5))
+@
+
+You can learn more about functions by typing ? followed by the
+function name. For example \texttt{?seq} gives information about the
+syntax and usage of the function {\tt seq()}.
+
+%\begin{exercise}
+\begin{enumerate}
+\item Create a vector {\tt w} with components 1, -1, 2, -2
+<<Create w,echo=F>>=
+w<-c(1,-1,2,-2)
+@
+\item Display this vector
+<<Display w,echo=F>>=
+w
+@
+\item Obtain a description of {\tt w} using {\tt str()}
+<<Structure of w,echo=F>>=
+str(w)
+@
+\item Create the vector {\tt w+1}, and display it.
+<<Create and display w+1,echo=F>>=
+w+1
+@
+\item Create the vector {\tt v} with components (5, 10, 15, ... , 75) using seq().
+<<Create v,echo=F>>=
+v<-seq(5,75,5)
+v
+@
+\item Now add the components 0 and 1 to the beginning of {\tt v} using c().
+<<Extend v,echo=F>>=
+v<-c(0,1,v)
+v
+@
+\item Find the length of this vector.
+<<Find length of v,echo=F>>=
+length(v)
+@
+\end{enumerate}
+%\end{exercise}
+
+\subsection{Displaying and changing parts of a vector (indexing)}
+
+Square brackets in R are used to extract parts of vectors. So
+\verb+x[1]+ gives the first element of vector {\tt x}. Since R is
+vectorized you can also supply a vector of integer index values inside
+the square brackets. Any expression that creates an integer vector
+will work.
+
+Try the following commands:
+<<>>=
+x <- c(2, 7, 0, 9, 10, 23, 11, 4, 7, 8, 6, 0)
+x[4]
+x[3:5]
+x[c(1,5,8)]
+x[(1:6)*2]
+x[-1]
+@
+Negative subscripts mean ``drop this element''. So \verb+x[-1]+
+returns every element of \texttt{x} except the first.
+
+Trying to extract an element that is beyond the end of the vector is,
+surprisingly, not an error. Instead, this returns a missing value
+<<results=verbatim>>=
+N <- length(x)
+x[N + 1]
+@
+There is a reason for this behaviour, which we will discuss in the recap.
+
+\textsf{R} also allows {\em logical subscripting}. Try the following
+<<>>=
+x > 10
+x[x > 10]
+@
+The first expression creates a logical vector of the same length as
+\texttt{x}, where each element has the value \texttt{TRUE} or
+\texttt{FALSE} depending on whether or not the corresponding element
+of \texttt{x} is greater than 10. If you supply a logical vector as an
+index, \textsf{R} selects only those elements for which the conditions is
+\texttt{TRUE}.
+
+You can combine two logical vectors with the operators \verb+&+
+(``logical and'') and \verb+|+ (``logical or''). For example, to select
+elements of x that are between 10 and 20 we combine two one-sided logical
+conditions for $x \geq 10$ {\bf and} $x \leq 20$:
+<<>>=
+x[x >= 10 & x <= 20]
+@ 
+The remaining elements of {\tt x} that are {\bf either} less than 10
+{\bf or} greater than 20 are selected with
+<<>>=
+x[x < 10 | x > 20]
+@ 
+
+Indexing can also be used to replace parts of a vector:
+<<>>=
+x[1] <- 1000
+x
+@
+This replaces the first element of \texttt{x}. Logical subscripting is
+useful for replacing parts of a vector that satisfy a certain condition.
+For example to replace all elements that take the value 0 with the value 1:
+<<>>=
+x[x==0] <- 1
+x
+@ 
+If you want to replace parts of a vector then you need to make sure
+that the replacement value is either a single value, as in the example
+above, or a vector equal in length to the number of elements to be
+replaced. For example, to replace elements 2, 3, and 4 we need to
+supply a vector of replacement values of length 3.
+<<>>=
+x[2:4] <- c(0, 8, 1)
+x
+@ 
+It is important to remember this when you are using logical
+subscripting because the number of elements to be replaced is not
+given explicitly in the R code, and it is easy to get confused about
+how many values need to be replaced.  If we want to add 3 to every
+element that is less than 3 then we can break the operation down into
+3 steps:
+<<>>=
+y <- x[x < 3]
+y <- y + 3
+x[x < 3] <- y
+x
+@ 
+First we extract the values to be modified, then we modify them, then we
+write back the modified values to the original positions. R experts will
+normally do this in a single expression.
+<<>>=
+x[x < 3] <- x[x < 3] + 3
+@ 
+Remember, if you are confused by a complicated expression you can usually
+break it down into simpler steps.
+
+If you want to create an entirely new vector based on some logical
+condition then use the \texttt{ifelse()} function. This function takes
+three arguments: the first is a logical vector; the second is the
+value taken by elements of the logical vector that are {\tt TRUE}; and
+the third is the value taken by elements that are {\tt FALSE}.
+
+In this example, we use the remainder operator \verb+%%+ to identify
+elements of {\tt x} that have value 0 when divided by 2 (i.e. the even numbers)
+and then create a new character vector with the labels ``even'' and ``odd'':
+<<>>=
+x %% 2
+ifelse(x %% 2 == 0,"even","odd")
+@
+
+Now try the following:
+\begin{enumerate}[resume]
+\item Display elements that are less than 10, but greater than 4
+\item Modify the vector x, replacing by 10 all values that are greater than 10
+\item Modify the vector x, multiplying by 2 all elements that are smaller than 5 (Remember you can do this in steps).
+\end{enumerate}
+
+\subsection{Lists}
+
+Collections of components of different types are called {\em lists},
+and are created with the {\tt list()} function. Thus
+<<>>=
+m <- list(4, TRUE, "name of company")
+m
+@ 
+creates a list with 3 components: the first is numeric, the second
+is logical and the third is character. A list element can be any
+object, including another list. This flexibility means that functions
+that need to return a lot of complex information, such as statistical
+modelling functions, often return a list.
+
+As with vectors, single square brackets are used to take a subset of a
+list, but the result will always be another list, even if you select
+only one element
+<<>>=
+m[1:2] #A list containing first two elements of m
+m[3]   #A list containing the third element of m 
+@ 
+If you just want to extract a single element of a list then you must use
+double square braces:
+<<>>=
+m[[3]] #Extract third element
+@ 
+
+Lists are more useful when their elements are named. You can name an element
+by using the syntax {\tt name=value} in the call to the {\tt list} function:
+<<>>=
+mylist <- list(name=c("Joe","Ann","Jack","Tom"),
+               age=c(34,50,27,42))
+mylist
+@ 
+This creates a new list with the elements ``name'', a character
+vector of names, and ``age'' a numeric vector of ages. The components
+of the list can be extracted with a dollar sign \verb+$+
+<<>>=
+mylist$name
+mylist$age
+@ 
+
+\subsection{Data frames}
+
+Data frames are a special structure used when we want to store several vectors of the
+same length, and corresponding elements of each vector refer to the same record.
+For example, here we create a simple data frame containing the names of some individuals
+along with their age in years, their sex (coded 1 or 2) and their height in cm.
+<<>>=
+mydata <- data.frame(name=c("Joe","Ann","Jack","Tom"),
+                     age=c(34,50,27,42),sex=c(1,2,1,1),
+                     height=c(185,170,175,182))
+@ 
+The construction of a data frame is just like a named list (except
+that we use the constructor function {\tt data.frame} instead of {\tt
+  list}). In fact data frames are lists so, for example, you can
+extract vectors using the dollar sign or other extraction methods for
+lists:
+<<>>=
+mydata$height
+mydata[[4]]
+@ 
+On the other hand, data frames are also two dimensional objects:
+<<results=verbatim>>=
+mydata
+@ 
+When you print a data frame, each variable appears in a separate
+column.  You can use square brackets with two comma-separated
+arguments to take subsets of rows or columns.
+<<>>=
+mydata[1,] 
+mydata[,c("age", "height")] 
+mydata[2,4]
+@ 
+We will look into indexing of data frames in more detail below.
+
+Now let's create another data frame with more individuals than the
+first one:
+<<>>=
+yourdata <- data.frame(name=c("Ann","Peter","Sue","Jack","Tom","Joe","Jane"),
+                       weight=c(67,81,56,90,72,79,69))
+@
+This new data frame contains the weights of the individuals. The two
+data sets can be joined together with the {\tt merge} function.
+<<>>=
+newdata <- merge(mydata, yourdata)
+newdata
+@ 
+The {\tt merge} function uses the variables common to both data
+frames -- in this case the variable ``name'' -- to uniquely identify
+each row.  By default, only rows that are in both data frames are
+preserved, the rest are discarded.  In the above example, the records
+for Peter, Sue, and Jane, which are not in {\tt mydata} are
+discarded. If you want to keep them, use the optional argument {\tt
+  all=TRUE}.
+<<>>=
+newdata <- merge(mydata, yourdata, all=TRUE)
+newdata
+@ 
+This keeps a row for all individuals but since Peter, Sue and Jane
+have no recorded age, height, or sex these are missing values.
+
+\subsection{Working with built-in data frames}
+
+We shall use the births data which concern 500 mothers who had
+singleton births (i.e. no twins) in a large London hospital. The
+outcome of interest is the birth weight of the baby, also dichotomised
+as normal or low birth weight. These data are available in the Epi
+package:
+<<Looking at births data>>=
+library(Epi)
+data(births)
+objects()
+@
+The function \texttt{objects()} shows what is in your workspace. To
+find out a bit more about \texttt{births} try
+\begin{Schunk}
+\begin{Sinput}
+help(births)
+\end{Sinput}
+\end{Schunk}
+%\begin{exercise}
+\begin{enumerate}[resume]
+\item The dataframe \texttt{"diet"} in the Epi package contains data from a follow-up study with
+  coronary heart disease as the end-point.  Load these data with
+<<>>=
+data(diet)
+@
+and print the contents of the data frame to the screen..
+\item Check that you now have two objects, {\tt births}, and {\tt
+  diet} in your workspace.
+\item Get help on the object {\tt diet}.
+\item Remove the object {\tt diet} with the command
+<<>>=
+remove(diet)
+@
+Check that the object {\tt diet} is no longer in your workspace.
+\end{enumerate}
+%\end{exercise}
+
+\subsection{Referencing parts of the data frame (indexing)}
+Typing
+\texttt{births}
+will list the entire data frame -- not usually very helpful. You can
+use the {\tt head} function to see just the first few rows of a data frame
+<<>>=
+head(births)
+@ 
+Now try
+<<>>=
+births[1,"bweight"]
+@
+This will list the value taken by the first subject for the {\tt bweight}
+variable. Alternatively
+<<>>=
+births[1,2]
+@
+will list the value taken by the first subject for the second
+variable (which is {\tt bweight}). Similarly
+<<>>=
+births[2,"bweight"]
+@
+will list the value taken by the second subject for {\tt bweight}, and so on.
+To list the data for the first 10 subject for the {\tt bweight} variable, try
+<<>>=
+births[1:10, "bweight"]
+@
+and to list all the data for this variable, try
+<<>>=
+births[, "bweight"]
+@
+To list the data for the first subject try
+<<>>=
+births[1, ]
+@
+An empty index before the comma means ``all rows'' and an empty index after
+the comma means ``all columns''.
+
+%\begin{exercise}
+\begin{enumerate}[resume]
+\item Display the data on the variable {\tt gestwks} for row 7 in the {\tt births}
+  data frame.
+<<Display row 7 of gestwks,echo=F>>=
+births[7, "gestwks"]
+@
+\item Display all the data in row 7.
+<<Display all the data in row 7,echo=F>>=
+births[7,]
+@
+\item Display the first 10 rows for the variable {\tt gestwks}.
+<<Display first 10 rows of gestwks,echo=F>>=
+births[1:10, "gestwks"]
+@
+\end{enumerate}
+%\end{exercise}
+
+The \textsf{subset} function is another way of getting subsets from a
+data frame.To select all subjects with height less than 180 cm from the
+data frame {\tt mydata} we use
+<<>>=
+subset(mydata, height < 180)
+@
+The subset function is usually clearer than the equivalent code using
+\textsf{[]}:
+<<>>=
+mydata[mydata$height < 180, ]
+@
+Another advantage of subset is that it will drop observations with
+missing values.  Compare the following
+<<>>=
+newdata[newdata$height < 180, ]
+subset(newdata, height < 180)
+@ 
+If \texttt{height} is missing then \texttt{subset} will drop that
+row. But \texttt{[]} will do something you might not expect. It will
+include the rows with missing \texttt{height}, but will replace every
+element in those rows with the missing value \texttt{NA}.
+
+\subsection{Summaries}
+A good way to start an analysis is to ask for a
+summary of the data by typing
+<<>>=
+summary(births)
+@
+This prints some summary statistics (minimum, lower quartile, mean, median,
+upper quartile, maximum). For variables with missing values, the number
+of {\tt NA}s is also printed.
+
+To see the names of the variables in the data frame try
+<<>>=
+names(births)
+@
+Variables in a data frame can be referred to by name, but to do so
+it is necessary also to specify the name of the data frame.  Thus
+\verb+births$hyp+ refers to the variable {\tt hyp} in the {\tt births}
+data frame, and typing \verb+births$hyp+ will print the data on this
+variable.  To summarize the variable {\tt hyp} try
+<<>>=
+summary(births$hyp)
+@
+%$
+Alternatively you can use
+<< >>=
+with(births, summary(hyp))
+@
+
+\subsection{Generating new variables}
+
+New variables can be produced using assignment together with the usual
+mathematical operations and functions. For example
+<<Create a new variable in the workspace >>=
+logbw <- log(births$bweight)
+@
+produces the variable {\tt logbw} in your workspace,  while
+<<Create a new variable in the data frame  >>=
+births$logbw <- log(births$bweight)
+@
+produces the variable {\tt logbw} in the {\tt births} data frame.
+
+You can also replace existing variables. For example {\tt bweight} measures
+birth weight in grams. To convert the units to kilograms we replace the
+original variable with a new one:
+<<>>=
+births$bweight <- births$bweight/1000
+@ 
+
+\subsection{Turning a variable into a factor}
+
+In R categorical variables are known as {\em factors}, and the
+different categories are called the {\em levels} of the factor.
+Variables such as {\tt hyp} and {\tt sex} are originally coded using
+integer codes, and by default R will interpret these codes as numeric
+values taken by the variables. Factors will become very important
+later in the course when we study modelling functions, where
+factors and numeric variables are treated very differently. For the moment,
+you can think of factors as ``value labels'' that are more informative
+than numeric codes.
+
+For R to recognize that the codes refer to categories it is necessary
+to convert the variables to be factors, and to label the levels. To
+convert the variable {\tt hyp} to be a factor, try
+<<Convert hyp to be a factor >>=
+births$hyp <- factor(births$hyp, labels=c("normal", "hyper"))
+@
+This takes the original numeric codes (0, 1) and replaces them with 
+informative labels ``normal'' and ``hyper'' for normal blood pressure
+and hypertension, respectively. 
+
+%\begin{exercise}
+\begin{enumerate}[resume]
+\item Convert the variable {\tt sex} into a factor
+with labels \texttt{"M"} and \texttt{"F"} for values 1 and 2, respectively
+<<:abel levels of sex,echo=F>>=
+births$sex<-factor(births$sex, labels = c("M", "F"))
+@
+
+\end{enumerate}
+%\end{exercise}
+
+\subsection{Frequency tables}
+When starting to look at any new data frame the first step is to check
+that the values of the variables make sense and correspond to the
+codes defined in the coding schedule. For categorical variables
+(factors) this can be done by looking at one-way frequency tables and
+checking that only the specified codes (levels) occur.  The most
+useful function for making simple frequency tables is {\tt table}.
+The distribution of the factor {\tt hyp} can be viewed using
+<<Distribution of hyp >>=
+with(births, table(hyp))
+@
+or by specifying the data frame as in
+<<Distribution of hyp >>=
+table(births$hyp)
+@
+For simple expressions the choice is a matter of taste, but {\tt with}
+is shorter for more complicated expressions.
+
+%\begin{exercise}
+\begin{enumerate}[resume]
+\item Find the frequency distribution of {\tt sex}.
+<<Distribution of sex,echo=F>>=
+table(births$sex)
+with(births, table(sex))
+@
+\item If you give two or more arguments to the {\tt table} function
+  then it produces cross-tabulations.  Find the two-way frequency
+  distribution of {\tt sex} and {\tt hyp}.
+<<Joint distribution of sex and hyp,echo=F>>=
+with(births, table(sex, hyp))
+@
+\item Create a logical variable called {\tt early}
+according to whether {\tt gestwks} is less than 30 or not. Make a frequency table of {\tt early}.
+<<Create logical variable early,echo=F >>=
+early<-births$gestwks<30
+table(early)
+@ 
+\end{enumerate}
+%\end{exercise}
+
+\subsection{Grouping the values of a numeric variable}
+
+For a numeric variable like {\tt matage} it is often useful
+to  group the values and to create a new factor which codes the groups.
+For example we might cut the values taken by {\tt matage} into  the
+groups 20--29, 30--34, 35--39, 40--44, and then create a factor called
+{\tt agegrp} with 4 levels corresponding to the four groups. The best way of doing this is
+with the function {\tt cut}. Try
+<<Cut matage into four groups >>=
+births$agegrp  <- cut(births$matage, breaks=c(20,30,35,40,45), right=FALSE)
+with(births, table(agegrp))
+@
+By default the factor levels are labelled \verb+[20-25)+,
+\verb+[25-30)+, etc., where \verb+[20-25)+ refers to the interval
+which includes the left hand end (20) but not the right hand end
+(25). This is the reason for {\tt right=FALSE}. When {\tt right=TRUE}
+(which is the default) the intervals include the right hand end but
+not the left hand.
+
+Observations which are not inside the range specified by the {\tt
+breaks} argument result in missing values for the new factor. Hence it
+is important that the first element in {\tt breaks} is smaller than the
+smallest value in your data, and the last element is larger than the
+largest value.
+
+%\begin{exercise}
+\begin{enumerate}[resume]
+\item Summarize the numeric variable {\tt gestwks}, which records the
+  length of gestation for the baby, and make a note of the range of
+  values.
+<<Summarize gestwks, echo=F >>=
+with(births, summary(gestwks))
+@
+\item Create a new factor {\tt gest4} which cuts {\tt gestwks} at 20,
+  35, 37, 39, and  45 weeks, including the left hand end, but not the
+  right hand. Make a table of the frequencies for the four levels of \texttt{gest4}.
+<<Cut gestwks,echo=F >>=
+births$gest4 <- cut(births$gestwks, breaks=c(20,35,37,39,45))
+@
+\end{enumerate}
+%\end{exercise}
+
+
+\subsection{Saving and loading data}
+
+As noted in section \ref{subsection:workingdir}, at the end of the
+session, R will offer to save your workspace and, if you accept, it
+will create a file {\tt .RData} in your working directory. In fact you
+can save any R object to disc. For example, to save the data frame
+{\tt births} try
+<< Saving births>>=
+save(births, file="births.RData")
+@
+which will save the births data frame in the file \textsf{births.RData}. 
+If you send this file to a colleague then they can read the data back
+into R with
+<<Loading births2 >>=
+load("births.RData")
+@
+The commands {\tt save()} and {\tt load()} can be used with any R
+objects, but they are particularly useful when dealing with large data
+frames. The binary format created by the {\tt save()} functions is the
+same across all platforms and between R versions.
+
+\subsection{The search path}
+
+When you load a package with the {\tt library()} function, the
+functions in that package become available for you to use via a
+mechanism called the {\em search path}.  The command
+<<>>=
+search()
+@ 
+shows the positions on the search path. The first position is
+``.GlobalEnv''. This is the global environment, which is another name
+for your workspace.  The second entry on the search path is the Epi
+package, the third is a package of commands called methods, the fourth
+is a package called stats, and so on.  To see what is in the workspace try
+<<>>=
+objects()
+@ 
+You should see the objects that you have created in this session.  To see what
+is in the Epi package, try
+<<>>=
+objects(2)
+@
+You can also refer to a package by name, not position
+<<>>=
+objects("package:Epi")
+@ 
+When you type the name of an object R looks for it in the order of the
+search path and will return the first object with this name that it
+finds. 
+
+\subsection{Attaching a data frame}
+
+The search path can also be modified by attaching a data frame. For
+example:
+<<>>=
+attach(births)
+@
+This places a copy of the variables in the {\tt births} data frame in
+position 2 of the search path. You can verify this with
+<<>>=
+search()
+objects(2)
+@
+which shows the objects in this position are the variables from the
+{\tt births} data frame.
+
+Attaching a data frame makes the variables in it directly accessible.
+For example, when you type the command:
+<<>>=
+hyp
+@ 
+you should get the variable {\tt hyp} from the {\tt births} data set
+without having to use the dollar sign. The {\tt detach()} function
+removes the data frame from the search path.
+<<>>=
+detach()
+@ 
+when no arguments are given, the {\tt detach()} function removes the
+second entry on the search path (after the global environment).
+
+This seems like an attractive feature, especially for people who are
+used to other statistical software (e.g. SAS, Stata) in which the
+variables in the ``current working dataset'' are directly accessible in
+this way. However, attaching data frames causes more problems than it
+solves and should be avoided. In particular:
+
+\begin{itemize}
+\item Since the attached data frame appears second in the search path,
+  it comes after the global environment. If you have an object {\tt
+    hyp} in the global environment then you will get this, instead of
+  the variable from the {\tt births} data frame. This is called {\em
+    masking}. R will warn you about masking, but only once for each
+  variable.
+\item Attaching a data frame creates a copy of all the variables in it.
+  Subsequent changes to the data frame (e.g. selecting rows or recoding
+  variables) are not reflected in the attached copy, which is a 
+  snapshot of the data frame when it was attached.
+\item If you forget to {\tt detach()} the data frame when you are
+  finished with it, then you may create multiple attached copies on your
+  search path, especially when using a script.
+\end{itemize}
+
+It is best to stick to using the dollar sign to select variables in a
+data frame, or to use the {\tt with()} function. Many R functions (but
+not all of them) have a {\tt data} argument which can be used to
+specify a data frame that should be searched before the search path.
+
+\subsection{Interactive use vs scripting}
+
+You can work with R simply by typing function calls at the command
+prompt and reading the results as they are printed.  This is OK for
+simple use but rapidly becomes cumbersome.  If the results of one
+calculation are used to feed into the next calculation, it can be
+difficult to go back if you find you have made a mistake, or if you
+want to repeat the same commands with different data. 
+
+When working with R it is best to use a text editor to prepare a batch
+file (or script) which contains R commands and then to run them from
+the script. If you are using a GUI then you can use the built-in
+script editor, or you can use your favourite text editor instead if
+you prefer.
+
+One major advantage of running all your R commands from a script is
+that you end up with a record of exactly what you did which can be
+repeated at any time. This will also help you redo the analysis in the
+(highly likely) event that your data changes before you have finished
+all analyses.

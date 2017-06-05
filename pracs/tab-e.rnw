@@ -1,0 +1,196 @@
+\SweaveOpts{results=hide}
+
+\section{Tabulation}
+\subsection{Introduction}
+
+\textsf{R} and its add-on packages provide several different
+tabulation functions with different capabilities.  The appropriate function
+to use depends on your goal. There are at least three different uses for
+tables.
+
+The first use is to create simple summary statistics that will be used
+for further calculations in \textsf{R}. For example,
+a two-by-two table created by the {\tt table} function can be passed
+to {\tt fisher.test}, which will calculate odds ratios and confidence
+intervals.  The appearance of these tables may, however, be quite basic,
+as their principal goal is to create new objects for future calculations.
+
+A quite different use of tabulation is to make ``production quality''
+tables for publication.  You may want to generate reports from for
+publication in paper form, or on the World Wide Web.  The package
+{\tt xtable} provides this capability, but it is not covered by this course.
+
+An intermediate use of tabulation functions is to create human-readable
+tables for discussion within your work-group, but not for publication. The
+{\tt Epi} package provides a function {\tt stat.table} for this purpose,
+and this practical is designed to introduce this function.
+
+\subsection{The births data}
+
+We shall use the births data which concern 500 mothers who had
+singleton births in a large London hospital. The outcome of interest
+is the birth weight of the baby, also dichotomised as normal or low
+birth weight. These data are available in the Epi package:
+<<Looking at births data>>=
+library(Epi)
+data(births)
+help(births)  
+names(births) 
+head(births)  
+@ %
+In order to work with this data set we need to transform some of the variables
+into factors. This is done with the following commands:
+<<>>=
+births$hyp <- factor(births$hyp,labels=c("normal","hyper"))
+births$sex <- factor(births$sex,labels=c("M","F"))
+births$agegrp <- cut(births$matage,breaks=c(20,25,30,35,40,45),right=FALSE)
+births$gest4 <- cut(births$gestwks,breaks=c(20,35,37,39,45),right=FALSE)
+@
+Now use {\tt str(births)} to examine the modified data frame. We have
+transformed the binary variables {\tt hyp} and {\tt sex} into factors
+with informative labels. This will help when displaying the tables. We
+have also created grouped variables {\tt agegrp} and {\tt gest4} from
+the continuous variables {\tt matage} and {\tt gestwks} so that they
+can be tabulated.
+
+\subsection{One-way tables}
+
+The simplest table one-way table is created by
+<<sex1>>=
+stat.table(index = sex, data = births)
+@
+This creates a count of individuals, classified by levels of the
+factor {\tt sex}.  Compare this table with the equivalent one produced
+by the {\tt table} function.  Note that {\tt stat.table} has a 
+{\tt data} argument that allows you to use variables in a data frame without
+specifying the frame.
+
+You can display several summary statistics in the same table by
+giving a list of expressions to the {\tt contents} argument:
+<<sex2>>=
+stat.table(index = sex, contents = list(count(), percent(sex)), data=births)
+@
+Only a limited set of expressions are allowed: see the help page
+for {\tt stat.table} for details.
+
+You can also calculate marginal tables by specifying {\tt margin=TRUE}
+in your call to {\tt stat.table}.  Do this for the above table. Check
+that the percentages add up to 100 and the total for {\tt count()} is the
+same as the number of rows of the data frame {\tt births}.
+<<sex3, echo=F>>=
+stat.table(index = sex, contents = list(count(), percent(sex)),
+  margin=TRUE, data=births)
+@ %
+To see how the mean birth weight changes with {\tt sex}, try
+<<bwsex1>>=
+stat.table(index = sex, contents = mean(bweight), data=births)
+@
+
+Add the count to this table. Add also the margin with {\tt margin=TRUE}. 
+<<bwsex2, echo=F>>=
+stat.table(index = sex, contents = list(count(), mean(bweight)), 
+   margin=T, data=births)
+@ %
+As an alternative to {\tt bweight} we can look at {\tt lowbw} with
+<<lowbwsex1>>=
+stat.table(index = sex, contents = percent(lowbw), data=births)
+@
+All the percentages are 100! To use the {\tt percent} function the variable {\tt lowbw} must also be in the index, as in
+<<lowbwsex2>>=
+stat.table(index = list(sex,lowbw), contents = percent(lowbw), data=births)
+@
+The final column is the percentage of babies with low birth weight by different categories of gestation.
+
+\begin{enumerate}
+\item Obtain a table showing the frequency distribution of {\tt gest4}.
+\item Show how the mean birth weight changes with {\tt gest4}.
+\item Show how the percentage of low birth weight babies changes with {\tt gest4}.
+\end{enumerate}
+<< exercise on tables, echo=F>>=
+stat.table(index = gest4, contents = count(), data=births)
+stat.table(index = gest4, contents = mean(bweight), data=births)
+stat.table(index = list(lowbw,gest4), contents = percent(lowbw), data=births)
+@
+
+Another way of obtaining the percentage of low birth weight babies by
+gestation is to use the ratio function:
+<<ratio>>=
+stat.table(gest4,ratio(lowbw,1,100),data=births)
+@ %
+This only works because {\tt lowbw} is coded 0/1, with 1 for low birth
+weight.
+
+Tables of odds can be produced in the same way by using {\tt
+  ratio(lowbw, 1-lowbw)}. The {\tt ratio} function is also very useful
+for making tables of rates with (say) {\tt ratio(D,Y,1000)} where {\tt
+  D} is the number of failures, and {\tt Y} is the follow-up time. We
+shall return to rates in a later practical.
+
+\subsection{Improving the Presentation of Tables}
+
+The {\tt stat.table} function provides default column headings based
+on the {\tt contents} argument, but these are not always very informative.
+Supply your own column headings using {\em tagged} lists as the
+value of the {\tt contents} argument, within a {\tt stat.table} call:
+<<tagged>>=
+stat.table(gest4,contents = list( N=count(), 
+     "(%)" = percent(gest4)),data=births)
+@
+This improves the readability of the table.  It remains to give an
+informative title to the index variable. You can do this in the same way:
+instead of giving {\tt gest4} as the {\tt index} argument to {\tt stat.table},
+use a named list:
+<<named>>=
+stat.table(index = list("Gestation time" = gest4),data=births)
+@
+
+\subsection{Two-way Tables}
+
+The following call gives a $2\times 2$ table showing the mean birth weight
+cross-classified by {\tt sex} and {\tt hyp}.
+<<twoway>>=
+stat.table(list(sex,hyp), contents=mean(bweight), data=births)
+@
+Add the count to this table and repeat the function call using {\tt margin = TRUE} to calculate the
+marginal tables.
+<<twoway2, echo=F>>=
+stat.table(list(sex,hyp), contents=list(count(), mean(bweight)),
+   margin=T, data=births)
+@ %
+Use {\tt stat.table} with the ratio function to obtain a $2\times 2$ table of percent low birth weight by {\tt sex} and {\tt hyp}.
+<< two way tables exc, echo=F>>= 
+stat.table(list(sex,hyp), contents=list(count(),mean(bweight)),margin=T, data=births)
+stat.table(list(sex,hyp), contents=list(count(),ratio(lowbw,1,100)),margin=T, data=births)
+@ %
+You can have fine-grained control over which margins to calculate by
+giving a logical vector to the {\tt margin} argument.  Use {\tt
+margin=c(FALSE, TRUE)} to calculate margins over {\tt sex} but not
+{\tt hyp}. This might not be what you expect, but the {\tt margin}
+argument indicates which of the index variables are to be {\bf marginalized
+out}, not which index variables are to remain.
+
+\subsection{Printing}
+
+Just like every other {\textsf R} function, {\tt stat.table} produces
+an object that can be saved and printed later, or used for further
+calculation.  You can control the appearance of a table with an explicit
+call to {\tt print()}
+
+There are two arguments to the print method for {\tt stat.table}. The
+{\tt width} argument which specifies the minimum column width, and the
+{\tt digits} argument which controls
+the number of digits printed after the decimal point. This table
+<<printing1>>=
+odds.tab <- stat.table(gest4, list("odds of low bw" = ratio(lowbw,1-lowbw)), 
+              data=births)
+print(odds.tab)
+@
+shows a table of odds that the baby has low birth weight. Use
+{\tt width=15} and {\tt digits=3} and see the difference.
+<< printing2, echo=F>>=
+print(odds.tab, width=15, digits=3)
+@
+
+
+
+

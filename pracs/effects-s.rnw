@@ -1,0 +1,580 @@
+\SweaveOpts{results=verbatim}
+
+
+\section{Estimation of effects: simple and more complex}
+
+This exercise deals with analysis of metric or continuous % and binary 
+response variables. 
+We start with simple estimation of effects of a binary, categorical or
+a numeric explanatory variable, the exposure variable of interest. 
+Then evaluation of potential  modification confounding and/or by other variables
+is considered by stratification by and adjustment or control for these variables.
+Use of function \texttt{effx()} for such tasks is introduced together
+with functions \texttt{lm()} and \texttt{glm()} that can be used for more
+general linear and generalized linear models.  Finally, more complex polynomial
+ models for the effect of a numeric exposure variable are
+illustrated.
+
+% The lecture on Saturday, 18 June, afternoon will tell more about 
+% linear regression models and their extensions to generalized linear and additive models,
+% and how these models are fitted and fitting results extracted and displayed with the tools of R.
+
+
+\subsection{Response and explanatory variables}
+
+
+Identifying the \textit{response} or \textit{outcome variable} correctly is the key
+to analysis. The main types are:
+\begin{itemize}
+\item Metric (a measurement taking many values, usually with units)
+\item Binary (two values coded 1/0)
+\item Failure (does the subject fail at end of follow-up, coded 1/0, and how long was follow-up, measurement of time)
+\item Count (aggregated data on failures in a group)
+\end{itemize}
+All these response variable are numeric.
+
+Variables on which the response may depend are called \textit{explanatory
+variables}. They can be categorical factors or numeric variables.
+A further important aspect of explanatory variables is the role they will play in the analysis.
+
+\begin{itemize}
+\item Primary role: exposure.
+\item Secondary role: confounder and/or modifier.
+\end{itemize}
+
+
+The word \textit{effect} is a general term referring to ways of
+comparing the values of the response variable at
+different levels of an explanatory 
+variable. The main measures of effect are:
+\begin{itemize}
+\item Differences in means for a metric response.
+\item Ratios of odds for a binary response.
+\item Ratios of rates for a failure or count response.
+\end{itemize}
+
+Other measures of effect include ratios of geometric means for positive-valued metric outcomes, differences and ratios between proportions 
+(risk difference and risk ratio), and differences between failure rates.
+
+\subsection{Data set \texttt{births} }
+
+We shall use the \texttt{births} data to illustrate 
+different aspects in estimating effects of various exposures on a metric response variable
+\texttt{bweight} = birth weight, recorded in grams.
+% To save too much typing these commands are in the
+% leaning on the same housekeeping file \texttt{births-house.r} as in the tabulation exercise. 
+% which can be run with the command \texttt{source("./data/births-house.r")} (or from your editor)
+\begin{enumerate}
+\item
+Load the {\tt Epi} package and the data set and look at its content
+<<Run births-house>>=
+library(Epi)
+data(births)
+str(births)
+@
+\item
+Because all variables are numeric we need first to do a little housekeeping. 
+Two of them are directly converted into factors,
+and categorical versions are created of two continuous variables by function {\tt cut()}.
+%% Also, express birth weights in kilograms
+<<>>=
+births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
+births$sex <- factor(births$sex, labels = c("M", "F"))
+births$agegrp <- cut(births$matage, 
+    breaks = c(20, 25, 30, 35, 40, 45), right = FALSE)
+births$gest4 <- cut(births$gestwks, 
+    breaks = c(20, 35, 37, 39, 45), right = FALSE)
+@
+\item
+Have a look at univariate summaries of the different variables in the data; especially
+the location and dispersion of the distribution of  \texttt{bweight}.
+<<summary>>=
+summary(births)
+with(births, sd(bweight) )
+@
+\end{enumerate}
+
+\subsection{Simple estimation with  \texttt{effx()}, \texttt{lm()} and \texttt{glm()} }
+
+We are ready to analyze the ``effect'' of \texttt{sex} on \texttt{bweight}.
+A binary exposure variable, like \texttt{sex}, leads to an elementary
+ two-group comparison of group
+means for a metric response. 
+\begin{enumerate}[resume]
+\item
+Comparison of two groups is commonly done by the conventional $t$-test and
+the associated confidence interval. 
+<<t test for sex on bweight>>=
+with( births, t.test(bweight ~ sex, var.equal=T) )
+@
+The $P$-value refers to the test
+of the  null hypothesis that there is no effect of \texttt{sex} on birth weight
+ (quite an uninteresting null hypothesis in itself!). However, \texttt{t.test()} does not provide
+the point estimate for the effect of sex; only the test result and a confidence interval.
+\item
+The function \texttt{effx()} in \texttt{Epi}
+is intended to introduce the estimation of effects in epidemiology, together with the related ideas of stratification and controlling, i.e. adjustment for confounding, 
+without the need for familiarity with statistical modelling.
+It is in fact a wrapper of function {\tt glm()} that fits generalized linear models.
+-- Now, do the same analysis with \texttt{effx()}
+<<Effects of sex on bweight>>=
+effx(response=bweight, type="metric", exposure=sex, data=births)
+@
+The estimated effect of sex on birth weight, measured as a difference in means between girls and boys, 
+is $-197$ g.
+Either the output from \texttt{t.test()} above or the command
+<<Table of mean birth weight by sex>>=
+stat.table(sex, mean(bweight), data=births)
+@
+confirms this ($3032.8-3229.9=-197.1$). 
+\item
+The same task can easily be performed by {\tt lm()} or by {\tt glm()}. The main argument in both 
+is the {\it model formula}, the left hand side being the response variable and the right hand side
+after $\sim$ defines the explanatory variables and their joint effects on the response. Here the only
+explanatory variable is the binary factor {\tt sex}. With {\tt glm()} one specifies the
+{\tt family}, i.e. the assumed distribution of the response variable, but in case you use
+{\tt lm()}, this argument is not needed, because {\tt lm()} fits only models for metric responses
+assuming Gaussian distribution.
+<<lm of bweight by sex>>=
+m1 <- glm(bweight ~ sex, family=gaussian, data=births)
+summary(m1)
+@
+ Note the amount of output that {\tt summary()} method produces.
+The point estimate plus confidence limits can, though, be concisely obtained by {\tt ci.lin()}. 
+<<ci.lin of bweight by sex>>=
+round( ci.lin(m1)[ , c(1,5,6)] , 1)
+@
+\item
+Now, use \texttt{effx()} to find the effect of \texttt{hyp} (maternal hypertension)
+ on \texttt{bweight}.
+<<Effects of hyp on bweight, echo=F>>=
+effx(response=bweight, type="metric", exposure=hyp, data=births)
+@
+\end{enumerate}
+
+\subsection{Factors on more than two levels}
+
+The variable \texttt{gest4} became as the result of cutting \texttt{gestwks}
+ into 4 groups with left-closed and right-open boundaries  [20,35) [35,37) [37,39) [39,45).
+\begin{enumerate}[resume]
+\item
+We shall find the effects of \texttt{gest4} on the metric response \texttt{bweight}.
+<<Effects of gest4 (four levels) on bweight >>=
+effx(response=bweight,typ="metric",exposure=gest4,data=births)
+@
+There are now 3 effect estimates:
+\begin{verbatim}
+[35,37) vs [20,35)  857
+[37,39) vs [20,35) 1360
+[39,45) vs [20,35) 1668
+\end{verbatim}
+The command
+<<Table of mean bweight by gest4 >>=
+stat.table(gest4,mean(bweight),data=births)
+@
+confirms that the effect of \texttt{agegrp} (level~2 vs level~1) is $2590-1733=857$, etc.
+\item
+Compute these estimates by {\tt lm()} and find out how the coefficients are related to the group means
+<<lm of gest4 on bweight>>=
+m2 <- lm(bweight ~ gest4, data = births)
+round( ci.lin(m2)[ , c(1,5,6)] , 1)
+@
+\end{enumerate}
+
+\subsection{Stratified effects and interaction or effect modification}
+
+We shall now examine whether and to what extent the effect 
+ of \texttt{hyp} on \texttt{bweight} varies by \texttt{gest4}. 
+\begin{enumerate}[resume]
+\item
+The following ``interaction plot''
+shows how the mean {\tt bweight} depends jointly on {\tt hyp} and {\tt gest4}
+<<bweight-by-hyp-gest4, fig = T>>=
+par(mfrow=c(1,1))
+with( births, interaction.plot(gest4, hyp, bweight) )
+@
+It appears that the mean difference in {\tt bweight} between normotensive and hypertensive 
+mothers is inversely related to gestational age.
+\item
+Let us get numerical values for the mean differences
+in the different {\tt gest4} categories:
+<<Effect of hyp on bweight stratified by gest4 >>=
+effx(bweight, type="metric", exposure=hyp, strata=sex,data=births)
+@
+The estimated effects of \texttt{hyp} in the different strata defined by \texttt{gest4} thus
+range from about $-100$ g among those with $\geq 39$ weeks of gestation to about $-700$ g among those
+with $< 35$ weeks of gestation. The error margin especially 
+around the latter estimate is quite wide, though.
+The $P$-value 0.055  from the test for \textit{effect modification} indicates weak evidence 
+against the null hypothesis of ``no interaction between {\tt hyp} and {\tt gest4}''.
+On the other hand, this test may well be not very sensitive given
+ the small number of preterm babies in these data. 
+\item
+Stratified estimation of effects can also be done by {\tt lm()},
+ and you should get the same results:
+<<lm for hyp on bweight stratified by gest4 >>=
+m3 <- lm(bweight ~ gest4/hyp, data = births)
+round( ci.lin(m3)[ , c(1,5,6)], 1) 
+@
+\item
+An equivalent model with an explicit {\it interaction term} between {\tt gest4} and {\tt hyp} is
+fitted as follows
+<<lmI for hyp on bweight stratified by gest4 >>=
+m3I <- lm(bweight ~ gest4 + hyp + gest4:hyp, data = births)
+round( ci.lin(m3I)[ , c(1,5,6)], 1) 
+@
+From this  output you would find a familiar estimate $-673$ g for those $< 35$ gestational weeks. 
+The remaining coefficients are estimates of the interaction effects such that e.g. $515 = -158 - (-673)$ g 
+describes the contrast in the effect of {\tt hyp} on {\tt bweight}
+ between those 35 to $< 37$ weeks and those $< 35$ weeks of gestation.
+\item
+Perhaps a more appropriate reference level for the categorized gestational age would be the highest one.
+Changing the reference level, here to be the 4th category,
+ can be done by {\tt Relevel()} function in the {\tt Epi} package,
+after which an equivalent interaction model is fitted, now using a shorter
+expression for it in the model formula:
+<<lmIb for hyp on bweight stratified by gest4b >>=
+births$gest4b <- Relevel( births$gest4, ref = 4)
+m3Ib <- lm(bweight ~ gest4b*hyp, data = births)
+round( ci.lin(m3Ib)[ , c(1,5,6)], 1) 
+@
+Notice now the coefficient $-91.6$ for {\tt hyp}. It estimates the effect 
+of {\tt hyp} on {\tt bweight} among those with $\geq 39$ weeks of gestation.
+The estimate $-88.5$ g = $-180.1 -(-91.6)$ g describes the additional
+effect of {\tt hyp} in the category 37 to 38 weeks of gestation upon
+that in the reference class.
+\item
+At this stage it is interesting to compare the results from the interaction models to those from the corresponding  {\it main effects} model,
+in which the effect of {\tt hyp} is assumed not to be modified by {\tt gest4}:
+<<lmI for hyp on bweight stratified by gest4 >>=
+m3M <- lm(bweight ~ gest4 + hyp, data = births)
+round( ci.lin(m3M)[ , c(1,5,6)], 1) 
+@
+The estimate $-201$ g describing the overall effect of {\tt hyp} is obtained
+as a weighted average of the stratum-specific estimates obtained by {\tt effx()} above. 
+It is a meaningful estimate adjusting for {\tt gest4} insofar as it is reasonable to assume
+that the effect of {\tt hyp} is not modified by {\tt gest4}. This assumption or the
+``no interaction'' null hypothesis can formally be tested by a common deviance test.
+<<test for hyp-gest4 interaction on bweight>>=
+anova(m3I, m3M)
+@
+The $P$-value is practically the same as before when the interaction was tested in  {\tt effx()}.
+However, in spite of obtaining a ``non-significant'' result from this test, the possibility
+of a real interaction should not be ignored in this case.
+
+\item
+Now, use \texttt{effx()} to stratify (i) the effect of \texttt{hyp} on \texttt{bweight} by \texttt{sex}
+ and then (ii) perform the stratified analysis using the two ways of fitting an interaction model 
+with {\tt lm}.
+<<Effects of hyp on lowbw stratified by sex, echo=F>>=
+effx(bweight, type="metric", exposure=hyp, strata= sex, data=births)
+m4S <- lm(bweight ~ sex/hyp, data = births)
+round( ci.lin(m4S)[ , c(1,5,6)], 1) 
+m4I <- lm(bweight ~ sex + hyp + sex:hyp, data = births)
+round( ci.lin(m4I)[ , c(1,5,6)], 1) 
+@
+
+ Look at the results. Is there evidence for the effect of {\tt hyp} being modified by {\tt sex}?
+\end{enumerate}
+
+\subsection{Controlling or adjusting for the effect of hyp for sex}
+
+The effect of \texttt{hyp} is \textit{controlled for} -- or \textit{adjusted for} -- \texttt{sex}
+by first looking at the estimated effects of \texttt{hyp} in the two stata defined by \texttt{sex}, and then combining these effects if they seem sufficiently similar. In this case the estimated effects were $-496$ and $-380$ which look quite similar (and the $P$-value against ``no interaction'' was quite large, too),
+ so we can perhaps combine them, and control for \texttt{sex}.
+\begin{enumerate}[resume]
+\item
+The combining is done by declaring \texttt{sex} as a control variable:
+<<Effect of hyp on bweight controlled for sex >>=
+effx(bweight, type="metric", exposure=hyp, control=sex, data=births)
+@
+\item
+The same is done with {\tt lm()} as follows: 
+<<lm for hyp on bweight controlled for sex >>=
+m4 <- lm(bweight ~ sex + hyp, data = births)
+ci.lin(m4)[ , c(1,5,6)]  
+@
+The estimated effect of \texttt{hyp} on \texttt{bweight} controlled for \texttt{sex} is thus $-448$ g.
+There can be more than one control variable, e.g \texttt{control=list(sex,agegrp)}.
+
+Many people go straight ahead and control for variables which are likely to confound the effect of exposure without bothering to stratify first, but usually it is useful to stratify first.
+\end{enumerate}
+
+\subsection{Numeric exposures}
+
+If we wished to study the effect of gestation time on the baby's birth 
+weight then  \texttt{gestwks} is a numeric exposure. 
+\begin{enumerate}[resume]
+\item
+Assuming that the relationship 
+of the response with \texttt{gestwks} is roughly linear (for a metric response) 
+% or log-linear (for a binary or failure rate response) 
+we can estimate the linear effect of \texttt{gestwks}, both with {\tt effx()} and with {\tt lm()} as follows:
+<<Linear effect of gestwks on bweight >>=
+effx(response=bweight, type="metric", exposure=gestwks,data=births)
+m5 <- lm(bweight ~ gestwks, data=births) ; ci.lin(m5)[ , c(1,5,6)]
+@
+We have fitted a simple linear regression model and obtained estimates of the
+two regression coefficient: \texttt{intercept} and \texttt{slope}.
+The linear effect of \texttt{gestwks} is thus estimated by the
+slope coefficient, which is 197 g per each additional week of gestation.
+
+\begin{comment}
+The linear effect of \texttt{gestwks} on the log-odds of \texttt{lowbw} can be estimated similarly:
+<<Linear effect of gestwks on lowbw >>=
+effx(response=lowbw, type="binary", exposure=gestwks,data=births)
+@
+The linear effect of \texttt{gestwks} on the log-odds of \texttt{lowbw} is manifested as a reduction by a factor of 0.408 per extra week of gestation, i.e. the odds of a baby having a low birth weight is reduced by a factor of 0.408 per one week increase in gestation.
+\end{comment}
+\item
+You cannot stratify by a numeric variable, but you can study the effects of a 
+numeric exposure stratified by (say) \texttt{agegrp} with
+<<Linear effect of gestwks on bweight stratified by agegrp >>=
+effx(bweight, type="metric", exposure=gestwks, strata=agegrp, data=births)
+@
+You can control/adjust for a numeric variable by putting it in the control list.
+\end{enumerate}
+
+\subsection{Checking the assumptions of the linear model}
+
+At this stage it will be best to make some visual check concerning
+our model assumptions using \texttt{plot()}. In particular, when the main argument
+for the {\it generic function} {\tt plot()} is a fitted {\tt lm} object,
+it will provide you some common diagnostic graphs.
+\begin{enumerate}[resume]
+\item
+To check whether \texttt{bweight} goes up linearly with \texttt{gestwks} try
+<<Plot-bweight-by-gestwks, fig = T >>=
+with(births, plot(gestwks,bweight))
+abline(m5)
+@
+\item
+Moreover, take a look at the basic diagnostic plots for the fitted model.
+<<bweight-gestwks-m5-diag, fig= T>>=
+par(mfrow=c(2,2))
+plot(m5)
+@
+What can you say about the agreement with data of the assumptions of the 
+simple linear regression model, 
+like linearity of the systematic dependence, 
+homoskedasticity and normality of the error terms? 
+\end{enumerate}
+
+\subsection{Third degree polynomial of {\tt gestwks} }
+A common practice to assess possible deviations from linearity 
+is to compare the fit of the simple model with 
+models having higher order polynomial terms. In perinatal epidemiology
+a popular model for describing the relationship between gestational age and birth weight 
+is a 3rd degree polynomial. 
+\begin{enumerate}[resume]
+\item
+For fitting a third degree polynomial of {\tt gestwks} 
+we can update our previous simple linear model by adding
+the quadratic and cubic terms of {\tt gestwks} using the {\it insulate} operator {\tt I()}
+<<bweight-by-gestwks-cubic>>=
+m6 <- update(m5, . ~ .  + I(gestwks^2) + I(gestwks^3))
+round(ci.lin(m6)[, c(1,5,6)], 1)
+@
+The intercept and linear coefficients are really spectacular -- but don't make any sense! 
+\item
+A more elegant way of fitting polynomial models is to utilize \textit{orthogonal polynomials},
+which are linear transformations of the original polynomial terms such that they are
+mutually uncorrelated. However, they are 
+scaled in such a way that the estimated regression
+coefficients are also difficult to interpret, 
+apart from the intercept term. 
+\item
+As function \texttt{poly()} creating orthogonal  polynomials
+does not accepet missing values, we shall only include babies whose value of \texttt{gestwks} 
+is not missing. Let us also perform an $F$ test for the null hypothesis of simple linear effect
+against the 3rd degree polynomial model
+<<bweight-by-gestwks-cubic-ortog>>=
+births2 <- subset(births, !is.na(gestwks))
+m.ortpoly <- lm(bweight ~ poly(gestwks, 3), data= births2 )
+round(ci.lin(m.ortpoly)[, c(1,5,6)], 1)
+anova(m5, m.ortpoly)
+@
+Note that the estimated intercept 3138 g has the same value as the mean birth weight
+among all those babies who are included, i.e. whose gestational age was known.
+
+There seems to be strong evidence
+against simple linear regression; addition of 
+the quadratic and the cubic term appears to have reduced 
+the residual sum of squares ``highly significantly''.
+\item
+Irrespective of whether the polynomial terms were  orthogonalized or not, 
+the fitted or predicted values for the response variable remain the same. 
+As the next step we shall present graphically the fitted polynomial curve together with
+95 \% confidence limits for the expected responses as well as 95 \% 
+prediction intervals for individual observations in new data 
+comprising gestational weeks from 24 to 45 in steps of 0.25 weeks.
+<<bweight-by-gestwks-cubic-pred, fig=T>>=
+nd <- data.frame(gestwks = seq(24, 45, by = 0.25) ) 
+fit.poly <- predict( m.ortpoly, newdata=nd, interval="conf" )
+pred.poly <- predict( m.ortpoly, newdata=nd, interval="pred" )
+par(mfrow=c(1,1))
+with( births, plot( bweight ~ gestwks, xlim = c(23, 46), cex.axis= 1.5, cex.lab = 1.5 )  )
+matlines( nd$gestwks, fit.poly, lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
+matlines( nd$gestwks, pred.poly, lty=1, lwd=c(3,2,2), col=c('red','green','green') )
+@
+The fitted curve fits nicely within the range of
+ observed values of the regressor. However, the tail behaviour in polynomial models
+tends to be problematic.
+
+We shall continue the analysis in the next practical, in which the apparently curved effect
+of {\tt gestwks} is modelled by a {\it penalized spline}. Also,
+ key details in fitting linear regression models and spline models
+are covered in the lecture of this afternoon.
+\end{enumerate}
+
+\begin{comment}
+
+
+\subsection{Fitting a natural spline model}
+
+One approach for flexible modelling with more reasonable tail behaviour
+is based on splines. By the following piece of code you can fit
+a \textit{natural cubic spline} with 5 pre-specified knots determining the degree of smoothing. 
+<<bweight-gestwks-Ns5>>=
+library(splines)
+mNs5 <- lm( bweight ~ Ns( gestwks, 
+        knots = c(28,34,38,40,43)), data = births)
+round(ci.lin(mNs5)[ , c(1,5,6)], 1)
+@ 
+
+These regression coefficients are even less interpretable than those in the 
+polynomial model. However, graphical presentation of the fitted curve
+together with the confidence and prediction intervals is more informative:
+<<Ns5-pred, fig=T>>=		
+fit.Ns5 <- predict( mNs5, newdata=nd, interval="conf" )
+pred.Ns5 <- predict( mNs5, newdata=nd, interval="pred" )
+with( births, plot( bweight ~ gestwks, xlim = c(23, 46), cex.axis= 1.5, cex.lab = 1.5 )  )
+matlines( nd$gestwks, fit.Ns5, lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
+matlines( nd$gestwks, pred.Ns5, lty=1, lwd=c(3,2,2), col=c('red','green','green') )
+@
+
+Compare this with the 3rd order curve fitted above.
+In natural splines the curve is constrained to be linear beyond the extreme knots.
+
+Take a look at the basic diagnostic plots from the spline model.
+<<cubic-diag, fig=T>>=
+par(mfrow=c(2,2))
+plot(mNs5)
+@
+How would you interpret these plots?
+
+The choice of the number of knots and their locations can be quite arbitrary,
+and the results are often sensitive to these choices. 
+
+\medskip
+$\bullet$ To illustrate problems with specification of knots, fit 
+an analogous natural spline model as above but now with 10 knots
+at the following sequence of points: \texttt{seq(25, 43, by = 2)}, 
+and display graphically the results 
+<<bweigth-gestwks-Ns10, echo = F, fig=T>>=		 
+mNs10 <- lm( bweight ~ Ns( gestwks, 
+        knots = seq(25, 43, by = 2)), data = births)
+round(ci.lin(mNs10)[ , c(1,5,6)], 1)
+fit.Ns10 <- predict( mNs10, newdata=nd, interval="conf" )
+pred.Ns10 <- predict( mNs10, newdata=nd, interval="pred" )
+par(mfrow=c(1,1))
+with( births, plot( bweight ~ gestwks, xlim = c(23, 46), cex.axis= 1.5, cex.lab = 1.5 )  )
+matlines( nd$gestwks, fit.Ns10, lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
+matlines( nd$gestwks, pred.Ns10, lty=1, lwd=c(3,2,2), col=c('red','green','green') )
+@
+The behaviour of the curve is really wild for small values of \texttt{gestwks}!
+
+One way to go around the arbitrariness in the specification of knots is to fit
+a \textit{penalized spline} model, which imposes a ``roughness penalty'' on
+the curve. Even though a big number of knots are initially allowed, 
+the resulting fitted curve will be optimally smooth. 
+
+You cannot fit a penalized spline model with \texttt{lm()} or \texttt{glm()}, 
+Instead, function \texttt{gam()} in package \texttt{mgcv} can be used 
+for this purpose. You must first install
+R package \texttt{mgcv} into your computer. 
+When calling \texttt{gam()}, the model formula contains expression '\texttt{s(X)}'
+for any explanatory variable \texttt{X}, for which you wish to
+fit a smooth function
+<<bweight-gestwks-mPen>>= 
+library(mgcv)
+mPen <- gam( bweight ~ s(gestwks), data = births)		
+summary(mPen)	
+@
+From the output given by \texttt{summary()} you find that
+the estimated intercept is here, too,
+ equal to the overall mean birth weight in the data.
+The estimated residual variance is given by ``\texttt{Scale est.}''
+or from subobject \texttt{sig2} of the fitted \texttt{gam} object.
+Taking square root you will obtain the estimated residual standard
+deviation: 445.2 g.
+<<mPen-sig2>>=
+mPen$sig2
+sqrt(mPen$sig2)
+@
+The degrees of freedom in this model are not computed as simply as in previous
+models, and they typically are not integer-valued. However,
+the fitted spline seems to consume only a little more degrees of freedom
+as the 3rd degree polynomial above.
+
+As in previous models we shall plot the fitted curve together with
+95 \% confidence intervals for the mean responses and 
+95 \% prediction intervals for individual responses. Obtaining these
+quantities from the fitted \texttt{gam} object requires a bit more work than
+with \texttt{lm} objects
+<<bweight-gestwks-mPen-plot, fig = T>>=	
+pr.Pen <- predict( mPen, newdata=nd, se.fit=T)
+par(mfrow=c(1,1))
+with( births, plot( bweight ~ gestwks, xlim = c(24, 45), cex.axis= 1.5, cex.lab = 1.5 )  )
+matlines( nd$gestwks, cbind(pr.Pen$fit, 
+  pr.Pen$fit - 2*pr.Pen$se.fit, pr.Pen$fit + 2*pr.Pen$se.fit),  
+  lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
+matlines( nd$gestwks, cbind(pr.Pen$fit, 
+  pr.Pen$fit - 2*sqrt( pr.Pen$se.fit^2 + mPen$sig2), 
+  pr.Pen$fit + 2*sqrt( pr.Pen$se.fit^2 + mPen$sig2)),  
+  lty=1, lwd=c(3,2,2), col=c('red','green','green')  )
+@   
+
+\medskip
+
+\end{comment}
+
+\subsection{Extra (if you have time): Frequency data}
+
+Data from very large studies are often summarized in the form of frequency data, which records the frequency of all possible combinations of values of the variables in the study. Such data are sometimes presented in the form of a contingency table, sometimes as a data frame in which one variable is the frequency. As an example, consider the \texttt{UCBAdmissions} data, which is one of the standard R data sets, and refers to the outcome of applications to 6 departments in the graduate school at Berkeley by gender.
+\begin{enumerate}[resume]
+\item
+Let us have a look at the data
+<<Get the UCBAdmissions data >>=
+UCBAdmissions
+@
+You can see that the data are in the form of a $2\times 2\times 6$ contingency table for the three variables \texttt{Admit} (admitted/rejected), \texttt{Gender} (male/female), and \texttt{Dept} (A/B/C/D/E/F). Thus in department A 512 males were admitted while 312 were rejected, and so on.
+The question of interest is whether there is any bias against admitting female applicants.
+\item
+The next command coerces the contingency table to a data frame, and shows the first 10 lines.
+<<Convert the 2x2x6 contingency table to a data frame >>=
+ucb <- as.data.frame(UCBAdmissions)
+head(ucb)
+@
+ The relationship between the contingency table and the data frame should be clear. 
+\item
+Let us turn \texttt{Admit} into a numeric variable coded 1 for rejection, 0 for admission
+<<Convert Admit to numeric coded 0/1 >>=
+ucb$Admit <- as.numeric(ucb$Admit)-1
+@ 
+The effect of {\tt Gender} on {\tt Admit} is crudely estimated by
+<<Effect of Gender on Admit >>=
+effx(Admit,type="binary",exposure=Gender,weights=Freq,data=ucb)
+@
+The odds of rejection for female applicants thus appear to be 1.84 times 
+the odds for males (note the use of \texttt{weights} to take account of the frequencies). 
+A crude analysis therefore suggests there is a strong bias against admitting females. 
+\item
+Continue the analysis by stratifying the crude analysis by department - does this still support a bias against females? What is the effect of gender controlled for department?
+<<Effect of Gender stratified by Dept, echo=F>>=
+effx(Admit,type="binary",exposure=Gender,strata=Dept,weights=Freq,data=ucb)
+@
+<<Effect of Gender controlled for Dept, echo=F>>=
+effx(Admit,type="binary",exposure=Gender,control=Dept,weights=Freq,data=ucb)
+@
+\end{enumerate}

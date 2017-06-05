@@ -1,0 +1,54 @@
+
+\paragraph{A small aside on glm}
+
+Here is the same for a \texttt{glm} with explicit knots placed at
+quantiles of deaths:
+<<SMRg,fig=TRUE,width=10>>=
+( a.kn <- with( subset(SLr,lex.Xst=="Dead"), quantile( A+lex.dur, (1:5-0.5)/5 ) ) )
+( p.kn <- with( subset(SLr,lex.Xst=="Dead"), quantile( P+lex.dur, (1:2-0.5)/2 ) ) )
+( d.kn <- with( subset(SLr,lex.Xst=="Dead"), quantile( dur+lex.dur, (1:3-0.5)/3 ) ) )
+Msg <- glm( (lex.Xst=="Dead") ~ Ns(   A, knots=a.kn ) +
+                                Ns(   P, knots=p.kn ) +
+                                Ns( dur, knots=d.kn ),
+            offset = log( E ),
+            family = poisson,
+              data = subset( SLr, sex=="M" ) )
+Fsg <- update( Msg, data = subset( SLr, sex=="F" ) )
+mpg <- fpg <- NULL
+pts <- seq(0,15,0.1)
+for( ip in c(1995,2005) )
+for( ia in c(50,60,70) )
+   { 
+nd <- data.frame( A=ia+pts,
+                  P=ip+pts,
+                dur=   pts,
+                  E=1 )
+mpg <- cbind( mpg, ci.pred( Msg, nd ) )
+fpg <- cbind( fpg, ci.pred( Fsg, nd ) )
+   }
+par( mfrow=c(1,2) )
+matplot( cbind(50+pts,60+pts,70+pts)[,rep(1:3,2,each=3)],
+         cbind( mpg[,1:9], fpg[,1:9] ),
+         log="y", xlab="Age", ylab="SMR, diagnosed 1995",
+         type="l", lwd=c(4,1,1), lty=1, ylim=c(0.5,5),
+         col=rep(c("blue","red"),each=9) )
+matlines( cbind(50+pts,60+pts,70+pts)[,rep(1:3,2,each=3)],
+         cbind( mpr[,1:9], fpr[,1:9] ),
+         type="l", lwd=c(4,1,1), lty="21", lend="butt",
+         col=rep(c("blue","red"),each=9) )
+abline( h= 1)
+matplot( cbind(50+pts,60+pts,70+pts)[,rep(1:3,2,each=3)],
+         cbind( mpg[,1:9+9], fpg[,1:9+9] ),
+         log="y", xlab="Age", ylab="SMR, diagnosed 2005",
+         type="l", lwd=c(4,1,1), lty=1, ylim=c(0.5,5),
+         col=rep(c("blue","red"),each=9) )
+matlines( cbind(50+pts,60+pts,70+pts)[,rep(1:3,2,each=3)],
+         cbind( mpr[,1:9+9], fpr[,1:9+9] ),
+         type="l", lwd=c(4,1,1), lty="21", lend="butt",
+         col=rep(c("blue","red"),each=9) )
+abline( h= 1)
+@ %
+\insfig{SMRg}{1.0}{SMR for diabetes patients diagnosed 1995 and 2005
+  in ages 50, 60 and 70; as estimated by a glm with knots at quantiles
+  of death. Overlaid are the estiamtes form the gam model. Men blue,
+  women red.}

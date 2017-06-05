@@ -1,0 +1,348 @@
+\SweaveOpts{results=hide,keep.source=TRUE,include=FALSE,eps=FALSE} %  ,prefix.string=./graph/rates}
+	
+\section{Calculation of rates, $\RR$ and $\RD$}
+
+This exercise is \textit{very} prescriptive, so you should make an
+effort to really understand everything you type into R. Consult the
+relevant slides of the lecture on ``Poisson regression for rates
+\dots''
+
+\subsection{Hand calculations for a single rate}
+
+Let $\lambda$ be the true hazard rate or theoretical incidence rate,
+its estimator being the empirical incidence rate
+$\widehat\lambda = D/Y$ = 'no. cases/person-years'.  Recall that the
+standard error of the empirical rate is
+SE$(\widehat\lambda) = \widehat\lambda/\sqrt{D}$.
+
+The simplest approximate 95\% confidence interval (CI) for $\lambda$
+is given by
+$$ \widehat\lambda \pm 1.96 \times \text{SE}(\widehat\lambda)$$
+
+An alternative approach is based on logarithmic transformation of the
+empirical rate.  The standard error of the log-rate
+$\widehat\theta = \log(\widehat\lambda)$ is
+SE$(\widehat\theta) = 1/\sqrt{D}$. Thus, a simple approximate 95\%
+confidence interval for the log-hazard $\theta = \log(\lambda)$ is
+obtained from
+\[
+  \widehat\theta \pm 1.96/\sqrt{D} = \log(\widehat\lambda) \pm 1.96/\sqrt{D}
+\]
+When taking the exponential from the above limits, we get another
+approximate confidence interval for the hazard $\lambda$ itself:
+\[
+  \exp\{ \log(\widehat\lambda) \pm 1.96/\sqrt{D} \} =  \widehat\lambda \td \text{EF}, 
+\]
+where EF = $\exp \{1.96 \times \text{SE}[\log(\widehat\lambda)] \}$ is
+the \textit{error factor} associated with the 95\% interval.  This
+approach provides a more accurate approximation with very small
+numbers of cases. (However, both these methods fail when $D = 0$, in
+which case an {\it exact} method or one based on {\it profile-likelihood} is needed.)
+
+\begin{enumerate}
+\item Suppose you have $15$ events during $5532$ person-years. Let's
+  use \R\ as a simple desk calculator to derive the rate (in 1000
+  person-years) and the first version of an approximate confidence
+  interval:
+<<>>=
+library( Epi )
+options(digits=4)  #  to cut down decimal points in the output
+@
+<<>>=
+D <- 15
+Y <- 5.532    # thousands of years
+rate <- D / Y
+SE.rate <- rate/sqrt(D)
+c(rate, SE.rate, rate + c(-1.96, 1.96)*SE.rate )
+@ %
+
+\item Compute now the approximate confidence interval using the method
+based on log-transformation and compare the result with that in item (a)
+<<>>=
+SE.logr <- 1/sqrt(D)
+EF <- exp( 1.96 * SE.logr )
+c(log(rate), SE.logr)
+c( rate, EF, rate/EF, rate*EF )
+@
+
+\end{enumerate}
+
+\subsection{Poisson model for a single rate with logarithmic link}
+
+You are able to estimate $\lambda$ and compute its CI with a Poisson model,
+as described in the relevant slides  in the lecture handout.
+
+\begin{enumerate}[resume]
+\item Use the number of events as the response and the
+  log-person-years as an {\it offset} term, and fit the Poisson model
+  with log-link
+<<>>=
+m <- glm( D ~ 1, family=poisson(link=log), offset=log(Y) )
+summary( m )
+@
+What is the interpretation of the parameter in this model?
+
+\item The summary method produces too much output. You can extract CIs
+  for the model parameters directly from the fitted model on the scale
+  determined by the {\it link} function with the
+  \texttt{ci.lin()}-function. Thus, the estimate, SE, and confidence
+  limits for the log-rate $\theta = \log(\lambda)$ are obtained by:
+<<>>=
+ci.lin( m )
+@ %
+However, to get the confidence limits for the rate
+$\lambda = \exp(\theta)$ on the original scale, the results must be
+exp-transformed:
+<<>>=
+ci.lin( m, Exp=T)
+@ %
+To get just the point estimate and CI for $\lambda$ from
+log-transformed quantities you are recommended to use function
+\texttt{ci.exp()}, which is actually a wrapper of \texttt{ci.lin()}:
+<<>>=
+ci.exp( m)
+ci.lin( m, Exp=T)[, 5:7] 
+@ %
+Both functions are found from \texttt{Epi} package. -- Note that the
+test statistic and $P$-value are rarely interesting quantities for a
+single rate.
+
+\item There is an alternative way of fitting a Poisson model: Use the
+  empirical rate $\widehat\lambda = D/Y$ as a {\it scaled} Poisson
+  response, and the person-years as {\it weight} instead of offset
+  (albeit it will give you a warning about non-integer response in a
+  Poisson model, but you can ignore this warning):
+<<>>=
+mw <- glm( D/Y ~ 1, family=poisson, weight=Y )
+ci.exp( mw ) 
+@
+Verify that this gave the same results as above.
+\end{enumerate}
+
+\subsection{Poisson model for a single rate with identity link}
+
+The advantage of the approach based on weighting is that it allows
+sensible use of the {\it identity} link. The response is the same but
+the parameter estimated is now the rate itself, not the log-rate.
+	
+\begin{enumerate}[resume]
+\item Fit the Poisson model with identity link	
+<<>>=
+mi <- glm( D/Y ~ 1, family=poisson(link=identity), weight=Y )
+coef( mi )
+@
+What is the meaning of the intercept in this model?
+
+Verify that you actually get the same rate estimate as before.
+
+\item Now use \texttt{ci.lin()} to produce the estimate and the
+  confidence intervals from this model:
+<<>>=
+ci.lin( mi )
+ci.lin( mi )[, c(1,5,6)]
+@
+%% Why are the confidence limits not the same as from the multiplicative model?
+
+%% Derive the formula for the standard error of this estimated rate.
+
+\end{enumerate}
+
+\subsection{Poisson model assuming same rate for several periods}
+
+Now, suppose the events and person years are collected over  three periods.
+\begin{enumerate}[resume]
+
+\item Read in the data and compute period-specific rates
+<<>>=
+Dx <- c(3,7,5)
+Yx <- c(1.412,2.783,1.337)
+Px <- 1:3
+rates <- Dx/Yx 
+rates
+@ %
+\item Fit the same model as before, assuming a single rate to the data
+  for the separate periods. Compare the result from previous ones
+<<>>=
+m3 <- glm( Dx ~ 1, family=poisson, offset=log(Yx)  )
+ci.exp( m3 )
+@
+
+\item Now test whether the rates are the same in the three periods:
+  Try to fit a model with the period as a factor in the model:
+<<>>=
+mp <- glm( Dx ~ factor(Px), offset=log(Yx), family=poisson )
+@
+and compare the two models using \texttt{anova()} with the argument
+\texttt{test="Chisq"}:
+<<>>=
+anova( m3, mp, test="Chisq" )
+@
+Compare the test statistic to the deviance of the model \texttt{mp}.
+
+What is the deviance good for?
+
+\end{enumerate}
+
+\subsection{Analysis of rate ratio}
+\label{sec:RRana}
+We now switch to comparison of two rates $\lambda_1$ and $\lambda_0$, i.e.
+the hazard in an exposed group vs. that in an unexposed one.
+
+Consider first estimation of the true rate ratio
+$\rho = \lambda_1/\lambda_0$ between the groups.  Suppose we have
+pertinent empirical data (cases and person-times) from both groups,
+$(D_1,Y_1)$ and $(D_0,Y_0)$. The point estimate of $\rho$ is the
+empirical rate ratio
+\[
+\RR = \frac{D_1/Y_1}{D_0/Y_0}
+\]	
+It is known that the variance of $\log(\RR)$, that is, the difference
+of the log of the empirical rates
+$\log(\widehat\lambda_1) - \log(\widehat\lambda_0)$ is estimated as
+\begin{eqnarray*}
+   {\mbox{var}}(\log(\RR)) 
+    & = & {\mbox{var}}\{ \log( \widehat\lambda_1/\widehat\lambda_0 ) \} \\
+    & = & \mbox{var}\{ \log( \widehat\lambda_1 ) \} + \mbox{var}\{ \log( \widehat \lambda_0 ) \} \\
+    & = & 1/D_1 + 1/D_0
+\end{eqnarray*}
+Based on a similar argument as before, an approximate 95\% CI for the
+true rate ratio $\lambda_1/\lambda_0$ is then: 
+\[
+  \RR \td \exp\left(1.96\sqrt{\frac{1}{D_1}+
+                              \frac{1}{D_0}}\,\right)
+\]
+Suppose you have $15$ events during $5532$ person-years in an
+unexposed group and $28$ events during $4783$ person-years in an
+exposed group:
+\begin{enumerate}[resume]
+\item
+Calculate the the rate-ratio and CI by direct application of the above formulae:
+<<>>=
+D0 <- 15   ; D1 <- 28
+Y0 <- 5.532 ; Y1 <- 4.783
+RR <- (D1/Y1)/(D0/Y0)
+SE.lrr <- sqrt(1/D0+1/D1) 
+EF <- exp( 1.96 * SE.lrr)
+c( RR, RR/EF, RR*EF )
+@
+
+\item Now achieve this using a Poisson model:
+<<>>=
+D <- c(D0,D1) ; Y <- c(Y0,Y1); expos <- 0:1
+mm <- glm( D ~ factor(expos), family=poisson, offset=log(Y) )
+@
+What do the parameters mean in this model?
+
+\item You can extract the exponentiated parameters in two ways:
+<<>>=
+ci.exp( mm )
+ci.lin( mm, E=T )[,5:7]
+@ %
+
+\end{enumerate}
+
+\subsection{Analysis of rate difference}
+
+For the true rate difference $\delta = \lambda_1 - \lambda_0$,
+the  natural estimator is the empirical rate difference
+$$ \widehat\delta = \widehat\lambda_1  - \widehat\lambda_0 = D_1/Y_1 - D_0/Y_0 = \mbox{RD} . $$ 
+Its variance is just the sum of the variances of the two rates (since the latter are
+  based on independent samples):
+\begin{eqnarray*}
+    \mbox{var}(\RD) & = & \mbox{var}(\widehat\lambda_1 ) + \mbox{var}( \widehat\lambda_0 ) \\
+    & = & D_1/Y_1^2 + D_0/Y_0^2
+\end{eqnarray*}
+\begin{enumerate}[resume]
+\item
+  Use this formula to compute the rate difference and a 95\%
+  confidence interval for it:
+<<>>=
+rd <- diff( D/Y )
+sed <- sqrt( sum( D/Y^2 ) )
+c( rd, rd+c(-1,1)*1.96*sed )
+@ %
+\item Verify that this is the confidence interval you get when you fit
+  an additive model with exposure as factor:
+<<>>=
+ma <- glm( D/Y ~ factor(expos), 
+           family=poisson(link=identity), weight=Y )
+ci.lin( ma )[, c(1,5,6)]
+@ %
+
+\end{enumerate}
+
+\subsection{Calculations using matrix tools}
+
+{\it NB. This subsection requires some familiarity with matrix algebra}. 
+
+\begin{enumerate}[resume]
+
+\item Explore the function \texttt{ci.mat()}, which lets you use
+  matrix multiplication (operator \verb+'%*%'+
+  in R) to produce a confidence interval from an estimate and its
+  standard error (or CIs from whole columns of estimates and SEs):
+<<>>=
+ci.mat
+ci.mat()
+@ 
+As you see, this function returns a $2\times 3$ matrix (2 rows, 3 columns) containing familiar numbers.
+\item
+When you combine the single rate and its standard error into 
+a row vector of length 2, i.e. a $1\times 2$ matrix, and multiply this 
+by the $2\times 3$ matrix above, the computation returns 
+a $1\times 3$ matrix containing the point estimate and the
+confidence limit. --
+Apply this method to the single rate calculations in 1.6.1;
+first creating the $1 \times 2$ matrix and then performing the matrix multiplication.
+<<>>=
+rateandSE <- c( rate, SE.rate ) 
+rateandSE
+rateandSE %*% ci.mat()
+@
+\item When the confidence interval is based on the log-rate and its
+  standard error, the result is obtained by appropriate application of
+  the exp-function on the pertinent matrix product
+<<>>=
+lograndSE <- c( log(rate), SE.logr )
+lograndSE
+exp( lograndSE %*% ci.mat() )
+@
+\item For computing the rate ratio and its CI as in 1.6.5, matrix
+  multiplication with {\tt ci.mat()} should give the same result as
+  there:
+<<>>=
+exp( c( log(RR), SE.lrr ) %*% ci.mat() )
+@ %
+\item The main argument in function {\tt ci.mat()} is {\tt alpha},
+  which sets the confidence level: $1 - \alpha$. The default value is
+  {\tt alpha = 0.05}, corresponding to the level $1 - 0.05$ = 95
+  \%. If you wish to get the confidence interval for the rate ratio at
+  the 90 \% level (= $1-0.1$), for instance, you may proceed as
+  follows:
+<<>>=
+ci.mat( alpha=0.1 )
+exp( c( log(RR), SE.lrr ) %*% ci.mat(alpha=0.1) )
+@ %
+\item Look again to the model used to analyse the rate ratio in
+  \ref{sec:RRana}. Often one would like to get simultaneously both
+  the rates and the ratio between them. This can be achieved in one go
+  using the {\it contrast matrix} argument \texttt{ctr.mat} to
+  \texttt{ci.lin()} or \texttt{ci.exp()}. Try:
+<<>>=
+CM <- rbind( c(1,0), c(1,1), c(0,1) )
+rownames( CM ) <- c("rate 0","rate 1","RR 1 vs. 0")
+CM
+mm <- glm( D ~ factor(expos),
+           family=poisson(link=log),  offset=log(Y) )
+ci.exp( mm, ctr.mat=CM )
+@
+\item Use the same machinery to the additive model to get the rates
+  and the rate-difference in one go. Note that the annotation of the
+  resulting estimates are via the column-names of the contrast matrix.
+<<>>=
+rownames( CM ) <- c("rate 0","rate 1","RD 1 vs. 0")
+ma <- glm( D/Y ~ factor(expos),
+                 family=poisson(link=identity), weight=Y )
+ci.lin( ma, ctr.mat=CM )[, c(1,5,6)]
+@ %
+\end{enumerate}

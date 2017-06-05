@@ -1,0 +1,351 @@
+\SweaveOpts{results=hide}
+
+\section{Reading data into \textsf{R}}
+\subsection{Introduction}
+
+It is said that Mrs Beeton, the 19th century cook and writer, began
+her recipe for rabbit stew with the instruction ``First catch your
+rabbit''.  Sadly, the story is untrue, but it does contain an
+important moral. \textsf{R} is a language and environment for data
+analysis. If you want to do something interesting with it, you need
+data.
+
+For teaching purposes, data sets are often embedded in \textsf{R}
+packages.  The base \textsf{R} distribution contains a whole package
+dedicated to data which includes around 100 data sets.  This is
+attached towards the end of the search path, and you can see its
+contents with
+<<>>=
+objects("package:datasets")
+@
+A description of all of these objects is available using the \verb+help()+
+function. For example
+\begin{verbatim}
+> help(Titanic)
+\end{verbatim}
+gives an explanation of the \verb+Titanic+ data set, along with
+references giving the source of the data.
+
+The \textsf{Epi} package also contains some data sets. These are not
+available automatically when you load the \textsf{Epi} package, but
+you can make a copy in your workspace using the \verb+data()+
+function. For example
+<<>>=
+library(Epi)
+data(bdendo)
+@ 
+will create a data frame called \verb+bdendo+ in your workspace
+containing data from a case-control study of endometrial cancer.
+Datasets in the \textsf{Epi} package also have help pages: type
+\verb+help(bdendo)+ for further information.
+
+To go back to the cooking analogy, these data sets are the equivalent
+of microwave ready meals, carefully packaged and requiring minimal
+work by the consumer.  Your own data will never be able in this form
+and you must work harder to read it in to \textsf{R}. 
+
+This exercise introduces you to the basics of reading external data
+into \textsf{R}. It consists of reading the same data from different
+formats.  Although this may appear repetitive, it allows you to see
+the many options available to you, and should allow you to recognize
+when things go wrong.
+
+You will need the following files in the sub-directory \textsf{data}
+of your working directory: {\tt fem.dat}, {\tt fem-dot.dat}, {\tt
+  fem.csv}, {\tt fem.dta} (Reminder: use \texttt{setwd()} to set your
+working directory).
+
+\subsection{Data sources}
+
+Sources of data can be classified into three groups:
+\begin{enumerate}
+\item Data in human readable form, which can be inspected with a text editor.
+\item Data in binary format, which can only be read by a program that
+understands that format (SAS, SPSS, Stata, Excel, ...).
+\item Online data from a database management system (DBMS)
+\end{enumerate}
+This exercise will deal with the first two forms of
+data. Epidemiological data sets are rarely large enough to justify
+being kept in a DBMS.  If you want further details on this topic, you
+can consult the ``R Data Import/Export'' manual that comes with
+\textsf{R}.
+
+\subsection{Data in text files}
+
+Human-readable data files are generally kept in a rectangular format,
+with individual records in single rows and variables in columns.  Such
+data can be read into a data frame in \textsf{R}.
+
+Before reading in the data, you should inspect the file in a text
+editor and ask three questions:
+\begin{enumerate}
+\item How are columns in the table separated?
+\item How are missing values represented?
+\item Are variable names included in the file?
+\end{enumerate}
+
+The file \verb+fem.dat+ contains data on 118 female psychiatric
+patients. The data set contains nine variables.
+
+\begin{center}
+\begin{tabular}{ll}
+  ID & Patient identifier \\
+  AGE & Age in years \\
+  IQ & Intelligence Quotient (IQ) score \\
+  ANXIETY & Anxiety (1=none, 2=mild, 3=moderate,4=severe) \\
+  DEPRESS & Depression (1=none, 2=mild, 3=moderate or severe) \\
+  SLEEP & Sleeping normally (1=yes, 2=no) \\
+  SEX & Lost interest in sex (1=yes, 2=no) \\
+  LIFE & Considered suicide (1=yes, 2=no) \\
+  WEIGHT & Weight change (kg) in previous 6 months
+\end{tabular}
+\end{center}
+Inspect the file {\tt fem.dat} with a text editor to answer the
+questions above.
+
+The most general function for reading in free-format data is
+\verb+read.table()+.  This function reads a text file and returns a
+data frame. It tries to guess the correct format of each variable in
+the data frame (integer, double precision, or text).
+
+Read in the table with:
+<<>>=
+fem <- read.table("./data/fem.dat", header=TRUE)
+@ 
+Note that you must assign the result of {\tt read.table()} to an
+object.  If this is not done, the data frame will be printed to the
+screen and then lost.
+
+You can see the names of the variables with
+<<>>=
+names(fem)
+@
+The structure of the data frame can be seen with
+<<>>=
+str(fem)
+@
+You can also inspect the top few rows with
+<<>>=
+head(fem)
+@ 
+Note that the IQ of subject 9 is -99, which is an illegal value:
+nobody can have a negative IQ. In fact -99 has been used in this file
+to represent a missing value. In \textsf{R} the special value
+\verb+NA+ (``Not Available'') is used to represent missing values. All
+\textsf{R} functions recognize \verb+NA+ values and will handle them
+appropriately, although sometimes the appropriate response is to stop
+the calculation with an error message.
+
+You can recode the missing values with
+<<>>=
+fem$IQ[fem$IQ == -99] <- NA
+@ 
+Of course it is much better to handle special missing value codes
+when reading in the data. This can be done with the
+\texttt{na.strings} argument of the \texttt{read.table()}
+function. See below.
+
+\subsection{Things that can go wrong}
+
+Sooner or later when reading data into \textsf{R}, you will make a
+mistake.  The frustrating part of reading data into \textsf{R} is that
+most mistakes are not fatal: they simply cause the function to return
+a data frame that is {\em not what you wanted.}  There are three
+common mistakes, which you should learn to recognize.
+
+\subsubsection{Forgetting the headers}
+
+The first row of the file \verb+fem.dat+ contains the variable names.
+The \verb+read.table()+ function does not assume this by default so
+you have to specify this with the argument \verb+header=TRUE+.  See
+what happens when you forget to include this option:
+<<>>=
+fem2 <- read.table("data/fem.dat")
+str(fem2)
+head(fem2)
+@
+and compare the resulting data frame with \verb+fem+. What are
+the names of the variables in the data frame? What is the class
+of the variables?
+
+\begin{quote}
+  {\bf Explanation:} Remember that \verb+read.table()+ tries to guess
+  the mode of the variables in the text file. Without the
+  \verb+header=TRUE+ option it reads the first row, containing the
+  variable names, as data, and guesses that all the variables are
+  character, not numeric. By default, all character variables are
+  coerced to factors by \verb+read.table+. The result is a data frame
+  consisting entirely of factors (You can prevent the conversion of
+  character variables to factors with the argument \verb+as.is=TRUE+).
+\end{quote}
+
+If the variable names are not specified in the file, then they are
+given default names {\tt V1, V2, ...}. You will soon realise this
+mistake if you try to access a variable in the data frame by, for
+example
+<<>>=
+fem2$IQ 
+@
+as the variable will not exist
+
+There is one case where omitting the \verb+header=TRUE+ option is
+harmless (apart from the situation where there is no header line,
+obviously).  When the first row of the file contains {\bf one less}
+value than subsequent lines, \verb+read.table()+ infers that the first
+row contains the variable names, and the first column of every
+subsequent row contains its {\bf row name}.
+
+\subsubsection{Using the wrong separator}
+
+By default, \verb+read.table+ assumes that data values are separated
+by any amount of white space. Other possibilities can be specified
+using the \verb+sep+ argument. See what happens when you assume the
+wrong separator, in this case a tab, which is specified using the
+escape sequence \verb+"\t"+
+<<>>=
+fem3 <- read.table("data/fem.dat", sep="\t")
+str(fem3)
+@
+How many variables are there in the data set?
+
+\begin{quote}
+  {\bf Explanation:} If you mis-specify the separator,
+  \verb+read.table()+ reads the whole line as a single character
+  variable. Once again, character variables are coerced to factors, so
+  you get a data frame with a single factor variable.
+\end{quote}
+
+\subsubsection{Mis-specifying the representation of missing values}
+
+The file \verb+fem-dot.dat+ contains a version of the FEM dataset in
+which all missing values are represented with a dot. This is a common
+way of representing missing values, but is not recognized by default
+by the \verb+read.table()+ function, which assumes that missing values
+are represented by ``NA''.
+
+Inspect the file with a text editor, and then see what happens when
+you read the file in incorrectly:
+<<>>=
+fem4 <- read.table("data/fem-dot.dat", header=TRUE)
+str(fem4)
+@
+You should have enough clues by now to work out what went wrong.
+
+You can read the data correctly using the \verb+na.strings+ argument
+<<>>=
+fem4 <- read.table("data/fem-dot.dat", header=TRUE, na.strings=".")
+@
+
+\subsection{Spreadsheet data}
+
+Spreadsheets have become a common way of exchanging data. All
+spreadsheet programs can save a single sheet in {\em comma-separated
+variable} (CSV) format, which can then be read into \textsf{R}.  There
+are two functions in \textsf{R} for reading in CSV data:
+\verb+read.csv()+ and \verb+read.csv2()+.
+
+To understand why there are two functions, inspect the contents of
+the function \verb+read.csv()+ by typing its name
+<<results=verbatim>>=
+read.csv
+@ 
+
+The first two lines show the arguments to the \verb+read.csv()+
+function and their default values (\verb+header=TRUE+, etc) The next
+two lines show the {\em body} of the function, which shows that the
+default arguments are simply passed verbatim onto the
+\verb+read.table()+ function. Hence \verb+read.csv()+ is a {\em
+wrapper} function that chooses the correct arguments for
+\verb+read.table()+ for you.  You only need to supply the name of the
+CSV file and all the other details are taken care of.
+
+Now inspect the \verb+read.csv2+ function to find the difference
+between this function and \verb+read.csv+.
+
+\begin{quote}
+  {\bf Explanation:} The CSV format is not a single standard.
+  The file format depends on the {\em locale} of your computer -- the
+  settings that determine how numbers are represented.  In some
+  countries, the decimal separator is a point ``.'' and the variable
+  separator in a CSV file is a comma ``,''.  In other countries, the
+  decimal separator is a comma ``,'' and the variable separator is a
+  semi-colon ``;''. The \verb+read.csv()+ function is used for the first
+  format and the \verb+read.csv2()+ function is used for the second
+  format.
+\end{quote}
+
+The file \verb+fem.csv+ contains the FEM dataset in CSV format.
+Inspect the file to work out which format is used, and read it into
+\textsf{R}.
+
+On Microsoft Windows, you can copy values directly from an open
+Excel spreadsheet using the clipboard. Highlight the cells you
+want to copy in the spread sheet and select copy from the pull-down
+edit menu. Then type 
+\verb+read.table(file="clipboard")+ to read
+the data in.  Beware, however, that the clipboard on Windows operates
+on the WYSIWYG principle (what-you-see-is-what-you-get). If you have
+a value $1.23456789$ in your spreadsheet, but have formatted the cell
+so it is displayed to two decimal places, then the value read into
+\textsf{R} will be the truncated value $1.23$.
+
+\subsection{Binary data}
+
+The \textsf{foreign} package allows you to read data in binary formats
+used by other statistical packages. Since \textsf{R} is an open source
+project, it can only read binary formats that are themselves ``open'',
+in the sense that the standards for reading and writing data are
+well-documented.  For example, there is a function in the
+\textsf{foreign} package for reading SAS XPORT files, a format that
+has been adopted as a standard by the US Food and Drug Administration
+(\url{http://www.sas.com/govedu/fda/faq.html}).  However, there is no
+function in the \textsf{foreign} package for reading native SAS
+binaries (\textsf{SAS7BDAT} files). Other packages are available from
+CRAN (\url{http://cran.r-project.org}) that offer the possibility of
+reading SAS binary files: see the \textsf{haven} and \textsf{sas7bdat}
+packages.
+
+The file \verb+fem.dta+ contains the FEM dataset in the format
+used by Stata. Read it into \textsf{R} with
+<<>>=
+library(foreign)
+fem5 <- read.dta("data/fem.dta")
+head(fem5)
+@ 
+The Stata data set contains value and variable labels.
+Stata variables with value labels are automatically converted to
+factors.
+
+There is no equivalent of variable labels in an \textsf{R} data frame,
+but the original variable labels are not lost. They are still attached
+to the data frame as an invisible {\em attribute}, which you can see
+with
+<<>>=
+attr(fem5, "var.labels")
+@ 
+A lot of {\em meta-data} is attached to the data in the form of
+attributes. You can see the whole list of attributes with
+<<>>=
+attributes(fem5)
+@ 
+or just the attribute names with
+<<>>=
+names(attributes(fem5))
+@ 
+
+The \texttt{read.dta()} function can only read data from Stata
+versions 5--12.  The R Core Team has not been able to keep up with
+changes in the Stata format. You may wish to try the \textsf{haven}
+package and the \textsf{readstata13} package, both available from
+CRAN.
+
+\subsection{Summary}
+
+In this exercise we have seen how to create a data frame in \textsf{R}
+from an external text file. We have also reviewed some common mistakes
+that result in garbled data.
+
+The capabilities of the \textsf{foreign} package for reading binary
+data have also been demonstrated with a sample Stata data set.
+
+

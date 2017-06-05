@@ -1,0 +1,97 @@
+\SweaveOpts{results=verbatim,keep.source=TRUE,eps=FALSE,include=FALSE,prefix.string=./graph/graph}
+\section{Graphics exercise}
+% \insout{R/alkfos-s.Rout}
+
+First we read in the basic dat from the experiemnet:
+<<>>=
+( alkfos <- read.csv("./data/alkfos.csv") )
+@
+Then we find out how many observations that are available for each
+varaibel in each group (that is
+how many that are \emph{not} missing (\texttt{!is.na}):
+<<>>=
+(available <- aggregate( !is.na(alkfos), list(alkfos$grp), sum))
+@
+Then we compute the percentage change since the first visit; we divide
+all mesurements by the first measurement \verb+alkfos$c0+. For these
+we compute the mean and the standard errors at each point for each group:
+<<>>=
+alkfos.pctchange <- (sweep(alkfos[-1], 1, alkfos$c0, "/") - 1)*100
+(means <- aggregate(alkfos.pctchange, list(alkfos$grp), mean, na.rm=TRUE))
+(sds   <- aggregate(alkfos.pctchange, list(alkfos$grp),   sd, na.rm=TRUE))
+available <- as.matrix(available[-(1:2)])
+@
+Put the means and sds into matrices which we will use for plotting of
+points and error bars. The quantities needed ultimately are \texttt{means},
+\texttt{upr} and \texttt{lwr}
+<<>>=
+means <- as.matrix(means[-1])
+  sds <- as.matrix(sds[-1])
+ sems <- sds/sqrt(available)
+  upr <- means + sems
+  lwr <- means - sems
+@
+Now we need a vector of times and also some idea of the required
+extent of the y-axis.
+<<>>=
+time <- c(0,3,6,9,12,18,24)
+(ylim <- range(means+sems,means-sems))
+@
+
+For the graph we first set the size of the margins (you should make a
+print of the help page for ``\texttt{par}'', which is the functin that
+sets all relevant graphics parameters).
+<<alkfos,fig=TRUE,height=5>>=
+par(mar=.1 + c(8,4,4,2))
+plot( time, means[1,],
+      type="b",   # boths dots and lines
+      xaxt="n",   # no x-axis
+      ylim=ylim,
+      ylab="alkaline phosphatase" )
+# Add the points for the second gropu
+points(time,means[2,], type="b")
+# The the vertial error-bars
+segments( time, upr[1,], time, lwr[1,] )
+segments( time, upr[2,], time, lwr[2,])
+# Draw the x-axis at the times
+axis( 1, at=time )
+# Plot the availabe numbers below the x-axis
+mtext( available[1,], side=1, line=5, at=time)
+mtext( available[2,], side=1, line=6, at=time)
+@
+
+<<alkfos-x,fig=TRUE,height=5>>=
+par(mar=.1 + c(8,5,4,2))
+plot(time,means[1,], type="b", ylim=ylim, xaxt="n",
+                     ylab="% change in alkaline phosphatase",
+                     xlab="Months after randomization",
+                     las=1, # All axis labels horizontal
+                     pch=16, # Dot as plotting symbol
+                     bty="n", lwd=2 ) # No box around the plot
+segments(time ,  upr[1,], time , lwr[1,], lwd=2 )
+time2 <- time + 0.25 # Plot the points and bars a little bit offset
+points  (time2,means[2,], type="b", pch=18, lwd=2, cex=1.3)
+segments(time2,  upr[2,], time2, lwr[2,], lwd=2 )
+axis(1,at=time)
+mtext(available[1,],side=1, line=5, at=time)
+mtext(available[2,],side=1, line=6, at=time)
+# par("usr") reaturns the actual x- and y coordinates of the axis ends.
+mtext("Placebo"  , side=1, line=5, adj=1, at=par("usr")[1] )
+mtext("Tamoxifen", side=1, line=6, adj=1, at=par("usr")[1] )
+abline(h=0) # Horizontal line
+@
+
+\begin{figure}[h]
+  \centering
+\includegraphics[width=0.8\textwidth]{./graph/graph-alkfos}
+  \caption{\it The first shot at the graph.}
+  \label{fig:alk1}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+\includegraphics[width=0.8\textwidth]{./graph/graph-alkfos-x}
+  \caption{\it The more elaborate version of the graph.}
+  \label{fig:alk2}
+\end{figure}
+

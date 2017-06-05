@@ -1,0 +1,111 @@
+\SweaveOpts{results=hide}
+
+\section{Simple simulation}
+
+Monte Carlo methods are computational procedures dealing
+ with simulation of artificial data
+from given probability distributions with the purpose of 
+learning about the behaviour of phenomena involving random variability.
+These methods have a wide range of applications in statistics as well as in several branches of science and technology.
+By solving the following exercises you will learn to use some 
+basic tools of statistical simulation.
+% In Exercise 5 the task is to
+% generate a dataset that corresponds to a certain causal structure. Then you 
+% can find out, which analysis returns a correct answer
+% to the causal question of interest and how misleading can be the results of 
+% incorrectly adjusted analysis.
+
+\begin{enumerate}
+\item Whenever using a {\it random number generator}
+ (RNG) for a simulation study  (or for another purpose, such as
+for producing a randomization list to be used in a clinical trial or for selecting a random sample from a large cohort),
+it is a good practice to set first the {\it seed}. It is a number
+that determines the initial state of the RNG, from which
+ it starts creating the desired sequence of pseudo-random numbers.
+Explicit specification of the seed enables the reproducibility of the
+sequence. %In serious applications (like in clinical trials) 
+%it is important that the
+%seed (and the whole randomization list) 
+%is concealed from persons with certain important roles in the study
+%(like the physicians who recruit or treat the patients in a clinical trial).
+-- Instead of the number 5462319 below you may use your own seed of choice.
+<<seed>>=
+set.seed(5462319)
+@
+\item Generate a random 
+sample of size 20 from a normal distribution with mean 100 and standard deviation 10. Draw a histogram of the sampled values and compute the conventional summary statistics
+<<rnorm20>>=
+ x <- rnorm(20, 100, 10)
+ hist(x)
+ c(mean(x), sd(x))
+@
+Repeat the above lines and compare the results.
+<<rnorm20, echo=F>>=
+ x <- rnorm(20, 100, 10)
+ hist(x)
+ c(mean(x), sd(x))
+@ 
+\item 
+Now replace the sample size 20 by 1000
+ and run again twice the previous command lines with this size
+ but keeping the parameter values as before.
+ Compare the results between the two samples here as well as with those in the previous item.
+<<rnorm1000, echo=F>>=
+ x <- rnorm(1000, 100, 10)
+ hist(x)
+ c(mean(x), sd(x))
+@
+<<rnorm1000, echo=F>>=
+ x <- rnorm(1000, 100, 10)
+ hist(x)
+ c(mean(x), sd(x))
+@
+%\item Generate a sample of size 1000 from a Uniform(0,1) distribution (\texttt{runif(1000)}) and look at the a) histogram of the original values, b) histogram of their natural logarithms, and  c) histogram of the logit-transforms of the values.
+%<<runif, echo=T>>=
+%x <- runif(1000)
+%hist(x)
+%hist(log(x))
+%hist(log(x/(1-x)))
+%@
+\item Generate 500 observations from a Bernoulli$(p)$ distribution, 
+or Bin$(1,p)$ distribution,  
+taking values 1 and 0 with probabilities $p$ and $1-p$, respectively,
+when $p=0.4$:
+<<bin1>>=
+X <- rbinom(500, 1, 0.4)
+table(X)
+@
+\item Now generate another $0/1$ variable $Y$, being dependent on previously generated $X$, so that $P(Y=1|X=1)=0.2$ and $P(Y=1|X=0)=0.1$.
+<<bin2>>=
+Y <- rbinom(500,1,0.1*X+0.1)
+table(X,Y)
+prop.table(table(X,Y),1)
+@
+% \item Test the association either by $\chi^2$-test or logistic regression:
+% <<testing>>=
+% chisq.test(table(X,Y))
+% summary(glm(Y ~ X,family="binomial"))$coef
+% @
+
+\item Generate data obeying a simple linear regression model 
+$y_i = 5 + 0.1 x_i + \varepsilon_i$, $i = 1, \dots 100$, 
+in which  $\varepsilon_i \sim N(0, 10^2)$, and
+$x_i$ values are integers from 1 to 100.
+Plot the $(x_i, y_i)$-values, and estimate the parameters of that model. 
+<<regression>>=
+x <- 1:100   
+y <- 5 + 0.1*x + rnorm(100,0,10)
+plot(x,y)
+abline(lm(y~x))
+summary(lm(y~x))$coef
+@
+Are your estimates consistent with the data-generating model? Run the code a couple of times to see the variability in the parameter estimates. 
+%\item Now change the slope coefficient of $x$ to (a) 0.05, and (b) 0.01,
+%respectively, and perform a similar simulation run. 
+%Do you still discover  association between $x$ and $y$?
+%(Look at the scatter plot and the error margin of the slope coefficient)
+%Check also, what happens if you change the standard deviation of the  error term to be a) 1, and b) 100.
+\end{enumerate}
+
+
+
