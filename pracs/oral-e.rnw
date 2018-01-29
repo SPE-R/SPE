@@ -52,7 +52,7 @@ Using function \texttt{table()} count the numbers of censorings
 as well as deaths from oral cancer and other causes, respectively,
  from the \texttt{event} variable.
 <<dinput, echo=T,eval=FALSE>>=
-orca <- read.table("oralca2.txt", header=T)
+orca <- read.table("../data/oralca2.txt", header=T)
 head(orca) ; str(orca) ; summary(orca)
 @
 \end{enumerate}
@@ -98,7 +98,7 @@ one can draw a curve describing their complements: the cumulative mortality prop
 <<survcdf1, echo=T, fig=T, height=6, width=7,eval=FALSE>>=
 plot(s.all)
 lines(s.all, fun = "event", mark.time=F, conf.int=F)
-@
+@ %
 
 The effect of option {\tt mark.time=F} is to omit
 marking the times when censorings occurred.
@@ -118,7 +118,7 @@ Also find the median survival time for each stage.
 <<cdfstage, echo=T, fig=T, height=6, width=7,eval=FALSE>>=
 s.stg  <- survfit(suob ~ stage, data= orca)
 col5 <- c("green", "blue", "black", "red", "gray")
-plot(s.stg, col= col5, fun="event", mark.time=F )
+plot(s.stg, col= col5, fun="event", mark.time=F, lwd=3 )
 s.stg
 @
 
@@ -132,19 +132,20 @@ with each other and with the one in the previous item.
 par(mfrow=c(1,2))
 plot(s.stg, col= col5, fun="cumhaz", main="cum. hazards" )
 plot(s.stg, col= col5, fun="cloglog", main = "cloglog: log cum.haz"  )
-@
+@ %
 
 \item If the survival times were {\it exponentially}
  distributed in a given (sub)population
  the corresponding cloglog-curve should follow an approximately linear pattern.
 Could this be the case here in the different stages?
-
+  
 \item Also, if the survival distributions of the different subpopulations would
 obey the {\it proportional hazards} model, the vertical distance between the
 cloglog-curves should be approximately constant over the time axis.
 Do these curves indicate serious deviation from the proportional hazards assumption?
 
-\item In the lecture handouts (p. 34, 37) it was observed that
+\item In the lecture handouts %(p. 34, 37) 
+  it was observed that
 the crude contrast between males and females in total mortality appears
 unclear, but the age-adjustment in the Cox model provided a more
 expected hazard ratio estimate.
@@ -154,43 +155,41 @@ into, say, three categories by function {\tt cut()}
 using suitable breakpoints, like 55 and 75 years, and
 cross-tabulate sex and age group:
 <<sexage, echo=T,eval=FALSE>>=
-orca$agegr <- cut(orca$age, br=c(0,55,75, 95))
-stat.table( list( sex, agegr), list( count(), percent(agegr) ),
-             margins=T, data = orca )
+orca$agegr <- cut( orca$age, br=c(0,55,75, 95) )
+stat.table( list( sex, agegr), 
+            list( count(), percent(agegr) ),
+            margins = TRUE, data = orca )
 @
-Male patients are clearly younger than females in these data.
+Male patients are clearly younger than females in this data set.
 
 Now, plot Kaplan--Meier curves jointly classified by sex and age.
 <<cdfsexage, echo=T, fig=T, height=6, width=7,eval=FALSE>>=
 s.agrx <- survfit(suob ~ agegr + sex, data=orca)
 par(mfrow=c(1,1))
 plot(s.agrx, fun="event", mark.time=F, xlim = c(0,15),
-             col=rep(c("red", "blue"),3), lty=c(2,2, 1,1, 5,5))
-@
-
+             col=rep(c("red","blue"),3), 
+             lty=rep(c(2,1,5),each=2), lwd=3 )
+@ %
 In each ageband the mortality curve for males is on a higher level
 than that for females.
 
 \end{enumerate}
 
-
 \subsection{Event-specific cumulative mortality curves}
-
 
 We move on to analysing cumulative mortalities for the
  two causes of death separately, first overall and then
  by prognostic factors.
 
-\begin{enumerate}
-\item
-Use the \texttt{survfit}-function in \texttt{survival} package with option \texttt{type="mstate"}. 
-
+\begin{enumerate}[resume]
+\item Use the \texttt{survfit}-function in \texttt{survival} package
+  with option \texttt{type="mstate"}.
 <<cif1a, echo=T,eval=FALSE>>=
 library(survival)
 cif1 <- survfit( Surv( time, event, type="mstate") ~ 1,
                  data = orca)
 str(cif1)
-@
+@ %
 
 \item
 One could apply here the plot method of the survfit object to plot the 
@@ -209,8 +208,8 @@ the overall cumulative incidence curves for both causes of death
 <<plotcif1, echo=T,fig=T,eval=FALSE>>=
 par(mfrow=c(1,2))
 plotCIF(cif1, 1, main = "Cancer death")
-plotCIF(cif1, 2, main= "Other deaths")
-@
+plotCIF(cif1, 2, main = "Other deaths")
+@ %
 
 \item
 Compute the estimated
@@ -221,7 +220,7 @@ See the structure of the resulting object, in which you should
 observe strata variable containing the stage grouping variable. Plot the pertinent curves in two parallel graphs.
 Cut the $y$-axis for a more efficient graphical presentation
 
-<<plotcif2, echo=T, fig=T, height=6, width=10,eval=FALSE>>=
+<<plotcif2,echo=T,fig=T,height=6,width=10,eval=FALSE>>=
 col5 <- c("green", "blue", "black", "red", "gray")
 cif2 <- survfit( Surv( time, event, type="mstate") ~ stage,
                  data = orca)
@@ -229,11 +228,10 @@ str(cif2)
 
 par(mfrow=c(1,2))
 plotCIF(cif2, 1, main = "Cancer death by stage",
-        col = col5, ylim = c(0, 0.7) )
+        col = col5, ylim = c(0, 0.7), lwd=3 )
 plotCIF(cif2, 2, main= "Other deaths by stage",
-        col=col5, ylim = c(0, 0.7) )
-@
-
+        col=col5, ylim = c(0, 0.7), lwd=3 )
+@ %
 Compare the two plots. What would you conclude about the
 effect of stage on the two causes of death?
 
@@ -247,13 +245,11 @@ cumulative mortality from other causes. You can also add some colours for the di
 par(mfrow=c(1,1))
 stackedCIF(cif1, colour = c("gray70", "gray85"))
 @
-
-
 \end{enumerate}
 
 \subsection{Regression modelling of overall mortality.}
 
-\begin{enumerate}
+\begin{enumerate}[resume]
 
 \item
 Fit the semiparametric proportional hazards
