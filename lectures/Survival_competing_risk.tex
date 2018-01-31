@@ -1,5 +1,6 @@
 
 \documentclass[handout,12pt,dvipsnames,t]{beamer}
+\setbeamertemplate{footline}[frame number]
 
 \title{Statistical Practice in Epidemiology 2018}
 \subtitle{Survival analysis with competing risks} % \\[10mm]
@@ -78,7 +79,7 @@ Examples of such times and outcome events:
   0 = censoring,  \\
   1 = death from oral cancer\\
 %  1 = death from oral cancer, \\
-%  2 = death from some other cause.
+  2 = death from some other cause.
 \end{itemize}
 % \texttt{Surv(time, event)} creates a \emph{survival} object.
 
@@ -319,5 +320,207 @@ records   n.max n.start  events  median 0.95LCL 0.95UCL
 \includegraphics{Survival_competing_risk-KM_plot}
 
 \end{frame}
+
+\begin{frame}
+   \frametitle{Competing risks model: causes of death}
+   
+\begin{itemize}
+\item
+Often the interest is focused on the risk or hazard of dying 
+from one specific cause.
+\medskip
+\item
+That cause may eventually not be realized, because
+a \textbf{competing cause} of death hits first.
+
+\bigskip
+
+\begin{center}
+\setlength{\unitlength}{0.65pt}
+\begin{picture}(400,190)
+  \thicklines
+  \put(  0, 80){\framebox(130,50){Alive}}
+  \put(  0, 80){\makebox(120,40)[b]{\scriptsize{(lex.Cst = 0 \& lex.Xst = 0)}}}
+  \put(230,130){\framebox(180,50){Dead from cancer}}
+  \put(230,130){\makebox(180,40)[b]{\scriptsize{(lex.Xst = 1)}}}
+%  \put(170, 97){(Cause-specific hazards)}
+  \put(230, 30){\framebox(180,50){Dead, other causes}}
+  \put(230, 30){\makebox(180,40)[b]{\scriptsize{(lex.Xst = 2)}}}
+  \put(135,125){\vector(3, 1){90}}
+%  \put(295,155){\vector(0,-1){100}}
+  \put(135, 85){\vector(3,-1){90}}
+  \put(165,157){\makebox(0,0)[b]{$\lambda_1(t)$}}
+  \put(165, 53){\makebox(0,0)[t]{$\lambda_2(t)$}}
+% \put(285,105){\makebox(0,0)[t]{$\nu$}}
+\end{picture}
+\end{center}
+\item
+ Generalizes to several competing causes.
+ \end{itemize}
+% Illness-death model. Little boxes with arrows.\\
+% (The mortality of lung cancer patients ($\nu$) not relevant here).
+\end{frame}
+
+\begin{frame}
+\frametitle{Competing events \& competing risks}
+
+In many epidemiological and clinical contexts there are
+competing events that may 
+occur before the target event and remove the person from 
+ the population at risk for the event, \textit{e.g.}
+
+\begin{itemize}
+\item \textit{target event}: occurrence of endometrial cancer,
+ \textit{competing events}: hysterectomy or death.
+\medskip
+\item \textit{target event}: relapse of a disease \\
+(ending the state of remission), \\
+ \textit{competing event}: death while still in remission.
+ 
+% \medskip
+\item \textit{target event}: divorce, \\ 
+ \textit{competing event}: death of either spouse.
+ 
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Event-specific quantities}
+
+\textbf{Cumulative incidence function} (CIF) for event $c$:
+\[  F_c(t) = P(T \leq t \text{ and } C = c ), \quad c = 1,2,  \]
+%{subdensity function} $f_c(t) = dF_c(t)/dt$ 
+
+\medskip
+From these one can recover
+\begin{itemize}
+\item
+$F(t) = \sum_{c} F_c(t)$, CDF of event-free survival time $T$, \textit{i.e.} 
+cumulative risk of any event by $t$.
+\medskip
+\item
+$S(t) = 1 - F(t)$, \textbf{event-free survival function}, \textit{i.e.} probability of avoiding all events by $t$
+\medskip
+\item
+$1-S(t) \neq F_1(t)+F_2(t)$
+
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Event-specific quantities (cont'd)}
+\begin{itemize}
+\item CIF = risk of event $c$ over risk period $[0,t]$ in the presence of competing risks, also obtained 
+% $c$-specific hazard and overall survival:
+$$ F_c(t) = \int_0^t \lambda_c(v) S(v) dv, \quad c = 1,2, $$
+\item
+Survival depends on the sum of the hazards of the competing events, too, 
+via 
+\begin{align*} 
+S(t) & = \exp\left\{ - \int_0^t [\lambda_1(v) + \lambda_2(v)]dv 
+ \right\} \\
+ & = \exp\left\{ - \Lambda_1(t) \right\} \times        \exp\left\{ - \Lambda_2(t) \right\} .
+\end{align*}
+\end{itemize}
+%\textbf{Hazard of the subdistribution} %\\
+%\begin{center}
+%  $\gamma_c(t) = {f_c(t)}/[1 - F_c(t)] %$
+%\end{center}	
+	% \qquad     [ \neq \lambda_c(t),\ \textbf{NB!}] \\
+%  & = \underset{\Delta\to 0}{\lim} \
+%    P \{ t < T \le t+\Delta \text{ and } C = c \mid \\
+%  & \qquad\qquad   T > t \text{ or }  
+%     ( T \leq t \text{ and }C \neq c) \}/{\Delta}  
+%\begin{itemize}
+%\item Is not the same as 
+%$\lambda_c(t) = f_c(t)/[1-F(t)]$,
+%\item Interpretation tricky!
+%\end{itemize}
+\end{frame} 
+
+\begin{frame}
+\frametitle{Warning of ``net risk'' and ``cause-specific survival''}
+
+\begin{itemize}                              
+\item
+The ``\textbf{\textit{net risk}}'' of outcome $c=1$ by time $t$, 
+assuming hypothetical elimination of competing risks,
+is often defined as
+\begin{center}
+$ F_1^*(t) = 1 - S_1^*(t) = 1- \exp\{ - \Lambda_1(t) \} \neq S(t)$
+% =1 - \exp\left\{ - \int_0^t h_c(v) dv \right\},  $$
+\end{center}
+\medskip
+\item
+In clinical survival studies, function 
+$S_1^*(t)$ is often called ``\textbf{\textit{cause-specific survival}}'',
+(estimated by KM) or net survival registry-based survival studies
+\medskip
+\item
+Yet, these *-functions, $ F_1^*(t)$ and $S_1^*(t)$, lack proper probability interpretation when
+ competing risks exist.
+\medskip
+\item
+Hence, their use should be viewed critically
+(Andersen \& Keiding, \textit{Stat Med}, 2012)
+\end{itemize}
+\end{frame}
+
+%----------------------------------------------------------------------
+\begin{frame}
+   \frametitle{Example: Risk of lung cancer by age $a$?}
+% \vspace*{-1em}
+% \[
+% \ptxt{Lung cancer before age 75} \ne 1-\e^{-\Lambda(75)}
+% \]
+% does not take the possibility of death prior to lung cancer into
+% account.
+
+\begin{itemize}
+% \item 
+%  Empirical \textbf{cumulative rate} 
+% CR$(a) = \sum_{k < a} I_k \Delta_k$, i.e.
+%  ageband-width ($\Delta_k$) weighted 
+%  sum of empirical 
+%  age-specific incidence rates $I_k$
+%  up to a given age $a$ \\
+%  = estimate of cumulative hazard $\Lambda_c(a)$.
+%  \medskip
+ \item 
+ Nordcan \& Globocan give 
+``\textbf{\textit{cumulative risk}}'' by 75 y of age, computed from 
+$1 - \exp\{-\text{CR}(75)\}$, as an estimate  of the probability of 
+getting cancer before age $75$ y, 
+assuming that death were avoided by that age. This is based on 
+deriving ``net risk'' from cumulative hazard:
+\begin{center} 
+$ F_c^*(a) = 1 - \exp\{ - \Lambda_c(a) \}. $
+\end{center}
+\medskip
+\item
+Yet, cancer occurs in a mortal population.
+\medskip
+\item
+As such CR$({75})$ is a sound age-standardized summary 
+ measure for comparing cancer incidence across populations 
+ based on a neutral standard population.
+\end{itemize}
+
+\end{frame}
+ 
+
+\begin{frame}
+\frametitle{Example. Male lung cancer in Denmark}
+
+Event and age-specifc specific hazards for lung cancer ($\lambda_1(a)$) and death (($\lambda_2(a)$)) estimated by respective rates
+
+\includegraphics[height=6.5cm]{lung-ca-rates}
+\end{frame}
+  
+
+
 
 \end{document}
