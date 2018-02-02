@@ -522,10 +522,297 @@ As such CR$({75})$ is a sound age-standardized summary
 
 Event and age-specifc specific hazards for lung cancer ($\lambda_1(a)$) and death (($\lambda_2(a)$)) estimated by respective rates
 
-\includegraphics[height=6.5cm]{lung-ca-rates}
+%\includegraphics[height=6.5cm]{lung-ca-rates}
 \end{frame}
   
 
+\begin{frame}
+\frametitle{Cumulative incidence of lung cancer by age}
+
+%\includegraphics[height=6.5cm]{lung-ca-prob}
+
+Both \text{CR} and $1 - \exp(- \text{CR})$ tend to \\
+ overestimate the real cumulative incidence CI after 60 y.
+\end{frame}
+
+\begin{frame}
+
+\frametitle{R tools for competing risks analysis}
+
+Package \texttt{mstate}
+\begin{itemize}
+% \item Covers even more general multi-state set-ups.
+%  \pause
+%  \medskip
+\item \texttt{Cuminc(time, status, ...)}:  \\
+ AJ-estimates (and SEs) for each event type 
+ % from observed follow-up times and events
+  (\texttt{status}, value 0 indicating censoring)
+\end{itemize}
+Package \texttt{cmprsk}
+\begin{itemize}
+\item \texttt{cuminc(ftime, fstatus, ...)} 
+  computes CIF-estimates,  % in \texttt{mstate},
+   \texttt{plot.cuminc()} plots them. 
+  \medskip
+\item \texttt{crr()}
+ fits Fine--Gray models for 
+the hazard $\gamma_c(t)$ of the subdistribution
+\end{itemize}   
+Package \texttt{Epi} -- \texttt{Lexis} tools for multistate analyses
+\begin{itemize}
+\item  will be advertised by Bendix!
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Ex. Survival from oral cancer}
+
+\begin{itemize}
+\item
+Creating a {\tt Lexis} object with two outcome events and \\ 
+obtaining a summary of transitions
+\end{itemize}
+\small
+\begin{verbatim}
+> orca.lex <- Lexis(exit = list(stime = time), 
+           exit.status = factor(event, 
+    labels = c("Alive", "Oral ca. death", "Other death") ),
+                  data = orca)
+
+> summary(orca.lex)  
+Transitions:
+     To
+From    Alive Oral ca. Other  Records:  Events: Risk time:  Persons:
+  Alive   109      122   107       338      229    1913.67       338
+\end{verbatim}
+\normalsize
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Box diagram for transitions}
+
+Interactive use of function {\tt boxes()}.
+\small
+%\begin{verbatim}
+%> boxes(orca.lex)
+%\end{verbatim}
+%\begin{center}
+%\includegraphics[height=6cm]{orca-boxes}
+%\end{center}
+\normalsize
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Ex. Survival from oral cancer}
+\begin{itemize}
+\item
+AJ-estimates of CIFs (solid) for both causes.
+\item
+Naive KM-estimates of CIF (dashed) $>$ AJ-estimates 
+\item
+CIF curves may also be stacked (right).  
+\end{itemize}
+%\includegraphics[width=\textwidth]{orcaCI1}
+
+\textbf{NB.} The sum of the naive KM-estimates of CIF exceeds 100\% at 13 years! 
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Ex. CIFs by cause in men and women}
+
+%\includegraphics[width=\textwidth]{orcaCI2}
+
+CIF for cancer higher in women (chance?) but for other causes
+higher in men (no surprise).
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Regression models (cont'd)}
+  
+Survival regression models can be defined \textit{e.g.} for hazards 
+\begin{itemize}
+%\item[(a)] survival times directly 
+%$$ \log(T_i) = \eta_i + \epsilon_i, \quad\text{s.t. } 
+%\epsilon_i \sim F_0(t; \alpha)$$ 
+%where $F_0(t; \alpha)$ is some baseline model, 
+%\medskip
+%\pause
+\item[(a)] multiplicatively: $$ 
+\lambda_i(t) = \lambda_0(t; \alpha) r(\eta_i), \quad\text{where}$$
+$\lambda_0(t; \alpha)$ = baseline hazard and \\
+$r(\eta_i)$ = relative rate function, typically $\exp(\eta_i)$
+\medskip
+\pause
+\item[(c)] additively: 
+$$ \lambda_i(t) = \lambda_0(t; \alpha) + \eta_i. $$
+\end{itemize}
+\end{frame}
+
+
+%\end{frame}
+
+
+\begin{frame}
+\frametitle{Relative hazards model or Cox model}
+
+In model (b), the baseline hazard $\lambda_0(t,\alpha)$ may be given a parametric form (\textit{e.g.} Weibull) or
+a piecewise constant rate (exponential) structure.
+
+\bigskip
+Often a parameter-free form $\lambda_0(t)$ is assumed. Then
+\[
+  \lambda_i(t) = \lambda_0(t) \exp(\eta_1),
+\]
+specifies the \textbf{Cox model} or the \textbf{semiparametric proportional hazards model}.
+
+\bigskip
+$\eta_i = \beta_1 x_{i1} + \dots + \beta_p x_{ip}$ not depending on time.  
+
+\bigskip
+Generalizations: \textbf{time-dependent} \\ covariates $x_{ij}(t)$.
+
+% For exponential model, $\lambda_0(t) = \lambda_0$.
+
+% Piecewise exponential model $\to$ constant baseline
+% hazard in successive intervals:   
+% \[ 
+% \lambda_0(t) = \lambda_{0k}, \mbox{ for } 
+% a_{k-1}} < t \leq a_k, \quad k = 1, 2, \dots, K 
+% \]
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Regression models (cont'd)}
+  
+Survival regression models can be defined \textit{e.g.} for hazards
+\begin{itemize}
+%\item[(a)] survival times directly 
+%$$ \log(T_i) = \eta_i + \epsilon_i, \quad\text{s.t. } 
+%\epsilon_i \sim F_0(t; \alpha)$$ 
+%where $F_0(t; \alpha)$ is some baseline model, 
+%\medskip
+%\pause
+\item[(a)] multiplicatively: $$ 
+\lambda_i(t) = \lambda_0(t; \alpha) r(\eta_i), \quad\text{where}$$
+$\lambda_0(t; \alpha)$ = baseline hazard and \\
+$r(\eta_i)$ = relative rate function, typically $\exp(\eta_i)$
+\medskip
+\pause
+\item[(b)] additively: 
+$$ \lambda_i(t) = \lambda_0(t; \alpha) + \eta_i. $$
+\end{itemize}
+\end{frame}
+
+
+%\end{frame}
+
+
+\begin{frame}
+\frametitle{Relative hazards model or Cox model}
+
+In model (b), the baseline hazard $\lambda_0(t,\alpha)$ may be given a parametric form (\textit{e.g.} Weibull) or
+a piecewise constant rate (exponential) structure.
+
+\bigskip
+Often a parameter-free form $\lambda_0(t)$ is assumed. Then
+\[
+  \lambda_i(t) = \lambda_0(t) \exp(\eta_1),
+\]
+specifies the \textbf{Cox model} or the \textbf{semiparametric proportional hazards model}.
+
+\bigskip
+$\eta_i = \beta_1 x_{i1} + \dots + \beta_p x_{ip}$ not depending on time.  
+
+\bigskip
+Generalizations: \textbf{time-dependent} \\ covariates $x_{ij}(t)$
+%, and/or effects $\beta_j(t)$.
+
+% For exponential model, $\lambda_0(t) = \lambda_0$.
+
+% Piecewise exponential model $\to$ constant baseline
+% hazard in successive intervals:   
+% \[ 
+% \lambda_0(t) = \lambda_{0k}, \mbox{ for } 
+% a_{k-1}} < t \leq a_k, \quad k = 1, 2, \dots, K 
+% \]
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Ex. Total mortality of oral ca. patients}
+
+Fitting Cox models with sex and sex + age.
+\small
+\begin{verbatim}
+> cm0 <- coxph( suob ~ sex, data = orca)
+> summary( cm0)
+        coef exp(coef) se(coef)    z Pr(>|z|)
+sexMale 0.126     1.134    0.134 0.94     0.35
+        exp(coef) exp(-coef) lower .95 upper .95
+sexMale      1.13      0.882     0.872      1.47
+
+> cm1 <- coxph( suob ~ sex + age, data = orca)
+> summary(cm1)
+        exp(coef) exp(-coef) lower .95 upper .95
+sexMale      1.49      0.669      1.14      1.96
+age          1.04      0.960      1.03      1.05
+\end{verbatim}
+\normalsize
+The M/F contrast visible only after age-adjustment.
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Predictions from the Cox model}
+\begin{itemize}
+\item
+Individual survival \textit{times} cannot be predicted
+but ind'l survival \emph{curves} can.
+PH model implies:
+\[
+S_i(t) = [S_0(t) ]^{\exp(\beta_1 x_{i1} +\ldots+\beta_p x_{ip})}
+\]
+\item
+Having  estimated $\beta$ by partial likelihood, 
+the baseline $S_0(t)$ is estimated by Breslow method 
+\item 
+\medskip
+ From these, a survival curve for an individual
+with given covariate values is predicted.
+\item
+\medskip
+In R: 
+\texttt{pred <- survfit(mod, newdata=...)} 
+and \texttt{plot(pred)}, where \texttt{mod} is the fitted
+\texttt{coxph} object, 
+and \texttt{newdata}  
+specifies the covariate values.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Modelling with competing risks}
+
+% When more than one outcome are operating,
+% one may consider the 
+Main options, providing answers to different questions.
+
+\begin{itemize}
+\item[(a)]
+  Cox model for event-specific hazards $\lambda_c(t) = f_c(t)/[1-F(t)]$, when \textit{e.g.} the interest is in the biological effect of the prognostic factors on the fatality of the very disease that often leads to the relevant outcome.  
+  \bigskip 
+\item[(b)]
+ \textbf{Fine--Gray model} for the hazard  of the subdistribution $\gamma_c(t) = f_c(t)/[1-F_c(t)]$ 
+  when we want to assess the impact of the factors on the overall cumulative incidence of event $c$.  \\
+  -- Function \texttt{crr()} in package \texttt{cmprsk}. 
+\end{itemize}
+
+\end{frame}
 
 
 \end{document}
