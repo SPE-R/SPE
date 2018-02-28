@@ -1,14 +1,39 @@
 language: r
+cache: packages
+sudo: required
 
 before_install:
-  - sudo apt-get install texlive-latex-extra
+  - sudo apt-get install texlive-latex-extra texlive-fonts-recommended
+#  - which kpsewhich
+#  - kpsewhich --expand-var='/home/travis/R-bin/lib/R/share/texmf'
   - cd pracs
+#  - mkdir ~/texmf
+#  - ln -s /home/travis/R-bin/lib/R/share/texmf ~/texmf
 
 install:
   - echo 'R package automatic build switch off'
-  - echo 'Installing dependencies'
 
 script:
+  - echo 'Make the latex R style libs accessible'
+#  - kpsewhich -var-value=TEXMFHOME
+#  - find /home/travis/R-bin/lib/R/share/texmf
+#  - sudo chmod -R 0777 sudo /home/travis/R-bin/lib/R/share
+#  - cp -rf /home/travis/R-bin/lib/R/share/texmf/* /home/travis/texlive/texmf-local/
+  - cp -rf /home/travis/R-bin/lib/R/share/texmf ~/
+## - kpsewhich --expand-var=~/texmf
+#  - kpsewhich Rd.sty
+#  - sudo chmod -R 0777 ~/texmf
+#  - sudo chmod -R 0777 /home/travis/texlive/texmf-local
+#  - kpsewhich Rd.sty
+#  - sudo texhash
+#  - kpsewhich Rd.sty
+#  - sudo find / -type f -name "Rd.sty" 
+#  - sudo kpsewhich Rd.sty
+  - echo 'Installing dependencies'
   - Rscript install-dependencies.R
+  - echo 'Build all the practicals pdf'
   - bash all.sh
-  - pdflatex pracs.tex
+  - echo 'Compile the practicals in a single file'
+#  - R --slave -e 'tools::texi2pdf("pracs.tex")'
+#  - pdflatex -halt-on-error -interaction=nonstopmode pracs.tex
+  - sudo pdflatex -halt-on-error -interaction=nonstopmode pracs.tex
