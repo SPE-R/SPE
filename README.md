@@ -1,5 +1,8 @@
 # SPE
+[![Build Status](https://travis-ci.org/SPE-R/SPE.svg?branch=master)](https://travis-ci.org/SPE-R/SPE)
+
 Material for the course Statistical Practice in Epidemiology with R
+
 #
 pracs contains the exercises: 
 - it reads ./adm/prog.tex which contain the program in details
