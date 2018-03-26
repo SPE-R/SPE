@@ -3,6 +3,9 @@
 ## 2018-03-26
 ## ---
 
+SHELL = /bin/sh
+
+.SUFFIXES: 
 .SUFFIXES: .tex .pdf .rnw .R
 
 ## The master file
@@ -17,7 +20,10 @@ TEX = $(RNWINCLUDES:=.tex)
 RFILES = $(RNWINCLUDES:=.R)
 RNWFILES = $(INCLUDES:=.rnw)
 
+BUILDDIR = build
+
 all: $(MAIN).pdf
+
 $(MAIN).pdf: $(TEX) $(MAIN).tex
 
 R: $(RFILES)
@@ -33,11 +39,18 @@ view: all
   
 .tex.pdf:
 	latexmk -pdf -pv $<
+
+.PHONY: clean builddir
+
+builddir: 
+	mkdir -p ${BUILDDIR}
+	cd ${BUILDDIR}
   
 clean:
 	rm -fv $(MAIN).pdf $(TEX) $(RFILES)
 	rm -fv *.aux *.dvi *.log *.toc *.bak *~ *.blg *.bbl *.lot *.lof
 	rm -fv *.nav *.snm *.out *.pyc *.vrb
 	rm -fv Rplots.pdf *.RData
+	rm -fv *.pdf
 	latexmk -C
 
