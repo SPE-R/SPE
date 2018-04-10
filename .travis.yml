@@ -3,7 +3,7 @@ cache: packages
 sudo: required
 
 before_install:
-  - sudo apt-get install texlive-latex-extra texlive-fonts-recommended
+  - sudo apt-get install texlive-latex-extra texlive-fonts-recommended latexmk
   - cd pracs
 
 install:
@@ -14,7 +14,19 @@ script:
   - cp -rf /home/travis/R-bin/lib/R/share/texmf ~/
   - echo 'Installing dependencies'
   - Rscript install-dependencies.R
-  - echo 'Build all the practicals pdf'
-  - bash all.sh
-  - echo 'Compile the practicals in a single file'
-  - sudo pdflatex -halt-on-error -interaction=nonstopmode pracs.tex
+  - echo 'Build an compile all the practicals pdf'
+  - sudo make
+  - echo 'keep only the outputs we are interested in'
+  - mkdir -f release
+  - cp pracs.pdf release/
+  - make clean
+  
+deploy:
+  provider: pages
+  fqdn: https://github.com/SPE-R/SPE-R.github.io.git
+  local-dir: release
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN  # Set in travis-ci.org dashboard, marked secure
+  keep-history: true
+  on:
+    branch: master
