@@ -5,7 +5,7 @@
 
 SHELL = /bin/sh
 
-.SUFFIXES: 
+## the files suffixes to consider
 .SUFFIXES: .tex .pdf .rnw .R
 
 ## The master file
@@ -18,11 +18,13 @@ RNWINCLUDES = basic-e dinput-e tab-e graph-intro-e simulation-e rates-rrrd-e log
 
 TEX = $(RNWINCLUDES:=.tex)
 RFILES = $(RNWINCLUDES:=.R)
-RNWFILES = $(INCLUDES:=.rnw)
+RNWFILES = $(RNINCLUDES:=.rnw)
 
+SRCDIR   = pracs
 BUILDDIR = build
 
-all: $(MAIN).pdf
+
+all: builddir; $(MAKE) -C ${BUILDDIR} $(MAIN).pdf
 
 $(MAIN).pdf: $(TEX) $(MAIN).tex
 
@@ -38,19 +40,20 @@ view: all
 	R CMD Sweave $<
   
 .tex.pdf:
-	latexmk -pdf -pv $<
+	latexmk -pdflatex='pdflatex -file-line-error -synctex=1 -recorder -halt-on-error -interaction=nonstopmode' -pdf -pv $<
 
 .PHONY: clean builddir
 
-builddir: 
-	mkdir -p ${BUILDDIR}
-	cd ${BUILDDIR}
+builddir:
+	mkdir -p ${BUILDDIR} && cp -r $(SRCDIR)/* ${BUILDDIR} 
+
   
 clean:
-	rm -fv $(MAIN).pdf $(TEX) $(RFILES)
-	rm -fv *.aux *.dvi *.log *.toc *.bak *~ *.blg *.bbl *.lot *.lof
-	rm -fv *.nav *.snm *.out *.pyc *.vrb
-	rm -fv Rplots.pdf *.RData
-	rm -fv *.pdf
-	latexmk -C
+	rm -rf ${BUILDDIR}
+#	rm -fv $(MAIN).pdf $(TEX) $(RFILES)
+#	rm -fv *.aux *.dvi *.log *.toc *.bak *~ *.blg *.bbl *.lot *.lof
+#	rm -fv *.nav *.snm *.out *.pyc *.vrb
+#	rm -fv Rplots.pdf *.RData
+#	rm -fv *.pdf
+#	latexmk -C
 
