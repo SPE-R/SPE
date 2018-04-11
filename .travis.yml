@@ -3,18 +3,33 @@ cache: packages
 sudo: required
 
 before_install:
-  - sudo apt-get install texlive-latex-extra texlive-fonts-recommended
-  - cd pracs
+  - sudo apt-get install latexmk
+  - tlmgr install genmisc floatflt needspace currfile filehook
+  - echo 'Make the latex R style libs accessible'
+  - cp -rf /home/travis/R-bin/lib/R/share/texmf/* /home/travis/texlive/texmf-dist/
+  - texhash
+#  - sudo apt-get install texlive-latex-extra texlive-fonts-recommended latexmk
 
 install:
   - echo 'R package automatic build switch off'
 
 script:
-  - echo 'Make the latex R style libs accessible'
-  - cp -rf /home/travis/R-bin/lib/R/share/texmf ~/
   - echo 'Installing dependencies'
-  - Rscript install-dependencies.R
-  - echo 'Build all the practicals pdf'
-  - bash all.sh
-  - echo 'Compile the practicals in a single file'
-  - sudo pdflatex -halt-on-error -interaction=nonstopmode pracs.tex
+  - Rscript pracs/install-dependencies.R
+  - echo 'Build an compile all the practicals pdf'
+  - make -f pracs/Makefile
+  - echo 'keep only the outputs we are interested in'
+  - mkdir -p deploy
+  - cp build/pracs.pdf deploy/
+  - make -f pracs/Makefile clean
+  
+deploy:
+  provider: pages
+  local-dir: deploy
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN  # Set in travis-ci.org dashboard, marked secure
+  keep-history: true
+  repo: SPE-R/SPE-R.github.io
+  target-branch: travis-build
+  on:
+    branch: clean-build
