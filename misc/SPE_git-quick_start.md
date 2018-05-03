@@ -17,12 +17,12 @@ For any question/issue please send me a mail at georgesd at iarc.fr
 - [Prerequest](#prerequest)
 - [Setting-up acount and repository](#setting-up-acount-and-repository)
   * [Linking GitKraken to your github account](#linking-gitkraken-to-your-github-account)
-  * [Cloning SPE repository](#-cloning--https---git-scmcom-docs-git-clone---spe-repository--https---githubcom-spe-r-spe-)
-  * [Opening SPE repository](#opening--spe-repository--https---githubcom-spe-r-spe-)
+  * [Cloning SPE repository](#cloning-spe-repository)
+  * [Opening SPE repository](#opening-spe-repository)
 - [Git actions](#git-actions)
-  * [Pulling online version of the repository](#-pulling--https---git-scmcom-docs-git-pull--online-version-of-the-repository)
-  * [Committing changes](#-committing--https---git-scmcom-docs-git-commit--changes)
-  * [Pushing changes](#-push--https---git-scmcom-docs-git-push--changes)
+  * [Pulling online version of the repository](#pulling-online-version-of-the-repository)
+  * [Committing changes](#committing-changes)
+  * [Pushing changes](#pushing-changes)
   
 
 
@@ -31,9 +31,9 @@ For any question/issue please send me a mail at georgesd at iarc.fr
 The usual git workflow is the following:
 
 -----
-1. `pull` (get the latest online version of the repos)
+1. `pull` (get the latest online version of the repository)
 2. Work on your files, make your changes, ...
-3. `commit` your changes (loccally commit and comment your changes)
+3. `commit` your changes (locally commit and comment your changes)
 4. `pull` again (to prevent from file conflicts)
 5. `push` your changes online
 
@@ -88,7 +88,7 @@ You only have to do it once. If you have already done that you can go to the `op
 4. Select `SPE`
 
 If `SPE` does not show up in the recently opened projects, click on `Open a Repository` and select the 
-directory where hou have cloned [SPE repository](https://github.com/SPE-R/SPE) (directory named `SPE`)
+directory where you have cloned [SPE repository](https://github.com/SPE-R/SPE) (directory named `SPE`)
 
 ![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-004.png)
 
@@ -99,7 +99,7 @@ directory where hou have cloned [SPE repository](https://github.com/SPE-R/SPE) (
 
 Getting the latest version of the repository available online.
 
-Please remember to do it everytime you open the repository and before pushing your changes.
+Please remember to do it every time you open the repository and before pushing your changes.
 
 1. Just click on `Pull` button
 
@@ -121,7 +121,7 @@ This has to be done regularly!
 
 1. Select the files you want to stage (i.e. commit the changed you have done on the file)
 2. Check that all and only the files you want to commit have been selected
-3. Write a explicit and understanable description of what changes have been added/changed/removed
+3. Write a explicit and understandable description of what changes have been added/changed/removed
 4. Commit the changes
 
 ![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-008.png)
@@ -136,8 +136,8 @@ This is the last step.
 
 ![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-009.png)
 
-If everithing goes right, a blue message should popup on the right corner of your windows with something like `Pushed Successfully`.
+If everything goes right, a blue message should popup on the right corner of your windows with something like `Pushed Successfully`.
 
-If somebody has pushed his changes in between your latest pulled version and your `push` you might be asked to resolve some conlicts.
-GitKraken will then let you compare the differences/conflicts between your local version and the latest available online one. You will have to choose which files/lines to keep/discare.
+If somebody has pushed his changes in between your latest pulled version and your `push` you might be asked to resolve some conflicts.
+GitKraken will then let you compare the differences/conflicts between your local version and the latest available online one. You will have to choose which files/lines to keep/discard.
 This is not the best part of the process and the only way to prevent it is to `pull`/`commit`/`push` regularly.
