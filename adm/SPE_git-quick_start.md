@@ -58,6 +58,8 @@ directory where hou have clone [SPE repository](https://github.com/SPE-R/SPE) (d
 
 # Pulling online version of the repository
 
+This means get the latest version of the repository available online.
+
 Please mind to do it everytime you open the repository.
 
 1. Just clivk on `Pull` button
@@ -68,5 +70,12 @@ Please mind to do it everytime you open the repository.
 
 ![](SPE_git-quick_start-images\spe_git-quick_start-006.png)
 
+# Committing changes
+
+Documenting and accepting changes you made in the code locally (this will not affect the online version)
+
+1. See what changes have been done since the last pull/commit.
 
 
+
+This has to be done regularly
