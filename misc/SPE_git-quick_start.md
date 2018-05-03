@@ -11,35 +11,38 @@ For any question/issue please send me a mail at georgesd at iarc.fr
 
 -----
 
+# Table of content
+
 - [Workflow](#workflow)
 - [Prerequest](#prerequest)
 - [Setting-up acount and repository](#setting-up-acount-and-repository)
   * [Linking GitKraken to your github account](#linking-gitkraken-to-your-github-account)
-  * [[Cloning](https://git-scm.com/docs/git-clone) [SPE repository](https://github.com/SPE-R/SPE)](#-cloning--https---git-scmcom-docs-git-clone---spe-repository--https---githubcom-spe-r-spe-)
-  * [Opening [SPE repository](https://github.com/SPE-R/SPE)](#opening--spe-repository--https---githubcom-spe-r-spe-)
+  * [Cloning SPE repository](#-cloning--https---git-scmcom-docs-git-clone---spe-repository--https---githubcom-spe-r-spe-)
+  * [Opening SPE repository](#opening--spe-repository--https---githubcom-spe-r-spe-)
 - [Git actions](#git-actions)
-  * [[Pulling](https://git-scm.com/docs/git-pull) online version of the repository](#-pulling--https---git-scmcom-docs-git-pull--online-version-of-the-repository)
-  * [[Committing](https://git-scm.com/docs/git-commit) changes](#-committing--https---git-scmcom-docs-git-commit--changes)
-  * [[Push](https://git-scm.com/docs/git-push) changes](#-push--https---git-scmcom-docs-git-push--changes)
+  * [Pulling online version of the repository](#-pulling--https---git-scmcom-docs-git-pull--online-version-of-the-repository)
+  * [Committing changes](#-committing--https---git-scmcom-docs-git-commit--changes)
+  * [Pushing changes](#-push--https---git-scmcom-docs-git-push--changes)
   
 
------
 
 # Workflow
 
 The usual git workflow is the following:
 
+-----
 1. `pull` (get the latest online version of the repos)
 2. Work on your files, make your changes, ...
 3. `commit` your changes (loccally commit and comment your changes)
 4. `pull` again (to prevent from file conflicts)
 5. `push` your changes online
 
+-----
+
 **note 1**: the steps 2,3,4 should be repeated several times before to `push` your modification
 
 **note 2**: you have first to `clone` and setup the repository correctly once
 
------
 
 # Prerequest
 
@@ -55,12 +58,12 @@ The usual git workflow is the following:
 2. If this is the first time you open it, you will be asked to give some git ids. Click on 
 `Sign in with GitHub` and enter your [github](https://github.com/) credentials.
 
-![](https://github.com/SPE-R/SPE/blob/git-tuto/misc/SPE_git-quick_start-images/spe_git-quick_start-001.png)
+![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-001.png)
 
 Once you have done it once you should be automatically connected to your git account each time
 you will open `GitKraken`. You can easily check it in the upper right corner of `GitKraken` window.
 
-![](https://github.com/SPE-R/SPE/blob/git-tuto/misc/SPE_git-quick_start-images/spe_git-quick_start-002.png)
+![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-002.png)
 
 
 ## [Cloning](https://git-scm.com/docs/git-clone) [SPE repository](https://github.com/SPE-R/SPE)
@@ -74,7 +77,7 @@ You only have to do it once. If you have already done that you can go to the `op
 5. Scroll down until you find `SPE-R` > `SPE` 
 6. Click on `Clone the repo!`
 
-![](https://github.com/SPE-R/SPE/blob/git-tuto/misc/SPE_git-quick_start-images/spe_git-quick_start-003.png)
+![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-003.png)
 
 
 ## Opening [SPE repository](https://github.com/SPE-R/SPE)
@@ -87,7 +90,7 @@ You only have to do it once. If you have already done that you can go to the `op
 If `SPE` does not show up in the recently opened projects, click on `Open a Repository` and select the 
 directory where hou have cloned [SPE repository](https://github.com/SPE-R/SPE) (directory named `SPE`)
 
-![](https://github.com/SPE-R/SPE/blob/git-tuto/misc/SPE_git-quick_start-images/spe_git-quick_start-004.png)
+![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-004.png)
 
 
 # Git actions
@@ -100,11 +103,11 @@ Please remember to do it everytime you open the repository and before pushing yo
 
 1. Just click on `Pull` button
 
-![](https://github.com/SPE-R/SPE/blob/git-tuto/misc/SPE_git-quick_start-images/spe_git-quick_start-005.png)
+![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-005.png)
 
 2. Be sure that a message like `Pulled Successfully` shows up on the top right corner
 
-![](https://github.com/SPE-R/SPE/blob/git-tuto/misc/SPE_git-quick_start-images/spe_git-quick_start-006.png)
+![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-006.png)
 
 
 ## [Committing](https://git-scm.com/docs/git-commit) changes
@@ -114,24 +117,24 @@ This has to be done regularly!
 
 1. See what changes have been done since the last pull/commit and click on `see changes`
 
-![](https://github.com/SPE-R/SPE/blob/git-tuto/misc/SPE_git-quick_start-images/spe_git-quick_start-007.png)
+![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-007.png)
 
 1. Select the files you want to stage (i.e. commit the changed you have done on the file)
 2. Check that all and only the files you want to commit have been selected
 3. Write a explicit and understanable description of what changes have been added/changed/removed
 4. Commit the changes
 
-![](https://github.com/SPE-R/SPE/blob/git-tuto/misc/SPE_git-quick_start-images/spe_git-quick_start-008.png)
+![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-008.png)
 
 
-## [Push](https://git-scm.com/docs/git-push) changes
+## [Pushing](https://git-scm.com/docs/git-push) changes
 
 Pushing your local changes of the repository online.
 This is the last step. 
 
 1. Just click on `Push`
 
-![](https://github.com/SPE-R/SPE/blob/git-tuto/misc/SPE_git-quick_start-images/spe_git-quick_start-009.png)
+![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-009.png)
 
 If everithing goes right, a blue message should popup on the right corner of your windows with something like `Pushed Successfully`.
 
