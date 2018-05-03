@@ -45,3 +45,9 @@ For SPE tagged release, the [SPE's Travis-ci platform](https://travis-ci.org/SPE
 -----
 
 [slides](https://github.com/SPE-R/SPE/tree/master/slides) is supposed to contain slides; one folder per lecture
+
+-----
+
+[misc](https://github.com/SPE-R/SPE/tree/master/misc) contains misclaneous documents:
+
+- [SPE git quick statr guide](https://github.com/SPE-R/SPE/tree/master/misc/SPE_git-quick_start.md): coulpe of instructions to setup and use git on SPE repos
