@@ -5,7 +5,9 @@
 \subtitle{Survival analysis with competing risks} % \\[10mm]
 \author{Janne Pitk\"aniemi (EL) }
 \date{}
+\usepackage{Sweave}
 \begin{document}
+\input{Survival_competing_risk-concordance}
 
 \maketitle
 
@@ -321,6 +323,7 @@ records   n.max n.start  events  median 0.95LCL 0.95UCL
 \end{figure}
 
 \end{frame}
+
 
 \begin{frame}
    \frametitle{Competing risks model: causes of death}
@@ -659,7 +662,152 @@ higher in men (no surprise).
 
 \end{frame}
 
+\begin{frame}
 
+\frametitle{Regression models for time-to-event data}
+
+
+Regression models for hazards can be defined \textit{e.g.} for 
+\begin{itemize}
+% \item[(a)] survival times directly 
+% $$ \log(T_i) = \eta_i + \epsilon_i, \quad\text{s.t. } 
+% \epsilon_i \sim F_0(t; \alpha)$$ 
+% where $F_0(t; \alpha)$ is some baseline model, 
+% \medskip
+% \pause
+\item[(a)] hazards, multiplicatively: $$ 
+\lambda_i(t) = \lambda_0(t; \alpha) r(\eta_i), \quad\text{where}$$
+$\lambda_0(t; \alpha)$ = baseline hazard and \\
+$r(\eta_i)$ = relative rate function, typically $\exp(\eta_i)$
+\medskip
+\pause
+\item[(b)] hazards, additively: 
+$$ \lambda_i(t) = \lambda_0(t; \alpha) + \eta_i. $$
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Relative hazards model or Cox model}
+
+In model (b), the baseline hazard $\lambda_0(t,\alpha)$ may be given a parametric form (\textit{e.g.} Weibull) or
+a piecewise constant rate (exponential) structure.
+
+\bigskip
+Often a parameter-free form $\lambda_0(t)$ is assumed. Then
+\[
+  \lambda_i(t) = \lambda_0(t) \exp(\eta_1),
+\]
+specifies the \textbf{Cox model} or the \textbf{semiparametric proportional hazards model}.
+
+\bigskip
+$\eta_i = \beta_1 x_{i1} + \dots + \beta_p x_{ip}$ not depending on time.  
+
+\bigskip
+Generalizations: \textbf{time-dependent} \\ covariates $x_{ij}(t)$
+
+% For exponential model, $\lambda_0(t) = \lambda_0$.
+
+% Piecewise exponential model $\to$ constant baseline
+% hazard in successive intervals:   
+% \[ 
+% \lambda_0(t) = \lambda_{0k}, \mbox{ for } 
+% a_{k-1}} < t \leq a_k, \quad k = 1, 2, \dots, K 
+% \]
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{PH model: interpretation of parameters}
+
+Present the model explicitly in terms of $x$'s and $\beta$'s.
+\[
+\lambda_i(t) = \lambda_0(t)  \exp({\beta_1 x_{i1} + \dots +
+\beta_p x_{ip}})
+\]
+Consider two individuals, $i$ and $i'$, having the same values of all
+other covariates except the $j^{\text{th}}$ one.
+
+\bigskip
+The ratio of hazards is constant:
+$$  \frac{\lambda_i(t)}{\lambda_{i'}(t)} = \frac{\exp( \eta_{i}) }{\exp(\eta_{i'})}
+= \exp \{ \beta_j(x_{ij}-x_{i'j}) \} . $$
+Thus $e^{\beta_j} = \text{HR}_j$ = \textbf{hazard ratio} or relative rate
+ associated with
+ a unit change in covariate $X_j$.
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Ex. Total mortality of oral ca. patients}
+
+Fitting Cox models with sex and sex + age.
+\small
+\begin{verbatim}
+> cm0 <- coxph( suob ~ sex, data = orca)
+> summary( cm0)
+        coef exp(coef) se(coef)    z Pr(>|z|)
+sexMale 0.126     1.134    0.134 0.94     0.35
+        exp(coef) exp(-coef) lower .95 upper .95
+sexMale      1.13      0.882     0.872      1.47
+
+> cm1 <- coxph( suob ~ sex + age, data = orca)
+> summary(cm1)
+        exp(coef) exp(-coef) lower .95 upper .95
+sexMale      1.49      0.669      1.14      1.96
+age          1.04      0.960      1.03      1.05
+\end{verbatim}
+\normalsize
+The M/F contrast visible only after age-adjustment.
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Predictions from the Cox model}
+\begin{itemize}
+\item
+Individual survival \textit{times} cannot be predicted
+but ind'l survival \emph{curves} can.
+PH model implies:
+\[
+S_i(t) = [S_0(t) ]^{\exp(\beta_1 x_{i1} +\ldots+\beta_p x_{ip})}
+\]
+\item
+Having  estimated $\beta$ by partial likelihood, 
+the baseline $S_0(t)$ is estimated by Breslow method 
+\item 
+\medskip
+ From these, a survival curve for an individual
+with given covariate values is predicted.
+\item
+\medskip
+In R: 
+\texttt{pred <- survfit(mod, newdata=...)} 
+and \texttt{plot(pred)}, where \texttt{mod} is the fitted
+\texttt{coxph} object, 
+and \texttt{newdata}  
+specifies the covariate values.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Modelling with competing risks}
+
+% When more than one outcome are operating,
+% one may consider the 
+Main options, providing answers to different questions.
+
+\begin{itemize}
+\item[(a)]
+  Cox model for event-specific hazards $\lambda_c(t) = f_c(t)/[1-F(t)]$, when \textit{e.g.} the interest is in the biological effect of the prognostic factors on the fatality of the very disease that often leads to the relevant outcome.  
+  \bigskip 
+\item[(b)]
+ \textbf{Fine--Gray model} for the hazard  of the subdistribution $\gamma_c(t) = f_c(t)/[1-F_c(t)]$ 
+  when we want to assess the impact of the factors on the overall cumulative incidence of event $c$.  \\
+  -- Function \texttt{crr()} in package \texttt{cmprsk}. 
+\end{itemize}
+
+\end{frame}
 
 
 \end{document}
