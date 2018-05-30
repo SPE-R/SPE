@@ -3,7 +3,7 @@
  % \usepackage{graphicx, subfig}
  % \begin{document}
 %\SweaveOpts{concordance=TRUE,keep.source=TRUE,eps=FALSE,include=TRUE}
-\SweaveOpts{eval=TRUE,keep.source=TRUE,eps=FALSE,include=TRUE}
+\SweaveOpts{keep.source=TRUE,eps=FALSE,include=TRUE, prefix.string=./graph/oral}
 
 \section{Survival analysis: Oral cancer patients}
 
@@ -38,9 +38,11 @@ The dataset contains the following variables:
 \begin{enumerate}[resume]
 
 \item Load the R packages \texttt{Epi, mstate}, and \texttt{survival} needed in this exercise.
-<<packages, echo=T>>=
+<<packages, echo=T,eval=FALSE>>=
 library(Epi)
 library(popEpi)
+library(data.table)
+library(knitr)
 library(survival)
 @ %
 
@@ -51,8 +53,8 @@ Look at the head, structure and the summary of the data frame.
 Using function \texttt{table()} count the numbers of censorings
 as well as deaths from oral cancer and other causes, respectively,
  from the \texttt{event} variable.
-<<dinput, echo=T>>=
-orca <- read.table("../data/oralca2.txt", header=T)
+<<dinput, echo=T,eval=FALSE>>=
+orca <- read.table("oralca2.txt", header=T)
 head(orca) ; str(orca) ; summary(orca)
 @
 \end{enumerate}
@@ -65,7 +67,7 @@ a single outcome.
 First, construct a {\it survival object} \verb!orca$suob! from
 the event variable and the follow-up time using function \verb+Surv()+.
 Look at the structure and summary of \verb!orca$suob! .
-<<Survobject, echo=T>>=
+<<Survobject, echo=T,eval=FALSE>>=
 orca$suob <- Surv(orca$time, 1*(orca$event > 0) )
 str(orca$suob)
 summary(orca$suob)
@@ -74,14 +76,14 @@ summary(orca$suob)
 \item Create a {\tt survfit} object {\tt s.all}, which does the
 default calculations for a Kaplan--Meier
 analysis of the overall (marginal) survival curve.
-<<surv1, echo=T>>=
+<<surv1, echo=T,eval=FALSE>>=
 s.all <- survfit(suob ~ 1, data=orca)
 @
 
 See the structure of this object and apply {\tt print()} method on it, too.
 Look at the results; what do you find?
 % Try also {\tt summary()} and see the outcome.
-<<surv2, echo=T>>=
+<<surv2, echo=T,eval=FALSE>>=
 s.all
 str(s.all)
 @
@@ -95,10 +97,10 @@ for a conventional illustration of the survival experience in the whole patient 
  Alternatively, instead of graphing survival proportions,
 one can draw a curve describing their complements: the cumulative mortality proportions. This curve is drawn together with the survival curve as the
  result of the second command line below.
-<<survcdf1, echo=T, fig=T, height=6, width=7>>=
+<<survcdf1, echo=T, fig=T, height=6, width=7,eval=FALSE>>=
 plot(s.all)
 lines(s.all, fun = "event", mark.time=F, conf.int=F)
-@ %
+@
 
 The effect of option {\tt mark.time=F} is to omit
 marking the times when censorings occurred.
@@ -115,10 +117,10 @@ Tumour stage is an important prognostic factor in cancer survival studies.
 Plot separate cumulative mortality curves for the different stage groups
 marking them with different colours, the order which you may define yourself.
 Also find the median survival time for each stage.
-<<cdfstage, echo=T, fig=T, height=6, width=7>>=
+<<cdfstage, echo=T, fig=T, height=6, width=7,eval=FALSE>>=
 s.stg  <- survfit(suob ~ stage, data= orca)
 col5 <- c("green", "blue", "black", "red", "gray")
-plot(s.stg, col= col5, fun="event", mark.time=F, lwd=3 )
+plot(s.stg, col= col5, fun="event", mark.time=F )
 s.stg
 @
 
@@ -128,24 +130,23 @@ cumulative hazards
 and the second one graphs the log-cumulative hazards against log-time
 for the different stages. Compare the two presentations
 with each other and with the one in the previous item.
-<<chstage, echo=T, fig=T, height=6, width=12>>=
+<<chstage, echo=T, fig=T, height=6, width=12,eval=FALSE>>=
 par(mfrow=c(1,2))
 plot(s.stg, col= col5, fun="cumhaz", main="cum. hazards" )
 plot(s.stg, col= col5, fun="cloglog", main = "cloglog: log cum.haz"  )
-@ %
+@
 
 \item If the survival times were {\it exponentially}
  distributed in a given (sub)population
  the corresponding cloglog-curve should follow an approximately linear pattern.
 Could this be the case here in the different stages?
-  
+
 \item Also, if the survival distributions of the different subpopulations would
 obey the {\it proportional hazards} model, the vertical distance between the
 cloglog-curves should be approximately constant over the time axis.
 Do these curves indicate serious deviation from the proportional hazards assumption?
 
-\item In the lecture handouts %(p. 34, 37) 
-  it was observed that
+\item In the lecture handouts (p. 34, 37) it was observed that
 the crude contrast between males and females in total mortality appears
 unclear, but the age-adjustment in the Cox model provided a more
 expected hazard ratio estimate.
@@ -154,42 +155,44 @@ First categorize the continuous age variable
 into, say, three categories by function {\tt cut()}
 using suitable breakpoints, like 55 and 75 years, and
 cross-tabulate sex and age group:
-<<sexage, echo=T>>=
-orca$agegr <- cut( orca$age, br=c(0,55,75, 95) )
-stat.table( list( sex, agegr), 
-            list( count(), percent(agegr) ),
-            margins = TRUE, data = orca )
+<<sexage, echo=T,eval=FALSE>>=
+orca$agegr <- cut(orca$age, br=c(0,55,75, 95))
+stat.table( list( sex, agegr), list( count(), percent(agegr) ),
+             margins=T, data = orca )
 @
-Male patients are clearly younger than females in this data set.
+Male patients are clearly younger than females in these data.
 
 Now, plot Kaplan--Meier curves jointly classified by sex and age.
-<<cdfsexage, echo=T, fig=T, height=6, width=7>>=
+<<cdfsexage, echo=T, fig=T, height=6, width=7,eval=FALSE>>=
 s.agrx <- survfit(suob ~ agegr + sex, data=orca)
 par(mfrow=c(1,1))
 plot(s.agrx, fun="event", mark.time=F, xlim = c(0,15),
-             col=rep(c("red","blue"),3), 
-             lty=rep(c(2,1,5),each=2), lwd=3 )
-@ %
+             col=rep(c("red", "blue"),3), lty=c(2,2, 1,1, 5,5))
+@
+
 In each ageband the mortality curve for males is on a higher level
 than that for females.
 
 \end{enumerate}
 
+
 \subsection{Event-specific cumulative mortality curves}
+
 
 We move on to analysing cumulative mortalities for the
  two causes of death separately, first overall and then
  by prognostic factors.
 
-\begin{enumerate}[resume]
-\item Use the \texttt{survfit}-function in \texttt{survival} package
-  with option \texttt{type="mstate"}.
-<<cif1a, echo=T>>=
+\begin{enumerate}
+\item
+Use the \texttt{survfit}-function in \texttt{survival} package with option \texttt{type="mstate"}. 
+
+<<cif1a, echo=T,eval=FALSE>>=
 library(survival)
 cif1 <- survfit( Surv( time, event, type="mstate") ~ 1,
                  data = orca)
 str(cif1)
-@ %
+@
 
 \item
 One could apply here the plot method of the survfit object to plot the 
@@ -205,11 +208,11 @@ Other arguments are like in the ordinary \texttt{plot()} function.
 \item
 Draw two parallel plots describing
 the overall cumulative incidence curves for both causes of death
-<<plotcif1, echo=T,fig=T>>=
+<<plotcif1, echo=T,fig=T,eval=FALSE>>=
 par(mfrow=c(1,2))
 plotCIF(cif1, 1, main = "Cancer death")
-plotCIF(cif1, 2, main = "Other deaths")
-@ %
+plotCIF(cif1, 2, main= "Other deaths")
+@
 
 \item
 Compute the estimated
@@ -220,7 +223,7 @@ See the structure of the resulting object, in which you should
 observe strata variable containing the stage grouping variable. Plot the pertinent curves in two parallel graphs.
 Cut the $y$-axis for a more efficient graphical presentation
 
-<<plotcif2,echo=T,fig=T,height=6,width=10>>=
+<<plotcif2, echo=T, fig=T, height=6, width=10,eval=FALSE>>=
 col5 <- c("green", "blue", "black", "red", "gray")
 cif2 <- survfit( Surv( time, event, type="mstate") ~ stage,
                  data = orca)
@@ -228,10 +231,11 @@ str(cif2)
 
 par(mfrow=c(1,2))
 plotCIF(cif2, 1, main = "Cancer death by stage",
-        col = col5, ylim = c(0, 0.7), lwd=3 )
+        col = col5, ylim = c(0, 0.7) )
 plotCIF(cif2, 2, main= "Other deaths by stage",
-        col=col5, ylim = c(0, 0.7), lwd=3 )
-@ %
+        col=col5, ylim = c(0, 0.7) )
+@
+
 Compare the two plots. What would you conclude about the
 effect of stage on the two causes of death?
 
@@ -245,11 +249,13 @@ cumulative mortality from other causes. You can also add some colours for the di
 par(mfrow=c(1,1))
 stackedCIF(cif1, colour = c("gray70", "gray85"))
 @
+
+
 \end{enumerate}
 
 \subsection{Regression modelling of overall mortality.}
 
-\begin{enumerate}[resume]
+\begin{enumerate}
 
 \item
 Fit the semiparametric proportional hazards
@@ -261,7 +267,7 @@ continuous covariates like \texttt{age} here.
 The estimated rate ratios and their confidence intervals
 can also here be displayed  by applying {\tt ci.lin()}
 on the fitted model object.
-<<cox1, echo=T>>=
+<<cox1, echo=T,eval=FALSE>>=
 options(show.signif.stars = F)
 m1 <- coxph(suob ~ sex + I((age-65)/10) + stage, data= orca)
 summary( m1 )
@@ -275,9 +281,10 @@ Look at the results. What are the main findings?
 assumption of proportional hazards with respect to each of
 the variables separately
 as well as globally, using the \texttt{cox.zph()} function.
-<<coxzph, echo=T>>=
+<<coxzph, echo=T,eval=FALSE>>=
 cox.zph(m1)
 @
+
 
 \item
 No evidence against proportionality assumption could apparently be found.
@@ -287,7 +294,7 @@ group with stage unknown is a complex mixture of patients from various
 true stages. Therefore, it may be prudent to exclude these subjects from the data
 and to pool the first two stage groups into one. After that fit a model in
 the reduced data with the new stage variable.
-<<cox2, echo=T>>=
+<<cox2, echo=T,eval=FALSE>>=
 orca2 <- subset(orca, stage != "unkn")
 orca2$st3 <- Relevel( orca2$stage, list(1:2, 3, 4:5) )
 levels(orca2$st3) = c("I-II", "III", "IV")
@@ -302,7 +309,7 @@ only on 40 and 80 year old patients, respectively,
 based on the fitted model \texttt{m2}.
 You need to create a new artificial data frame
 containing the desired values for the covariates.
-<<cox2cll, echo=T>>=
+<<cox2cll, echo=T,eval=FALSE>>=
 newd <- data.frame( sex = c( rep("Male", 6), rep("Female", 6) ),
                     age = rep( c( rep(40, 3), rep(80, 3) ), 2 ),
                     st3 = rep( levels(orca2$st3), 4) )
@@ -318,20 +325,20 @@ plot( survfit(m2, newdata= subset(newd, sex=="Male" & age==80)),
 lines( survfit(m2, newdata= subset(newd, sex=="Female" & age==80)),
       col=col3, fun="event", lty=2, mark.time=F)
 
-@ %
+@
 
 \end{enumerate}
 
 \subsection{Modelling event-specific hazards and hazards of the subdistribution}
 
-\begin{enumerate}[resume]
+\begin{enumerate}
 
 \item
 Fit the Cox model for the cause-specific hazard of cancer deaths
 with the same covariates as above. In this case
 only cancer deaths are counted as events and deaths from other causes
 are included into censorings.
-<<coxhaz1, echo=T>>=
+<<coxhaz1, echo=T,eval=FALSE>>=
 m2haz1 <- coxph( Surv( time, event==1)  ~ sex + I((age-65)/10) + st3 , data=orca2 )
 round( ci.exp(m2haz1 ), 4)
 cox.zph(m2haz1)
@@ -340,7 +347,7 @@ Compare the results with those of model \texttt{m2}. What are the major differen
 
 \item
  Fit a similar model for deaths from other causes and compare the results.
-<<coxhaz2, echo=T>>=
+<<coxhaz2, echo=T,eval=FALSE>>=
 m2haz2 <- coxph( Surv( time, event==2)  ~ sex + I((age-65)/10) + st3 , data=orca2 )
 round( ci.exp(m2haz2 ), 4)
 cox.zph(m2haz2)
@@ -350,9 +357,8 @@ cox.zph(m2haz2)
 Finally, fit the Fine--Gray model for the hazard of the subdistribution
 for cancer deaths with the same covariates as above. For this you have to
 first load package \texttt{cmprsk}, containing the necessary function
-\texttt{crr()}. You also need to attach the data frame, because the
-the \texttt{crr} function does not have a \texttt{data=} argument.
-<<fg1, echo=T>>=
+\texttt{crr()}, and attach the data frame.
+<<fg1, echo=T,eval=FALSE>>=
 library(cmprsk)
 attach(orca2)
 m2fg1 <- crr(time, event, cov1 = model.matrix(m2), failcode=1)
@@ -363,7 +369,7 @@ Compare the results with those of model \texttt{m2} and \texttt{m2haz1}.
 
 \item
  Fit a similar model for deaths from other causes and compare the results.
-<<fg2, echo=T>>=
+<<fg2, echo=T,eval=FALSE>>=
 m2fg2 <- crr(time, event, cov1 = model.matrix(m2), failcode=2)
 summary(m2fg2, Exp=T)
 @
@@ -377,7 +383,7 @@ summary(m2fg2, Exp=T)
 \item Load package {\tt popEpi} for the estimation of relative survival. 
 Use the (simulated) female Finnish breast cancer patients diagnosed 
 between 1993-2012, called {\tt sibr}.
-<<test,echo=T>>=
+<<test,echo=T,eval=FALSE>>=
 library(popEpi)
 head(sibr)
 @
@@ -386,7 +392,7 @@ head(sibr)
 \item Prepare the data by using {\tt lexpand} command in the {\tt popEpi} package, define follow-up time intervals,
 (calendar time) period that you are interested and where are the population mortality figures.
 Calculate 5-year observed survival (2008-2012) using period method by Ederer II (default)
-<<test,echo=T>>=
+<<test,echo=T,eval=FALSE>>=
 ## pretend some are male
 set.seed(1L)
 sire$sex <- rbinom(nrow(sire), 1, 0.01)
@@ -406,7 +412,7 @@ x <- lexpand(sire,
 
 \item
 Calculate 5-year relative survival (2008-2012) using period method by Ederer II (default)
-<<test,echo=T,fig=TRUE>>=
+<<test,echo=T,fig=TRUE,eval=FALSE>>=
 
 st.e2 <- survtab_ag(fot ~ sex, data = x,
                     surv.type = "surv.rel",
@@ -431,7 +437,7 @@ More detailed explanation of these tools will be given by Bendix in this afterno
 Form a \texttt{Lexis} object from the data frame and
 print a summary of it. We shall name the main (and only) time axis
 in this object as {\tt stime}.
-<<lexis, echo=T>>=
+<<lexis, echo=T,eval=FALSE>>=
 orca.lex <- Lexis(exit = list(stime = time),
            exit.status = factor(event,
    labels = c("Alive", "Oral ca. death", "Other death")),
@@ -482,7 +488,7 @@ We shall now demonstrate the numerical equivalence of the Cox model
  the relevant subset of the already available {\tt orca.lex} object.
  Upon that the three-level stage factor {\tt st3} is created
  as above.
-<<split, echo=T>>=
+<<split, echo=T,eval=FALSE>>=
 orca2.lex <- subset(orca.lex, stage != "unkn" )
 orca2.lex$st3 <- Relevel( orca2$stage, list(1:2, 3, 4:5) )
 levels(orca2.lex$st3) = c("I-II", "III", "IV")
@@ -493,7 +499,7 @@ levels(orca2.lex$st3) = c("I-II", "III", "IV")
  is defined according to the splitted survival times
  stored in variable {\tt stime}.
 
-<<split, echo=T>>=
+<<split, echo=T,eval=FALSE>>=
 cuts <- sort(orca2$time[orca2$event==1])
 orca2.spl <- splitLexis( orca2.lex, br = cuts, time.scale="stime" )
 orca2.spl$timeband <- as.factor(orca2.spl$stime)
@@ -508,7 +514,7 @@ As a result we now have an expanded
  the value 1 or 2 at his/her last interval ending at the time of death.
  -- See now the structure of the splitted object.
 
-<<strsplit, echo=T>>=
+<<strsplit, echo=T,eval=FALSE>>=
 str(orca2.spl)
 orca2.spl[ 1:20, ]
 @
@@ -519,7 +525,7 @@ We are ready to fit the desired Poisson model for oral cancer death
 as the outcome. The splitted person-years are contained in {\tt lex.dur},
 and the explanatory variables are the same as in model {\tt m2haz1}.
 -- This fitting may take some time \dots
-<<poisson, echo=T>>=
+<<poisson, echo=T,eval=FALSE>>=
 m2pois1 <- glm( 1*(lex.Xst=="Oral ca. death")  ~
       -1 + timeband + sex + I((age-65)/10) + st3,
       family=poisson, offset = log(lex.dur), data = orca2.spl)
@@ -535,7 +541,7 @@ zero and better be omitted when displaying the results. Also, as each timeband
 is quantitatively
 named accoding to its leftmost point, it is good to compute the midpoint values \texttt{tbmid}
 for the timebands
-<<poissonresults, echo=T, fig=T>>=
+<<poissonresults, echo=T, fig=T,eval=FALSE>>=
 tb <- as.numeric(levels(orca2.spl$timeband)) ; ntb <- length(tb)
 tbmid <- (tb[-ntb] + tb[-1])/2   # midpoints of the intervals
 round( ci.exp(m2pois1 ), 3)
@@ -558,7 +564,7 @@ draw the estimated curve (together with a band of the 95\%
 confidence limits about the fitted values).
 From the same model you should also obtain quite familiar results for the
 rate ratios of interest.
-<<poissonspline, echo=T, fig=T>>=
+<<poissonspline, echo=T, fig=T,eval=FALSE>>=
 library(splines)
 m2pspli <- update(m2pois1, . ~  ns(stime, df = 6, intercept = F) +
         sex + I((age-65)/10) + st3)

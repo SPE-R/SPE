@@ -1,3 +1,6 @@
+
+
+
 \SweaveOpts{results=verbatim,keep.source=TRUE,eps=FALSE,include=FALSE,prefix.string=./graph/DMDK}
 <<echo=FALSE>>=
 options( width=90,
@@ -8,14 +11,21 @@ options( width=90,
 @ %
 \renewcommand{\rwpre}{./graph/DMDK}
 \section{Time-splitting, time-scales and SMR}
+
+This exercise is about mortaity among Danish Diabetes patients. It is
+based on the dataset \texttt{DMlate}, a random sample of 10,000
+patients from the Danish Diabetes Register (scrambeled dates), all
+with date of diagnosis after 1994.
+
 \begin{enumerate}
 
 
-\item First, we load the \texttt{Epi} package and the dataset, and
-  take a look at it:
+\item First, we load the \texttt{Epi} package (and two other packages
+  we will need later) and the dataset, and take a look at it:
 <<>>=
 options( width=90 )
 library( Epi )
+library( popEpi )
 library( mgcv )
 data( DMlate )
 str( DMlate )
@@ -45,10 +55,10 @@ LL <- Lexis( entry = list( A = dodm-dobth,
                              labels=c("Alive","Dead") ),
               data = DMlate )
 @ %
-  Note that we made sure the the \texttt{first} level of
-  \texttt{exit.status} is alive, because the default is the use the
-  first level as entry status when \texttt{entry.status} is not given
-  as argument.  
+Note that we made sure the the \texttt{first} level of
+\texttt{exit.status} is ``Alive'', because the default is to use the
+first level as entry status when \texttt{entry.status} is not given as
+argument to \texttt{Lexis}.
 
   The 4 persons are persons that have identical date of diabetes and
   date of death; they can be found by using \texttt{keep.dropped=TRUE}:
@@ -60,7 +70,7 @@ LL <- Lexis( entry = list( A = dodm-dobth,
        exit.status = factor( !is.na(dodth),
                              labels=c("Alive","Dead") ),
               data = DMlate,
-              keep = TRUE )
+      keep.dropped = TRUE )
 @ %
   The dropped persons are:
 <<>>=
@@ -81,309 +91,62 @@ stat.table( sex,
             list( D=sum( lex.Xst=="Dead" ),
                   Y=sum( lex.dur ),
                rate=ratio( lex.Xst=="Dead", lex.dur, 1000 ) ),
+            margins=TRUE,
             data=LL )
 @ %
-  So not surprising, we see that men have a higher mortality than women.
+  So not surprising, we see that men have a higher mortality than
+  women, here apparently only some 10\%.
 
 
   
-\item We now assess how mortality depends on age, calendar time and
-  duration. In principle we could split the follow-up along all three
-  time scales, but in practice it is sufficient to split it
-  along one of the time-scales and then just use the value of each of
-  the time-scales at the left endpoint of the intervals.
+\item When we want to assess how mortality depends on age, calendar
+  time and duration or to comapre with population mortality, we would
+  in principle split the follow-up along all three time scales, but in
+  practice it is sufficient to split it along one of the time-scales
+  and then just use the value of each of the time-scales at the left
+  endpoint of the intervals for analysis and for matching with
+  population mortality. Note however that this requires that
+  time-scales are treated as \emph{quantitative} variables in the
+  modeling.
 
   We note that the total follow-up time was some 54,000 person-years,
   so if we split the follow-up in 6-month intervals we should get a
-  bit more than 110,000 records:
+  bit more than 110,000 records. Note that in the \texttt{popEpi}
+  package there is a function with the same functionality, which is
+  faster (particularly for large datasets) and has a somewhat smarter
+  syntax --- it returns a \texttt{data.table}:
 <<>>=
-SL <- splitLexis( LL, breaks=seq(0,125,1/2), time.scale="A" )
-summary( SL )
+system.time( SL <- splitLexis( LL, breaks=seq(0,125,1/2), time.scale="A" ) )
+summary( SL ) ; class( SL )
+system.time( SL <- splitMulti( LL, A=seq(0,125,1/2) ) )
+summary( SL ) ; class( SL )
 summary( LL )
 @
   We see that the number of records have increased, but the number of
   persons, events and person-years is still the same as in
-  \texttt{LL}. Thus the amount of follow-up information is still the
+  \texttt{LL}. Thus, the amount of follow-up information is still the
   same; it is just distributed over more records, and hence allowing
   more detailed analyses. 
-  
-
-\item We now use this dataset to estimate models with age-specific
-  mortality curves for men and women separately, using natural splines
-  (the function \texttt{ns} from the \texttt{splines} package).
-<<>>=
-library( splines )
-r.m <- glm( (lex.Xst=="Dead") ~ ns( A, df=10 ),
-            offset = log( lex.dur ),
-            family = poisson,
-              data = subset( SL, sex=="M" ) )
-r.f <- update( r.m, data = subset( SL, sex=="F" ) )
-@ %
-Here we are modeling the follow-up (events
-(\texttt{(lex.Xst=="Dead")}) and person-years (\texttt{lex.dur}) ) as
-a non-linear function of age --- represented by the spline function
-\texttt{ns}.
-
-
-
-\item From these objects we could get the estimated log-rates by using
-  \texttt{predict}, by supplying a data frame of values for the
-  variables used as predictors in the model. These will be values of
-  age --- the ages where we want to see the predicted rates \emph{and}
-  \texttt{lex.dur}.
-  
-  The default \texttt{predict.glm} function is a bit clunky as it
-  gives the prediction and the standard errors of these in two different
-  elements of a list, so in \texttt{Epi} there is a wrapper function
-  \texttt{ci.pred} that uses this and computes predicted rates and
-  confidence limits for these, which is usually what is needed. 
-  
-  Note that \texttt{lex.dur} is a covariate too; by setting this to
-  1000 throughout the data frame \texttt{nd} we get the rates in units
-  of deaths per 1000 PY:
-<<>>=
-nd <-  data.frame( A = seq(10,90,0.5),
-             lex.dur = 1000)
-p.m <- ci.pred( r.m, newdata = nd )
-p.f <- ci.pred( r.f, newdata = nd )
-str( p.m )
-@ %
-  
-  
-\item We can then plot the predicted rates for men and women together
-  using \texttt{matplot}:
-<<a-rates,fig=TRUE>>=
-matplot( nd$A, cbind(p.m,p.f),
-         type="l", col=rep(c("blue","red"),each=3), lwd=c(3,1,1), lty=1,
-         log="y", xlab="Age", ylab="Mortality of DM ptt per 1000 PY")
-@ % $
-\insfig{a-rates}{0.7}{Age-specific mortality rates for Danish diabetes
-  patients as estimated from a model with only age. Blue: men, red:
-  women.}
-From the figure \ref{fig:a-rates} we see that the mortality rates are
-presumably both over- and under-modeled, over-modeled in the middle,
-and under-modeled in the beginning.
-
-  
-\item However there are also other considerations when choosing knots,
-  namely the actual shape of the curve, we may inadvertently over-model
-  a curve if we just allocate knots by the distribution of events ---
-  the curved get too wiggly. Hence, we should use a \emph{penalty}
-  to model the curves. This is available from the \texttt{gam}
-  function in the \texttt{mgcv} package. Note that \texttt{gam}
-  objects inherits from \texttt{glm}, so \texttt{ci.pred} is
-  immediately applicable, \emph{except} that when the offset is given
-  as a argument instead of a term in the model formula, the offset
-  variable is ignored in the prediction, and hence the prediction is
-  made for an offset of $0=log(1)$, that is rates in the units of
-  \texttt{lex.dur}:
-<<>>=
-library( mgcv )
-s.m <- gam( (lex.Xst=="Dead") ~ s(A,k=20),
-            offset = log( lex.dur ),
-            family = poisson,
-              data = subset( SL, sex=="M" ) )
-s.f <- update( s.m, data = subset( SL, sex=="F" ) )
-p.m <- ci.pred( s.m, newdata = nd ) * 1000
-p.f <- ci.pred( s.f, newdata = nd ) * 1000
-@   
-<<s-rates,fig=TRUE>>=
-matplot( nd$A, cbind(p.m,p.f),
-         type="l", col=rep(c("blue","red"),each=3), lwd=c(3,1,1), lty=1,
-         log="y", xlab="Age", ylab="Mortality of DM ptt per 1000 PY")
-@ % 
-\insfig{s-rates}{0.7}{Age-specific mortality rates for Danish diabetes
-  patients as estimated from a model with only age, but with penalized
-  splines (\textrm{\tt s()}). Blue: men, red: women.}
-
-From figure \ref{fig:s-rates} we see that the penalized splines render
-curves that are much less wiggly then the \texttt{ns}.
 
 \end{enumerate}
 
-\subsection*{Period and duration effects}
-\begin{enumerate}[resume]
-
-  
-\item We model the mortality rates among diabetes patients also
-  including current date and duration of diabetes. However, we shall
-  not just use the positioning of knots for the splines as provided by
-  \texttt{ns}, but model the rates using penalized splines --- note
-  that we for later prediction purposes use \texttt{lex.dur/1000} in
-  order to get predicted rates per 1000 PY --- essentially just to avoid
-  multiplying the result of \texttt{ci.pred} by 1000. 
-<<>>=
-Mcr <- gam( (lex.Xst=="Dead") ~ s(   A, k=10 ) +
-                                s(   P, k=10 ) +
-                                s( dur, k=10 ),
-            offset = log( lex.dur/1000 ),
-            family = poisson,
-              data = subset( SL, sex=="M" ) )
-summary( Mcr )
-gam.check( Mcr )
-Fcr <- update( Mcr, data = subset( SL, sex=="F" ) )
-@ %
-It is not possible to attach any meaning to the single parameters from
-the model, so we shall look at the estimated non-linear effects of
-each of the variables.
-<<eval=FALSE,echo=FALSE>>=
-# Simplification
-Mcl <- update( Mcr, . ~ A + P + s( dur, k=10 ) )
-Fcl <- update( Fcr, . ~ A + P + s( dur, k=10 ) )
-anova( Mcr, Mcl, test="Chisq" )
-anova( Fcr, Fcl, test="Chisq" )
-@ 
-
-
-\item We can now plot the estimated effects for men and women:
-<<plgam-default,fig=TRUE,height=9,width=9>>=
-par( mfrow=c(2,3) )
-plot( Mcr, ylim=c(-3,3) )
-plot( Fcr, ylim=c(-3,3) )
-@ %
-\insfig{plgam-default}{1.0}{Plot of the estimated smooth terms for men
-(top) and women (bottom).}
-However, 
-  
-  
-\item Not surprisingly, these models fit substantially better than the
-  model with only age as we can see from this comparison:
-<<>>=
-anova( Mcr, r.m, test="Chisq" )
-anova( Fcr, r.f, test="Chisq" )
-@ %
+\subsection*{SMR}
 
 
 
-%
 
-\item Since the fitted model has three time-scales: current age,
-  current date and current duration of diabetes, so the effects that
-  we see from the \texttt{plot.gam} are not really interpretable; they
-  are (as in any kind of multiple regressions) to be interpreted as
-  ``all else equal'' which they are not; the three time scales
-  advance simultaneously at the same pace.
+The SMR is the \textbf{S}tandardized \textbf{M}ortality
+\textbf{R}atio, which is the mortality rate-ratio between the diabetes
+patients and the general population.  In real studies we would
+subtract the deaths and the person-years among the diabetes patients
+from those of the general population, but since we do not have access
+to these, we make the comparison to the general population at large,
+\textit{i.e.} also including the diabetes patients.
 
-  The reporting would therefore more naturally be \emph{only} on one
-  time scale, showing the mortality for persons diagnosed in
-  different ages in a given year.
-
-  This is most easily done using the \texttt{ci.pred} function with
-  the \texttt{newdata=} argument. So a person diagnosed in age 50 in
-  1995 will have a mortality measured in cases per 1000 PY as:
-<<>>=
-pts <- seq(0,20,0.5)
-nd <- data.frame( A =   50+pts,
-                  P = 1995+pts,
-                dur =      pts,
-            lex.dur=1 )
-head( cbind( nd$A, ci.pred( Mcr, newdata=nd ) ) )
-@ % $
-Note, that since we used \texttt{offset=log(lex.dur/1000))} as
-argument in the model specification rather than the \texttt{+ offset()}
-the offset specification in \texttt{nd} will be ignored, and
-prediction be made for the scale chosen in the model specification; so
-in this case as events per 1000 PY (since \texttt{lex.dur} is in units
-of single person-years).
-
-Since there is no duration beyond 18 years in the dataset we only make
-predictions for 20 years of duration, and do it for persons diagnosed
-in 1995 and 2005 --- the latter is quite dubious too because we are
-extrapolating calendar time trends way beyond data.
-  
-We form matrices of predictions with confidence intervals, that we
-will plot in the same frame:
-<<>>=
-mpr <- fpr <- NULL
-pts <- seq(0,20,0.1)
-for( ip in c(1995,2005) )
-for( ia in c(50,60,70) )
-   { 
-nd <- data.frame( A=ia+pts,
-                  P=ip+pts,
-                dur=   pts,
-            lex.dur=1 )
-mpr <- cbind( mpr, ci.pred( Mcr, nd ) )
-fpr <- cbind( fpr, ci.pred( Fcr, nd ) )
-   }
-str( fpr )
-@ %
-These 18 columns are 9 columns for 1995, and 9 for 2005, each of these
-chunks are estimate and lower and upper confidence bound for persons
-diagnosed in ages 50, 60 and 70. 
-
-These can now be plotted:
-<<rates,fig=TRUE,width=10>>=
-par( mfrow=c(1,2) )
-matplot( cbind(50+pts,60+pts,70+pts)[,rep(1:3,2,each=3)],
-         cbind( mpr[,1:9], fpr[,1:9] ), ylim=c(5,500),
-         log="y", xlab="Age", ylab="Mortality, diagnosed 1995",
-         type="l", lwd=c(4,1,1), lty=1,
-         col=rep(c("blue","red"),each=9) )
-matplot( cbind(50+pts,60+pts,70+pts)[,rep(1:3,2,each=3)],
-         cbind( mpr[,1:9+9], fpr[,1:9+9] ), ylim=c(5,500),
-         log="y", xlab="Age", ylab="Mortality, diagnosed 2005",
-         type="l", lwd=c(4,1,1), lty=1,
-         col=rep(c("blue","red"),each=9) )
-@ %
-\insfig{rates}{1.0}{Mortality rates for diabetes patients diagnosed
-  1995 and 2005 in ages 50, 60 and 70; as estimated by penalized
-  splines. Men blue, women red.}
-
-
-\item From figure \ref{fig:rates} it seems that the duration effect is
-dramatically over-modeled, so we refit constraining the d.f. to 4:
-<<rates5,fig=TRUE,width=10>>=
-Mcr <- gam( (lex.Xst=="Dead") ~ s(   A, bs="cr", k=10 ) +
-                                s(   P, bs="cr", k=10 ) +
-                                s( dur, bs="cr", k=4 ),
-            offset = log( lex.dur/1000 ),
-            family = poisson,
-              data = subset( SL, sex=="M" ) )
-Fcr <- update( Mcr, data = subset( SL, sex=="F" ) )
-mpr <- fpr <- NULL
-pts <- seq(0,20,0.1)
-for( ip in c(1995,2005) )
-for( ia in c(50,60,70) )
-   { 
-nd <- data.frame( A=ia+pts,
-                  P=ip+pts,
-                dur=   pts,
-            lex.dur=1000 )
-mpr <- cbind( mpr, ci.pred( Mcr, nd ) )
-fpr <- cbind( fpr, ci.pred( Fcr, nd ) )
-   }
-par( mfrow=c(1,2) )
-matplot( cbind(50+pts,60+pts,70+pts)[,rep(1:3,2,each=3)],
-         cbind( mpr[,1:9], fpr[,1:9] ), ylim=c(5,500),
-         log="y", xlab="Age", ylab="Mortality, diagnosed 1995",
-         type="l", lwd=c(4,1,1), lty=1,
-         col=rep(c("blue","red"),each=9) )
-matplot( cbind(50+pts,60+pts,70+pts)[,rep(1:3,2,each=3)],
-         cbind( mpr[,1:9+9], fpr[,1:9+9] ), ylim=c(5,500),
-         log="y", xlab="Age", ylab="Mortality, diagnosed 2005",
-         type="l", lwd=c(4,1,1), lty=1,
-         col=rep(c("blue","red"),each=9) )
-@ %
-\insfig{rates5}{1.0}{Mortality rates for diabetes patients diagnosed
-  1995 and 2005 in ages 50, 60 and 70; as estimated by penalized
-  splines. Men blue, women red.}
-
-\end{enumerate}
-
-\subsection{SMR}
-
-
-There are two ways to make the comparison of the diabetes mortality to
-the population mortality; one is to amend (stack) the diabetes patient
-dataset with the population mortality dataset and then analyze the
-rate-ratio between persons with and without diabetes. The other (classical)
-one is to include the population mortality rates as a fixed variable
-in the calculations.
-
-The latter requires that each analytic unit in the diabetes patient
-dataset is amended with a variable with the population mortality rate
-for the corresponding sex, age and calendar time.
+We now want to include the population mortality rates as a fixed
+variable in the split dataset; for each record in the split dataset we
+attach the value of the population mortality for the relevant sex, and
+and calendar time.
 
 This can be achieved in two ways: Either we just use the current split
 of follow-up time and allocate the population mortality rates for some
@@ -455,10 +218,270 @@ stat.table( list( sex, Age = floor(pmax(A,39)/10)*10 ),
                   Y = sum(lex.dur), 
                   E = sum(E), 
                 SMR = ratio(lex.Xst=="Dead",E) ), 
+             margin = TRUE,
                data = SLr )
 @ %
   We see that the SMR is pretty much the same for women and men, but
   also that there is a steep decrease in SMR by age. 
+
+
+
+\item We can fit a poisson model with sex as the explanatory variable and
+  log-expected as offset to derive the SMR (and c.i.).
+
+  Some of the population mortality rates are 0, so we must exclude
+  those records from the analysis.
+<<>>=
+msmr <- glm( (lex.Xst=="Dead") ~ sex - 1 + offset(log(E)),
+             family = poisson,
+             data = subset(SLr,E>0) )
+ci.exp( msmr )
+@ %
+  These are the same SMRs as just coomputed by \texttt{stat.table},
+  but now with confidence intervals.
+  
+  We can assess the ratios of SMRs between men and women by using the
+  \texttt{ctr.mat} argument:
+<<>>=
+round( ci.exp( msmr, ctr.mat=rbind(M=c(1,0),W=c(0,1),'M/F'=c(1,-1)) ), 2 )
+@ %  
+
+\end{enumerate}
+
+\subsection*{Age-specific mortality}
+ 
+\begin{enumerate}[resume]
+  
+
+\item We now use this dataset to estimate models with age-specific
+  mortality curves for men and women separately, using splines (the
+  function \texttt{gam}, using \texttt{s} from the \texttt{mgcv}
+  package).
+<<>>=
+r.m <- gam( (lex.Xst=="Dead") ~ s(A,k=20) + offset( log(lex.dur) ),
+            family = poisson,
+              data = subset( SL, sex=="M" ) )
+r.f <- update( r.m, data = subset( SL, sex=="F" ) )
+gam.check( r.m )
+gam.check( r.f )
+@ %
+Here we are modeling the follow-up (events
+(\texttt{(lex.Xst=="Dead")}) and person-years (\texttt{lex.dur}) ) as
+a non-linear function of age --- represented by the penalized spline
+function \texttt{s}.
+
+
+
+\item From these objects we could get the estimated log-rates by using
+  \texttt{predict}, by supplying a data frame of values for the
+  variables used as predictors in the model. These will be values of
+  age --- the ages where we want to see the predicted rates \emph{and}
+  \texttt{lex.dur}.
+  
+  The default \texttt{predict.gam} function is a bit clunky as it
+  gives the prediction and the standard errors of these in two different
+  elements of a list, so in \texttt{Epi} there is a wrapper function
+  \texttt{ci.pred} that uses this and computes predicted rates and
+  confidence limits for these, which is usually what is needed. 
+  
+  Note that interms of prediction \texttt{lex.dur} is a covariate too;
+  by setting this to 1000 throughout the data frame \texttt{nd} we get
+  the rates in units of deaths per 1000 PY\footnote{Note however this is only
+  the case if the offset is specified in the model formula. If the offset is
+  specified as an argument (\texttt{offset = log(lex.dur)}), then the
+  value of \texttt{lex.dur} in the dataframe will be ignored
+  (equivaent of setting \texttt{lex.dur} to 1 in the \texttt{newdata}
+  argument to \texttt{ci.pred}.)}
+<<>>=
+nd <-  data.frame( A = seq(20,90,0.5),
+             lex.dur = 1000)
+p.m <- ci.pred( r.m, newdata = nd )
+p.f <- ci.pred( r.f, newdata = nd )
+str( p.m )
+@ %
+  
+  
+\item We can then plot the predicted rates for men and women together
+  using \texttt{matplot}:
+<<a-rates,fig=TRUE>>=
+matplot( nd$A, cbind(p.m,p.f),
+         type="l", col=rep(c("blue","red"),each=3), lwd=c(3,1,1), lty=1,
+         log="y", xlab="Age", ylab="Mortality of DM ptt per 1000 PY")
+@ % $
+An alternative is to use \texttt{matshade} that gives confidence
+limist as shaded areas
+<<A-rates,fig=TRUE>>=
+matshade( nd$A, cbind(p.m,p.f), plot=TRUE,
+          col=c("blue","red"), lty=1,
+          log="y", xlab="Age", ylab="Mortality of DM ptt per 1000 PY")
+@ % $
+\insfig{A-rates}{0.7}{Age-specific mortality rates for Danish diabetes
+  patients as estimated from a \textrm{\tt gam} model with only
+  age. Blue: men, red: women.}
+
+   Not surprisingly, the uncertainty on the rates is largest among the
+   youngest where the no. of deths is smallest. 
+
+\end{enumerate}
+
+\subsection*{Period and duration effects}
+
+\begin{enumerate}[resume]
+
+  
+\item We model the mortality rates among diabetes patients also
+  including current date and duration of diabetes. Note that we for
+  later prediction purposes put the offset in the model formula.
+<<>>=
+Mcr <- gam( (lex.Xst=="Dead") ~ s(   A, bs="cr", k=10 ) +
+                                s(   P, bs="cr", k=10 ) +
+                                s( dur, bs="cr", k=10 ) + offset(log(lex.dur)),
+            family = poisson,
+              data = subset( SL, sex=="M" ) )
+summary( Mcr )
+Fcr <- update( Mcr, data = subset( SL, sex=="F" ) )
+summary( Fcr )
+gam.check( Mcr )
+gam.check( Fcr )
+@ %
+For the male rates the \texttt{edf} (effective degrees of freedom) is
+quite close to the \texttt{k}, but as wee shall see no need to more
+detailed modeling.
+
+
+\item We can now plot the estimated effects for men and women:
+<<plgam-default,fig=TRUE,height=9,width=9>>=
+par( mfrow=c(2,3) )
+plot( Mcr, ylim=c(-3,3), col="blue" )
+plot( Fcr, ylim=c(-3,3), col="red" )
+@ %
+\insfig{plgam-default}{1.0}{Plot of the estimated smooth terms for men
+(top) and women (bottom). Clearly it seems that the duration effects
+are somewhat over-modeled.}
+  
+  
+\item Not surprisingly, these models fit substantially better than the
+  model with only age as we can see from this comparison:
+<<>>=
+anova( Mcr, r.m, test="Chisq" )
+anova( Fcr, r.f, test="Chisq" )
+@ %
+
+
+
+
+
+\item Since the fitted model has three time-scales: current age,
+  current date and current duration of diabetes, so the effects that
+  we see from the \texttt{plot.gam} are not really interpretable; they
+  are (as in any kind of multiple regressions) to be interpreted as
+  ``all else equal'' which they are not; the three time scales
+  advance simultaneously at the same pace.
+
+  The reporting would therefore more naturally be \emph{only} on one
+  time scale, showing the mortality for persons diagnosed in
+  different ages in a given year.
+
+  This is most easily done using the \texttt{ci.pred} function with
+  the \texttt{newdata=} argument. So a person diagnosed in age 50 in
+  1995 will have a mortality measured in cases per 1000 PY as:
+<<>>=
+pts <- seq(0,17,0.5)
+nd <- data.frame( A =   50+pts,
+                  P = 1995+pts,
+                dur =      pts,
+            lex.dur = 1000 )
+head( cbind( nd$A, ci.pred( Mcr, newdata=nd ) ) )
+@ % $
+Note, that we used \texttt{+ offset(log(lex.dur))} as the offset
+specification in the model, the value of \texttt{lex.dur} in
+\texttt{nd} will be honoured and prediction be made for the scale
+chosen, in the model specification; so in this case as events per 1000
+PY (since \texttt{lex.dur} is in units of single person-years).
+
+Since there is no duration beyond 18 years in the dataset we only make
+predictions for 12 years of duration, and do it for persons diagnosed
+in 1995 and 2005 --- the latter is quite dubious too because we are
+extrapolating calendar time trends way beyond data.
+  
+We form matrices of predictions with confidence intervals, that we
+will plot in the same frame:
+<<rates,fig=TRUE>>=
+pts <- seq(0,12,0.1)
+plot( NA, xlim = c(50,85), ylim = c(5,400), log="y",
+          xlab="Age", ylab="Mortality rate for DM patients" )
+for( ip in c(1995,2005) )
+for( ia in c(50,60,70) )
+   {
+nd <- data.frame( A=ia+pts,
+                  P=ip+pts,
+                dur=   pts,
+            lex.dur=1000 )
+matshade( nd$A, ci.pred( Mcr, nd ), col="blue" )
+matshade( nd$A, ci.pred( Fcr, nd ), col="red" )
+   }
+@ %
+\insfig{rates}{1.0}{Mortality rates for diabetes patients diagnosed
+  1995 and 2005 in ages 50, 60 and 70; as estimated by penalized
+  splines. Men blue, women red.}
+
+
+\item From figure \ref{fig:rates} it seems that the duration effect is
+dramatically over-modeled, so we refit constraining the d.f. to 5 (note
+that this choice is essentially an arbitray choice) and redo the whole
+thing again:
+<<rates5,fig=TRUE,width=10>>=
+Mcr <- gam( (lex.Xst=="Dead") ~ s(   A, bs="cr", k=10 ) +
+                                s(   P, bs="cr", k=10 ) +
+                                s( dur, bs="cr", k=5 ) +
+                                offset( log(lex.dur) ),
+            family = poisson,
+              data = subset(SL,sex=="M") )
+Fcr <- update( Mcr, 
+              data = subset(SL,sex=="F") )
+gam.check( Mcr )
+gam.check( Fcr )
+@ %
+Thus it seems that \texttt{k=5} is a bit \texttt{under} modeling the
+duration effect.
+
+We also add the rate-ratio between men and women using the
+\texttt{ci.ratio} function:
+<<rates-5,fig=TRUE>>=
+plot( NA, xlim = c(50,80), ylim = c(0.9,100), log="y",
+          xlab="Age", ylab="Mortality rate for DM patients" )
+abline( v = c(50,55,60,65,70), col=gray(0.8) )
+# for( ip in c(1995,2005) )
+ip <- 2005
+for( ia in c(50,55,60,65,70) )
+   {
+nd <- data.frame( A=ia+pts,
+                  P=ip+pts,
+                dur=   pts,
+            lex.dur=1000 )
+matshade( nd$A, rm <- ci.pred( Mcr, nd ), col="blue", lwd=2 )
+matshade( nd$A, rf <- ci.pred( Fcr, nd ), col="red" , lwd=2 )
+matshade( nd$A, ci.ratio( rm, rf ), lwd=2 )
+   } 
+abline( h=1, lty="55" )
+@ %
+\insfig{rates-5}{1.0}{Mortality rates for diabetes patients diagnosed
+  1995 and 2005 in ages 50, 55, 60, 65 and 70; as estimated by penalized
+  splines. Note that we did this for year of diagnosis 2005 alone, but
+  for a longer duration period. Men blue, women red, M/W rate ratio gray.}
+From figure \ref{fig:rates-dur} we see that there is an incraesed
+mortality in the first few years afer diagnosis (this is a clinical
+artifact) and little indication that age \emph{at} diagnosis has any effect.
+(This can of course be tried explicitly).
+
+Moreover it is pretty clear that the M/W mortality rate ratio is
+constant across age and duration.
+
+\end{enumerate}
+
+\subsection{SMR modeling}
+
+\begin{enumerate}[resume]
 
   
   
@@ -474,59 +497,46 @@ stat.table( list( sex, Age = floor(pmax(A,39)/10)*10 ),
   analyses for mortality rates:
 <<SMReff,fig=TRUE,width=10>>=
 SLr <- subset( SLr, E>0 )
-Msm <- gam( (lex.Xst=="Dead") ~ s(   A, k=10 ) +
-                                s(   P, k=10 ) +
-                                s( dur, k=10 ),
-            offset = log( E ),
-            family = poisson,
-                    data = subset( SLr, sex=="M" ) )
-Fsm <- update( Msm, data = subset( SLr, sex=="F" ) )
-summary( Msm )
-summary( Fsm )
+Msmr <- gam( (lex.Xst=="Dead") ~ s(   A, bs="cr", k=10 ) +
+                                 s(   P, bs="cr", k=10 ) +
+                                 s( dur, bs="cr", k=5 ),
+              offset = log( E ),
+              family = poisson,
+                data = subset( SLr, sex=="M" ) )
+Fsmr <- update( Msmr, 
+                data = subset( SLr, sex=="F" ) )
+summary( Msmr )
+summary( Fsmr )
 par( mfrow=c(2,3) )
-plot( Msm, ylim=c(-1,2) )
-plot( Fsm, ylim=c(-1,2) )
+plot( Msmr, ylim=c(-1,2), col="blue" )
+plot( Fsmr, ylim=c(-1,2), col="red" )
 @ %
 \insfig{SMReff}{1.0}{Estimated effects of age, calendar time and
   duration on SMR --- top men, bottom women}
 
 
-\item We then compute the predicted rates from the models for men and
+\item We then compute the predicted SMRs from the models for men and
   women diagnosed in ages 50, 60 and 70 in 1995 and 2005,
   respectively, and show them in plots side by side. We are going to
   make this type of plot for other models (well, pairs, for men and
   women) so we wrap it in a function:
 <<SMRsm,fig=TRUE,width=10>>=
-show.mort <-
-function( Msm, Fsm )
-    {
-mpr <- fpr <- NULL
-pts <- seq(0,15,0.1)
-for( ip in c(1995,2005) )
-for( ia in c(50,60,70) )
-   { 
+plot( NA, xlim = c(50,80), ylim = c(0.8,5), log="y",
+          xlab="Age", ylab="SMR relative to total population" )
+abline( v = c(50,55,60,65,70), col=gray(0.8) )
+# for( ip in c(1995,2005) )
+ip <- 2005
+for( ia in c(50,55,60,65,70) )
+   {
 nd <- data.frame( A=ia+pts,
                   P=ip+pts,
                 dur=   pts,
                   E=1 )
-mpr <- cbind( mpr, ci.pred( Msm, nd ) )
-fpr <- cbind( fpr, ci.pred( Fsm, nd ) )
-   }
-par( mfrow=c(1,2) )
-matplot( cbind(50+pts,60+pts,70+pts)[,rep(1:3,2,each=3)],
-         cbind( mpr[,1:9], fpr[,1:9] ), ylim=c(0.5,5),
-         log="y", xlab="Age", ylab="SMR, diagnosed 1995",
-         type="l", lwd=c(4,1,1), lty=1,
-         col=rep(c("blue","red"),each=9) )
-abline( h= 1)
-matplot( cbind(50+pts,60+pts,70+pts)[,rep(1:3,2,each=3)],
-         cbind( mpr[,1:9+9], fpr[,1:9+9] ), ylim=c(0.5,5),
-         log="y", xlab="Age", ylab="SMR, diagnosed 2005",
-         type="l", lwd=c(4,1,1), lty=1,
-         col=rep(c("blue","red"),each=9) )
-abline( h= 1)
-    }
-show.mort( Msm, Fsm )
+matshade( nd$A, rm <- ci.pred( Msmr, nd ), col="blue", lwd=2 )
+matshade( nd$A, rf <- ci.pred( Fsmr, nd ), col="red" , lwd=2 )
+matshade( nd$A, ci.ratio( rm, rf ), lwd=2, col=gray(0.5) )
+   } 
+abline( h=1, lty="55" )
 @ %
 \insfig{SMRsm}{1.0}{Mortality rates for diabetes patients diagnosed
   1995 and 2005 in ages 50, 60 and 70; as estimated by penalized
@@ -534,8 +544,8 @@ show.mort( Msm, Fsm )
 
 From figure \ref{fig:SMRsm} we see that like for mortality there is a
 clear peak at diagnosis and flattening after approximately 2
-years. But also that the duration is possibly over-modeled.
-
+years. But also that the duration is possibly over-modeled. Finally
+there is no indication that the SMR is different for men and women.
   
   
 \item It would be natural to simplify the model to one with a non-linear
@@ -543,74 +553,92 @@ years. But also that the duration is possibly over-modeled.
   calendar time, and moreover to squeeze the number of d.f. for the
   non-linear smooth term for duration:
 <<>>=
-llsm <- gam( (lex.Xst=="Dead") ~ I(A-60) + 
-                                 I(P-2000) + 
-                                 s( dur, k=5 ),
-             offset = log( E ),
+Asmr <- gam( (lex.Xst=="Dead") ~ sex +
+                                 sex:I(A-60) + 
+                                 sex:I(P-2000) +
+                                 s( dur, k=5 ) +
+                                 offset( log(E) ),
              family = poisson,
-               data = subset( SLr, sex=="M" ) )
-summary( llsm )
-gam.check( llsm )
-llsf <- update( llsm, data = subset( SLr, sex=="F" ) )
-round( (cbind( ci.exp( llsm, subset="-" ),
-               ci.exp( llsf, subset="-" ) )-1)*100, 1 )
+               data = SLr )
+summary( Asmr )
+gam.check( Asmr )
+round( ( ci.exp(Asmr,subset="sex")-1 )*100, 1 )
 @ %
-Thus the change in SMR per year of age is about 2\% / year for both
-sexes and 1.2\% per calendar year for man, but 2.1\% per year for women.
+Thus the decrease in SMR per year of age is about 2\% / year for both
+sexes and 1.3\% per calendar year for men, but 1.8\% per year for women.
+
+The estimate of sex indicates that the SMR for 60 year old women in
+2000 at duration 0 of DM is about 3.6\% larger than that of men, but nowhere near
+significantly so.
 
 
 \item We can use the previous code to show the predicted mortality
-  under this model:
-
+  under this model. 
 <<SMRsl,fig=TRUE,width=10>>=
-show.mort( llsm, llsf )
+plot( NA, xlim = c(50,80), ylim = c(0.8,5), log="y",
+          xlab="Age", ylab="SMR relative to total population" )
+abline( v = c(50,55,60,65,70), col=gray(0.8) )
+# for( ip in c(1995,2005) )
+ip <- 2005
+for( ia in c(50,55,60,65,70) )
+   {
+nd <- data.frame( A=ia+pts,
+                  P=ip+pts,
+                dur=   pts,
+                  E=1 )
+matshade( nd$A, rm <- ci.pred( Asmr, cbind(nd,sex="M") ), col="blue", lwd=2 )
+matshade( nd$A, rf <- ci.pred( Asmr, cbind(nd,sex="F") ), col="red" , lwd=2 )
+matshade( nd$A, ci.ratio( rm, rf ), lwd=2, col=gray(0.5) )
+   } 
+abline( h=1, lty="55" )
 @ %
 \insfig{SMRsl}{1.0}{Mortality rates for diabetes patients diagnosed
   1995 and 2005 in ages 50, 60 and 70; as estimated by penalized
   splines. Men blue, women red.}
+We see that there is absolutely no indication of difference between
+men and women, but also that the estimated effect of duraion is not
+exactly credible.
 
-%
 
 \item If we deem the curves non-credible, we may resort to a brutal
   parametric assumption without any penalization of curvature
   involved. If we choose a natural spline for the duration with knots
   at 0,1,3,6 years we get a model with 3 parameters, try:
 <<>>=
-dim( Ns(SLr$dur, knots=c(0,1,3,6) ) )
+dim( Ns(SLr$dur, knots=c(0,1,4,8) ) )
 @ %   
   Now fit the same model as above using this:
 <<>>=
-Mglm <- glm( (lex.Xst=="Dead") ~ I(A-60) + 
-                                 I(P-2000) + 
-                                Ns( dur, knots=c(0,1,3,6) ),
-             offset = log( E ),
-             family = poisson,
-               data = subset( SLr, sex=="M" ) )
-Fglm <- update( Mglm, data = subset( SLr, sex=="F" ) )
-show.mort( Mglm, Fglm )
+SMRglm <- glm( (lex.Xst=="Dead") ~ I(A-60) + 
+                                   I(P-2000) + 
+                                   Ns( dur, knots=c(0,1,4,8) ) +
+                                   offset( log(E) ),
+               family = poisson,
+                 data = SLr )
 @ %
-  We can wrap the knots in a function so we can inspect the effect of
-  moving knots around:
-<<>>=
-move.kn <-
-function( kn )
-    {
-Mglm <- glm( (lex.Xst=="Dead") ~ I(A-60) + 
-                                 I(P-2000) + 
-                                Ns( dur, knots=kn ),
-             offset = log( E ),
-             family = poisson,
-               data = subset( SLr, sex=="M" ) )
-Fglm <- update( Mglm, data = subset( SLr, sex=="F" ) )
-show.mort( Mglm, Fglm )
-    }
+Then we can plot again:
+<<SMRsp,fig=TRUE,width=10>>=
+plot( NA, xlim = c(50,80), ylim = c(0.8,5), log="y",
+          xlab="Age", ylab="SMR relative to total population" )
+abline( v = c(50,55,60,65,70), col=gray(0.8) )
+# for( ip in c(1995,2005) )
+ip <- 2005
+for( ia in c(50,55,60,65,70) )
+   {
+nd <- data.frame( A=ia+pts,
+                  P=ip+pts,
+                dur=   pts,
+                  E=1 )
+matshade( nd$A, ci.pred( SMRglm, nd ), lwd=2 )
+   } 
+abline( h=1, lty="55" )
 @ %
-The main conclusion seem to be that SMR decrease by a factor 2 during
-the first 2 years after diagnosis and after that increases a bit
-whereafter it is stable for men and decreasing for women. Depending on
-how we choose the knots, we may conclude that the long-terms SMR for
-women is smaller the younger the diagnosis, where as for men it is the
-other way round but to a much lesser degree.
-
+\insfig{SMRsp}{1.0}{Mortality rates for diabetes patients diagnosed
+  1995 and 2005 in ages 50, 60 and 70; as estimated by penalized
+  splines, no difference between men and women assumed} Form figure
+\ref{fig:SMRsp} it appears that the SMR drops by a factor 2 during the
+first 2 years, increases a bit and after that decreases by age. But
+the general pattern is that after som 5 years the SMR no longer depend
+on the age at diagnosis --- but the evidence for this is pretty thin.
 
 \end{enumerate}
