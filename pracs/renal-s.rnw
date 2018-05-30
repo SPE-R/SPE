@@ -1,3 +1,4 @@
+
 \SweaveOpts{results=verbatim,keep.source=TRUE,include=FALSE,eps=FALSE,prefix.string=./graph/renal}
 <<echo=FALSE>>=
 options( width=90,
@@ -6,41 +7,34 @@ options( width=90,
          par(mar=c(3,3,1,1),mgp=c(3,1,0)/1.6,las=1,bty="n") ) )
 @ %
 \renewcommand{\rwpre}{./graph/renal}
+\section{Time-dependent variables and multiple states}
 
-\section{Renal complications:%
-\newline Time-dependent variables and multiple states}
+
+
 
 \subsection{The renal failure dataset}
 
-The dataset \texttt{renal.dta} contains data on follow up of 125
-patients from Steno Diabetes Center. They enter the study when they
-are diagnosed with nephrotic range albuminuria (NRA). This is a
-condition where the levels of albumin in the urine is exceeds a
-certain level as a sign of kidney disease. The levels may however drop
-as a consequence of treatment, this is called remission. Patients exit
-the study at death or kidney failure (dialysis or transplant).
-
 \begin{enumerate}
 
-
+    
 \item The dataset is in Stata-format, so we read the dataset
   using \texttt{read.dta} from the \texttt{foreign} package (which is
   part of the standard \R-distribution):
 <<>>=
-library( Epi ) ; clear()
+library( Epi ) 
 library( foreign )
-# renal <- read.dta( "http://BendixCarstensen.com/SPE/data/renal.dta" )
-renal <- read.dta( "./data/renal.dta" )
+clear()
+renal <- read.dta( "http://BendixCarstensen.com/SPE/data/renal.dta" )
+# renal <- read.dta( "./data/renal.dta" )
 renal$sex <- factor( renal$sex, labels=c("M","F") )
 head( renal )
 @ %
 
-  
 
-\item We use the \texttt{Lexis} function to declare the data as survival
-  data with age, calendar time and time since entry into the study as
-  timescales. Note that any coding of event $>0$ will be labeled
-  ``ESRD'', i.e. renal death (death of kidney (transplant or
+\item We use the \texttt{Lexis} function to declare the data as
+  survival data with age, calendar time and time since entry into the
+  study as timescales. Note that any coding of event $>0$ will be
+  labeled ``ESRD'', i.e. renal death (death of kidney (transplant or
   dialysis), or person).
   
   Note that you must make sure that the ``alive'' state (here
@@ -48,15 +42,15 @@ head( renal )
   starts in this state (unless of course \texttt{entry.status} is
   specified):
 <<>>=
-Lr <- Lexis( entry = list( per=doe,
-                           age=doe-dob,
-                           tfi=0 ),
-              exit = list( per=dox ),
+Lr <- Lexis( entry = list( per = doe,
+                           age = doe-dob,
+                           tfi = 0 ),
+              exit = list( per = dox ),
        exit.status = factor( event>0, labels=c("NRA","ESRD") ),
               data = renal )
 str( Lr )
 summary( Lr )
-@
+@ %
 
 
 \item We can visualize the follow-up in a Lexis-diagram, using the
@@ -83,7 +77,7 @@ plot( Lr, col="black", lwd=3 )
 \item We can produce a slightly more fancy Lexis diagram. Note that we
   have a $x$-axis of 40 years, and a $y$-axis of 80 years, so when
   specifying the output file adjust the \emph{total} width of the plot
-  so that the use \texttt{mai} to specify the margins of the plot
+  so that the use mai \texttt{mai} to specify the margins of the plot
   leaves a plotting area twice as high as wide. The \texttt{mai}
   argument to \texttt{par} gives the margins in inches, so the total
   size of the horizontal and vertical margins is 1 inch, to which we
@@ -114,6 +108,7 @@ dev.off()
   \label{fig:Lexis-fancy}
 \end{figure}
 
+ 
 
 \item We now do a Cox-regression analysis with the variables sex and age at
   entry into the study, using time since entry to the study as time scale.
@@ -128,10 +123,8 @@ inverse of the c.i. for female vs male) and between two persons who
 differ 10 years in age at entry it is 1.74 (1.32--2.29).
 
 
-
-
-\item The main focus of the paper was to assess whether the occurrence of
-  remission (return to a lower level of albumin excretion, an
+\item The main focus of the paper was to assess whether the occurrence
+  of remission (return to a lower level of albumin excretion, an
   indication of kidney recovery) influences mortality.
 
   ``Remission'' is a time-dependent variable which is initially 0, but
@@ -150,7 +143,7 @@ Lc <- cutLexis( Lr, cut = Lr$dor, # where to cut follow up
        precursor.states = "NRA" ) # which states are less severe
 summary( Lc )
 @ %
-Note that we have two different ESRD states depending on wheter the
+Note that we have two different ESRD states depending on whether the
 person was in remission or not at the time of ESRD.
 
 To illustrate how the cutting of follow-up has worked we can list the
@@ -166,17 +159,18 @@ subset( Lc, lex.id %in% c(2:4,21) )[,c(1:9,12)]
   that requires you to click in the graph window
 
   Alternatively you can let R try to place the boxes for you, and even
-compute rates (in this case in units of events per 100 PY):
+  compute rates (in this case in units of events per 100 PY):
 <<Lc-boxes,fig=TRUE>>=
 # boxes( Lc, boxpos=TRUE, scale.R=100, show.BE=TRUE, hm=1.5, wm=1.5 )
 boxes( Relevel(Lc,c(1,2,4,3)), 
        boxpos=TRUE, scale.R=100, show.BE=TRUE, hm=1.5, wm=1.5 )
 @ % $
 \insfig{Lc-boxes}{0.7}{States and transitions between them.\\
-The number in the boxes are the person-years and the number of persons
-starting (left) and ending (right) their follow-up in each state; the
-numbers on the arrows are the number of transitions and the overall
-transition rates (in per 100 PY, by the \textrm{\tt scale.R=100}).}
+  The numbers in each box are the person-years and the number of
+  persons starting (left) and ending (right) their follow-up in each
+  state; the numbers on the arrows are the number of transitions and
+  the overall transition rates (in per 100 PY, by the \textrm{\tt
+    scale.R=100}).}
 
 
 \item We can make a Lexis diagram where different coloring is
@@ -199,6 +193,7 @@ points( Lc, pch=c(NA,NA,1,1)[Lc$lex.Xst],
 \insfig{Lexis-rem}{0.9}{Lexis diagram for the split data, where time after
     remission is shown in green.}
 
+
 \item We now make Cox-regression of mortality (i.e. endpoint
        ``ESRD'') with sex, age at entry and remission as explanatory
        variables, using time since entry as timescale.
@@ -211,16 +206,16 @@ points( Lc, pch=c(NA,NA,1,1)[Lc$lex.Xst],
 m1 <- coxph( Surv( tfi,                  # from
                    tfi+lex.dur,          # to
                    lex.Xst %in% EP ) ~   # event
-             sex + I((doe-dob-50)/10) + 
+             sex + I((doe-dob-50)/10) +  # fixed covariates
              (lex.Cst=="Rem"),           # time-dependent variable 
              data = Lc )
 summary( m1 )
 @ %
-We see that the rate of ESRD is less than a third among those
+  We see that the rate of ESRD is less than a third among those
   who obtain remission --- 0.28 (0.13--0.60), showing that we can be
   pretty sure that the rate is at least halved.
 
-
+  
 \item The assumption in this model about the two rates of remission is
   that they are proportional as functions of time since
   remission. This could be tested quickly with the \texttt{cox.zph} function:
@@ -237,8 +232,8 @@ cox.zph( m1 )
 
 
 \begin{enumerate}[resume]
-  
 
+  
 \item We split the follow-up time every month after entry, and verify
   that the number of events and risk time is the same as before and
   after the split:
@@ -259,14 +254,14 @@ summary(sLc, scale=100 )
   baseline hazard that is not visible in the Cox-model)
 <<>>=
 library( splines )
-mp <- glm( lex.Xst %in% EP ~ ns( tfi, df=4 ) +
+mp <- glm( lex.Xst %in% EP ~ Ns( tfi, knots=c(0,2,5,10) ) +
            sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem"),
            offset = log(lex.dur),
            family = poisson, 
              data = sLc )
 ci.exp( mp )
 @ %
-We see that the effecst are pretty much the same as from the
+We see that the effects are pretty much the same as from the
 Cox-model.
 
 
@@ -275,12 +270,12 @@ Cox-model.
 <<>>=
 library( mgcv )
 mx <- gam( (lex.Xst %in% EP) ~ s( tfi, k=10 ) +
-           sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem"),
-           offset = log(lex.dur),
+           sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem") +
+           offset( log(lex.dur) ),
            family = poisson, 
              data = sLc )
-ci.exp( mp, subset=c("I","sex") )
-ci.exp( mx, subset=c("I","sex") )
+ci.exp( mp, subset=c("Cst","doe","sex") )
+ci.exp( mx, subset=c("Cst","doe","sex") )
 @ %
 We see that there is virtually no difference between the two
 approaches in terms of the regression parameters.
@@ -291,7 +286,7 @@ approaches in terms of the regression parameters.
 <<>>=
 ci.exp( mx, subset=c("sex","dob","Cst"), pval=TRUE )
 ci.exp( m1 )
-round( ci.exp( mp, subset=c("sex","dob","Cst") ) / ci.exp( m1 ), 2 )
+round( ci.exp( mp, subset=c("sex","dob","Cst") ) / ci.exp( m1 ), 3 )
 @ %def
 Thus we see that it has an absolute minimal influence on the
 regression parameters to impose the assumption of smoothly varying
@@ -321,20 +316,18 @@ nd <- data.frame( tfi = seq(0,20,.1),
                   doe = 1990,
                   dob = 1940,
               lex.Cst = "NRA",
-              lex.dur = 1 )
+              lex.dur = 100 )
 str( nd )
-matplot( nd$tfi, cbind( ci.pred( mx, newdata=nd )*100,
-                        ci.pred( mp, newdata=nd )*100 ),
-         type="l", lty=1, lwd=c(4,1,1), col=rep(c("gray","black"), each=3),
-         log="y", xlab="Time since entry (years)",
-                  ylab="ESRD rate (per 100 PY) for 50 year man" )
-@ %
+matshade( nd$tfi, cbind( ci.pred( mp, newdata=nd ),
+                         ci.pred( mx, newdata=nd ) ), plot=TRUE,
+          type="l", lwd=3:4, col=c("black","forestgreen"),
+          log="y", xlab="Time since entry (years)",
+                   ylab="ESRD rate (per 100 PY) for 50 year man" )
+@ % 
 \insfig{pred}{0.7}{Rates of ESRD by time since NRA for a man aged 50 at
-  start of NRA. The gray line is the curve fitted by \texttt{gam}, the
-  black the one fitted by an ordinary \texttt{glm} using \texttt{ns}
-  with 4 d.f.}
-
-
+  start of NRA. The green line is the curve fitted by \texttt{gam}, the
+  black the one fitted by an ordinary \texttt{glm} using \texttt{Ns}
+  with knots at 0, 2, 5 and 10 years.}
 
 
 \item Apart from the baseline timescale, time since NRA, the time
@@ -359,8 +352,8 @@ sLc <- transform( sLc, tfr = pmax( (per-dor)/10, 0, na.rm=TRUE ) )
 <<time-since-rem>>=
 mPx <- gam( lex.Xst %in% EP ~ s( tfi, k=10 ) +
                    factor(sex) + I((doe-dob-40)/10) +  
-                   I(lex.Cst=="Rem") + tfr,
-            offset = log(lex.dur/100),
+                   I(lex.Cst=="Rem") + tfr +
+                   offset( log(lex.dur/100) ),
             family = poisson, 
               data = sLc )
 round( ci.exp( mPx ), 3 )
@@ -400,13 +393,10 @@ mr <- gam( lex.Xst=="Rem" ~ s( tfi, k=10 ) + sex,
 ci.exp( mr, pval=TRUE )
 @
 We see that there is a clear effect of sex; women have a remission
-rate 2.6 times higher than for men, bote when using \texttt{glm} and
+rate 2.6 times higher than for men, both when using \texttt{glm} and
 \texttt{ns} and \texttt{gam} with \texttt{s}.
 
-  
-
-
-
+%%
 
 \item In order to use the function \texttt{simLexis} we must have as input
   to this the initial status of the persons whose life-course we
@@ -439,6 +429,7 @@ inL[2,"sex"] <- "F"
 inL
 str( inL )
 @ %
+
 \item The other input for the simulation is the transitions, which is
   a list with an element for each transient state (that is ``NRA'' and
   ``Rem''), each of which is again a list with names equal to the
@@ -456,9 +447,11 @@ Tr <- list( "NRA" = list( "Rem"  = mr,
 \item Now generate the life course of 5,000 persons (of each sex), and look at the summary.
   The \texttt{system.time} command is just to tell you how long it
   took, you may want to start with 1000 just to see how long that takes.
-<<10000-sim>>=
-system.time(
-sM <- simLexis( Tr, inL, N=5000 ) )
+<<10000-sim,>>=
+# system.time( sM <- simLexis( Tr, inL, N=5000 ) )
+# 
+# save( sM, file="sM.Rda" )
+load(     file="sM.Rda" )
 summary( sM, by="sex" )
 @ %
 The many ESRD-events in the resulting data set is attributable to the
@@ -473,47 +466,52 @@ nStm <- nState( subset(sM,sex=="M"), at=seq(0,10,0.1), from=50, time.scale="age"
 nStf <- nState( subset(sM,sex=="F"), at=seq(0,10,0.1), from=50, time.scale="age" )
 head( nStf )
 @ %
-  We see that we get a count of perosn in each state at timepoints
+  We see that we get a count of persons in each state at time points
   0,0.1,0.2,\ldots years after 50 on the age time scale.
 
-  
+    
 \item Once we have the counts of persons in each state at the
   designated time points, we compute the cumulative fraction over the
   states, arranged in order given by \texttt{perm}:
 <<pState>>=
-ppm <- pState( nStm, perm=c(1,2,4,3) )
-ppf <- pState( nStf, perm=c(1,2,4,3) )
+ppm <- pState( nStm, perm=c(2,1,3,4) )
+ppf <- pState( nStf, perm=c(2,1,3,4) )
 head( ppf )
 tail( ppf )
 @ %
 
 
-\item Try to plot the cumulative probabilities using the \texttt{plot}
+\item Then we plot the cumulative probabilities using the \texttt{plot}
   method for \texttt{pState} objects:
 <<plot-pp,fig=TRUE>>=
 plot( ppf )
 @ %
 \insfig{plot-pp}{0.7}{The default plot for a \texttt{pState} object,
-  bottom to top: Alive no remissiom, alive remission, dead remission,
-  dead no remission.}
+  bottom to top: Alive remission, alive no remission, dead no remission,
+  dead remission.}
 
 
 \item Now try to improve the plot so that it is easier to read, and
-  easier to comapre men and women:
-<<new-pState,fig=TRUE>>=
-par( mfrow=c(1,2) )
-plot( ppm, col=c("red","limegreen","forestgreen","#991111") )
-lines( as.numeric(rownames(ppm)), ppm[,"Rem"], lwd=4 )
+  easier to compare men and women:
+<<new-pState,fig=TRUE,width=8>>=
+par( mfrow=c(1,2), mar=c(3,1.5,1,1), oma=c(0,2,0,0), las=1 )
+plot( ppm, col=c("limegreen","red","#991111","forestgreen") )
+mtext( "Probability", side=2, las=0, outer=T, line=0.5 )
+lines( as.numeric(rownames(ppm)), ppm[,"NRA"], lwd=4 )
 text( 59.5, 0.95, "Men", adj=1, col="white", font=2, cex=1.2 )
 axis( side=4, at=0:10/10 )
+axis( side=4, at=0:20/20 , labels=NA, tck=-0.02 )
 axis( side=4, at=1:99/100, labels=NA, tck=-0.01 )
-plot( ppf, col=c("red","limegreen","forestgreen","#991111"), xlim=c(60,50) )
-lines( as.numeric(rownames(ppf)), ppf[,"Rem"], lwd=4 )
+
+plot( ppf, col=c("limegreen","red","#991111","forestgreen"),
+           xlim=c(60,50), yaxt="n", ylab="" )
+lines( as.numeric(rownames(ppf)), ppf[,"NRA"], lwd=4 )
 text( 59.5, 0.95, "Women", adj=0, col="white", font=2, cex=1.2 )
-axis( side=2, at=0:10/10 )
+axis( side=2, at=0:10/10 , labels=NA )
+axis( side=2, at=0:20/20 , labels=NA, tck=-0.02 )
 axis( side=2, at=1:99/100, labels=NA, tck=-0.01 )
 @ %
-\insfig{new-pState}{0.9}{Predicted state occupancy for men and women
+\insfig{new-pState}{1.05}{Predicted state occupancy for men and women
   entering at age 50. The green areas are remission, the red without
   remission; the black line is the survival curve.}
 
@@ -521,6 +519,6 @@ We see that the probability that a 50-year old man with NRA sees a
 remission from NRA during the next 10 years is about 25\% whereas the
 same for a woman is about 50\%. Also it is apparent that no new
 remissions occur after about 5 years since NRA --- mainly because only
-perons with remission are alive after 5 years. 
+persons with remission are alive after 5 years. 
 
 \end{enumerate}
