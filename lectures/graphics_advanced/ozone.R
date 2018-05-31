@@ -1,0 +1,17 @@
+library(lattice)
+pdf("ozone1.pdf")
+xyplot(log(Ozone) ~ Solar.R, data=airquality)
+dev.off()
+pdf("ozone2.pdf")
+xyplot(log(Ozone) ~ Solar.R | equal.count(Temp), data=airquality)
+dev.off()
+pdf("ozone3.pdf")
+xyplot(log(Ozone) ~ Solar.R | equal.count(Temp), group=Month,data=airquality)
+dev.off()
+pdf("ozone4.pdf")
+mypanel <- function(x, y, ...) {
+   panel.xyplot(x,y,...)
+   panel.lmline(x,y,type="l")
+}
+xyplot(log(Ozone)~Solar.R | equal.count(Temp), panel=mypanel, data=airquality)
+dev.off()
