@@ -1,0 +1,38 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{Sweave}{}
+
+\RequirePackage{ifthen}
+\newboolean{Sweave@gin}
+\setboolean{Sweave@gin}{true}
+\newboolean{Sweave@ae}
+\setboolean{Sweave@ae}{true}
+
+\DeclareOption{nogin}{\setboolean{Sweave@gin}{false}}
+\DeclareOption{noae}{\setboolean{Sweave@ae}{false}}
+\ProcessOptions
+
+\RequirePackage{graphicx,fancyvrb}
+% \IfFileExists{upquote.sty}{\RequirePackage{upquote}}{}
+
+\ifthenelse{\boolean{Sweave@gin}}{\setkeys{Gin}{width=0.8\textwidth}}{}%
+\ifthenelse{\boolean{Sweave@ae}}{%
+  \RequirePackage[T1]{fontenc}
+  \RequirePackage{ae}
+}{}%
+
+% \DefineVerbatimEnvironment{Sinput}{Verbatim}{fontsize=\footnotesize,fontshape=sl}
+% \DefineVerbatimEnvironment{Soutput}{Verbatim}{fontsize=\footnotesize}
+% \DefineVerbatimEnvironment{Scode}{Verbatim}{fontsize=\footnotesize}
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{fontsize=\scriptsize,fontshape=sl,formatcom=\color{Blue}}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{fontsize=\scriptsize,formatcom=\color{Maroon}}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{fontsize=\scriptsize}
+
+\newenvironment{Schunk}%
+{\renewcommand{\baselinestretch}{0.85}}%
+{\renewcommand{\baselinestretch}{1.00}}
+
+\newcommand{\Sconcordance}[1]{%
+  \ifx\pdfoutput\undefined%
+  \csname newcount\endcsname\pdfoutput\fi%
+  \ifcase\pdfoutput\special{#1}%
+  \else\immediate\pdfobj{#1}\fi}
