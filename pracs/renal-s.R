@@ -254,10 +254,9 @@ Tr <- list( "NRA" = list( "Rem"  = mr,
 ###################################################
 ### code chunk number 25: 10000-sim
 ###################################################
-# system.time( sM <- simLexis( Tr, inL, N=5000 ) )
-# 
+system.time( sM <- simLexis( Tr, inL, N=5000 ) )
 # save( sM, file="sM.Rda" )
-load(     file="sM.Rda" )
+# load(     file="sM.Rda" )
 summary( sM, by="sex" )
 
 
