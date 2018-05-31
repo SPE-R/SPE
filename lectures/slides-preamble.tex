@@ -1,0 +1,135 @@
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+% \usepackage[latin1]{inputenc}
+% \usepackage[danish]{babel}
+\usepackage{booktabs,amsmath,xcolor,amsmath,amsfonts,%enumitem,
+amsbsy,Sweave,relsize,datetime}
+\usepackage[super]{nth}
+\usepackage[abspath]{currfile}
+\definecolor{darkgreen}{RGB}{25,99,25}
+\definecolor{forestgreen}{RGB}{34,139,34}
+\definecolor{ForestGreen}{RGB}{34,139,34}
+% \usepackage[colorlinks]{hyperref}
+
+%----------------------------------------------------------------------
+% General looks of things:
+
+% Theme with navigation bar on the right; [width=0em] removes it
+\mode<presentation>{\usetheme[width=0em]{Goettingen}}
+
+% Omit the navigation symbols --- I have pg-up and pg-dn anyway
+\setbeamertemplate{navigation symbols}{}
+
+% Pagenumbering at the far right bottom corner
+\setbeamertemplate{footline}{
+  \usebeamercolor[fg]{frametitle}
+  \hspace*{3ex}\currentlecture % This is for inserting title of the lecture
+  \hfill \bf \insertframenumber / \inserttotalframenumber
+  \rule[-2ex]{0pt}{5ex} \hspace*{3ex}}
+
+% How visible should the uncovered items be? 0 corresponds to not at all.
+\setbeamercovered{transparent=0}
+
+% Get the fonts to look right in mathematics parts
+\usefonttheme[onlymath]{serif}
+\input{../beamer-math.tex} % A re-definition of all math
+                                              % commands (and some more) that
+                                              % makes them appear in serif font
+
+% The heading font is a little too thin to my taste
+\setbeamerfont{frametitle}{size=\large,series=\bfseries}
+
+% Use pdf graphs etc.
+\DeclareGraphicsExtensions{.pdf,.eps,.jpg,.png}
+
+% End of setting up the formal layout of the slides
+
+% Definition of a dummy command so that the above works and so that ALL
+% redefinitions can be done by \renewcommand{\currentlecture}
+\newcommand{\currentlecture}{}
+
+% Make the Sweave output nicer
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{fontsize=\footnotesize,fontshape=sl,formatcom=\color{darkgreen}}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{fontsize=\footnotesize,formatcom=\color{Maroon},xleftmargin=0em}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{fontsize=\footnotesize}
+\fvset{listparameters={\setlength{\topsep}{0.0ex}}}
+\renewenvironment{Schunk}%
+{\renewcommand{\baselinestretch}{0.85} \vspace{\topsep}}%
+{\renewcommand{\baselinestretch}{1.00} \vspace{\topsep}}
+
+%----------------------------------------------------------------------
+% The usual usefuls
+\input{/home/bendix/util/tex/useful.tex}
+
+%----------------------------------------------------------------------
+% How to insert a figure in a .rnw file
+\newcommand{\rwpre}{./graph/gr}
+\newcommand{\insfig}[3]{
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=#2\textwidth]{\rwpre-#1}
+  \caption{#3}
+  \label{fig:#1}
+%  \afterpage{\clearpage}
+\end{figure}}
+
+% \newcommand{\CPR}{Central Person Register}
+% \newcommand{\NPR}{National Patient Register}
+% \newcommand{\sysi}{National Health Insurance Service Registry}
+% \newcommand{\lmdb}{Register of Medicinal Product Statistics}
+
+%----------------------------------------------------------------------
+\begin{document}
+% It is more readable with a little extra space between paragraphs
+\parskip 0.8ex
+
+% \AtBeginSubsection[]
+% {
+%   \begin{frame}<beamer>
+%     \frametitle{Outline}
+%     \tableofcontents[currentsection,currentsubsection]
+%   \end{frame}
+% }
+% \beamerdefaultoverlayspecification{<+->}
+
+% A banner page to include and separate lectures
+\newcommand{\banner}[4]{
+\addtocounter{framenumber}{-1}
+\section{#1}
+\renewcommand{\currentlecture}{#1 (\texttt{#4})}
+\begin{frame}[plain]
+\vfill
+{\usebeamercolor[fg]{frametitle}
+ \LARGE \bf #1}\\
+\vspace*{2em} 
+
+\textbf{#3}
+\vfill
+\small
+\Title \\
+\noindent               \Where,\\   %  \vfill
+\noindent               \Dates    \vfill
+\noindent \vspace*{1ex} \Homepage \hfill 
+\scriptsize \texttt{#4} \\
+\end{frame}
+\input{#4}
+}
+
+%----------------------------------------------------------------------
+% The default titlepage is horribly formatted, so a custom made one:
+\begin{frame}
+{\usebeamercolor[fg]{frametitle} \LARGE \bf \Title\\}
+\small
+\vfill
+\noindent \hspace*{-1em} \Faculty  \vfill
+\noindent                \Where,\\   %  \vfill
+\noindent                \Dates    \vfill
+\noindent \vspace*{ 1em} \Homepage \hfill \vfill
+\tiny From \texttt{\currfileabspath} \hfill \today, \currenttime
+\end{frame}
+
+%----------------------------------------------------------------------
+% Just for the annotation of the sidebar since we do not use \titlepage
+\title{\Title}
+\author{Bendix Carstensen}
