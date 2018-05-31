@@ -1,14 +1,13 @@
 \SweaveOpts{results=hide, prefix.string=./graph/dinput}
 
 \section{Reading data into \textsf{R}}
+
 \subsection{Introduction}
 
-It is said that Mrs Beeton, the 19th century cook and writer, began
-her recipe for rabbit stew with the instruction ``First catch your
-rabbit''.  Sadly, the story is untrue, but it does contain an
-important moral. \textsf{R} is a language and environment for data
-analysis. If you want to do something interesting with it, you need
-data.
+\quote{``If you want to have rabbit stew, first catch the rabbit'' -- Old saying, origin unknown}
+
+\textsf{R} is a language and environment for data analysis. If you
+want to do something interesting with it, you need data.
 
 For teaching purposes, data sets are often embedded in \textsf{R}
 packages.  The base \textsf{R} distribution contains a whole package
@@ -50,10 +49,15 @@ formats.  Although this may appear repetitive, it allows you to see
 the many options available to you, and should allow you to recognize
 when things go wrong.
 
-You will need the following files in the sub-directory \textsf{data}
-of your working directory: {\tt fem.dat}, {\tt fem-dot.dat}, {\tt
-  fem.csv}, {\tt fem.dta} (Reminder: use \texttt{setwd()} to set your
-working directory).
+\begin{quote}
+{\bf getting the data:} You will need to download the zip file
+\texttt{data.zip} from the course web site
+\url{https://spe-r.github.io/data.zip} and unpack this in your working
+directory. This will create a sub-directory \textsf{data} containing
+(among other things) the files {\tt fem.dat}, {\tt fem-dot.dat}, {\tt
+  fem.csv}, and {\tt fem.dta} (Reminder: use \texttt{setwd()} to set
+your working directory).
+\end{quote}
 
 \subsection{Data sources}
 
@@ -175,9 +179,9 @@ of the variables?
   variable names, as data, and guesses that all the variables are
   character, not numeric. By default, all character variables are
   coerced to factors by \verb+read.table+. The result is a data frame
-  consisting entirely of factors (You can prevent the conversion of
+  consisting entirely of factors. (You can prevent the conversion of
   character variables to factors with the argument \verb+as.is=TRUE+).
-\end{quote}
+\end{quote}%FIXME More on this below
 
 If the variable names are not specified in the file, then they are
 given default names {\tt V1, V2, ...}. You will soon realise this
@@ -244,50 +248,73 @@ variable} (CSV) format, which can then be read into \textsf{R}.  There
 are two functions in \textsf{R} for reading in CSV data:
 \verb+read.csv()+ and \verb+read.csv2()+.
 
-To understand why there are two functions, inspect the contents of
-the function \verb+read.csv()+ by typing its name
-<<results=verbatim>>=
-read.csv
+Both of these are wrappers around the \texttt{read.table()} function,
+{\em i.e.} the \texttt{read.table()} function is still doing the work
+of reading in the data but the \texttt{read.csv()} function provides
+default argument values for reading in CSV file so all you need to
+do is specify the file name.
+
+You can see what these default arguments are with the \texttt{args()}
+function.
+<<>>=
+args(read.csv)
+args(read.csv2)
 @ 
 
-The first two lines show the arguments to the \verb+read.csv()+
-function and their default values (\verb+header=TRUE+, etc) The next
-two lines show the {\em body} of the function, which shows that the
-default arguments are simply passed verbatim onto the
-\verb+read.table()+ function. Hence \verb+read.csv()+ is a {\em
-wrapper} function that chooses the correct arguments for
-\verb+read.table()+ for you.  You only need to supply the name of the
-CSV file and all the other details are taken care of.
-
-Now inspect the \verb+read.csv2+ function to find the difference
-between this function and \verb+read.csv+.
+See if you can spot the difference between \texttt{read.csv} and 
+\texttt{read.csv2}.
 
 \begin{quote}
-  {\bf Explanation:} The CSV format is not a single standard.
-  The file format depends on the {\em locale} of your computer -- the
+  {\bf Explanation:} The CSV format is not a single standard.  The
+  file format depends on the {\em locale} of your computer -- the
   settings that determine how numbers are represented.  In some
   countries, the decimal separator is a point ``.'' and the variable
   separator in a CSV file is a comma ``,''.  In other countries, the
   decimal separator is a comma ``,'' and the variable separator is a
-  semi-colon ``;''. The \verb+read.csv()+ function is used for the first
-  format and the \verb+read.csv2()+ function is used for the second
-  format.
+  semi-colon ``;''. This is reflected in the different default values
+  for the arguments \texttt{sep} and \texttt{dec}.  The
+  \verb+read.csv()+ function is used for the first format and the
+  \verb+read.csv2()+ function is used for the second format.
 \end{quote}
 
 The file \verb+fem.csv+ contains the FEM dataset in CSV format.
 Inspect the file to work out which format is used, and read it into
 \textsf{R}.
 
-On Microsoft Windows, you can copy values directly from an open
-Excel spreadsheet using the clipboard. Highlight the cells you
-want to copy in the spread sheet and select copy from the pull-down
-edit menu. Then type 
-\verb+read.table(file="clipboard")+ to read
-the data in.  Beware, however, that the clipboard on Windows operates
-on the WYSIWYG principle (what-you-see-is-what-you-get). If you have
-a value $1.23456789$ in your spreadsheet, but have formatted the cell
-so it is displayed to two decimal places, then the value read into
-\textsf{R} will be the truncated value $1.23$.
+\subsection{Reading data from the Internet}
+
+You can also read in data from a remote web site. The \texttt{file}
+argument of \texttt{read.table()} does not need to be a local file on
+your computer; it can be a Uniform Resource Locator (URL), {\em i.e.}
+a web address.
+
+A copy of the file \texttt{fem.dat} is held at
+\url{https://www.bendixcarstensen.com/SPE/data/fem.dat}. You can
+read it in with
+
+<<>>=
+fem6 <- read.table("http://www.bendixcarstensen.com/SPE/data/fem.dat",
+                   header=TRUE)
+str(fem6)
+@ 
+
+\subsection{Reading from the clipboard}
+
+On Microsoft Windows, you can copy values directly from an open Excel
+spreadsheet using the clipboard. Highlight the cells you want to copy
+in the spread sheet and select copy from the pull-down edit menu. Then
+type \verb+read.table(file="clipboard")+ to read the data in.
+
+There are two reasons why this is a bad idea
+\begin{itemize}
+\item It is not reproducible. In order to read the data in again you
+  need to complete exactly the same sequence of mouse moves and clicks,
+  and there is no record of what you did before.
+\item Copying from the clipboard loses precision. If you have a value
+  $1.23456789$ in your spreadsheet, but have formatted the cell so it
+  is displayed to two decimal places, then the value read into
+  \textsf{R} will be the truncated value $1.23$.
+\end{itemize}
 
 \subsection{Binary data}
 
