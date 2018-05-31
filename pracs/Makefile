@@ -18,7 +18,7 @@ RNWINCLUDES = basic-e dinput-e tab-e graph-intro-e simulation-e rates-rrrd-e log
 
 TEX = $(RNWINCLUDES:=.tex)
 RFILES = $(RNWINCLUDES:=.R)
-RNWFILES = $(RNINCLUDES:=.rnw)
+RNWFILES = $(RNWINCLUDES:=.rnw)
 
 SRCDIR   = pracs
 BUILDDIR = build
@@ -28,7 +28,7 @@ all: builddir; $(MAKE) -C ${BUILDDIR} $(MAIN).pdf
 
 $(MAIN).pdf: $(TEX) $(MAIN).tex
 
-R: $(RFILES)
+R: builddir; $(MAKE) -C ${BUILDDIR} $(RFILES)
 
 view: all
 	evince $(MAIN).pdf &
