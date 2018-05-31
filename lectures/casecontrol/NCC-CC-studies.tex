@@ -1,0 +1,2823 @@
+\documentclass[12pt,t  , handout  % Uncomment ",handout" when doing handouts
+]{beamer}
+
+\newcommand{\toggle}[1]{%
+\addtocounter{framenumber}{-1}#1 % Comment this out if extra slides should be omitted
+}
+\newcommand{\toggleafter}[1]{%
+#1\addtocounter{framenumber}{-1} % Comment this out if extra slides should be omitted
+}
+
+% \usepackage[latin1]{inputenc}
+% \usepackage[danish]{babel}
+% \usepackage{booktabs,amsmath,amsbsy}
+
+\usepackage[latin1]{inputenc}
+\usepackage[english]{babel}
+%\usepackage{graphicx,rotating,booktabs,verbatim,amsmath,amsbsy}
+\usepackage{graphicx,rotating,booktabs,verbatim,amsmath}
+
+%----------------------------------------------------------------------
+% The general look of things:
+
+% Theme with navigation bar on the right; [width=0em] removes it
+\mode<presentation>{\usetheme[width=0em]{Goettingen}}
+
+% Omit the navigation symbols --- I have pg-up and pg-dn anyway
+\setbeamertemplate{navigation symbols}{}
+
+% Pagenumbering at the far right bottom corner
+\setbeamertemplate{footline}{
+  \usebeamercolor[fg]{frametitle}
+  \hspace*{3ex}\currentlecture % This is for inserting title of the lecture
+  \hfill \bf \insertframenumber / \inserttotalframenumber
+  \rule[-2ex]{0pt}{5ex} \hspace*{3ex}}
+
+% How visible should the uncovered items be? 0 corresponds to not at all.
+\setbeamercovered{transparent=0}
+
+% Get the fonts to look right in mathematics parts
+\usefonttheme[onlymath]{serif}
+\input{beamer-math.tex} % A re-definition of all math
+                        % commands (and some more) that
+                        % makes them appear in serif font
+
+\input{useful}
+
+% The heading font is a little too thin to my taste
+\setbeamerfont{frametitle}{size=\large,series=\bfseries}
+
+% Use pdf graphs
+\DeclareGraphicsExtensions{.pdf,.jpg}
+
+% End of setting up the formal layout of the slides
+
+% Definition of a dummy command so that the above works and so that ALL
+% redefinitions can be done by \renewcommand{\currentlecture}
+\newcommand{\currentlecture}{}
+
+% A banner page to include and separate lectures
+
+\newcommand{\banner}[3]{
+\addtocounter{framenumber}{-1}
+\section{#1}
+\renewcommand{\currentlecture}{#1}
+\begin{frame}[plain]
+{\usebeamercolor[fg]{frametitle}
+ \LARGE \bf #1\\
+ \large \sf #2\\
+ \large \bf #3}
+\vfill
+Statistical Practice in Epidemiology with R\\
+%% Tartu, Estonia, 1 to 6 June, 2017\\
+International Agency for Research on Cancer \\
+Lyon, France, 14 to 20 June, 2018\\
+\end{frame}
+%\input{#4}
+}
+
+% Tree drawing is from useful.tex which won;t load since it produces an error
+% when trying to overwrite existing definitions
+
+%
+% Tree drawing
+%
+\newcommand{\tree}[3]{\setlength{\unitlength}{#1}\begin{picture}(0,0)
+   \put(0,0){\line(3,2){1}}
+   \put(0,0){\line(3,-2){1}}
+   \put(0.81,0.54){\makebox(0,0)[br]{\footnotesize #2\ }}
+   \put(0.81,-0.54){\makebox(0,0)[tr]{\footnotesize #3\ }}
+\end{picture}}
+
+\newcommand{\wtree}[3]{\setlength{\unitlength}{#1}\begin{picture}(0,0)
+   \put(0,0){\line(1,1){1}}
+   \put(0,0){\line(1,-1){1}}
+   \put(0.8,0.8){\makebox(0,0)[br]{\footnotesize #2\ }}
+   \put(0.8,-0.8){\makebox(0,0)[tr]{\footnotesize #3\ }}
+\end{picture}}
+
+\newcommand{\ntree}[3]{\setlength{\unitlength}{#1}\begin{picture}(0,0)
+   \put(0,0){\line(2,1){1}}
+   \put(0,0){\line(2,-1){1}}
+   \put(0.8,0.4){\makebox(0,0)[br]{\footnotesize #2\ }}
+   \put(0.8,-0.4){\makebox(0,0)[tr]{\footnotesize #3\ }}
+\end{picture}}
+
+\newcommand{\nutree}[3]{\begin{picture}(0,0)
+   \put(0,0){\line(2,1){#1}}
+   \put(0,0){\line(2,-1){#1}}
+   \put(0.8,0.4){\makebox(0,0)[br]{#2\ }}
+   \put(0.8,-0.4){\makebox(0,0)[tr]{#3\ }}
+\end{picture}}
+
+\newcommand{\bes}{\begin{eqnarray*}}
+\newcommand{\ees}{\end{eqnarray*}}
+
+% Commands to draw observation lines on follow-up diagrams
+%
+% Horizontal lines
+%
+\newcommand{\hfail}[1]{\begin{picture}(250,5)
+      \put(0,0){\line(1,0){#1}}
+      \put(#1,0){\circle*{5}}
+   \end{picture}}
+
+\newcommand{\hcens}[1]{\begin{picture}(250,5)
+      \put(0,0){\line(1,0){#1}}
+      \put(#1,0){\line(0,1){2.5}}
+      \put(#1,0){\line(0,-1){2.5}}
+   \end{picture}}
+
+\definecolor{darkgreen}{rgb}{0,.5,0}
+
+%----------------------------------------------------------------------
+\begin{document}
+% It is more readable with a little extra space between paragraphs
+\parskip 0.8ex
+
+% \AtBeginSubsection[]
+% {
+%   \begin{frame}<beamer>
+%     \frametitle{Outline}
+%     \tableofcontents[currentsection,currentsubsection]
+%   \end{frame}
+% }
+% \beamerdefaultoverlayspecification{<+->}
+
+%----------------------------------------------------------------------
+% The default titlepage is horribly formatted, so a custom made one:
+\addtocounter{framenumber}{-1}
+\begin{comment}
+\begin{frame}[plain]
+{\usebeamercolor[fg]{frametitle}
+ \LARGE \bf Statistical Practice in Epidemiology with R}
+\vfill
+{\footnotesize
+ \bf Bendix Carstensen\sf, Steno Diabetes Center, Copenhagen\\%[1ex]
+% \bf Peter Dalgaard\sf, Dept. of Biostatistics, 
+% University of Copenhagen\\%[1ex]
+ \bf Krista Fischer\sf, Dept. of Biostatistics, University of Tartu\\%[1ex]
+% \bf Lyle Gurrin\sf, School of Population Health,
+% University of Melbourne\\%[1ex]
+% \bf Michael Hills\sf, (retired), Highgate, London\\%[1ex]
+ \bf Esa Läärä\sf, Unit of Math. Sciences, University of Oulu\\%[1ex]
+ \bf Janne Pitkäniemi\sf, Finnish Cancer Registry\\
+ \bf Martyn Plummer\sf, IARC, Lyon\\%[1ex]
+}
+\normalsize
+\vfill
+14 to 20 June, 2018\\
+International Agency for Research on Cancer,\\ Lyon, France.
+%% Institute of Mathematical Statistics, University of Tartu \\
+%% Tartu, Estonia
+\end{frame}
+\end{comment}
+
+%----------------------------------------------------------------------
+% Just for the annotation of the sidebar since we do not use \titlepage
+\title{Statistical Practice in Epidemiology}
+\author{BxC, KF, EL, JP, MP}
+
+% %----------------------------------------------------------------------
+% \begin{frame}
+%   \frametitle{Outline}
+%   \tableofcontents
+%   % You might wish to add the option [pausesections]
+% \end{frame}
+
+%----------------------------------------------------------------------
+% Here is the input of the individual lectures including the chapter
+% headings, timing and lecturer
+
+%%% Tuesday 27
+% \banner{Simple Poisson and logistic regression}%
+%        {Saturday 25 May 2007, morning}%
+%        {Bendix Carstensen}%
+%        {.bxc/Poisson-logreg}
+
+%\banner{Parametrization of models}%
+%       {Saturday 25 May 2007, morning}%
+%       {Bendix Carstensen}
+% \input{./bxc/param}     % These files assume that the graphs are in
+% \input{./bxc/interact}  % ./bxc/graph (i.e. refer to ./bxc/graph/x.pdf)
+
+%% Tuesday 29
+ \banner{Nested case-control studies and case-cohort studies}%
+       {Monday, 18 June, 2018  \\{ } }%
+        { { } \\ Esa Läärä \& Martyn Plummer }
+%        {}
+%----------------------------------------------------------------------
+
+\begin{frame}
+\frametitle{Points to be covered}
+
+\begin{itemize}
+\item
+Outcome-dependent sampling designs a.k.a. \\ 
+\textbf{case-control} studies {\it vs.} 
+\textbf{full cohort} design.
+\medskip
+\item
+\textbf{Nested case-control} study (NCC): sampling 
+of controls from risk-sets during follow-up of study population.
+\medskip
+\item
+\textbf{Matching} in selection of control subjects in NCC.
+\medskip
+\item
+R tools for NCC: function {\tt ccwc()}  in {\tt Epi} 
+for sampling controls, and
+ {\tt clogit()} in {\tt survival} 
+ for model fitting.
+\medskip
+\item
+\textbf{Case-cohort} study (CC): sampling a subcohort from the
+whole cohort as it is at the start of follow-up.
+\medskip
+\item
+R tools for CC model fitting: function {\tt cch()} in \texttt{survival}
+ % {\tt coxph()} % but SEs, CIs {\it etc.} with additional tricks. 
+ % {\tt robust=T} or using {\tt 'dfbeta'} residuals;
+  % in package {\tt survival} 
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Example: Smoking and cervix cancer}% (Simen Kapeu 2006)}
+\small
+\pause
+Study population,  measurements, follow-up, and sampling design
+\begin{itemize}
+\item 
+Joint cohort of $N \approx$ 500 000 women from 3
+Nordic biobanks. 
+% (in Norway, Sweden and Finland). \pause %\medskip
+% \item Recruitment \& taking blood specimens started 1975. 
+% \ei
+%
+% Study subjects 
+% \bi
+\pause %\medskip
+\item Follow-up: From variable entry times since 1970s till 2000.\pause
+% \item 200 incident cases of cervix ca., 
+% 596 controls. \pause % \medskip
+\item For each of 200 cases, 3 controls were sampled; matched for biobank,  % region (NO), 
+  age ($\pm 2$ y), and time of entry ($\pm 2$ mo).\pause % \medskip 
+\item Frozen sera of cases and controls 
+analyzed for cotinine {\it etc.}
+% plus antibodies to   HPV16, 18, 33, and {\it C. trachomatis}.
+\end{itemize}
+\pause
+Main result: Adjusted OR = 1.5 (95\% CI 1.1 to 2.3) for high 
+($>$242.6 ng/ml) 
+ {\it vs.} low ($<$3.0 ng/ml) cotinine levels.
+
+\bigskip
+Simen Kapeu {\it et al.} (2009) {\it Am J Epidemiol}
+\normalsize
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Example: \emph{USF1} gene and CVD}
+ 
+ \small
+Study population,  measurements, follow-up, and sampling design
+\begin{itemize}
+\item
+Two FINRISK cohorts, total $N \approx$ 14000 M \& F, 25-64 y.
+% \item 
+\item Baseline health exam, questionnaire \& blood specimens
+  at recruitment in the 1990s -- Follow-up until the end of 2003.
+% taken and stored.
+\item Subcohort of 786 subjects sampled.
+% Study subjects 
+% \bi
+\pause
+\item 
+528 incident cases of CVD; 72 of them in the subcohort. \pause
+\item Frozen blood from cases and subchort members 
+genotyped. % for \emph{USF1}.
+\end{itemize}
+\pause
+Main result: Female carriers of a high risk haplotype had a \\ 2-fold hazard
+ of getting CVD [95\% CI: 1.2 to 3.5] % , adjusted for conventional risk factors.
+
+\bigskip
+Komulainen {\it et al.} (2006) \emph{PLoS Genetics}
+
+\normalsize
+
+\end{frame}
+
+\begin{comment}
+
+\begin{frame}
+\frametitle{Full cohort design or ``cohort study''}
+
+\pause
+\bi
+% \item Cohort = closed study population.
+\item Cohort defined: eligibility criteria. % of membership.
+\pause\medskip
+\item
+Possible selection of special groups of exposed and/or unexposed.
+\pause\medskip
+\item Risk factors of interest, 
+confounders \& modifiers measured in  all cohort members.
+  \pause\medskip
+\item Cases of outcome are identified 
+% during {\it follow-up} from {\it entry} time 
+%  till {\it exit} time. 
+  \pause\medskip 
+\item Occurrence measures in exposure groups, and
+  comparative measures are computed.
+\pause\medskip
+\item Confounding and modification are controlled by
+   stratification \& Mantel--Haenszel methods, or \\
+   regression models.
+ \ei
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Cohort follow-up and risk sets}
+  
+ \pause 
+  Each member of the cohort provides exposure data, 
+%  for all cases, 
+  as long as (s)/he is {\bf at risk},
+   \pause {\it i.e.} alive, not censored \& free from outcome.
+  
+  \ \\
+\pause
+  \begin{center}
+  \begin{picture}(200,100)(0,0)
+
+    \thicklines
+
+    %Axes
+    \put(0,0){\vector(1,0){200}}
+    \put(200,0){Time}
+    \put(0,0){\vector(0,1){100}}
+    \put(0,105){Subjects}
+    \put(0,10){\line(-1,0){3}}
+    \put(0,20){\line(-1,0){3}}
+    \put(0,30){\line(-1,0){3}}
+    \put(0,40){\line(-1,0){3}}
+    \put(0,50){\line(-1,0){3}}
+    \put(0,60){\line(-1,0){3}}
+    \put(0,70){\line(-1,0){3}}
+    \put(0,80){\line(-1,0){3}}
+    \put(0,90){\line(-1,0){3}}
+    \pause    
+
+    %first time step step
+    \thinlines
+    \put(0,10){\line(1,0){50}}
+    \put(0,20){\line(1,0){50}}
+    \put(0,30){\line(1,0){50}}
+    \put(0,40){\line(1,0){50}}
+    \put(0,50){\line(1,0){50}}
+    \put(0,60){\line(1,0){30}} \put(30,57.5){\line(0,1){5}}
+    \put(0,70){\line(1,0){50}}
+    \put(0,80){\line(1,0){50}}
+    \put(0,90){\line(1,0){50}}
+    % Legend for controls
+    \put(30,-10){\line(-1,0){5}}
+    \put(30,-12.5){\line(0,1){5}}
+    \put(35,-10){\makebox(0,0)[l]{Censored}}
+    \pause
+
+    %second time step
+    \put(50,10){\line(1,0){50}}
+    \put(50,20){\line(1,0){50}}
+    \put(50,30){\line(1,0){30}} \put(80,27.5){\line(0,1){5}}
+    \put(50,40){\line(1,0){50}}
+    \put(50,50){\line(1,0){50}} 
+    %Censored at time 80
+    \put(50,70){\line(1,0){50}}
+    \put(50,80){\line(1,0){50}}
+    \put(50,90){\line(1,0){50}}
+    \color{red} 
+    \put(100,50){\circle*{5}} %case
+
+    % Legend for case
+    \put(100,-10){\circle*{5}}
+    \color{black}
+    \put(105,-10){\makebox(0,0)[l]{Case}}
+    \pause
+    
+    %sampling frame
+    \color{darkgreen} 
+    \put(100,50){\oval(8,100)} 
+    \pause
+    
+    %sampled controls
+    \put(100,90){\circle{5}}
+    \put(100,80){\circle{5}}
+    \put(100,70){\circle{5}}
+    \put(100,40){\circle{5}}
+  %  \put(100,30){\circle{5}}
+    \put(100,20){\circle{5}}
+    \put(100,10){\circle{5}}
+    % Legend for controls
+    \put(150,-10){\circle{5}}
+    \color{black}
+    \put(155,-10){\makebox(0,0)[l]{At risk}}
+    \pause
+
+    %third time step
+    \put(100,10){\line(1,0){50}}
+    \put(100,20){\line(1,0){10}} \put(110,17.5){\line(0,1){5}}
+    %Censored at time 130
+    \put(100,40){\line(1,0){50}}
+    %Case at time 150
+    %\put(100,60){\line(1,0){50}}
+    \put(100,70){\line(1,0){30}} \put(130,67.5){\line(0,1){5}}
+    \put(100,80){\line(1,0){50}}
+    \put(100,90){\line(1,0){50}}
+    \color{red} 
+    \put(150,10){\circle*{5}} %second case
+    \pause
+
+    %Second sampling frame
+    \color{darkgreen} 
+    \put(150,50){\oval(8,100)} 
+    \pause
+
+    %sampled controls
+    \put(150,90){\circle{5}}
+    \put(150,80){\circle{5}}
+    \put(150,40){\circle{5}}
+  %  \color{black}
+    \put(105,105){Risk sets}
+  \end{picture}
+  \end{center}
+
+\end{frame}
+
+\end{comment}
+
+\begin{frame}
+\frametitle{Full cohort design \& its simple analysis}
+
+\bi
+\item
+{\bf Full cohort design}: Data on exposure variables 
+obtained for all subjects in a large study population.
+\pause
+\medskip
+\item
+Summary data for crude comparison:
+\medskip
+\begin{center}
+\begin{tabular}{lccc}
+\hline
+          &  Exposed  &  Unexposed & Total\\
+\hline
+ Cases     &   $D_{1}$ &    $D_{0}$ & $D$ \\
+ Non-cases  &  $B_{1}$  &  $B_{0}$  & $B$ \\
+\hline    
+ Group size at start  &  $N_{1}$  &  $N_{0}$ & $N$ \\
+ Follow-up times      &  $Y_1 $ & $Y_0$  & $Y$\\ 
+\hline 
+\end{tabular}
+\end{center}
+\pause
+\bigskip
+\item  
+Crude estimation of {\bf hazard ratio} $\rho = \lambda_1/\lambda_0$: \\
+{\bf incidence rate ratio} IR, with standard error of log(IR):
+% \begin{align*}
+$$ \widehat\rho = \text{IR} % = \frac{I_1}{I_0}
+   = \frac{ D_1/Y_1}{D_0/Y_0}  \qquad
+  \text{SE}[\log(\text{IR})] & =  \sqrt{\frac{1}{D_1} + \frac{1}{D_0} }.
+$$  
+% \end{align*}
+% \item      
+% Statistical precision resides in numbers of cases.
+\item More refined analyses: Poisson or Cox regression.
+\ei
+
+\end{frame}
+
+\begin{comment}
+
+\begin{frame}
+  \frametitle{Example. HT and prevention of CVD}
+  
+ \pause  
+ 
+ Nurses' Health Study (Grodstein {\it et al.} {\it AIM} 2000)
+ \pause
+ 
+ \begin{itemize}
+ \item Cohort: $N \approx 70000$ postmenopausal women.
+ \pause
+ \item Use of HT asked biennially by questionnaire.
+ \pause
+ \item Follow-up 1976-96.
+ \pause
+ \item 1258 (major) coronary events, 767 strokes.
+ \end{itemize} 
+ \pause
+
+Main result: IR of coronary events 0.61 [95\% CI: 0.52 to 0.71] for
+ current vs. never users of HT, adjusted for known risk factors.
+ \pause
+\bi
+\item[$\bullet$] HT reduces the risk of CVD -- or bias?
+\pause
+%\item[$\bullet$] Is this result due to bias?
+\item[$\bullet$] Results from randomized trials are not quite 
+concordant with this observational evidence  
+({\it e.g.} WHI study, JAMA 2002).
+% Veerus P. {\it et al.} 
+% Results from the Estonian postmenopausal hormone therapy trial.
+% {\it Maturitas} 2006; {\bf 55}: 162-173.
+  
+\ei
+ 
+\end{frame}
+ 
+\begin{frame}
+ \frametitle{Example.  HT and CVD in NHS (cont'd)}
+
+\pause
+
+Summary of results
+\begin{center}
+\begin{tabular}{l r r }
+\hline
+ %              & \multicolumn{2}{c}{Use of HRT}\\
+%               \cline{2-3}
+							 & current HT & never HT \\
+\hline
+coronary events        & 259     & 662   \\
+person-years   & 265 200   & 358 100 \\
+incidence rate ($/10^4$y) & 9.8 & 18.5 \\
+\hline
+\end{tabular}
+\end{center}
+ \pause
+Crude estimate, estimated
+variance, 95\% error factor \& confidence interval of hazard  ratio
+$\rho$:
+\pause
+\bes
+   \text{IR} & = &\frac{9.8}{18.5} = 
+    \frac{259 / 662 } {265200 / 358100} = 0.53  \\ 
+    \pause
+     V & = & 1 / 259 + 1 / 662 = 0.073^2  \\  
+    \pause
+  \text{EF} & = & \text{exp}(1.96 \times 0.073) = 1.1545 \\  
+ \pause
+95\%\text{CI} & = & [0.53 / 1.154, 0.53 \times 1.154] = [0.46, 0.61]
+\ees
+\end{frame}
+
+\end{comment}
+
+\begin{frame}
+\frametitle{Problems with full cohort design}
+
+% For rare diseases large cohorts needed to obtain
+% adequate number of cases.
+
+% \pause
+Obtaining exposure and covariate data
+\pause
+\bi
+\item Slow and expensive in a big cohort. \pause
+\item Easier with questionnaire and register data, \pause
+\item Extremely costly and laborious for {\it e.g.} 
+\bi
+{\normalsize
+\item[--]   measurements from biological specimens, 
+    like genotyping, antibody assays, {\it etc.} % \pause
+    \medskip
+\item[--] dietary diaries \& other manual records
+%% \medskip
+%% \item[--]  occupational exposure histories in manual records.
+}
+\ei
+\ei
+\pause
+
+% \medskip
+% Question: % \pause
+\emph{ Can we obtain equally valid estimates of hazard ratios
+etc. with nearly as good precision by some other
+strategies}? 
+\pause
+
+\medskip
+Yes -- we can!
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Estimation of hazard ratio}
+
+% \pause
+The incidence rate ratio can be expressed:
+\pause
+\bes
+   \text{IR} =  \frac{ D_1/ D_0 }{ Y_1 / Y_0 }  
+    =  \frac{\text{cases: exposed / unexposed}}
+				    {\text{person-times: exposed / unexposed}}
+				    \\ { } \\ 
+	  \pause			    
+              =  \frac{\textit{exp're odds} \text{ in cases}}
+                 {\textit{exp're odds} \text{ in p-times}}   
+             = \textbf{exposure odds ratio} \text{ (EOR)}  
+\ees
+\pause
+= Exposure distribution in cases {\it vs.} that in cohort!
+
+\pause
+\bigskip
+Implication for more efficient design: 
+\pause
+\bi 
+\item {\it Numerator}: Collect exposure data on all cases. \pause
+\item {\it Denominator}: Estimate the ratio of
+person-times $Y_1/Y_0$ of the exposure groups in the cohort by
+\textbf{sampling}  ``control'' subjects,
+ on whom exposure is measured. 
+% from members of the cohort at risk.
+\ei
+\end{frame}  
+ 
+
+\begin{frame}
+\frametitle{Case-control designs}
+
+{General principle:} Sampling of subjects from a given {study population}
+is {\it outcome-dependent}. \\ 
+
+\pause
+\bigskip
+Data on risk factors are collected separately from
+\pause
+\begin{itemize}
+\item[(I)] {\bf Case group}: All (or high \% of) the $D$ subjects 
+in the study population (total $N$)
+      encountering the outcome event during the follow-up.
+	     \pause\bigskip
+\item[(II)] {\bf Control group}:
+          
+ \item Random {\bf sample} (simple or stratified) of \\
+ $C$ subjects ($C<<N$) from the population.
+                  \pause\medskip
+\item Eligible controls must be {bf risk} 
+(alive, under follow-up \& free of outcome) at given time(s).   
+%			      \pause\medskip
+% \item Different \emph{sampling schemes} or {\it designs}  available.
+\end{itemize}
+\end{frame} 
+
+\begin{frame}
+\frametitle{Study population in a case-control study?}
+
+\pause
+{Ideally:} The study population comprises subjects who
+ \underline{\textit{would be}} included as
+	cases, \underline{\textit {if they got}} the outcome in
+	the study
+\pause
+%	= {\it Source population} of cases. 
+	\bigskip
+	\bi
+\item {\it Cohort-based studies}: {\bf cohort} or
+ {\bf closed} population of well-identified subjects
+  under intensive follow-up for outcomes (\textit{e.g.} biobank cohorts).
+% and total mortality.
+\pause
+\medskip
+\item {\it Register-based studies}: {\bf open} or
+ {\bf dynamic} population in a region covered by a disease register. 
+ % (\textit{e.g.} the melanoma study).	
+  \pause
+  \medskip
+\item {\it Hospital-based} studies: dynamic {\bf catchment} population of cases 
+--  may be hard to identify ({\it e.g.} hospitals in US). 
+\end{itemize}
+
+\pause
+In general, the role of control subjects is to represent the
+distribution of person-times by exposure variables 
+in the underlying population
+from which the cases emerge.
+
+\end{frame} 
+%-----------------
+
+
+
+
+%----------------------------------------------------
+
+\begin{frame}
+\frametitle{\large Sampling of controls -- alternative frames}
+
+\medskip
+Illustrated in a simple longitudinal setting: \\
+Follow-up of a cohort over a fixed risk period \& no censoring.
+
+% \pause
+\begin{center}
+{\normalsize
+\setlength{\unitlength}{0.08cm}
+\begin{picture}(135,50)
+\thicklines
+\linethickness{0.3mm}
+
+%mittlere Box
+
+%% \put(40,45){\line(6,-1){55}}
+%% \put(40,5){\framebox(55,40){}}
+ \put(42.5,45){\line(6,-1){60}}
+ \put(42.5,5){\framebox(60,40){}}
+%Achsenbeschriftung
+\put(50,-1.5){\makebox(25,5){\small Time ($t$)}}
+\put(30,-1){\makebox(25,5){\small Start}}
+\put(90,-1){\makebox(25,5){\small End}}
+\put(75,2){\vector(1,0){20}}
+
+% \pause
+%linker Text
+\put(0,5){\makebox(40,40){\parbox{7cm}{\begin{center}
+						   {\small \bf (B)  Initially at risk}\\
+						%	(disease-free)\\ (C)\\
+							{\small $(N)$}
+							\end{center} }}}
+% \pause
+\put(45,15){\makebox(55,10){\parbox{11cm}{ \begin{center}
+						{\small \bf (C) Currently at risk $(N_t)$}
+							\end{center} }}}
+\put(72.5,25){\vector(0,1){15}}
+\put(72.5,15){\vector(0,-1){9}}							
+%rechter Text
+% \pause
+\put(100,30){\makebox(40,15){\parbox{7cm}{\begin{center}
+					{\small		New cases\\of disease\\ $(D)$}
+							\end{center} }}}
+% \pause							
+\put(100,5){\makebox(40,20){\shortstack{\strut\small
+       {\bf (A) Still at risk} \\ \strut
+						%	(disease-free)\\ \strut 	(A)\\
+						 \strut $(N - D)$ }}}
+
+
+\end{picture}
+}
+\end{center}
+
+\medskip
+{\small Rodrigues, L. \& Kirkwood, B.R. (1990).
+ Case-control designs of common diseases \dots 
+ {\it Int J Epidemiol} {\bf  19}: 205-13. }
+
+\end{frame} 
+
+
+%---------------------------------
+
+\begin{frame}
+\frametitle{\large Sampling schemes or designs for controls}
+
+\pause
+\medskip
+{\bf (A) Exclusive} or {\bf traditional, ``case-noncase'' sampling}
+           \bi
+           \item
+           Controls chosen from those $N-D$ 
+           subjects still at risk (healthy) 
+    \underline{\it at the end}
+				    of the risk period (follow-up). 
+	     \ei 
+	     \pause  
+{\bf (B) Inclusive sampling} or {\bf case-cohort design} (CC)
+	     \bi
+\item The control group -- {\it subcohort} -- 
+           is a random sample of the whole cohort $(N)$  
+%    free from the disease 
+\underline{\it at start}. % of the follow-up.
+    \ei
+    \pause
+{\bf (C) Concurrent sampling} or {\bf density sampling}  
+          \bi 
+         %  \item[--] Also called % {\it density} sampling, 
+           % {\it risk-set} s., 
+           % {\it time-matched} s., or
+         %  {\it concurrent} sampling.
+			  %        or {\it dynamic} s.
+           \item  
+           Controls drawn 
+     %      at different times $t$
+            \underline{\it during the follow-up}
+            % from those
+           % $N_t$ 
+           % at risk.
+           \pause 
+           \medskip
+           \item {\bf Risk-set} or {\bf time-matched sampling:} \\
+         A set of controls is sampled from
+         the {\it risk set} 
+          %  (alive \& yet uncensored)
+	%			  for the outcome 
+			  \underline{\it at each time $t$ of diagnosis}
+                           of a new case 
+         \pause                  
+         \medskip                  
+          \item[ ] a.k.a. \textbf{nested case-control design} (NCC)                
+	%			     i.e. have not yet contracted the disease by then.
+	 %\medskip
+   %       \item[$\bullet$]  applicable both in cohorts 
+   %        and in dynamic populations.
+   %        \pause\medskip
+   %       \item[$\bullet$] in dynamic populations, 
+   %       time-matching not always exact.
+	     \ei
+    
+\end{frame}
+
+\begin{frame}
+\frametitle{Nested case-control -- two meanings}
+
+\begin{itemize}
+\item
+In some epidemiologic books, the term ``nested case-control study''
+ (NCC) covers jointly 
+all variants of sampling: {\bf (A)}, {\bf (B)}, and {\bf (C)}, from
+ a cohort.
+ \pause
+\bi
+\item[ ]
+ Rothman \textit{et al.} (2008): 
+  \textit{Modern Epidemology, 3rd Ed.}  
+\item[ ]  
+  Dos Santos Silva (1999): \textit{Cancer Epidemiology.} Ch 8-9 
+\ei  
+\bigskip
+\pause
+\item
+In biostatistical texts NCC typically refers only to
+the variant of concurrent or density sampling {\bf (C)}, in which 
+{\it risk-set} or {\it time-matched} sampling is employed.
+ \pause
+ \medskip 
+ \bi
+\item[ ]
+Borgan \& Samuelsen (2003) in \textit{Norsk Epidemiologi} 
+\item[ ]
+ Langholz (2005) in \textit{Encyclopedia of Biostatistics.}
+ \ei
+
+\pause
+\medskip
+ \item
+We shall follow the biostatisticians!
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{NCC: Risk-set sampling with staggered entry}
+\ \\
+
+Sampling frame to select controls for a given case: \\
+Members ($\times$) of the {\bf risk set} at $t_k$, {\it i.e.}
+the population at risk at the time of diagnosis $t_k$ of case $k$.
+
+% \begin{frame}\frametitle{Choice of controls (II)}
+\pause
+\bigskip
+
+\begin{center}
+{\small
+\begin{picture}(150,85)(0,0)
+\setlength{\unitlength}{0.023cm}
+\put( 75,140){\hfail{110}}
+\put(180,140) {\makebox(0,0){$\times$}}
+\put(-80,140){\makebox(0,0)[l]{Case}}
+\put( 75,120){\hcens{250}}
+\put(180,120) {\makebox(0,0){$\times$}}
+\put(-80,120){\makebox(0,0)[l]{Healthy until end}}
+\put( 75,100){\hcens{90}}
+\put(-80,100){\makebox(0,0)[l]{Early censoring}}
+% \put(200, 80){\makebox(0,0)[l]{case's dgn}}
+\put(120, 80){\hcens{150}}
+\put(180, 80) {\makebox(0,0){$\times$}}
+\put(-80, 80){\makebox(0,0)[l]{Late entry}}
+\put(210, 60){\hcens{115}}
+% \put(180, 60) {\makebox(0,0){$\times$}}
+\put(-80, 60){\makebox(0,0)[l]{Too late entry}}
+\put(100,40){\hfail{50}}
+% \put(180,40) {\makebox(0,0){$\times$}}
+\put(-80,40){\makebox(0,0)[l]{Early case}}
+\put( 100,20){\hfail{110}}
+\put(180,20) {\makebox(0,0){$\times$}}
+\put(-80,20){\makebox(0,0)[l]{Later case}}
+\put(180, 00){\line(0,1){140}}
+\put(190, 00){\line(0,1){140}}
+\put( 75, 00){\line(1,0){250}}
+\put( 75, -10){\makebox(0,0)[l]{Start}}
+\put(325, -10){\makebox(0,0)[r]{End}}
+\put(200, -25){\makebox(0,0)[c]{Study period}}
+\end{picture}
+} % end small
+\end{center}
+
+\medskip
+{\bf Sampled risk set} contains the case
+and the control subjects randomly sampled from the 
+non-cases in the risk set at $t_k$. 
+
+\end{frame} 
+
+
+
+\begin{frame}
+\frametitle{\large Use of different sampling schemes}
+
+\pause
+\bigskip
+ 
+{\textbf{(A)} Exclusive sampling, or ``textbook'' case-control design}
+\bi
+% \item traditional view of the case-control study,
+% \item effect measure available\\
+% $ \ \ \ \ $ {\bf disease odds ratio}, which is the same as \\
+% $ \ \ \ \ $ {\bf exposure odds ratio} EOR 
+% \item practical in some ,
+% \item with prevalent cases and non-cases \\ 
+\item Almost exclusively(!) used in studies of epidemics. 
+\item (Studies on birth defects with \textit{prevalent} cases.)
+\ei
+
+\pause
+\textbf{(B)} Inclusive sampling or case-cohort design 
+\bi
+\item Good esp. for multiple outcomes, if
+ measurements of  \\ risk factors from stored material
+ remain stable.
+\ei
+
+\pause
+\textbf{(C)} Concurrent or density sampling \\ 
+(without or with time-matching, {\it i.e.} NCC) 
+ \pause
+\bi
+\item The only logical design in an open population.
+\medskip
+\pause
+\item Most popular in chronic diseases (Knol {\it et al.} 2008).
+% \pause 
+%\medskip
+%\item[$\Rightarrow$] Should receive priority in 
+% introductory courses and texts!
+\ei
+
+\pause
+Designs {\bf (B)} and {\bf (C)} allow valid 
+estimation of hazard ratios $\rho$ without any
+	``rare disease'' assumption.
+	
+\end{frame} 
+
+\begin{frame}
+\frametitle{\large Case-control studies: Textbooks vs. real life}
+
+\pause
+\bi
+\item
+Many epi texts %% in epidemiology teach outdated dogma and myths
+%% about outcome-dependent designs.
+%% \pause \medskip \item They tend to 
+focus on the traditional design: \\
+ \textbf{exclusive sampling} of controls, ignoring other designs.
+%% from the non-diseased,
+\pause
+\medskip
+\item
+Claim: ``\textit{Odds ratio is the only estimable parameter.}'' 
+ \pause
+\medskip
+\item
+ Yet, over 60\% of published case-control 
+ studies apply \textbf{concurrent sampling}
+ or {\bf density sampling} of controls from an \textbf{open} or
+ \textbf{dynamic} population. 
+ \pause
+ \medskip
+ \item
+ Thus, the parameter most often estimated % in case control studies
+ is the \\ {\bf hazard ratio} (HR) or {\bf rate ratio} $\rho$.
+\pause
+ \medskip
+ \item
+  Still,  90\% of authors really estimating HR, 
+  reported as having estimated an OR ({\it e.g.} Simen Kapeu {\it et al.})
+\ei
+\pause
+
+{\small Knol {\it et al.} (2008). What do case-control studies estimate? \\% Survey of methods and assumptions in published case-control research.
+{\it Am J Epidemiol} {\bf 168}: 1073-81. }
+% \medskip
+% see also Langholz (2010). Case-control studies = odds ratios: Blame the retrospective model. {\it Epidemiology} {\bf 21}: 10-12. } 
+\end{frame}
+
+\begin{comment}
+
+\begin{frame}
+\frametitle{\large Case-control studies -- true essence}
+
+\pause
+\medskip
+\begin{itemize}
+% \item
+% ``In the 1970s the concept was advanced that 
+% case-control studies should be  viewed as 
+% \textit{efficient sampling schemes} of the disease experience of the 
+% underlying  \textit{cohorts}'' \\
+% \item[ ]
+% {\small (MacMahon \& Trichopoulos 1996.
+% \textit{Epidemiology})} % : Principles \& Methods})}.
+\item
+``the modern conception of the case-control study as involving  \textbf{sampling}, on the basis of {\it outcome}, from an ongoing real or imagined  \textit{cohort study}.''\\
+{\small (Breslow 2005, in % Case-Control Studies. In
+ \textit{Handbook of Epidemiology}}) % , 2005)}
+% CC study as outcome-dependent sampling from real or fictitious cohort
+% - Cohort definition
+% - Paradigm: nested CC study
+% - Incidence density sampling
+\pause
+\medskip
+\item[$\Rightarrow$] 
+ ``Case-control studies'' not so distinct from  
+``cohort studies'' -- rather a subspecies of them?
+\pause\bigskip
+\item
+``The case-control study \dots
+ {\bf data missing}  by design'' 
+{\small (Wacholder. \textit{Epidemiology} 1996; 7:144-50.)}
+\pause
+\medskip
+\item[$\Rightarrow$] General approaches for analysis: \\
+(i) full likelihood methods for incomplete data, \\
+(ii) partial or pseudo-likelihood methods, with weighing \& calibration , 
+% both were nicely covered in Nathalie's talk!
+\end{itemize}
+ 
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{\large Only odds ratio & and it $\approx$ ``relative risk''?}
+
+\pause
+\bi
+\item Textbook dogma: 
+  ``Case-control studies: Only odds ratio is estimable, and it
+  approximates relative risk with rare diseases.''
+\pause
+\medskip
+\item
+What is this ubiquitous ``relative risk''? 
+\pause
+\bi
+\item[--] rate ratio or hazard ratio (HR)? 
+\medskip
+\item[--] cumulative incidence ratio or risk ratio (RR)?
+\medskip
+\item[--] prevalence ratio (PR)?
+\ei   
+\pause 
+\medskip
+\item
+{\bf NB.} 
+Sometimes hazard ratio 
+= prevalence odds ratio.
+ \\
+{\small (see e.g. Keiding {\it JRSSA}, 1991; Alho, J. {\it Biometrics}, 1992; and Kari Auranen's talk at NBBC11)}.    
+\ei  
+% \medskip
+\end{frame}
+
+\end{comment}
+
+\begin{frame}
+\frametitle{\large Exposure odds ratio -- estimate of what?}
+
+\bi
+\item
+Crude summary of case-control data
+% (ignoring possible matching or stratification in design)
+
+\medskip
+\begin{center}
+\begin{tabular}{l c c c}
+\hline
+               & exposed & unexposed & total\\
+\hline
+cases          & $D_1$     & $D_0$       & $D$\\
+controls       & $C_1$     & $C_0$       & $C$\\
+% (total)      & $(n_1)$ & $(n_0)$    & $(N)$\\
+\hline
+\end{tabular}
+\end{center}
+
+\pause
+\bigskip
+\item  Depending on study base \& sampling strategy, \\  
+the empirical {\bf exposure odds ratio} (EOR) 
+$$
+  \text{EOR} 
+    = \frac{D_1/ D_0}{C_1/C_0}
+    = \frac{\text{cases: exposed / unexposed}}
+           {\text{controls: exposed / unexposed}}
+$$
+\pause
+is a consistent estimator of  
+\bi
+{\normalsize 
+\item[ ]
+ (a) hazard ratio, (b) risk ratio,
+(c) risk odds ratio, \pause \medskip
+\item[ ] (d) prevalence ratio, or (e) prevalence
+odds ratio 
+}
+\ei
+\pause
+\medskip
+\item {\bf NB.} In case-cohort studies with variable follow-up times
+$C_1/C_0$ is substituted by $\widehat Y_{1}/\widehat Y_{0}$, 
+from estimated p-years.
+      
+ \ei  
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Precision and efficiency}
+
+With exclusive {\bf (A)} or concurrent {\bf (C)} sampling 
+of controls (unmatched), estimated variance of log(EOR) is \pause
+\bes
+ \widehat{\text{var}}\text{[log(EOR)]} 
+  & = & \frac{1}{D_1} + \frac{1}{D_0} 
+      + \frac{1}{C_1} + \frac{1}{C_0} \\
+\pause
+ & = & \text{cohort variance} + \text{sampling variance}
+\ees 
+\pause
+\begin{itemize}
+\item Depends basically on the numbers of cases, when there are  
+$\geq 4$ controls per case.
+\pause
+\medskip
+\item Is not much bigger than $1/D_1 + 1/D_0$ = variance in a full cohort study with   
+ same numbers of cases.
+ \pause
+ \medskip
+\item[$\Rightarrow$] Usually $< 5$ controls per case is enough.
+ \pause\medskip
+\item
+[$\Rightarrow$] {\it These designs are very cost-efficient!}
+\end{itemize}
+% CC design: Same principle, more complicated formula.
+\end{frame} 
+
+
+\begin{frame}
+\frametitle{Estimation in concurrent or density sampling}
+
+\pause
+\bi
+% \item Assume first a simple situation: 
+% Prevalence of exposure % $q(t)$  in the study population is constant % $q$ % over time.
+\pause
+\medskip
+\item To put it simply: Exposure odds $C_1/C_0$ among controls
+ = consistent estimator of exposure odds $Y_1/Y_0$ of person-times.
+%% even if controls sampled at any time from population at risk.
+\pause
+\medskip
+\item
+Therefore, crude EOR = $(D_1/D_0)/(C_1/C_0)$ \\ 
+= consistent estimator of
+ {hazard ratio}  $\rho = \lambda_1/\lambda_0$.
+\pause
+\medskip
+\item
+Variance of log(EOR) estimated as above.
+ \pause
+\medskip
+\item
+Yet, with a closed population or cohort, 
+stability of exposure distribution may be unrealistic.
+\pause
+\medskip
+\item
+Solution: \textbf{Time-matched} sampling of controls from \\
+{\bf risk sets}, {\it i.e.} NCC, \& 
+matched EOR to estimate HR.
+\ei
+ Prentice \& Breslow (1978), Greenland \& Thomas (1982).
+\end{frame} 
+
+\begin{comment}
+\begin{frame}
+\frametitle{Case-cohort design: Estimation of HR}
+
+\medskip
+Summary of case-cohort data with variable follow-up times.
+
+\begin{center}
+\begin{tabular}{ l c c c}
+\hline
+               & Exposed & Unexp. & Total\\
+\hline
+Numbers of cases\\
+${}\quad {} $ outside subcohort & $D_{10}$ & $D_{00}$  & $D_{+0}$\\
+ ${}\quad {} $  in subcohort  & $D_{11}$ & $D_{01}$  & $D_{+1}$\\
+ \hline
+ Total                         & $D_1$  & $D_0 $      & $D$  \\
+\hline
+Person-times\\
+${}\quad {}$ cases outside subcohort & $Y_{10D}$ & $Y_{00D}$ & $Y_{+0D}$   \\
+${}\quad {} $  cases in subcohort & $Y_{11D}$ & $Y_{01D}$ & $Y_{+1D}$   \\
+${}\quad {} $  non-cases in subcohort & $Y_{11B}$  & $Y_{01B}$ & $Y_{+1B}$   \\
+${}\quad {} $  (non-cases outside) & ($Y_{10B}$)  & ($Y_{00B}$) & $Y_{+0B}$  \\
+\hline
+ Total        & $(Y_1)$ & $(Y_0)$    & $ Y $\\
+ \hline
+\end{tabular}
+\end{center}
+
+\medskip
+Person-times in parentheses not directly observed
+\end{frame}
+
+\begin{frame}
+\frametitle{Case-cohort design: Estimation of HR (cont'd)}
+
+\bi
+\item
+Total person-times in the subcohort\\
+-- among exposed: $Y_{11} = Y_{11D} + Y_{11B}$, \\
+-- among unexposed $Y_{01} = Y_{01D} + Y_{01B}$.
+\pause
+\medskip
+\item
+Exposure odds $Y_{11}/Y_{01}$ in the subcohort 
+is consistently estimating odds $Y_1/Y_0$ in the whole cohort.
+\pause
+\medskip
+\item
+Consistent estimator of the {\it hazard ratio}
+ $\rho = \lambda_1/\lambda_0$ is 
+%% the following kind of exposure odds ratio
+$$ \text{EOR} = \frac{D_1/D_0}{Y_{11}/Y_{01}} $$
+\pause
+\item
+(Generalization: {\it Prentice's pseudo-likelihood}.)
+\pause
+ \medskip
+\item
+Estimated variance of log(EOR): 
+$$ V = 1/D_1 + 1/D_0 + \text{ additional terms}, $$ 
+the additional terms depending on the precision of 
+sampled person-times $Y_{11}$ and $Y_{01}$.
+
+
+\ei
+\end{frame}
+
+%------------------------
+
+\begin{frame}
+\frametitle{Case-cohort design: Estimation of HR (cont'd)}
+
+\bi
+\item
+Information in person-times
+of {\it cases outside subcohort} can be utilized, too.
+\pause 
+\medskip
+\item
+$f$ = {\bf sampling fraction} of non-cases to subcohort.
+\pause
+\medskip
+\item[$\to$]
+Expanded exposure odds in the whole case-cohort data 
+$$ \frac{Y_{10D} + Y_{11D} + Y_{11B}/f}
+        {Y_{00D} + Y_{01D} + Y_{01B}/f} 
+   = \frac{\widehat Y_1}{\widehat Y_0} $$ 
+is consistent for $Y_1/Y_0$. 
+%% In fact, $\widehat Y_1$ and $\widehat Y_0$ are valid estimates
+%% of person-times in the whole cohort.
+\pause
+ $\to$  Crude absolute rates \\ $\lambda_1, \lambda_0$
+ also estimable by $\widehat\lambda_j = D_j/{\widehat Y_j}$, $j=1,0$.
+\pause
+\medskip
+\item
+Hazard ratio now efficiently estimated
+\begin{center}
+$ \widehat\rho = {(D_1/D_0)}/{(\widehat Y_{1}/\widehat Y_{0})} $
+\end{center}
+\medskip
+\pause
+\item
+(Generalization: {\it Weighted partial likelihood}.)
+\pause
+\medskip
+\item
+Estimated variance of log($\widehat\rho$): 
+$$ V = 1/D_1 + 1/D_0 + \text{ smaller add'l term}. $$
+\ei
+\end{frame}
+
+\begin{frame}
+\frametitle{Estimation in open population}
+
+\bi
+\item
+Concurrent sampling -- the only logical sampling scheme!
+\medskip
+\item
+The population at risk ``at the end'', namely, does not necessarily
+contain anybody from the population at risk ``in the beginning''
+of the period of case collection. 
+(\textit{e.g.} infant mortality study during one calendar year)
+\medskip
+\item
+Assuming constant exposure prevalence $q(t) = q$ over time, the
+hazard ratio $\rho = \lambda_1/\lambda_0$ is again 
+consistently estimated by   EOR = $(D_1/D_0)/(C_1/C_0)$.
+\medskip
+\item
+Stability of exposure distribution may actually be more often realistic
+in a dynamic population with short time period compared to
+a lengthy follow-up of a cohort.
+\medskip
+\item
+Nevertheless, time-matched sampling may often be employed leading to
+matched EOR for estimating $\rho$.
+
+\ei
+\end{frame}
+
+
+
+\end{comment}
+
+% ----------------------------------------------------------------------
+
+\begin{frame}
+\frametitle{Matching in case-control studies}
+\pause
+% Matching in sampling designs {\it A} and {\it B}:
+\begin{itemize}
+\item[=] {\bf Stratified sampling} of controls,  {\it e.g.} from 
+the \\ same region, sex, and age group as a given case 
+%  (with or without \textit{time-matching} on risk set!).  
+\pause\medskip
+   \item {\bf Frequency matching} or {\bf group matching:} \\
+  For cases in a specific stratum 
+  ({\it e.g.} same sex and 5-year age-group), % in the relevant risk set
+a set of controls from a similar subgroup. % (see melanoma study). 
+\\ { } \\
+		\pause 
+		  \medskip		
+\item {\bf Individual matching} (1:1 or 1:m matching):\\
+		For each case, choose 1 or more (rarely $>5$) closely similar
+		controls (\textit{e.g.} same sex, age within $\pm$1 year. 
+%%		same neighbourhood, \textit{etc.}).
+		\pause
+	\medskip
+\item
+{\bf NCC}: Sampling from risk-sets 
+implies time-matching at least.
+Additional matching for other factors possible. 
+\pause
+	\medskip
+\item
+{\bf CC}: Subcohort selection involves no matching with cases.	
+		\end{itemize}
+% \item Creates similar distributions of matching factors
+%      for ctrls \& cases $\Rightarrow$ balanced comparisons 
+\end{frame}
+%      \pause\medskip
+\begin{frame}
+\frametitle{Virtues of matching}
+\pause
+\begin{itemize}
+ \item Increases {\it efficiency}, 
+ if the matching factors are both
+ \bi
+ {\normalsize
+ \item[ ]
+   (i) strong
+	 \textit{risk factors} of the disease, and 
+\item[ ](ii) 
+	 \textit{correlated} with the main exposure. 
+}
+\ei	 
+\pause
+	-- Major reason for matching.  
+	\pause   
+\medskip   
+\item \textit{Confounding} due to poorly
+quantified factors (sibship, 
+   neighbourhood, {\it etc.}) may be removed by close matching  
+  -- only if properly analyzed. 
+	\pause\medskip
+\item Biobank studies: Matching
+  for storage time, % (depening on the date of baseline measurements), 
+  freeze-thaw cycle \& analytic batch improves \textbf{comparability of measurements}
+	from frozen specimens 
+\bi
+\item[$\to$] 
+{\normalsize
+  Match on the time of baseline measurements within the case's risk set.
+  }
+\ei   
+\end{itemize}
+
+\end{frame} 
+
+
+
+
+\begin{frame}
+\frametitle{Warnings for overmatching}
+
+\pause
+
+Matching a case with a control subject is a different issue than matching an unexposed subject to an exposed one in a cohort study  --  much trickier! 
+\pause
+\begin{itemize}
+\item Matching on an {\it intermediate} variable between
+	exposure  and outcome.   	
+	\pause\medskip
+	$\Rightarrow$ {\it Bias}! % in effect estimation
+\pause\medskip
+\item Matching on a {\it surrogate} or 
+{\it correlate} of exposure, which is not a
+	true risk factor. \\ % of outcome 		
+%	\pause\medskip
+	$\Rightarrow$ {\it Loss of efficiency}. 
+	\pause\medskip
+% From the latter arises the principle of
+\item[$\rightarrow$] {\bf Counter-matching:} \pause
+ Choose a control which \\
+    \underline{is not
+	similar} to the case w.r.t a correlate of exposure. 
+	\\	
+	\medskip
+	$\Rightarrow$ Increases efficiency!
+	
+	\medskip
+	$\bullet \ \ $ Requires appropriate weighting in the analysis.
+\end{itemize}
+\end{frame} 
+
+\begin{frame}
+\frametitle{Sampling matched controls for NCC using R}
+
+\pause
+\bi
+\item
+Suppose key follow-up items are recorded
+for all subjects in a cohort, in which a NCC study
+is planned.
+\pause
+\medskip
+\item
+Function {\tt ccwc()} in package {\tt Epi} can be used for risk-set sampling
+of controls. -- Arguments:
+\ei
+\pause
+\begin{tabular}{r l}
+{\tt entry} : & Time of entry to follow-up\\  
+{\tt exit} : & Time of exit from follow-up \\ 
+{\tt fail} : & Status on exit (1 for case, 0 for censored) \\ 
+{\tt origin} : & Origin of analysis time scale (e.g. time of birth)\\ 
+{\tt controls} : & Number of controls to be selected for each case \\ 
+{\tt match} : & List of matching factors\\
+{\tt data} : & Cohort data frame containing input variables 
+\end{tabular}
+\pause 
+\bi
+\item Creates a data frame for a NCC study,
+containing the desired number of matched controls
+for each case.
+\ei
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Analysis of matched studies}
+
+\begin{itemize}
+\item Close matching induces a new 
+parameter for each matched case-control set or stratum.
+\pause
+\begin{itemize}
+{\normalsize 
+\item[$\Rightarrow$] % Methods that ignore matching, like 
+ {\bf unconditional logistic regression} breaks down.
+}
+\end{itemize}
+\pause 
+\item Matching on well-defined variables (like age, sex) \\ -- 
+%% broader strata may be formed {\em post hoc}, and 
+include these factors as covariates.
+\pause
+\medskip
+\item Matching  on ``soft'' variables (like sibship) %% cannot be ignored, but this 
+can be dealt with 
+{\bf conditional logistic regression}.
+\pause
+\medskip
+\item Same method in matched designs {\bf (A)}, exclusive, and {\bf (C)}, concurrent, but interpretation of % regression coefficients 
+$\beta_j$s differs:
+\medskip
+\begin{itemize}
+{\normalsize
+\item[]\textbf{(A)} $\beta_j$ = log of risk odds ratio (ROR),
+\item[]\textbf{(C)} $\beta_j$ = log of hazard ratio (HR).
+}
+ \end{itemize} 
+\end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}
+  \frametitle{Full cohort design: Follow-up \& risk sets}
+  
+ \pause 
+  Each member of the cohort provides exposure data
+   for all cases, as long as this member is {at risk}, 
+   {\it i.e.} \\ 
+	(i) alive, (ii) not censored \& (iii) free from outcome.
+  
+  \ \\
+\pause
+  \begin{center}
+  \begin{picture}(200,100)(0,0)
+
+    \thicklines
+
+    %Axes
+    \put(0,0){\vector(1,0){200}}
+    \put(200,0){Time}
+    \put(0,0){\vector(0,1){100}}
+    \put(0,105){Subjects}
+    \put(0,10){\line(-1,0){3}}
+    \put(0,20){\line(-1,0){3}}
+    \put(0,30){\line(-1,0){3}}
+    \put(0,40){\line(-1,0){3}}
+    \put(0,50){\line(-1,0){3}}
+    \put(0,60){\line(-1,0){3}}
+    \put(0,70){\line(-1,0){3}}
+    \put(0,80){\line(-1,0){3}}
+    \put(0,90){\line(-1,0){3}}
+    \pause    
+
+    %first time step step
+    \thinlines
+    \put(0,10){\line(1,0){50}}
+    \put(0,20){\line(1,0){50}}
+    \put(0,30){\line(1,0){50}}
+    \put(0,40){\line(1,0){50}}
+    \put(0,50){\line(1,0){50}}
+    \put(0,60){\line(1,0){30}} \put(30,57.5){\line(0,1){5}}
+    \put(0,70){\line(1,0){50}}
+    \put(0,80){\line(1,0){50}}
+    \put(0,90){\line(1,0){50}}
+    % Legend for controls
+    \put(30,-10){\line(-1,0){5}}
+    \put(30,-12.5){\line(0,1){5}}
+    \put(35,-10){\makebox(0,0)[l]{Censored}}
+    \pause
+
+    %second time step
+    \put(50,10){\line(1,0){50}}
+    \put(50,20){\line(1,0){50}}
+    \put(50,30){\line(1,0){30}} \put(80,27.5){\line(0,1){5}}
+    \put(50,40){\line(1,0){50}}
+    \put(50,50){\line(1,0){50}} 
+    %Censored at time 80
+    \put(50,70){\line(1,0){50}}
+    \put(50,80){\line(1,0){50}}
+    \put(50,90){\line(1,0){50}}
+    \color{red} 
+    \put(100,50){\circle*{5}} %case
+
+    % Legend for case
+    \put(100,-10){\circle*{5}}
+    \color{black}
+    \put(105,-10){\makebox(0,0)[l]{Case}}
+    \pause
+    
+    %sampling frame
+    \color{darkgreen} 
+    \put(100,50){\oval(8,100)} 
+    \pause
+    
+    %sampled controls
+    \put(100,90){\circle{5}}
+    \put(100,80){\circle{5}}
+    \put(100,70){\circle{5}}
+    \put(100,40){\circle{5}}
+  %  \put(100,30){\circle{5}}
+    \put(100,20){\circle{5}}
+    \put(100,10){\circle{5}}
+    % Legend for controls
+    \put(150,-10){\circle{5}}
+    \color{black}
+    \put(155,-10){\makebox(0,0)[l]{At risk}}
+    \pause
+
+    %third time step
+    \put(100,10){\line(1,0){50}}
+    \put(100,20){\line(1,0){10}} \put(110,17.5){\line(0,1){5}}
+    %Censored at time 130
+    \put(100,40){\line(1,0){50}}
+    %Case at time 150
+    %\put(100,60){\line(1,0){50}}
+    \put(100,70){\line(1,0){30}} \put(130,67.5){\line(0,1){5}}
+    \put(100,80){\line(1,0){50}}
+    \put(100,90){\line(1,0){50}}
+    \color{red} 
+    \put(150,10){\circle*{5}} %second case
+    \pause
+
+    %Second sampling frame
+    \color{darkgreen} 
+    \put(150,50){\oval(8,100)} 
+    \pause
+
+    %sampled controls
+    \put(150,90){\circle{5}}
+    \put(150,80){\circle{5}}
+    \put(150,40){\circle{5}}
+  %  \color{black}
+    \put(105,105){Risk sets}
+  \end{picture}
+  \end{center}
+\pause
+\medskip
+Times of new cases define the {\bf risk-sets}.
+
+\end{frame}
+
+ \begin{frame}
+  \frametitle{Nested case-control (NCC) design}
+
+\pause
+Whenever a new case occurs, a set of controls \\
+ (here 2/case)  are sampled
+from its {risk set}. % = those at risk at the time of diagnosis.
+
+\ \\
+\pause
+  \begin{center}
+  \begin{picture}(200,100)(0,0)
+
+    \thicklines
+
+    %Axes
+    \put(0,0){\vector(1,0){200}}
+    \put(200,0){Time}
+    \put(0,0){\vector(0,1){100}}
+    \put(0,100){Subjects}
+    \put(0,10){\line(-1,0){3}}
+    \put(0,20){\line(-1,0){3}}
+    \put(0,30){\line(-1,0){3}}
+    \put(0,40){\line(-1,0){3}}
+    \put(0,50){\line(-1,0){3}}
+    \put(0,60){\line(-1,0){3}}
+    \put(0,70){\line(-1,0){3}}
+    \put(0,80){\line(-1,0){3}}
+    \put(0,90){\line(-1,0){3}}
+    \pause    
+
+    %first time step step
+    \thinlines
+    \put(0,10){\line(1,0){50}}
+    \put(0,20){\line(1,0){50}}
+    \put(0,30){\line(1,0){50}}
+    \put(0,40){\line(1,0){50}}
+    \put(0,50){\line(1,0){50}}
+    \put(0,60){\line(1,0){30}} \put(30,57.5){\line(0,1){5}}
+    \put(0,70){\line(1,0){50}}
+    \put(0,80){\line(1,0){50}}
+    \put(0,90){\line(1,0){50}}
+    % Legend for controls
+    \put(30,-10){\line(-1,0){5}}
+    \put(30,-12.5){\line(0,1){5}}
+    \put(35,-10){\makebox(0,0)[l]{Censored}}
+    \pause
+
+    %second time step
+    \put(50,10){\line(1,0){50}}
+    \put(50,20){\line(1,0){50}}
+    \put(50,30){\line(1,0){30}} \put(80,27.5){\line(0,1){5}}
+    \put(50,40){\line(1,0){50}}
+    \put(50,50){\line(1,0){50}} 
+    %Censored at time 80
+    \put(50,70){\line(1,0){50}}
+    \put(50,80){\line(1,0){50}}
+    \put(50,90){\line(1,0){50}}
+    \color{red} 
+    \put(100,50){\circle*{5}} %case
+
+    % Legend for case
+    \put(100,-10){\circle*{5}}
+    \color{black}
+    \put(105,-10){\makebox(0,0)[l]{Case}}
+    \pause
+    \color{darkgreen}  
+     \put(105,105){Risk sets}
+    %sampling frame
+    \color{darkgreen} 
+    \put(100,50){\oval(8,100)} 
+    \pause
+    
+    %sampled controls
+    \put(100,90){\circle{5}}
+    \put(100,20){\circle{5}}
+    % Legend for controls
+    \put(150,-10){\circle{5}}
+    \color{black}
+    \put(155,-10){\makebox(0,0)[l]{Control}}
+    \pause
+
+    %third time step
+    \put(100,10){\line(1,0){50}}
+    \put(100,20){\line(1,0){10}} \put(110,17.5){\line(0,1){5}}
+    %Censored at time 130
+    \put(100,40){\line(1,0){50}}
+    %Case at time 150
+    %\put(100,60){\line(1,0){50}}
+    \put(100,70){\line(1,0){30}} \put(130,67.5){\line(0,1){5}}
+    \put(100,80){\line(1,0){50}}
+    \put(100,90){\line(1,0){50}}
+    \color{red} 
+    \put(150,10){\circle*{5}} %second case
+    \pause
+
+    %Second sampling frame
+    \color{darkgreen} 
+    \put(150,50){\oval(8,100)} 
+    \pause
+
+    %sampled controls
+    \put(150,80){\circle{5}}
+    \put(150,40){\circle{5}}
+    \color{black}
+    
+  \end{picture}
+  \end{center}
+  
+\ \\  
+\pause
+{\bf NB.} A control once selected for some case can be
+selected as a control for another case, and 
+can later on become a case, too.
+\end{frame}
+
+%------------------------
+
+
+
+% \section{Case-cohort design}
+
+\begin{frame}
+  \frametitle{Case-cohort (CC) design}
+  
+  \pause
+ {\bf Subcohort}: Sample of the whole cohort randomly selected
+ at the outset. --  Serves as reference group for all cases. 
+ 
+ \pause
+ \bigskip
+ 
+ \medskip
+ 
+  \begin{center}
+  \begin{picture}(200,100)(0,0)
+
+    \thicklines
+    %\graphpaper(0,0)(200,100)
+
+    %Axes
+    \put(0,0){\vector(1,0){200}}
+    \put(200,0){Time}
+    \put(0,0){\vector(0,1){100}}
+    \put(0,100){Subjects}
+    \put(0,10){\line(-1,0){3}}
+    \put(0,20){\line(-1,0){3}}
+    \put(0,30){\line(-1,0){3}}
+    \put(0,40){\line(-1,0){3}}
+    \put(0,50){\line(-1,0){3}}
+    \put(0,60){\line(-1,0){3}} 
+    \put(0,70){\line(-1,0){3}}
+    \put(0,80){\line(-1,0){3}}
+    \put(0,90){\line(-1,0){3}}
+ %   \put(0,100){\line(-1,0){3}}
+    % Legend
+    \put(30,-10){\line(-1,0){5}}
+    \put(30,-12.5){\line(0,1){5}}
+    \put(35,-10){\makebox(0,0)[l]{Censored}}
+
+    \color{red}
+    \put(100,-10){\circle*{5}}
+    \color{black}
+    \put(105,-10){\makebox(0,0)[l]{Case}}
+
+    \color{darkgreen}
+    \put(150,-10){\circle{5}}
+    \color{black}
+    \put(155,-10){\makebox(0,0)[l]{Control}}
+
+    \pause    
+
+    %Subcohort
+    \color{darkgreen} 
+    \put(-3,80){\oval(8,30)[l]} 
+    \put(-11,80){\makebox(0,0)[r]{Subcohort}}
+    \color{black}
+    \pause
+    
+    %first time step
+    \thinlines
+    \put(0,10){\line(1,0){50}}
+    \put(0,20){\line(1,0){50}}
+    \put(0,30){\line(1,0){50}}
+    \put(0,40){\line(1,0){50}}
+    \put(0,50){\line(1,0){50}}
+    \put(0,60){\line(1,0){30}} \put(30,57.5){\line(0,1){5}}
+    \color{darkgreen}
+    \put(0,70){\line(1,0){50}}
+    \put(0,80){\line(1,0){50}}
+    \put(0,90){\line(1,0){50}}
+ %   \put(0,100){\line(1,0){50}}
+    \color{black}
+    \pause
+
+    %second time step
+    \put(50,10){\line(1,0){50}}
+    \put(50,20){\line(1,0){50}}
+    \put(50,30){\line(1,0){30}} \put(80,27.5){\line(0,1){5}}
+    \put(50,40){\line(1,0){50}}
+    \put(50,50){\line(1,0){50}} 
+    %Censored at time 80
+    \color{darkgreen}
+    \put(50,70){\line(1,0){50}}
+    \put(50,80){\line(1,0){50}}
+    \put(50,90){\line(1,0){50}}
+    \color{red} 
+    \put(100,50){\circle*{5}} %case
+    \pause
+
+   
+    %Risk set
+    \color{darkgreen} 
+    \put(100,80){\oval(8,30)} 
+    \put(100,50){\oval(8,15)}  %%%%%%%%%%%%%%%
+     \put(90,105){Sampled risk sets}
+ %%%%   \pause
+
+    %sampled controls
+    \put(100,90){\circle{5}}
+    \put(100,80){\circle{5}}
+    
+    \color{black}
+    \put(100,70){\circle{5}}
+    \pause
+
+    
+    %third time step
+    \put(100,10){\line(1,0){50}}
+    \put(100,20){\line(1,0){10}} \put(110,17.5){\line(0,1){5}}
+    %Censored at time 130
+    \put(100,40){\line(1,0){50}}
+    %Case at time 150
+    %\put(100,60){\line(1,0){50}}
+    \color{darkgreen}
+    \put(100,70){\line(1,0){30}} \put(130,67.5){\line(0,1){5}}
+    \put(100,80){\line(1,0){50}}
+    \put(100,90){\line(1,0){50}}
+    \color{darkgreen}
+    \color{red} 
+    \put(150,10){\circle*{5}} %second case
+    \pause
+
+    %Second risk set
+    \color{darkgreen} 
+    \put(150,80){\oval(8,30)} 
+    \put(150,10){\oval(8,15)} 
+ %%%   \pause
+
+    %sampled controls
+    \color{darkgreen}
+    \put(150,90){\circle{5}}
+    \put(150,80){\circle{5}}
+    \color{black}
+    
+  \end{picture}
+  \end{center}
+ 
+ \ \\ 
+ \pause
+{\bf NB.} A subcohort member can become a case, too.
+\end{frame}
+
+%------------------------
+
+
+
+
+\begin{comment}
+
+\begin{frame}
+\frametitle{Sampling from the risk sets}
+
+Follow-up of cohort with $n=11$, four cases ($\bullet$). Risk-sets comprise subjects under follow-up at the times of diagnosis. 
+
+ \small
+\setlength{\unitlength}{0.7pt}
+   \begin{center}
+      \begin{picture}(300,230)
+\thicklines
+      \small
+      \put(  0,215){\makebox(0,0)[cl]{Subject}}
+      \put(  0, 20){\vector(1,0){300}}
+      \put(300, 10){\makebox(0,0)[tr]{Time}}
+      \put(  0,195){\makebox(0,0)[cl]{1}}
+      \put( 10,195){\hfail{250}}
+      \put(260, 15){\line(0,1){185}}
+      \put(  0,180){\makebox(0,0)[cl]{2}}
+      \put( 30,180){\hcens{100}}
+      \put(  0,165){\makebox(0,0)[cl]{3}}
+      \put( 80,165){\hcens{120}}
+      \put(  0,150){\makebox(0,0)[cl]{4}}
+      \put( 20,150){\hcens{250}}
+      \put(  0,135){\makebox(0,0)[cl]{5}}
+      \put(130,135){\hcens{170}}
+      \put(  0,120){\makebox(0,0)[cl]{6}}
+      \put( 40,120){\hfail{110}}
+      \put(150, 15){\line(0,1){185}}
+      \put(  0,105){\makebox(0,0)[cl]{7}}
+      \put( 50,105){\hcens{80}}
+      \put(  0, 90){\makebox(0,0)[cl]{8}}
+      \put( 90, 90){\hcens{200}}
+      \put(  0, 75){\makebox(0,0)[cl]{9}}
+      \put( 10, 75){\hfail{95}}
+      \put(105, 15){\line(0,1){185}}
+      \put(  0, 60){\makebox(0,0)[cl]{10}}
+      \put(100, 60){\hcens{80}}
+      \put(  0, 45){\makebox(0,0)[cl]{11}}
+      \put( 60, 45){\hfail{60}}
+      \put(120, 15){\line(0,1){185}}
+      \end{picture}
+   \end{center}
+\setlength{\unitlength}{1pt}
+ \normalsize
+Draw two controls at random from each risk set and
+list the resulting matched sets.
+
+\end{frame}
+
+\end{comment}
+
+% %----------------------------------------------------------------------
+% \bs{The risk sets}
+% Defined at each event time ($\bullet$):
+
+% \renewcommand{\arraystretch}{1.5}
+% \begin{tabular}{p{5em}|p{10em}|p{10em}|}
+% Event & Risk set & Sample \\
+% \hline
+%     1 & & \\ \hline
+%     2 & & \\ \hline
+%     3 & & \\ \hline
+%     4 & & \\ \hline
+% \end{tabular}
+% \renewcommand{\arraystretch}{1}
+% \es
+
+% \toggle{
+% %----------------------------------------------------------------------
+% \bs{The risk sets}
+% Defined at each event time ($\bullet$):
+
+% \begin{center}
+% \begin{tabular}{r@{\ \ \ }l@{\ \ \ }l}
+% Event & Risk set & Sample \\
+% \hline
+%     1 & 1,2,3,4,6,7,8,\textbf{9},10,11 & 4,1 \\
+%     2 & 1,2,3,4,6,7,8,10,\textbf{11} & 2,1 \\
+%     3 & 1,3,4,5,\textbf{6},8,10 & 8,3 \\
+%     4 & \textbf{1},4,5,8 & 4,5 \\ \hline
+% \end{tabular}
+% \end{center}
+
+% Note that individuals 4 and 1 are used twice as controls, and that
+% individual 1 eventually becomes a case.
+
+% This is perfectly OK, because they are controls (=at risk) at
+% the time where they are selected to represent the risk set.
+
+% \es
+% }
+
+
+
+
+\begin{comment}
+
+
+%----------------------------------------------------------------------
+
+
+\begin{frame}
+\frametitle{Statistical modelling of case-base data}
+\pause
+
+Most popular approach: fit proportional hazards (PH) model.
+{Hazard} % (theoretical incidence of disease) 
+at age $t$ for cohort member $i$ with risk factor 
+profile $x_i$% = (x_{i1}, \dots, x_{ip})$:
+$$ \lambda_i(t, x_i ;\beta) =
+  \lambda_0(t ) \exp(x_{i}^{\T}\beta), $$
+% where $\lambda_0(t)$ = baseline hazard, 
+% $\beta = (\beta_1 \dots, \beta_p)$ are
+% parameters: \\ \pause
+% $\beta_j$ = log(HR$_j$) for unit change of value in covariate $X_j$.
+Estimation of parameters, typical methods based on:\pause
+\bi
+% \item full cohort: partial likelihood,
+\item NCC: partial likelihood $\Leftrightarrow$ cond'l logistic model,
+\item CC: weighted partial likelihood, or 
+pseudo-likelihood (Samuelsen et al \emph{SJS} 2007).
+% \item CC: weighted pseudo-likelihood,
+\ei
+\pause
+Estimation of ``absolute'' risks also feasible by proper weighting
+(Langholz \& Borgan \emph{Biometrics} 1997, Borgan \emph{SMMR} 2002)
+
+\pause
+Full-likelihood solutions recently developed --  computationally 
+challenging: EM algorithm or MCMC data augmentation  \\
+(Scheike \& Juul \emph{Biostat's} 2004, Scheike \& Martinussen
+\emph{SJS} 2004, Kulathinal \& Arjas \emph{SJS} 2006, 
+Saarela {\it et al.} \emph{SiM} 2008)
+
+\end{frame}
+
+
+
+% \section{$\bullet\quad$Comparison \& conclusion}
+
+\end{comment}
+
+%----------------------------------------------------------------------
+
+\begin{frame}
+\frametitle{Modelling in NCC and other matched studies}
+
+\pause
+Cox proportional hazards model: 
+% {Hazard}  
+% at time (or age) $t$ for subject $i$ with risk factor 
+% profile $x_i = (x_{i1}, \dots, x_{ip})$:
+$$ \lambda_i(t, x_i ;\beta) =
+  \lambda_0(t ) \exp(x_{i1}\beta_1 + \dots + x_{ip} \beta_p ) , $$
+ % $\lambda_0(t)$ = baseline hazard, 
+% $\beta = (\beta_1 \dots, \beta_p)$ are
+% parameters: \\
+%$\beta_j$ = log(HR$_j$) for unit change in covariate $X_j$.
+\pause
+Estimation: partial likelihood $L^P = \prod_k L^P_k$:
+\[
+ L^P_k  = \exp(\eta_{i_k} ) /  \sum_{i\in \widetilde{R}(t_k)} \exp(\eta_i), 
+\]
+where $\widetilde{R}(t_k)$ = \textbf{sampled risk set}  
+at observed event time $t_k$, containing the case + sampled controls
+ $(t_1 < \dots < t_D)$
+ \pause
+\bi
+\item[$\Rightarrow$] Fit stratified Cox model, with
+$\widetilde{R}(t_k)$'s as the strata.
+ % being defined by the sampled risk sets.
+% (\texttt{coxph( suob ~ X + strata(rset)}) 
+\pause
+\medskip
+\item[$\Leftrightarrow$] \textbf{Conditional logistic regression} \\
+ -- function \texttt{clogit()} in \texttt{survival}, wrapper
+ of {\tt coxph()}.
+
+\ei
+% Estimation of ''absolute'' risks also feasible by proper weighting.
+% \bigskip
+% Full-likelihood solutions recently developed \\
+% --  computationally challenging (\textit{e.g.} EM, MCMC).
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Modelling case-cohort data}
+
+Cox's PH model $\lambda_i(t) = \lambda_0(t)\exp(\eta_i)$ again, but \dots
+\pause
+  \begin{itemize}
+  \item Analysis of survival data relies on the theoretical principle that
+    you {\it can't know the future}.
+ \pause
+  \medskip  
+  \item  Case-cohort sampling breaks this principle: \\ cases are sampled
+    based on what {\it is known} to be happening to them during follow-up.
+\pause
+  \medskip  
+  \item The union of cases and subcohort is a mixture 
+    \begin{enumerate}
+{\normalsize    
+    \item  random sample of the population, and
+    \medskip
+    \item ``high risk'' subjects who are 
+    \textit{certain} to become cases.
+}    
+    \end{enumerate}
+\pause
+% \medskip   
+  \item[$\Rightarrow$] Ordinary Cox partial likelihood is wrong.
+\pause
+ \medskip
+ \item 
+  Overrepresentation of cases must be corrected for, by \\ 
+  (I) \textbf{weighting}, or (II) \textbf{late entry method}.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Correction method I -- weighting}
+
+The method of \textbf{weighted partial likelihood}
+borrows some basics ideas from survey sampling.
+\pause
+\begin{itemize} 
+\item
+ Sampled risk sets \\ $\widetilde{R}(t_k)$ 
+  = \{cases\} $\cup$ \{subcohort members\} at risk at $t_k$.
+\pause
+ \medskip
+ \item
+  Weights:
+ {\normalsize 
+ \begin{itemize}
+  \item[$-$]
+   $w$ = 1 for all cases (within and out of subcohort),
+\pause   
+    \item[$-$]  
+   $w$ = $N_{\text{non-cases}}/
+   n_{\text{non-cases}}$ = inverse of sampling-fraction \\
+  ${}\qquad$ $f$ for selecting a non-case to the subcohort.
+  \end{itemize} 
+  }
+  \pause
+  \medskip
+  \item
+  Function {\tt coxph()} with option {\tt weights = w} would
+  provide consistent estimation of $\beta$ parameters.
+  \pause
+ \medskip
+\item
+However, the SEs must be corrected! % using either
+% robust ``sandwich'' covariance matrix option {\tt robust = TRUE}
+% or utilizing the \textbf{dfbeta} residuals.
+\pause
+\medskip
+\item
+R solution: Function {\tt cch()} --
+a wrapper of {\tt coxph()} -- in package {\tt survival}, 
+with {\tt method = "LinYing"}.
+\end{itemize}
+
+\end{frame}
+
+\begin{comment}
+
+\begin{frame}
+  \frametitle{Correction method II -- late entry}
+ 
+ Principle of \textbf{pseudo-likelihood} or \textbf{late entry} method:
+ \pause
+  \begin{itemize}
+  \item Pretend we \emph{don't know} risk factor values for  
+  cases {\it outside subcohort} until the times $t_k$ they become cases.
+\pause
+  \medskip  
+  \item These cases only become ``at risk'' an instant before $t_k$.
+  % \small In \textsf{R} late entry may be specified by
+ % \texttt{  Surv(entry.time, exit.time, status) }  
+\pause
+  \medskip
+ \item 
+   The sampled risk set $\widetilde R(t_k)$
+    at $t_k$ thus contains the case and the
+   subcohort non-cases still at risk.
+   \pause
+  \medskip 
+  \item At any time, subjects in the current sample are representative of the 
+    population at risk.
+\pause    
+  \medskip
+  \item 
+However, the risk sets across the event times are dependent $\Rightarrow$
+ Must correct the standard errors. 
+ \pause    
+  \medskip
+  \item 
+R: Function {\tt cch()} with   
+{\tt method = "Prentice"}.  
+ \end{itemize}
+\end{frame}
+  
+
+\begin{frame}
+\frametitle{Late entry method applied in R}
+
+Function {\tt coxph()} works again, but with modified data:
+\pause
+\bi
+\item
+Non-cases within subcohort: original entry and exit times
+\pause
+\medskip
+\item
+Cases {\it outside} subcohort: \\
+ entry time = exit time -- ``epsilon''.
+\pause
+\medskip
+\item
+Cases {\it within} the subcohort are given two records:
+\pause
+\bi
+{\normalsize
+\item[1.]
+  as a {\it non-case} until time of outcome event: \\
+   ``epsilon'' subtracted from original exit time, and \\
+   event indicator = 0.
+\pause
+\medskip
+\item[2.]
+  as a {\it case} at the time of outcome: \\
+   entry time = exit time -- ``epsilon'',
+  and \\ event indicator = 1.
+  }
+\ei
+
+\ei
+\pause
+Alternative: Function {\tt cch()} with   
+{\tt method = "Prentice"}. \\ 
+-- No data modification needed.
+
+\end{frame}
+
+ 
+\begin{frame}
+  \frametitle{How both correction methods work}
+
+\bi
+\item
+  We estimate the log-hazard ratio parameters $\beta$ by
+  solving the \textbf{estimating equations} 
+  \[
+  S(\widehat{\beta}) = 0,
+  \]
+  based on the 
+  {\bf gradient} or {\bf score function}
+   $S = \partial \log L^P/\partial \beta$
+\medskip
+\item
+These methods work in a case-cohort setting,
+as it has been shown for both that the estimation
+equation is {\it unbiased}, {\it i.e.}
+  \[
+  \mbox{E}\left(S(\beta)\right) = 0
+  \]
+\item  
+  Unbiasedness of the estimating equation 
+  implies that the 
+  estimator $\widehat{\beta}$ is {\it consistent}.
+\ei
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Score function in the Cox model}
+
+  There is a contribution to the score function every time
+  a case occurs.
+  \[
+  S(\beta) = \sum_i S_i (\beta)
+  \]  
+  Suppose subject $i$ becomes a case
+  \[
+  \begin{array}{rcc}
+    S_i(\beta) = x_i & - & \mbox{E}(x_{\mbox{case}}) \\
+    \pause 
+    &   & \downarrow \\
+    &   & \frac{\sum_{j \in \mathcal{R}_i} r_j z_j}
+	{\sum_{j \in \mathcal{R}_i} r_j}
+  \end{array}
+  \]
+  \pause
+  Where
+  \begin{eqnarray*}
+    x_j & = & \mbox{Vector of covariates} \\
+    r_j & = & \mbox{exp}(\beta' z_j) = \mbox{Relative rate function}\\
+    \mathcal{R}_i & = & \mbox{Set of subjects at risk when i becomes a case}
+  \end{eqnarray*}
+  
+\end{frame}
+
+
+
+\begin{frame}
+  \frametitle{Correcting standard errors}
+  
+  \begin{itemize}
+  \item
+  SEs  in the output  from a usual Cox 
+   model fit in R \\ % using {\tt coxph()} function 
+	(or % analogous procedures in
+	SAS, Stata, {\it etc.})
+  are incorrect for case-cohort data.
+  \pause
+  \medskip
+  \item  Function {\tt coxph()} by default assumes that 
+  the partial likelihood contributions    
+   at each $t_k$ are \emph{independent}.
+  \pause
+  \medskip
+  \item 
+  Yet, with case-cohort data
+   we keep reusing the same sampled subcohort as representing
+    the whole cohort \\ $\Rightarrow$ \textit{dependence} is induced!
+  \pause
+  \medskip
+  \item Valid error margins are obtained from appropriately estimated 
+  covariance matrix cov$(\widehat\beta )$: % of the regression coefficients.
+  {\normalsize
+  \bi
+  \item[(a)] \textbf{Robust ``sandwich'' estimator} of cov$(\widehat\beta)$.% (Barlow 1994), 
+  \medskip
+  \item[(b)] Estimation of 
+  $\text{cov}(\widehat\beta)$ based on \textbf{dfbeta residuals}
+  from the subcohort.
+%  (Self \& Prentice 1988).
+   \ei
+   }
+  \end{itemize}
+	
+	{\small See Samuelsen {\it et al.} (2007) {\it Scand J Stat} {\bf 34}: 103-119.}
+
+\end{frame}
+
+\end{comment}
+\begin{comment}
+
+\begin{frame}
+  \frametitle{Correcting SEs: Robust covariance matrix}
+  
+  \medskip
+  Using the \texttt{robust=TRUE} argument with \texttt{coxph()}
+  gives the robust estimate of the covariance matrix.
+  
+\pause  
+  \bigskip
+  This is a general-purpose method
+  \begin{itemize}
+  \item Valid for any unbiased estimating function.
+ \pause
+  \medskip
+  \item Calculates a ``jackknife'' estimate of the variance of the score
+    function.
+ \pause   
+  \medskip  
+  \item An approximate ``bootstrap'' method.
+  \end{itemize}
+
+\end{frame}
+
+ 
+
+\begin{frame}
+ \frametitle{Correcting SEs: Use of dfbeta residuals}
+  
+  \pause
+  \begin{itemize}
+  \item
+  The Self-Prentice variance estimator adds a \\
+  \textbf{penalty} to
+  cov$(\widehat{\beta})$ for reusing the same sample.
+\pause
+\medskip
+  \item Define \textbf{dfbeta residual} $\Delta\widehat\beta_i$ for subject $i$ as the \\ 
+  change in $\widehat{\beta}$ when obs'n   $i$ is deleted,
+ \pause
+  \medskip  
+  \item Calculate  $\Delta\widehat\beta_i$ for all subjects $i$ 
+  in subcohort.
+  \pause
+  \medskip
+  \item If we did a new analysis after deleting at random one subcohort member, cov$(\widehat{\beta})$ would increase by
+    \mbox{cov}$(\Delta\widehat\beta)$.
+ \pause
+ \medskip   
+  \item Yet, instead of having {\it selected} the subcohort
+    at random, \\
+     we in a way {\it delete all the rest} in the whole cohort! \\
+\pause      
+      \medskip 
+    $\Rightarrow$ Appropriate decrease in precision.
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Heuristic derivation of the variance penalty}
+
+\bi
+\item
+  If we start with a larger cohort of size $N_C$, 
+  the penalty for deleting a random member is smaller
+  \[
+  \frac{N_{SC}}{N_C} \mbox{cov}(\Delta\widehat\beta)
+  \]
+  where $N_{SC}$ is the size of the sub-cohort.
+\medskip
+\item  
+  Apply this penalty for each subject excluded from the subcohort
+  \[
+  (N_C - N_{SC}) \frac{N_{SC}}{N_C} \mbox{cov}(\Delta\widehat\beta)
+  \]
+\item  
+  This can also be written
+  \[
+  ( 1 - \alpha) \sum_{i \in SC} \Delta\widehat\beta_i \Delta\widehat\beta_i^T
+  \]
+  where $\alpha = N_{SC}/N_C$ is the sampling fraction.
+  \ei
+  
+\end{frame}
+
+\end{comment}
+
+\begin{frame}
+\frametitle{Comparison of NCC and CC designs}
+
+\pause
+\bi
+\item Statistical efficiency
+\bi
+\item[ ] Broadly similar in NCC
+and CC with about same amounts of cases and controls.
+\ei
+\pause
+\item Statistical modelling and valid inference \pause
+\bi
+\item[ ] Straightforward for both designs with appropriate software, now 
+ widely available for CC, too 
+% fitting
+% conditional logistic regression or proportional hazards models.
+% \pause
+% \medskip
+% \item[CC:] Software for Cox PH regression can 
+% be used when supplemented with additional tricks.
+ \ei
+ \pause
+ \item Analysis of outcome rates on several time scales?
+ \pause
+ \bi
+ \item[NCC:] Only the time scale used in risk set definition
+ can be the \\ time variable $t$ in the baseline hazard 
+ of PH model.\pause\medskip
+ \item[CC:] Different choices for the basic time  in
+    PH model possible, because subcohort members are
+    not time-matched to cases. 
+ \ei
+ \ei
+ \end{frame}
+ 
+ \begin{frame}
+ \frametitle{Comparison of designs (cont'd)}
+ \pause
+ \bi
+ \item Missing data
+ \pause
+ \bi \item[NCC:]
+   With close 1:1 matching, a case-control pair is lost,
+  if either of the two has data missing on key exposure(s).
+  \pause\medskip
+  \item[CC:] Missingness of few data items is less serious.
+  \ei 
+  \pause
+ \item Quality and comparability of biological measurements
+ \pause
+ \bi
+ \item[NCC:] Allows 
+ each case  and its controls to be matched also 
+ for analytic batch, storage time, freeze-thaw cycle,  
+   \\ $\to$ better comparability. \pause\medskip
+  \item[CC:] Measurements for subcohort 
+  performed at different times than for cases $\to$ 
+  differential quality \& misclassification.
+ \ei
+ \pause
+ \item  Possibility for studying many diseases with same controls
+ \pause
+ \bi
+ \item[NCC:] Complicated, but possible if matching is not too refined.
+ \meskip
+ \item[CC:] Easy, as no subcohort member is ``tied'' with any case.
+ \ei
+ \ei
+ 
+ \end{frame}
+ 
+
+\begin{frame}
+\frametitle{Conclusion}
+
+\pause
+\begin{itemize}
+\item
+``Case-controlling'' is very cost-effective.
+\pause
+\medskip
+\item
+ Case-cohort design is useful especially when several outcomes
+are of interest, given that the measurements on stored
+materials remain stable during the study.
+\pause
+\medskip
+\item
+ Nested case-control design is better suited \textit{e.g.}
+ for studies involving biomarkers that can be infuenced by analytic batch,
+long-term storage, and freeze-thaw cycles.
+\pause
+\medskip
+\item
+ Matching helps in improving effciency and in reducing bias
+-- but only if properly done.
+\pause
+\medskip
+\item
+Handy R tools are available for all designs.
+
+\end{itemize}
+
+\end{frame}
+
+\end{document}
+
+\begin{frame}
+\frametitle{Modelling case-control data}
+
+Common paradigm -- {\bf logistic regression model} (LRM)
+\bi
+\item \textbf{unconditional} LRM for unmatched data, 
+\item \textbf{conditional} LRM for matched data,
+\item \textbf{weighted} LRM for case-cohort data.
+\ei
+
+\textbf{Design A} -- exclusive (case-noncase) sampling
+ in both a cross-sectional and longitudinal base: 
+\bi
+\item
+{\it Unmatched} design:
+Unconditional LRM to estimate prevalence odds ratios or risk odds ratios. 
+\medskip
+\item
+{\it Matched} design: 
+Matching factors need to be allowed for,
+ by either conditional LRM or
+appropriate incorporation in unconditional LRM.
+-- More about this soon.
+% including them appropriately
+% as categorical, stratifying factors, and/or quantitative terms
+% in an unconditional model.
+\medskip
+\item
+No adjustments needed for SEs \& CIs in the output.
+\ei
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Modelling case-control data (cont'd)}
+
+\textbf{Design C} -- concurrent sampling
+ in both closed and open populations, estimation
+ of hazard ratios for the $X_j$s.
+\bi
+\item
+{\it Unmatched} design:
+Unconditional LRM, as in design A. 
+\medskip
+\item
+{\it Matched} design -- not necessarily involving 
+time-matching: Same principles as in design A.
+% Conditional LRM, in which intercept parameters for 
+% vindividual matched sets are conditioned out.
+\medskip
+\item
+{\it Time-matched}, or {\it nested case-control} (NCC) design: \\
+% based on sampling from the {\it risk sets}: 
+Cox model stratified by times $t_k$ of the new cases 
+$$ \lambda_k(t; x_i) = \lambda_{0k} \exp(x_i^{\small{\text T}} \beta). $$
+$\Rightarrow$ conditional LRM. 
+\medskip
+\item
+No further adjustments needed to the output.
+\ei
+
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Dealing with matching}
+
+\medskip
+\begin{itemize}
+\item
+Close individual matching on a non-quantifiable factor
+ (\textit{e.g.} sibship) induces a separate 
+(intercept) parameter $\alpha_i$ for each matched 
+case-control set or stratum.
+\begin{itemize}
+{\normalsize 
+\item Unconditional LRM with fixed $\alpha_i$s breaks down.
+\medskip
+\item Use conditional LRM that throws out $\alpha_i$s. 
+\medskip
+\item Unconditional LRM with $\alpha_i$s as random terms?
+}
+\end{itemize} 
+
+\medskip
+\item Matching on categorical 
+factors with few classes ({\it e.g.} sex, marital status):
+{\em Post hoc} pooling into bigger strata $\Rightarrow$
+ frequency matching. Use unconditional LRM including the stratification.
+% and these factors included as covariates.
+\medskip
+\item Same principles in designs {\it A} and {\it C} with matching.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\frametitle{Matching on quantitative variables $Z$}
+
+\bi
+\item
+Conditional LRM remains robust in principle.
+\medskip
+\item
+If the tolerance for the difference of $Z$-values
+ between cases and controls
+is wide ({\it e.g.} $\pm$ 5 years in individual matching, or 
+belonging to the same 10-year ageband in frequency matching),
+ residual confounding may remain.
+\medskip
+\item
+{\it Post hoc} stratification into finer intervals? \\
+ -- May result in too many uninformative strata.
+\medskip
+\item
+Dissolving the matching and inclusion of $Z$ into LRM
+as {\it e.g.} linear term? -- May lead to bias in matched data 
+even if the assumed model were true in the study base!  
+\medskip
+\item
+Modelling upon stratification: For each $i$ add
+difference $Z_i - \bar Z_s$ btw ind'l value 
+and stratum mean to LRM.
+\ei
+See Greenland (1997) \textit{Stat Med} {\bf 16}: 515-526.
+\end{frame}
+
+\begin{frame}
+\frametitle{Modelling case-cohort data}
+
+\medskip
+{\bf Design B} -- inclusive (case-cohort) sampling in cross-sectional and longitudinal base; for the latter first with a fixed risk period and complete follow-up.
+\bi
+\item
+Unconditional LRM to estimate prevalence probability ratios or risk ratios. 
+\medskip
+\item
+Non-cases in subcohort weighted by $1/f$, where \\
+$f = C/N$ is the sampling fraction to the subcohort. 
+\medskip
+\item
+Cases in subcohort have two rows in the data: \\
+ (1) as a case, and (2) as a cohort member. 
+\medskip
+\item
+SEs need to be corrected by using {\it e.g.} \\
+ robust ``sandwich'' covariance matrix.
+\ei
+Schouten {\it et al.} (1993) {\it Stat Med} {\bf 12}: 1733-1745.
+
+\end{frame}
+
+
+
+
+\begin{comment}
+
+\begin{frame}
+  \frametitle{Analysis of case-cohort data}
+
+Cox's PH model $\lambda_i(t) = \lambda_0(t)\exp(\eta_i)$ again, but ...
+  \begin{itemize}
+  \item Analysis of survival data relies on the theore- tical principle that
+    you {can't know the future}.
+  \medskip  
+  \item  Case-cohort sampling breaks this principle: cases are sampled
+    based on what {\bf will} happen to them during follow-up.
+  \medskip  
+  \item The union of cases and subcohort is a mixture
+    \begin{enumerate}
+    \item  random sample of the population, and
+    \item ``high risk'' subjects who are \textit{certain} to become cases.
+    \end{enumerate}
+  \item[$\Rightarrow$] Ordinary Cox partial likelihood is wrong.
+  \end{itemize}
+
+\end{frame}
+
+\section{Estimates}
+
+\end{comment}
+
+
+ 
+
+\begin{frame}
+
+\item Different variants of case-control studies exist, and the
+terminology varies.
+\medskip
+\item Unmatched studies with few ``large'' strata: --
+\textit{Unconditional logistic regression} using \texttt{glm()},
+and including the factors determining
+ stratified sampling of the controls to the model.
+\medskip
+\item Matched studies on ``sparse'' data with
+many thin strata: -- \textit{Conditional logistic regression}
+ using function
+\texttt{clogit()}, and defining the variable distinguishing
+matched sets as a \texttt{strata()} term in the model formula.
+\end{itemize}
+\end{frame} 
+
+
+\end{document}
+
+
+
+%----------------------------------------------------------------------
+
+% \renewcommand{\currentlecture}{References}
+% %----------------------------------------------------------------------
+% \begin{frame}[plain,allowframebreaks]
+% \frametitle{References}
+% \footnotesize
+% \bibliographystyle{plain}
+% \bibliography{SPE}
+% \end{frame}
+
+\end{document}
