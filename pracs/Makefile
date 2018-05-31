@@ -18,7 +18,7 @@ RNWINCLUDES = basic-e dinput-e tab-e graph-intro-e simulation-e rates-rrrd-e log
 
 TEX = $(RNWINCLUDES:=.tex)
 RFILES = $(RNWINCLUDES:=.R)
-RNWFILES = $(RNINCLUDES:=.rnw)
+RNWFILES = $(RNWINCLUDES:=.rnw)
 
 SRCDIR   = pracs
 BUILDDIR = build
