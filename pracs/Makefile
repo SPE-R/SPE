@@ -28,7 +28,7 @@ all: builddir; $(MAKE) -C ${BUILDDIR} $(MAIN).pdf
 
 $(MAIN).pdf: $(TEX) $(MAIN).tex
 
-R: $(RFILES)
+R: builddir; $(MAKE) -C ${BUILDDIR} $(RFILES)
 
 view: all
 	evince $(MAIN).pdf &
