@@ -20,6 +20,8 @@ TEX = $(RNWINCLUDES:=.tex)
 RFILES = $(RNWINCLUDES:=.R)
 RNWFILES = $(RNWINCLUDES:=.rnw)
 
+RFILESSOL = $(filter %-s.R, $(RFILES))
+
 SRCDIR   = pracs
 BUILDDIR = build
 
@@ -29,6 +31,8 @@ all: builddir; $(MAKE) -C ${BUILDDIR} $(MAIN).pdf
 $(MAIN).pdf: $(TEX) $(MAIN).tex
 
 R: builddir; $(MAKE) -C ${BUILDDIR} $(RFILES)
+
+Rsol: builddir; $(MAKE) -C ${BUILDDIR} $(RFILESSOL)
 
 view: all
 	evince $(MAIN).pdf &
