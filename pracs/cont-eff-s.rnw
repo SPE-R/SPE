@@ -71,6 +71,10 @@ fit.Ns5 <- predict( mNs5, newdata=nd, interval="conf" )
 pred.Ns5 <- predict( mNs5, newdata=nd, interval="pred" )
 par(mfrow=c(1,1))
 with(births, plot(bweight ~ gestwks, xlim=c(23, 46),cex.axis= 1.5,cex.lab = 1.5 ) )
+# matshade gives you semitransparent areas
+matshade( nd$gestwks, fit.Ns5, lwd=2, alpha=0.2 )
+matshade( nd$gestwks, pred.Ns5, lwd=2, alpha=0.2 )
+# matlines puts lines for the intervals
 matlines( nd$gestwks, fit.Ns5, lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
 matlines( nd$gestwks, pred.Ns5, lty=1, lwd=c(3,2,2), col=c('red','green','green') )
 @
@@ -94,13 +98,15 @@ another natural spline model like the one above but now with 10 knots
 at the following sequence of points: \texttt{seq(25, 43, by = 2)}.
 Display graphically the results 
 <<bweigth-gestwks-Ns10, echo=TRUE, fig=TRUE>>=		 
-mNs10 <- lm( bweight ~ Ns( gestwks, 
-        knots = seq(25, 43, by = 2)), data = births)
+mNs10 <- lm( bweight ~ Ns( gestwks, knots = seq(25, 43, by = 2)), 
+             data = births)
 round(ci.lin(mNs10)[ , c(1,5,6)], 1)
 fit.Ns10 <- predict( mNs10, newdata=nd, interval="conf" )
 pred.Ns10 <- predict( mNs10, newdata=nd, interval="pred" )
 par(mfrow=c(1,1))
 with( births, plot( bweight ~ gestwks, xlim = c(23, 46), cex.axis= 1.5, cex.lab = 1.5 )  )
+matshade( nd$gestwks, fit.Ns10, lwd=2, alpha=0.2 )
+matshade( nd$gestwks, pred.Ns10, lwd=2, alpha=0.2 )
 matlines( nd$gestwks, fit.Ns10, lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
 matlines( nd$gestwks, pred.Ns10, lty=1, lwd=c(3,2,2), col=c('red','green','green') )
 @
@@ -155,13 +161,20 @@ with \texttt{lm} objects
 pr.Ps <- predict( mPs, newdata=nd, se.fit=TRUE)
 par(mfrow=c(1,1))
 with(births, plot(bweight ~ gestwks, xlim=c(24, 45), cex.axis=1.5, cex.lab=1.5) )
+matshade( nd$gestwks, cbind(pr.Ps$fit, 
+                            pr.Ps$fit - 2*pr.Ps$se.fit, 
+                            pr.Ps$fit + 2*pr.Ps$se.fit), lwd=2 )
+matshade( nd$gestwks, cbind(pr.Ps$fit,
+                            pr.Ps$fit - 2*sqrt( pr.Ps$se.fit^2 + mPs$sig2), 
+                            pr.Ps$fit + 2*sqrt( pr.Ps$se.fit^2 + mPs$sig2)), lwd=2 )
 matlines( nd$gestwks, cbind(pr.Ps$fit, 
-  pr.Ps$fit - 2*pr.Ps$se.fit, pr.Ps$fit + 2*pr.Ps$se.fit),  
-  lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
+                            pr.Ps$fit - 2*pr.Ps$se.fit, 
+                            pr.Ps$fit + 2*pr.Ps$se.fit),  
+          lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
 matlines( nd$gestwks, cbind(pr.Ps$fit, 
-  pr.Ps$fit - 2*sqrt( pr.Ps$se.fit^2 + mPs$sig2), 
-  pr.Ps$fit + 2*sqrt( pr.Ps$se.fit^2 + mPs$sig2)),  
-  lty=1, lwd=c(3,2,2), col=c('red','green','green')  )
+                            pr.Ps$fit - 2*sqrt( pr.Ps$se.fit^2 + mPs$sig2), 
+                            pr.Ps$fit + 2*sqrt( pr.Ps$se.fit^2 + mPs$sig2)),  
+          lty=1, lwd=c(3,2,2), col=c('red','green','green')  )
 @   
 The fitted curve is indeed clearly more reasonable than the polynomial.
 
@@ -189,12 +202,13 @@ do some housekeeping. The age range will be limited to 15--79 years, and age and
 are both categorised into 5-year intervals -- according to the time-honoured practice in epidemiology.
 <<housekeeping>>=
 tdk <- subset(testisDK, A > 14 & A < 80)
-tdk$Age <- cut(tdk$A, br = 5*(3:16), include.lowest=TRUE, right=FALSE)
+tdk$Age <- cut(tdk$A, br = 5*(3:16), 
+               include.lowest=TRUE, right=FALSE)
 nAge <- length(levels(tdk$Age))
 tdk$Per <- cut(tdk$P, br = seq(1943, 1998, by = 5),   
-     include.lowest=TRUE, right=FALSE)
+               include.lowest=TRUE, right=FALSE)
 nPer <- length(levels(tdk$Per))
-@
+@ %
 \end{enumerate}
 
 \subsection{Some descriptive analysis}
@@ -209,9 +223,10 @@ compute the incidence rates (per 100,000 y)
  using \texttt{stat.table()}
 <<tabulation>>=
 tab <- stat.table(  index = list(Age, Per),
-                 contents = list(D = sum(D), Y = sum(Y/1000),
+                 contents = list(D = sum(D), 
+                                 Y = sum(Y/1000),
                               rate = ratio(D, Y, 10^5) ),
-     margins = TRUE, data = tdk )										
+     margins = TRUE, data = tdk ) 
 print(tab, digits=c(sum=0, ratio=1))	
 @
 
@@ -232,7 +247,15 @@ plot( c(15,80), c(1,30), type='n', log='y', cex.lab = 1.5, cex.axis = 1.5,
 for (p in 1:nPer)
    lines( seq(17.5, 77.5, by = 5), tab[3, 1:nAge, p], type = 'o', pch = 16 ,
 	   lty = rep(1:6, 2)[p] )
-@		
+@ %
+There is also a function \texttt{rateplot} that does default plotting of
+rate tables (see the help page for \texttt{rateplot}):
+<<rateplot,fig=TRUE>>=
+par( mfrow=c(1,1) )
+rateplot( tab[3,1:nAge,1:nPer], "ap", ylim=c(1,30),
+          age = seq(15,75,5), per=seq(1943,1993,5),
+          col=heat.colors(16), ann=TRUE )
+@ %
 Is there any common pattern in the age-incidence curves across the periods?
 
 \end{enumerate}
@@ -326,15 +349,16 @@ par(mfrow=c(1,2))
 plot(mPen, seWithMean=TRUE)
 abline(v = 1968, lty=3)
 abline(h = 0, lty=3)
-@
-The dashed lines describe the 95 \% confidence band for the pertinent curve.
-One could get the impression that year 1968 would be some kind of reference value for the period
-effect, as it was in the categorical model previously fitted. This is not the case, however, because
-{\tt gam()} by default 
-parametrizes the spline effects such that the reference level, at which the spline effect is nominally zero,
- is the overall ``grand mean''
-value of the log-rate in the data. This corresponds to the principle of {\it sum contrasts} ({\tt contr.sum})
-for categorical explanatory factors.
+@ %
+The dashed lines describe the 95 \% confidence band for the
+pertinent curve.  One could get the impression that year 1968 would be
+some kind of reference value for the period effect, as it was in the
+categorical model previously fitted. This is not the case, however,
+because {\tt gam()} by default parametrizes the spline effects such
+that the reference level, at which the spline effect is nominally
+zero, is the overall ``grand mean'' value of the log-rate in the
+data. This corresponds to the principle of {\it sum contrasts} ({\tt
+  contr.sum}) for categorical explanatory factors.
 
 % The confidence band indicates, namely,
 % that there is uncertainty about the true age effect curve about the overall (``grand mean'')
@@ -372,7 +396,7 @@ par(mfrow=c(1,2))
 plot(mPen2, seWithMean=TRUE)
 abline(v = 1968, lty=3)
 abline(h = 0, lty=3)
-@
+@ %
 There does not seem to have happened any essential changes from the previously fitted curves,
 so maybe 8 df could, after all,  be quite enough for the age effect.
 
@@ -407,8 +431,8 @@ Fitting these models can be done with \texttt{glm()} such that
 in the model formula the spline components are defined by function \texttt{Ns()} 
 <<mNs>>=
 mNs <- glm( D ~ Ns(A, knots = seq(15, 75, 10)) +
-                  Ns(P, knots = seq(50, 90, 10)),
-                  offset=log(Y), family=poisson, data=tdk )
+                Ns(P, knots = seq(1950, 1990, 10)),
+                offset=log(Y), family=poisson, data=tdk )
 summary( mNs)
 @
 
@@ -419,32 +443,70 @@ presentation of the effects.
 As in previous models we want to describe the age effect on the original rate scale
 merging the intercept. In the categorical model
 we chose the years 1968--72 as the reference period.
-Here we assign year 1970 as the reference calendar year,
+Here we assign year 1970 as the reference date,
 so that the age curve describes the estimated age effect
-and the period curve describes the rate ratio of
-each calendar year versus the reference year. 
-To this end we can utilize function \texttt{ci.exp()} 
-with suitable contrast matrices for age and period, that comply with 
-the structure of the fitted splines for both effects
-as well as the desire to keep year 1970 as the reference calendar year.
-All of that can be done with the following piece of script
-<<mNs10-plot, fig=T>>=
+and the period curve describes the rate ratio versus the reference date. 
+To this end we can utilize functions \texttt{ci.pred} to make
+predicted rates fo the reference date, and \texttt{ci.exp}
+to extract predicted rate-ratios relative to the reference (see the
+help page for \texttt{ci.exp}).
+
+What is needed are data frames with values for the covariates
+\texttt{A}, \texttt{P} and \texttt{Y}, one data frame for the
+predictions and two data frames representing the rate ratios we want:
+<<>>=
+summary( mNs )
 aa <- 15:79
 pp <- 1943:1996
-As <- Ns( aa, knots=seq(15, 75, 10) )
-Ps <- Ns( pp, knots=seq(1950, 1990, 10) )
-Ar <- Ns( rep(70, length(aa)), knots=seq(50, 90, 10) )
-Pr <- Ns( rep(1970, length(pp)), knots=seq(1950, 1990, 10) )
+# for the prediction
+ndp <- data.frame( A=aa, P=1970, Y=10^5 )
+# for the RR between pp and 1970
+ndx <- data.frame( A=50, P=pp  , Y=10^5 )
+ndr <- data.frame( A=50, P=1970, Y=10^5 )
 par(mfrow=c(1,2))
-matplot( aa, ci.exp( mNs, ctr.mat =cbind(1, As, Ar) )*10^5,
+matplot( aa, ci.pred( mNs, ndp ),
           log="y", xlab="Age", ylab="Incidence rate (per 100000 y)",
           type="l", lty=1, lwd=c(3,1,1), col = c("red", "blue",  "blue") )
-matplot( pp, ci.exp( mNs, ctr.mat = Ps - Pr, subset="P" ),
+matplot( pp, ci.exp( mNs, list(ndx,ndr) ),
           log="y", xlab="Year", ylab="Rate ratio",
           type="l", lty=1, lwd=c(3,1,1), col= c("red", "blue",  "blue") )
-@
+abline( h=1,v=1970)
+@ 
+
+%% All of that can be done with the following piece of script
+%% <<mNs10-plot, fig=T>>=
+%% aa <- 15:79
+%% pp <- 1943:1996
+%% As <- Ns( aa, knots=seq(15, 75, 10) )
+%% Ps <- Ns( pp, knots=seq(1950, 1990, 10) )
+%% Ar <- Ns( rep(70, length(aa)), knots=seq(50, 90, 10) )
+%% Pr <- Ns( rep(1970, length(pp)), knots=seq(1950, 1990, 10) )
+%% par(mfrow=c(1,2))
+%% matplot( aa, ci.exp( mNs, ctr.mat =cbind(1, As, Ar) )*10^5,
+%%           log="y", xlab="Age", ylab="Incidence rate (per 100000 y)",
+%%           type="l", lty=1, lwd=c(3,1,1), col = c("red", "blue",  "blue") )
+%% matplot( pp, ci.exp( mNs, ctr.mat = Ps - Pr, subset="P" ),
+%%           log="y", xlab="Year", ylab="Rate ratio",
+%%           type="l", lty=1, lwd=c(3,1,1), col= c("red", "blue",  "blue") )
+%% @
 Inspect the curves. Are they very different from those you got
 from the penalized splines model?
+
+The nice thing about the approach is that exactly the same piece of
+code works for the \texttt{gam} model, so we can show the \texttt{gam}
+model with shades on top of the \texttt{Ns} resuts:
+<<gamNs,fig=TRUE>>=
+par(mfrow=c(1,2))
+matplot( ndp$A, ci.pred( mNs, ndp ),
+          log="y", xlab="Age", ylab="Incidence rate (per 100000 y)",
+          type="l", lty=1, lwd=c(3,1,1), col = c("red", "blue",  "blue") )
+matshade( ndp$A, ci.pred( mPen2, ndp ), lwd=2, lty=3 )
+matplot( ndx$P, ci.exp( mNs, list(ndx,ndr) ),
+          log="y", xlab="Year", ylab="Rate ratio",
+          type="l", lty=1, lwd=c(3,1,1), col= c("red", "blue",  "blue") )
+matshade( ndx$P, ci.exp( mPen2, list(ndx,ndr) ), lwd=2, lty=3 )
+abline( h=1,v=1970)
+@ 
 
 One obvious difference is found in the way the error margins for the
 period effect are displayed. In the current model
