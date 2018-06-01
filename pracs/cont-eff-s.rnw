@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 \SweaveOpts{results=verbatim, prefix.string=./graph/cont-eff}
-=======
-\SweaveOpts{results=verbatim}
->>>>>>> a92faa1bb94bb66aa133c173a0e17cd5bf69e54c
 
 \section{Estimation and reporting of curved effects}
 
@@ -30,7 +26,7 @@ on linear models.
 \begin{enumerate}
 \item
 Make a basic scatter plot and draw the fitted line from a simple linear regression on it.
-<<data-births, echo=T, fig=T>>=
+<<data-births, fig=TRUE>>=
 library(Epi)
 data(births)
 with(births, plot(gestwks, bweight))
@@ -39,7 +35,7 @@ abline(mlin)
 @
 \item
 Repeat also the diagnostic plots of this simple model
-<<diag-lin, echo=T, fig=T>>=
+<<diag-lin, fig=TRUE>>=
 par(mfrow=c(2,2))
 plot(mlin)
 @
@@ -68,10 +64,11 @@ polynomial model.
 \item
 A graphical presentation of the fitted curve
 together with the confidence and prediction intervals is more informative:
-<<Ns5-pred, fig=T>>=
+<<Ns5-pred, fig=TRUE>>=
 nd <- data.frame(gestwks = seq(24, 45, by = 0.25) ) 
 fit.Ns5 <- predict( mNs5, newdata=nd, interval="conf" )
 pred.Ns5 <- predict( mNs5, newdata=nd, interval="pred" )
+par(mfrow=c(1,1))
 with(births, plot(bweight ~ gestwks, xlim=c(23, 46),cex.axis= 1.5,cex.lab = 1.5 ) )
 matlines( nd$gestwks, fit.Ns5, lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
 matlines( nd$gestwks, pred.Ns5, lty=1, lwd=c(3,2,2), col=c('red','green','green') )
@@ -80,7 +77,7 @@ Compare this with the 3rd order curve previously fitted (see slide 20 of the lec
 In a natural spline the curve is constrained to be linear beyond the extreme knots.
 \item
 Take a look at the basic diagnostic plots from the spline model.
-<<cubic-diag, fig=T>>=
+<<cubic-diag, fig=TRUE>>=
 par(mfrow=c(2,2))
 plot(mNs5)
 @
@@ -95,7 +92,7 @@ problems with specification of knots, you may now fit
 another natural spline model like the one above but now with 10 knots
 at the following sequence of points: \texttt{seq(25, 43, by = 2)}.
 Display graphically the results 
-<<bweigth-gestwks-Ns10, echo = F, fig=T>>=		 
+<<bweigth-gestwks-Ns10, echo=TRUE, fig=TRUE>>=		 
 mNs10 <- lm( bweight ~ Ns( gestwks, 
         knots = seq(25, 43, by = 2)), data = births)
 round(ci.lin(mNs10)[ , c(1,5,6)], 1)
@@ -153,8 +150,8 @@ As in previous models we shall plot the fitted curve together with
 95 \% prediction intervals for individual responses. Obtaining these
 quantities from the fitted \texttt{gam} object requires a bit more work than
 with \texttt{lm} objects
-<<bweight-gestwks-mPs-plot, fig=T>>=	
-pr.Ps <- predict( mPs, newdata=nd, se.fit=T)
+<<bweight-gestwks-mPs-plot, fig=TRUE>>=	
+pr.Ps <- predict( mPs, newdata=nd, se.fit=TRUE)
 par(mfrow=c(1,1))
 with(births, plot(bweight ~ gestwks, xlim=c(24, 45), cex.axis=1.5, cex.lab=1.5) )
 matlines( nd$gestwks, cbind(pr.Ps$fit, 
@@ -191,11 +188,10 @@ do some housekeeping. The age range will be limited to 15--79 years, and age and
 are both categorised into 5-year intervals -- according to the time-honoured practice in epidemiology.
 <<housekeeping>>=
 tdk <- subset(testisDK, A > 14 & A < 80)
-tdk$Age <- cut(tdk$A, br = 5*(3:16), include.lowest=T, right=F)
+tdk$Age <- cut(tdk$A, br = 5*(3:16), include.lowest=TRUE, right=FALSE)
 nAge <- length(levels(tdk$Age))
-tdk$P <- tdk$P - 1900
-tdk$Per <- cut(tdk$P, br = seq(43, 98, by = 5),   
-     include.lowest=T, right=F)
+tdk$Per <- cut(tdk$P, br = seq(1943, 1998, by = 5),   
+     include.lowest=TRUE, right=FALSE)
 nPer <- length(levels(tdk$Per))
 @
 \end{enumerate}
@@ -227,7 +223,7 @@ From the saved table object \texttt{tab}
  you can plot an age-incidence curve for each period separately,
  after you have checked the structure of the table, so that you know the
 relevant dimensions in it.
-<<plot-rates, fig=T>>=
+<<plot-rates, fig=TRUE>>=
 str(tab)
 par(mfrow=c(1,1))
 plot( c(15,80), c(1,30), type='n', log='y', cex.lab = 1.5, cex.axis = 1.5, 
@@ -263,14 +259,14 @@ define shorthands for the pertinent mid-age and mid-period values of the
 different intervals  
 <<mCat-est, fig=T>>=
 aMid <- seq(17.5, 77.5, by = 5)
-pMid <- seq(45, 95, by = 5)
+pMid <- seq(1945, 1995, by = 5)
 par(mfrow=c(1,2))
 plot( c(15,80), c(0.6, 6), type='n', log='y', cex.lab = 1.5, cex.axis = 1.5, 
    xlab = "Age (years)", ylab = "Rate ratio") 
 lines( aMid,  c( 1, ci.exp(mCat)[2:13, 1] ), type = 'o', pch = 16 )
 segments( aMid[-1],  ci.exp(mCat)[2:13, 2], aMid[-1], ci.exp(mCat)[2:13, 3] ) 
-plot( c(43, 98), c(0.6, 6), type='n', log='y', cex.lab = 1.5, cex.axis = 1.5, 
-   xlab = "Calendar year - 1900", ylab = "Rate ratio") 
+plot( c(1943, 1998), c(0.6, 6), type='n', log='y', cex.lab = 1.5, cex.axis = 1.5, 
+   xlab = "Calendar year", ylab = "Rate ratio") 
 lines( pMid,  c( 1, ci.exp(mCat)[14:23, 1] ), type = 'o', pch = 16 )
 segments( pMid[-1],  ci.exp(mCat)[14:23, 2], pMid[-1], ci.exp(mCat)[14:23, 3] ) 
 @
@@ -290,7 +286,7 @@ par(mfrow=c(1,2))
 plot( c(15,80), c(2, 20), type='n', log='y', cex.lab = 1.5, cex.axis = 1.5, 
    xlab = "Age (years)", ylab = "Incidence rate (per 100000 y)") 
 lines( aMid,  c(ci.exp(mCat2)[1:13, 1] ), type = 'o', pch = 16 )
-plot( c(43, 98), c(0.4, 2), type='n', log='y', cex.lab = 1.5, cex.axis = 1.5, 
+plot( c(1943, 1998), c(0.4, 2), type='n', log='y', cex.lab = 1.5, cex.axis = 1.5, 
    xlab = "Calendar year - 1900", ylab = "Rate ratio") 
 lines( pMid, c(ci.exp(mCat2)[14:18, 1], 1, ci.exp(mCat2)[19:23, 1]),  
    type = 'o', pch = 16 )
@@ -324,10 +320,10 @@ On the rate scale the baseline level (per 100000 y) is obtained by \texttt{exp(1
 \item
 See also the default plot for the fitted curves (solid lines) describing the age and the period effects
 which are interpreted as contrasts to the baseline level on the log-rate scale.
-<<mPen-plot, fig=T>>=
+<<mPen-plot, fig=TRUE>>=
 par(mfrow=c(1,2))
-plot(mPen, seWithMean=T)
-abline(v = 68, lty=3)
+plot(mPen, seWithMean=TRUE)
+abline(v = 1968, lty=3)
 abline(h = 0, lty=3)
 @
 The dashed lines describe the 95 \% confidence band for the pertinent curve.
@@ -370,10 +366,10 @@ gam.check(mPen2)
 @ 
 With this choice of \texttt{k} the df value for age became about 11, which is well below 
 $k-1 = 19$. Let us plot the fitted curves from this fitting, too
-<<mPen2-plot, fig=T>>=
+<<mPen2-plot, fig=TRUE>>=
 par(mfrow=c(1,2))
-plot(mPen2, seWithMean=T)
-abline(v = 68, lty=3)
+plot(mPen2, seWithMean=TRUE)
+abline(v = 1968, lty=3)
 abline(h = 0, lty=3)
 @
 There does not seem to have happened any essential changes from the previously fitted curves,
