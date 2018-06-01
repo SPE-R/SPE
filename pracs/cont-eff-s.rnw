@@ -29,6 +29,7 @@ Make a basic scatter plot and draw the fitted line from a simple linear regressi
 <<data-births, fig=TRUE>>=
 library(Epi)
 data(births)
+par(mfrow=c(1,1))
 with(births, plot(gestwks, bweight))
 mlin <- lm(bweight ~ gestwks, data = births )
 abline(mlin)
@@ -257,7 +258,7 @@ A graphical inspection of point estimates and confidence intervals
 can be obtained as follows. In the beginning it is useful to
 define shorthands for the pertinent mid-age and mid-period values of the
 different intervals  
-<<mCat-est, fig=T>>=
+<<mCat-est, fig=TRUE>>=
 aMid <- seq(17.5, 77.5, by = 5)
 pMid <- seq(1945, 1995, by = 5)
 par(mfrow=c(1,2))
@@ -281,7 +282,7 @@ mCat2 <- glm( D ~ -1 + Age +Per70, offset=log(Y/100000), family=poisson, data= t
 round( ci.exp( mCat2 ), 2)
 @
 We shall plot just the point estimates from the latter model
-<<mCat2-plot, fig=T>>=
+<<mCat2-plot, fig=TRUE>>=
 par(mfrow=c(1,2))
 plot( c(15,80), c(2, 20), type='n', log='y', cex.lab = 1.5, cex.axis = 1.5, 
    xlab = "Age (years)", ylab = "Incidence rate (per 100000 y)") 
@@ -386,7 +387,7 @@ as determined by the model intercept.
 In order to produce these plots one needs to extract certain items from the fitted \texttt{gam}
 object \texttt{mPen2} and do some calculations. A source script named ``\texttt{plotPenSplines.R}''
 that does all of that can be found from the \texttt{/R} subdirectory on the course website.
-<<mPen2-plotAge, fig=T>>=
+<<mPen2-plotAge, fig=TRUE>>=
 source("http://bendixcarstensen.com/SPE/R/plotPenSplines.R")
 @ 
 \end{enumerate}
@@ -429,11 +430,11 @@ as well as the desire to keep year 1970 as the reference calendar year.
 All of that can be done with the following piece of script
 <<mNs10-plot, fig=T>>=
 aa <- 15:79
-pp <- 43:96
+pp <- 1943:1996
 As <- Ns( aa, knots=seq(15, 75, 10) )
-Ps <- Ns( pp, knots=seq(50, 90, 10) )
+Ps <- Ns( pp, knots=seq(1950, 1990, 10) )
 Ar <- Ns( rep(70, length(aa)), knots=seq(50, 90, 10) )
-Pr <- Ns( rep(70, length(pp)), knots=seq(50, 90, 10) )
+Pr <- Ns( rep(1970, length(pp)), knots=seq(1950, 1990, 10) )
 par(mfrow=c(1,2))
 matplot( aa, ci.exp( mNs, ctr.mat =cbind(1, As, Ar) )*10^5,
           log="y", xlab="Age", ylab="Incidence rate (per 100000 y)",
