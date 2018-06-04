@@ -188,7 +188,9 @@ On the command line (or a line in a script) one could:
 \begin{frame}[fragile]
   \frametitle{Data frames}
   \begin{itemize}
-\item A \alert{data frame} is similar to a matrix, but can have columns (variables) of different types
+\item Usually a dataset in R is stored in a form of a \alert{data frame}. 
+\item While reading in data from text files (using \code{read.table(), read.csv()}), a data frame is created.
+\item A data frame is similar to a matrix, but can have columns (variables) of different types.
 \item A variable can be extracted using \code{dataframe\$variable} (as data frames are lists) 
 \begin{vcode}
 > D<- data.frame(a=c(8,3,5),b=c("X","Z","Y"))
@@ -212,23 +214,6 @@ On the command line (or a line in a script) one could:
   \end{itemize}
 \end{frame}
 
-
-\begin{frame}{}
-  \frametitle{The workspace}
-  \begin{itemize}
-  \item The \emph{global environment} contains R objects created on the
-    command line. 
-  \item There is an additional \emph{search path} of loaded packages
-    and attached data frames.
-  \item When you request an object by name, R looks first in the
-    global environment, and if it doesn't find it there, it continues
-    along the search path.
-  \item The search path is maintained by \code{library()},
-    \code{attach()}, and \code{detach()}
-  \item Notice that objects in the global environment may mask objects
-    in packages and attached data frames
-  \end{itemize}
-\end{frame}
 
 \section{Data frames and data manipulation}
 \begin{frame}[fragile] 
@@ -259,25 +244,22 @@ detach()
 
 \begin{frame}[fragile]
 \frametitle{Data manipulation}
-To create a new variable in the data frame, you could use:
+To create a new variable \code{bmi} in the existing data frame \code{students}, use either of the two:
 \begin{vcode}
 students$bmi <- 
-              with(students, weight/(height/100)^2)
-\end{vcode}
-Or:
-\begin{vcode}
+       with(students, weight/(height/100)^2)
 students <-
-      transform(students, bmi=weight/(height/100)^2)
+     transform(students, bmi=weight/(height/100)^2)
 \end{vcode}
 (notice: you need an assignment, to save the transformed object)
 \mbox{  }\\[0.3cm]
-{\small 
-whereas
-\begin{vcode}
-with(students,  bmi <- weight/(height/100)^2)
-\end{vcode}
-creates the variable \code{bmi} in the global environment (not in the data frame). 
- }
+%{\small 
+%whereas
+%\begin{vcode}
+%with(students,  bmi <- weight/(height/100)^2)
+%\end{vcode}
+%creates the variable \code{bmi} in the global environment (not in the data frame). 
+ %}
 
 \end{frame}
 
@@ -290,8 +272,8 @@ creates the variable \code{bmi} in the global environment (not in the data frame
   \begin{itemize}
    \item Elements of vectors: \code{a[5]} (5th element);  \code{a[5:7]} (5th to 7th elements);  \code{a[-6]} (all elements except the 6th)
   \item Logical index:  \code{a[a<3]},  \code{a[b>2]} , \code{a[is.na(b)]} (elements of \code{a} corresponding to missing values of \code{b})
-\item In a dataframe or matrix -- two dimensions, two indexes: \\ \code{students[5, 7]},  
-\code{students[1:10, c(1,2,5)]}, \\  \code{students[students\$age>40, ]}
+\item In a data frame or matrix -- two dimensions, two indexes: \\ \code{students[5, 7]},  
+\code{students[1:10, c(2,5)]}, \\  \code{students[1, ], students[ ,3]  (entire row/column)}
 \end{itemize}
 \end{frame}
 
@@ -304,18 +286,16 @@ creates the variable \code{bmi} in the global environment (not in the data frame
 [1] 2 5 0
 > x[x<3]
 [1] 2 1 0
-> A[2,1]   # a matrix has row and column indexes 
-[1] 2
-> A[2,]    # the entire 2nd row  
-[1] 2 6
 
 > NMRimp[1:2,1:4]    #quick look at a large data
   sample.id XXL.VLDL.P XXL.VLDL.L XXL.VLDL.PL 
 1    V18566   1.46e-04     0.0313     0.00331  
 2    V36115   9.00e-05     0.0195     0.00178    
 
-> fgsa[is.na(fgsa$height),"age"] 
+> fgsa[is.na(fgsa$height),"age"]  
   [1] 18 69 52 41 52 44 73 28 66 20 73 63 26 
+# ages of those with missing height
+
 # equivalent: fgsa$age[is.na(fgsa$height)]   
 \end{vcode}
 \end{frame}
@@ -425,7 +405,6 @@ Use \code{help(\textit{function})} or  \code{args(\textit{function})} to see the
   \end{itemize}
 \end{frame}
 
-%\addtocounter{framenumber}{-1} %% workaround for beamer buglet
 \begin{frame}[fragile]
 \frametitle{Example}
 From R-help (\code{help(t.test)}):
@@ -439,14 +418,21 @@ t.test(x, y = NULL,
 \item The first argument (x) does not have a default -- you have to provide some data!
 \item The other arguments can be modified, if you need to.
   \end{itemize}
+  \end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Example (cont.)}
 The following lines of code are equivalent:
 \begin{vcode}
 t.test(a, b,  alternative="less", paired=TRUE)
 t.test(a, b, paired=TRUE, alt="less")
+
 t.test(a, b, p=T, a="l")   #not a good style!
 \end{vcode}
 Order does not matter for named arguments! \\ 
 Partial keyword matching is possible (``alternative" or ``alt'' or ``a") (partial matching is possible) 
+
+\alert{For a readable code, the use of explicit argument names is highly recommended!}
 \end{frame}
 
 \section{Graphics}
@@ -471,7 +457,24 @@ and a bar plot of category frequencies, when \code{x} is a factor variable
 %\addtocounter{framenumber}{-1} %% workaround for beamer buglet
 
 
-%\section{The workspace}
+\section{The workspace}
+
+\begin{frame}{}
+  \frametitle{The workspace}
+  \begin{itemize}
+  \item The \emph{global environment} contains R objects created on the
+    command line. 
+  \item There is an additional \emph{search path} of loaded packages
+    and attached data frames.
+  \item When you request an object by name, R looks first in the
+    global environment, and if it doesn't find it there, it continues
+    along the search path.
+  \item The search path is maintained by \code{library()},
+    \code{attach()}, and \code{detach()}
+  \item Notice that objects in the global environment may mask objects
+    in packages and attached data frames
+  \end{itemize}
+\end{frame}
 
 \section{Additional topics}
 \begin{frame}
