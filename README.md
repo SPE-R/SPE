@@ -26,13 +26,13 @@ Then clean the working directory running:
 
 `make -f pracs/Makefile clean`
 
-To produce the R source code from .rnw files:
+To produce the R source code from solutions .rnw files:
 
-`make -f pracs/Makefile R`
+`make -f pracs/Makefile Rsol`
 
-Automatic build of practicals pdf is preformed threw [SPE's Travis-ci platform](https://travis-ci.org/SPE-R/SPE).
+Automatic build of practicals pdf and R solutions files is preformed threw [SPE's Travis-ci platform](https://travis-ci.org/SPE-R/SPE).
 
-For SPE tagged release, the [SPE's Travis-ci platform](https://travis-ci.org/SPE-R/SPE) will deploy pracs.pdf file on the [travis-build branch](https://github.com/SPE-R/SPE-R.github.io/tree/travis-build) of [SPE-R github page](https://spe-r.github.io/).
+For SPE tagged release, the [SPE's Travis-ci platform](https://travis-ci.org/SPE-R/SPE) will deploy pracs.pdf and R solutions files on the [travis-build branch](https://github.com/SPE-R/SPE-R.github.io/tree/travis-build) of [SPE-R github page](https://spe-r.github.io/).
 
 -----
 
