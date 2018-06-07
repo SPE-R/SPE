@@ -12,19 +12,19 @@ SHELL = /bin/sh
 MAIN = SPE-2018-lectures-3x1
 
 ## The rnw depencencies
-## FILEINCLUDES = \
-	ecology/R-history-ecology \
-	language-index/spe2018-lang_index \
-	poisson-logistic/SPE-Poisson-Logistic-Regression \
-	linmodels/lm \
-	graphics_advanced/Graphics \
-	Survival_competing_risk/Survival_competing_risk \
-	time-rep/time-rep \
-	casecontrol/NCC-CC-studies \
-	causal/spe2017-CIlect-kf \
-	multistate/multistate
-	
 PDFINCLUDES = \
+	ecology/R-history-ecology.pdf \
+	language-index/spe2018-lang_index.pdf \
+	poisson-logistic/SPE-Poisson-Logistic-Regression.pdf \
+	linmodels/lm.pdf \
+	graphics_advanced/Graphics.pdf \
+	Survival_competing_risk/Survival_competing_risk.pdf \
+	time-rep/time-rep.pdf \
+	casecontrol/NCC-CC-studies.pdf \
+	causal/spe2017-CIlect-kf.pdf \
+	multistate/multistate.pdf
+	
+## PDFINCLUDES = \
 	linmodels/lm.pdf \
 	graphics_advanced/Graphics.pdf \
 	time-rep/time-rep.pdf \
