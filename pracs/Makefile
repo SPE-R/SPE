@@ -21,18 +21,23 @@ RFILES = $(RNWINCLUDES:=.R)
 RNWFILES = $(RNWINCLUDES:=.rnw)
 
 RFILESSOL = $(filter %-s.R, $(RFILES))
+TEXFILESEX = $(filter %-e.tex, $(TEX))
+TEXFILESSOL = $(filter %-s.tex, $(TEX))
 
 SRCDIR   = pracs
 BUILDDIR = build
 
+all: builddir; $(MAKE) -C ${BUILDDIR} $(MAIN).pdf; $(MAKE) -C ${BUILDDIR} $(MAIN)-sol.pdf 
 
-all: builddir; $(MAKE) -C ${BUILDDIR} $(MAIN).pdf
+$(MAIN).pdf: $(TEXFILESEX) $(MAIN).tex
 
-$(MAIN).pdf: $(TEX) $(MAIN).tex
+$(MAIN)-sol.pdf: $(TEX) $(MAIN)-sol.tex
 
-R: builddir; $(MAKE) -C ${BUILDDIR} $(RFILES)
+R: $(MAKE) -C ${BUILDDIR} $(RFILES)
 
-Rsol: builddir; $(MAKE) -C ${BUILDDIR} $(RFILESSOL)
+Rsol: $(MAKE) -C ${BUILDDIR} $(RFILESSOL)
+
+config: builddir
 
 view: all
 	evince $(MAIN).pdf &
