@@ -33,9 +33,9 @@ $(MAIN).pdf: $(TEXFILESEX) $(MAIN).tex
 
 $(MAIN)-sol.pdf: $(TEX) $(MAIN)-sol.tex
 
-R: $(MAKE) -C ${BUILDDIR} $(RFILES)
+R: builddir; $(MAKE) -C ${BUILDDIR} $(RFILES)
 
-Rsol: $(MAKE) -C ${BUILDDIR} $(RFILESSOL)
+Rsol: builddir; $(MAKE) -C ${BUILDDIR} $(RFILESSOL)
 
 config: builddir
 
