@@ -17,6 +17,7 @@ PDFINCLUDES = \
 	language-index/spe2018-lang_index.pdf \
 	poisson-logistic/SPE-Poisson-Logistic-Regression.pdf \
 	linmodels/lm.pdf \
+	splines/splines.pdf \
 	graphics_advanced/Graphics.pdf \
 	Survival_competing_risk/Survival_competing_risk.pdf \
 	time-rep/time-rep.pdf \
