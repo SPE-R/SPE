@@ -1,9 +1,11 @@
+options( width=75 )
 par( mar=c(3,3,1,1), mgp=c(3,1,0)/1.6, las=1, bty="n" )
 
 ###################################################
 library( Epi ) ; clear()
 library( foreign )
 renal <- read.dta( "http://BendixCarstensen.com/SPE/data/renal.dta" )
+renal <- read.dta( "renal.dta" )
 renal$sex <- factor( renal$sex, labels=c("M","F") )
 head( renal )
 
@@ -48,6 +50,7 @@ subset( Lc, lex.id %in% c(2:4,21) )[,c(1:9,12)]
 
 ###################################################
 boxes( Lc, boxpos=TRUE, scale.R=100, show.BE=TRUE, hm=1.5, wm=1.5 )
+par( mfrow=c(1,1) )
 boxes( Relevel(Lc,c(1,2,4,3)), 
        boxpos=TRUE, scale.R=100, show.BE=TRUE, hm=1.5, wm=1.5 )
 
@@ -72,23 +75,12 @@ m1 <- coxph( Surv( tfi,                  # from
 summary( m1 )
 
 ###################################################
-cox.zph( m1 )
-
-###################################################
 sLc <- splitLexis( Lc, "tfi", breaks=seq(0,30,1/12) )
+options( "popEpi.datatable" = FALSE ) # Make sure we get at data frame
+                                      # from splitMulti
+sLc <- splitMulti( Lc, tfi=seq(0,30,1/12) )
 summary( Lc, scale=100 )
 summary(sLc, scale=100 )
-
-###################################################
-library( splines )
-mp <- glm( lex.Xst %in% EP ~ ns( tfi, df=4 ) +
-           sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem"),
-           offset = log(lex.dur),
-           family = poisson, 
-             data = sLc )
-round( ci.exp( mp ), 3 )
-round( ci.exp( m1 ), 3 )
-
 
 ###################################################
 ### code chunk number 16: renal-s.rnw:286-294
@@ -99,16 +91,11 @@ mx <- gam( (lex.Xst %in% EP) ~ s( tfi, k=10 ) +
            offset = log(lex.dur),
            family = poisson, 
              data = sLc )
-ci.exp( mp, subset=c("I","sex") )
-ci.exp( mx, subset=c("I","sex") )
 
 ###################################################
-ci.exp( mx, subset=c("sex","dob","Cst"), pval=TRUE )
-ci.exp( m1 )
-round( ci.exp( mp, subset=c("sex","dob","Cst") ) / ci.exp( m1 ), 2 )
-
-###################################################
-plot( mx )
+round( ci.exp( mx, subset=c("sex","dob","Cst"), pval=TRUE ), 3 )
+round( ci.exp( m1 ), 3 )
+round( ci.exp( mx, subset=c("sex","dob","Cst") ) / ci.exp( m1 ), 3 )
 
 ###################################################
 nd <- data.frame( tfi = seq(0,20,.1),
@@ -117,14 +104,13 @@ nd <- data.frame( tfi = seq(0,20,.1),
                   dob = 1940,
               lex.Cst = "NRA",
               lex.dur = 1 )
-str( nd )
-matplot( nd$tfi, cbind( ci.pred( mx, newdata=nd )*100,
-                        ci.pred( mp, newdata=nd )*100 ),
-         type="l", lty=1, lwd=c(4,1,1), col=rep(c("gray","black"), each=3),
-         log="y", xlab="Time since entry (years)",
-                  ylab="ESRD rate (per 100 PY) for 50 year man" )
+matshade( nd$tfi, ci.pred( mx, newdata=nd )*100, plot=TRUE,
+          type="l", lty=1, lwd=c(4,1,1), col=rep(c("gray","black"), each=3),
+          log="y", xlab="Time since entry (years)",
+                   ylab="ESRD rate (per 100 PY) for 50 year man" )
 
 ###################################################
+## Define time from remission in units of decades:
 sLc <- transform( sLc, tfr = pmax( (per-dor)/10, 0, na.rm=TRUE ) )
 
 ###################################################
@@ -137,6 +123,7 @@ mPx <- gam( lex.Xst %in% EP ~ s( tfi, k=10 ) +
 round( ci.exp( mPx ), 3 )
 
 ###################################################
+## Incidence rate of Remission
 mr <- gam( lex.Xst=="Rem" ~ s( tfi, k=10 ) + sex,
            offset = log(lex.dur),
            family = poisson,
@@ -146,7 +133,7 @@ ci.exp( mr, pval=TRUE )
 ###################################################
 inL <- subset( sLc, select=1:11 )[NULL,]
 str( inL )
-timeScales(inL)
+timeScales( inL )
 inL[1,"lex.id"] <- 1
 inL[1,"per"] <- 2000
 inL[1,"age"] <- 50
@@ -170,8 +157,8 @@ Tr <- list( "NRA" = list( "Rem"  = mr,
             "Rem" = list( "ESRD(Rem)" = mx ) )
 
 ###################################################
-system.time(
-sM <- simLexis( Tr, inL, N=500 ) )
+system.time( sM <- simLexis( Tr, inL, N=500 ) )
+system.time( sM <- simLexis( Tr, inL, N=1000 ) )
 summary( sM, by="sex" )
 
 ###################################################
@@ -183,22 +170,22 @@ head( nStf )
 ppm <- pState( nStm, perm=c(1,2,4,3) )
 ppf <- pState( nStf, perm=c(1,2,4,3) )
 head( ppf )
-tail( ppf )
 
 ###################################################
 plot( ppf )
 
 ###################################################
 par( mfrow=c(1,2), las=1 )
+clr <- c("red","limegreen","forestgreen","#991111")
 
-plot( ppm, col=c("red","limegreen","forestgreen","#991111") )
+plot( ppm, col=clr )
 lines( as.numeric(rownames(ppm)), ppm[,"Rem"], lwd=4 )
 text( 59.5, 0.95, "Men", adj=1, col="white", font=2, cex=1.2 )
 axis( side=4, at=0:10/10 , labels=NA )
 axis( side=4, at=0:20/20 , labels=NA, tck=-0.02 )
 axis( side=4, at=1:99/100, labels=NA, tck=-0.01 )
 
-plot( ppf, col=c("red","limegreen","forestgreen","#991111"), xlim=c(60,50) )
+plot( ppf, col=clr, xlim=c(60,50) )
 lines( as.numeric(rownames(ppf)), ppf[,"Rem"], lwd=4 )
 text( 59.5, 0.95, "Women", adj=0, col="white", font=2, cex=1.2 )
 axis( side=2, at=0:10/10 )
