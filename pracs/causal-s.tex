@@ -1,4 +1,4 @@
-\SweaveOpts{results=hide,keep.source=TRUE,include=FALSE,eps=FALSE,prefix.string=./graph/causal}
+
 \section{Causal inference}
 \subsection{Proper adjustment for confounding in regression models}
 The first exercise of this session will ask you to simulate some data
@@ -35,35 +35,39 @@ average to $0.5mmHg$ difference in (systolic) blood pressures
 \end{itemize}
 
 If you do want to draw the graph in \R\:
-<<causgraph1, echo=TRUE>>=
-library(Epi)
-par( mar=c(0,0,0,0), cex=2)
-plot( NA, bty="n",xlim= c(40,100), ylim=c(0,80), xaxt="n", yaxt="n",
- xlab="", ylab="" ) # create an empty plot with coordinates
-b<-0; w=12
-bb  <- tbox( "beer", 44, 40, w,w, col.txt="red" ,col.border=b)
-ww  <- tbox( "weight", 90, 40, w,w, col.txt="red" ,col.border=b)
-ss  <- tbox( "sex", 67, 70, w,w, col.txt="blue" ,col.border=b)
-bp  <- tbox( "BP", 67, 10, w,w, col.txt="blue" ,col.border=b)
-text( boxarr( bb, ww , col="red", lwd=3 ,gap= 4), "?", col="red", adj=c(0,-0.5) )
-boxarr( bb, bp , col="blue", lwd=3 )
-boxarr( ww, bp , col="blue", lwd=3 )
-boxarr( ss, bb , col="blue", lwd=3 )
-boxarr( ss, ww , col="blue", lwd=3 )
-@
+\begin{Schunk}
+\begin{Sinput}
+> library(Epi)
+> par( mar=c(0,0,0,0), cex=2)
+> plot( NA, bty="n",xlim= c(40,100), ylim=c(0,80), xaxt="n", yaxt="n",
++  xlab="", ylab="" ) # create an empty plot with coordinates
+> b<-0; w=12
+> bb  <- tbox( "beer", 44, 40, w,w, col.txt="red" ,col.border=b)
+> ww  <- tbox( "weight", 90, 40, w,w, col.txt="red" ,col.border=b)
+> ss  <- tbox( "sex", 67, 70, w,w, col.txt="blue" ,col.border=b)
+> bp  <- tbox( "BP", 67, 10, w,w, col.txt="blue" ,col.border=b)
+> text( boxarr( bb, ww , col="red", lwd=3 ,gap= 4), "?", col="red", adj=c(0,-0.5) )
+> boxarr( bb, bp , col="blue", lwd=3 )
+> boxarr( ww, bp , col="blue", lwd=3 )
+> boxarr( ss, bb , col="blue", lwd=3 )
+> boxarr( ss, ww , col="blue", lwd=3 )
+\end{Sinput}
+\end{Schunk}
 
 \textit{Following the algorithm from the lecture: remove BP and the corresponding arrows -- it is not an ancestor of the exposure or outcome. Beer and weight are separated if sex is removed -- thus one needs to adjust the analysis for sex}
 
 
 The \R\ commands to generate the data are:
-<<beerdata_1, echo=TRUE>>=
-set.seed(02062017)
-bdat= data.frame(sex = c(rep(0,500),rep(1,500))  )
-                   # a data frame with 500 females, 500 males
-bdat$beer <- rbinom(1000,1,0.2+0.5*bdat$sex)
-bdat$weight <- 60 + 10*bdat$sex + rnorm(1000,0,7)
-bdat$bp <- 110 + 0.5*bdat$weight + 10*bdat$beer + rnorm(1000,0,10)
-@
+\begin{Schunk}
+\begin{Sinput}
+> set.seed(02062017)
+> bdat= data.frame(sex = c(rep(0,500),rep(1,500))  )
+>                    # a data frame with 500 females, 500 males
+> bdat$beer <- rbinom(1000,1,0.2+0.5*bdat$sex)
+> bdat$weight <- 60 + 10*bdat$sex + rnorm(1000,0,7)
+> bdat$bp <- 110 + 0.5*bdat$weight + 10*bdat$beer + rnorm(1000,0,10)
+\end{Sinput}
+\end{Schunk}
 \item Now fit the following models for body weight as dependent
   variable and beer-drinking as independent variable. Look, what is
   the estimated effect size:
@@ -72,50 +76,58 @@ bdat$bp <- 110 + 0.5*bdat$weight + 10*bdat$beer + rnorm(1000,0,10)
 \item Adjusted for sex
 \item Adjusted for sex and blood pressure
 \end{enumerate}
-<<beermodels_1, echo=T>>=
-library( Epi )
-m1a<-lm(weight~beer, data=bdat)
-m2a<-lm(weight~beer+sex, data=bdat)
-m3a<-lm(weight~beer+sex+bp, data=bdat)
-ci.lin(m1a)
-ci.lin(m2a)
-ci.lin(m3a)
-@
+\begin{Schunk}
+\begin{Sinput}
+> library( Epi )
+> m1a<-lm(weight~beer, data=bdat)
+> m2a<-lm(weight~beer+sex, data=bdat)
+> m3a<-lm(weight~beer+sex+bp, data=bdat)
+> ci.lin(m1a)
+> ci.lin(m2a)
+> ci.lin(m3a)
+\end{Sinput}
+\end{Schunk}
 
 \item What would be the conclusions on the effect of beer on weight, based on the three models? Do they agree? 
 Which (if any) of the models gives an unbiased estimate of the
   actual causal effect of interest?
-  
+
 \item How can the answer be seen from the graph?
 
 \item Now change the data-generation algorithm so, that in fact beer-drinking
   does increase the body weight by 2kg. Look, what are
   the conclusions in the above models now. 
 Thus the data is generated as before, but the weight variable is computed as:
-<<beerdata_2, echo=TRUE>>=
-bdat$weight <- 60 + 10*bdat$sex + 2*bdat$beer + rnorm(1000,0,7)
-@
+\begin{Schunk}
+\begin{Sinput}
+> bdat$weight <- 60 + 10*bdat$sex + 2*bdat$beer + rnorm(1000,0,7)
+\end{Sinput}
+\end{Schunk}
 
-<<beermodels_2b, echo=T>>=
-bdat$bp <- 110 +0.5*bdat$weight  + 10*bdat$beer+ rnorm(1000,0,10)  #
-m1b<-lm(weight~beer,data=bdat)
-m2b<-lm(weight~beer+sex,data=bdat)
-m3b<-lm(weight~beer+sex+bp,data=bdat)
-ci.lin(m1b)
-ci.lin(m2b)    # the correct model
-ci.lin(m3b)
-@
+\begin{Schunk}
+\begin{Sinput}
+> bdat$bp <- 110 +0.5*bdat$weight  + 10*bdat$beer+ rnorm(1000,0,10)  #
+> m1b<-lm(weight~beer,data=bdat)
+> m2b<-lm(weight~beer+sex,data=bdat)
+> m3b<-lm(weight~beer+sex+bp,data=bdat)
+> ci.lin(m1b)
+> ci.lin(m2b)    # the correct model
+> ci.lin(m3b)
+\end{Sinput}
+\end{Schunk}
 
 \item Suppose one is interested in the effect of beer-drinking on blood pressure instead, and is fitting a) an unadjusted model  for blood pressure, with beer as an only covariate; b) a model with beer, weight and sex as covariates. Would either a) or b) give an unbiased estimate for the effect? (You may double-check whether the simulated data is consistent with your answer).
 
-<<bpmodel, echo=T>>=
-m1bp<-lm(bp~beer,data=bdat)
-m2bp<-lm(bp~beer+weight,data=bdat)
-m3bp<-lm(bp~beer+weight+sex,data=bdat)
-ci.lin(m1bp)
-ci.lin(m2bp)    # the correct model
-ci.lin(m3bp)    # also correct!
-@
+\begin{Schunk}
+\begin{Sinput}
+> m1bp<-lm(bp~beer,data=bdat)
+> m2bp<-lm(bp~beer+weight+sex,data=bdat)
+> m3b<-lm(weight~beer+sex+bp,data=bdat)
+> ci.lin(m1bp)
+> ci.lin(m2bp)    # the correct model
+\end{Sinput}
+\end{Schunk}
+
 
 \end{enumerate}
 
@@ -128,93 +140,115 @@ a real dataset may misleadingly be interpreted as an evidence of a direct effect
  has a direct effect on the exposure only, whereas exposure-outcome association is confounded.  
 \begin{enumerate}
 \item Start by generating the genotype variable as \textit{Binomial(2,p)}, with $p=0.2$:
-<<mrdat1, echo=TRUE>>=
- n <- 10000
- mrdat <- data.frame(G = rbinom(n,2,0.2))
- table(mrdat$G)
-@
+\begin{Schunk}
+\begin{Sinput}
+>  n <- 10000
+>  mrdat <- data.frame(G = rbinom(n,2,0.2))
+>  table(mrdat$G)
+\end{Sinput}
+\end{Schunk}
 \item Also generate the confounder variable U 
-<<mrdat2, echo=TRUE>>=
-mrdat$U <- rnorm(n)
-@
+\begin{Schunk}
+\begin{Sinput}
+> mrdat$U <- rnorm(n)
+\end{Sinput}
+\end{Schunk}
 
 \item Generate a continuous (normally distributed) exposure variable $BMI$ so that it depends on $G$ and $U$. 
 Check with linear regression, whether there is enough power to get significant parameter estimates.  
 For instance:
-<<mrdat3, echo=T>>=
-mrdat$BMI <- with(mrdat, 25 + 0.7*G + 2*U + rnorm(n) )
-@
+\begin{Schunk}
+\begin{Sinput}
+> mrdat$BMI <- with(mrdat, 25 + 0.7*G + 2*U + rnorm(n) )
+\end{Sinput}
+\end{Schunk}
 \item Finally generate $Y$ ("Blood glucose level") so that it depends on $BMI$ and $U$ (but not on $G$).
-<<mrdat4, echo=TRUE>>=
-mrdat$Y <- with(mrdat, 3 + 0.1*BMI - 1.5*U + rnorm(n,0,0.5) )
-@
+\begin{Schunk}
+\begin{Sinput}
+> mrdat$Y <- with(mrdat, 3 + 0.1*BMI - 1.5*U + rnorm(n,0,0.5) )
+\end{Sinput}
+\end{Schunk}
 \item Verify, that simple regression model for $Y$, with $BMI$ as a covariate, results in a biased 
 estimate of the causal effect (parameter estimate is different from what was generated) 
-<<mrmod1, echo=T>>=
-mxy<-lm(Y ~ BMI, data=mrdat)
-ci.lin(mxy)
-@
+\begin{Schunk}
+\begin{Sinput}
+> mxy<-lm(Y ~ BMI, data=mrdat)
+> ci.lin(mxy)
+\end{Sinput}
+\end{Schunk}
 How different is the estimate from 0.1?  
 
 \item  Estimate a regression model for $Y$ with two covariates, $G$ and $BMI$. Do you see a significant effect of $G$?
 Could you explain analytically, why one may see a significant parameter estimate for $G$ there?
-<<mrmod2, echo=T>>=
-mxyg<-lm(Y ~ G + BMI, data=mrdat)
-ci.lin(mxyg)
-@
+\begin{Schunk}
+\begin{Sinput}
+> mxyg<-lm(Y ~ G + BMI, data=mrdat)
+> ci.lin(mxyg)
+\end{Sinput}
+\end{Schunk}
 
 \item Find an IV (instrumental variables) estimate, using G as an instrument, by following the algorithm 
 in the lecture notes (use two linear models and find a ratio of the parameter estimates). 
 Does the estimate get closer to the generated effect size?
-<<mrmod3, echo=T>>=
-mgx<-lm(BMI ~ G, data=mrdat)
-ci.lin(mgx)  # check the instrument effect
-bgx<-mgx$coef[2]   # save the 2nd coefficient (coef of G) 
-mgy<-lm(Y ~ G, data=mrdat)
-ci.lin(mgy)
-bgy<-mgy$coef[2]
-causeff <- bgy/bgx
-causeff    # closer to 0.1?
-@
+\begin{Schunk}
+\begin{Sinput}
+> mgx<-lm(BMI ~ G, data=mrdat)
+> ci.lin(mgx)  # check the instrument effect
+> bgx<-mgx$coef[2]   # save the 2nd coefficient (coef of G) 
+> mgy<-lm(Y ~ G, data=mrdat)
+> ci.lin(mgy)
+> bgy<-mgy$coef[2]
+> causeff <- bgy/bgx
+> causeff    # closer to 0.1?
+\end{Sinput}
+\end{Schunk}
 
 \item  A proper simulation study would require the analysis to be run several times, to see the extent of variability in the parameter estimates. 
 A simple way to do it here would be using a \verb+for+-loop. Modify the code as follows (exactly the same commands as executed so far, adding a few lines of code to the beginning and to the end):
-<<mrsim, echo=TRUE>>=
-n <- 10000
-# initializing simulations:
-# 30 simulations (change it, if you want more):
-nsim<-30       
-mr<-rep(NA,nsim)   # empty vector for the outcome parameters
-for (i in 1:nsim) { # start the loop
-### Exactly the same commands as before:
-mrdat <- data.frame(G = rbinom(n,2,0.2))
-mrdat$U <- rnorm(n)
-mrdat$BMI <- with(mrdat, 25 + 0.7*G + 2*U + rnorm(n) )
-mrdat$Y <- with(mrdat, 3 + 0.1*BMI - 1.5*U + rnorm(n,0,0.5) )
-mgx<-lm(BMI ~ G, data=mrdat)
-bgx<-mgx$coef[2]
-mgy<-lm(Y ~ G, data=mrdat)
-bgy<-mgy$coef[2]
-# Save the i'th parameter estimate:
-mr[i]<-bgy/bgx
-}   # end the loop
-@
+\begin{Schunk}
+\begin{Sinput}
+> n <- 10000
+> # initializing simulations:
+> # 30 simulations (change it, if you want more):
+> nsim<-30       
+> mr<-rep(NA,nsim)   # empty vector for the outcome parameters
+> for (i in 1:nsim) { # start the loop
++ ### Exactly the same commands as before:
++ mrdat <- data.frame(G = rbinom(n,2,0.2))
++ mrdat$U <- rnorm(n)
++ mrdat$BMI <- with(mrdat, 25 + 0.7*G + 2*U + rnorm(n) )
++ mrdat$Y <- with(mrdat, 3 + 0.1*BMI - 1.5*U + rnorm(n,0,0.5) )
++ mgx<-lm(BMI ~ G, data=mrdat)
++ bgx<-mgx$coef[2]
++ mgy<-lm(Y ~ G, data=mrdat)
++ bgy<-mgy$coef[2]
++ # Save the i'th parameter estimate:
++ mr[i]<-bgy/bgx
++ }   # end the loop
+\end{Sinput}
+\end{Schunk}
 Now look at the distribution of the parameter estimate:
-<<mrsim2, echo=T>>=
-summary(mr)    
-@
+\begin{Schunk}
+\begin{Sinput}
+> summary(mr)    
+\end{Sinput}
+\end{Schunk}
 \item (\textit{optional}) Change the code of simulations so that the assumptions are violated: add a weak direct effect of the genotype G to the equation that generates $Y$:
-<<mrsim3, echo=TRUE>>=
-mrdat$Y <- with(mrdat, 3 + 0.1*BMI - 1.5*U + 0.05*G + rnorm(n,0,0.5) )
-@
+\begin{Schunk}
+\begin{Sinput}
+> mrdat$Y <- with(mrdat, 3 + 0.1*BMI - 1.5*U + 0.05*G + rnorm(n,0,0.5) )
+\end{Sinput}
+\end{Schunk}
 Repeat the simulation study to see, what is the bias in the average estimated causal effect of $BMI$ on $Y$.
 
 \item (\textit{optional}) Using library \texttt{sem}  and function \texttt{tsls}, obtain a two-stage least squares estimate for the 
 causal effect. Do you get the same estimate as before? 
-<<tsls, echo=TRUE>>=
-library(sem)
-summary(tsls(Y ~ BMI, ~G, data=mrdat))
-@
+\begin{Schunk}
+\begin{Sinput}
+> library(sem)
+> summary(tsls(Y ~ BMI, ~G, data=mrdat))
+\end{Sinput}
+\end{Schunk}
 \end{enumerate}
 \subsection*{Why are simulation exercises useful for causal inference?}
 If we simulate the data, we know the data-generating mechanism and the ``true'' causal effects. So this is a way to check, whether 
