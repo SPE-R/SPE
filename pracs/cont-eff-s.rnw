@@ -454,7 +454,7 @@ help page for \texttt{ci.exp}).
 What is needed are data frames with values for the covariates
 \texttt{A}, \texttt{P} and \texttt{Y}, one data frame for the
 predictions and two data frames representing the rate ratios we want:
-<<>>=
+<<predRR>>=
 summary( mNs )
 aa <- 15:79
 pp <- 1943:1996
@@ -463,6 +463,12 @@ ndp <- data.frame( A=aa, P=1970, Y=10^5 )
 # for the RR between pp and 1970
 ndx <- data.frame( A=50, P=pp  , Y=10^5 )
 ndr <- data.frame( A=50, P=1970, Y=10^5 )
+ci.pred( mPen2, data.frame( A=aa ) )
+ci.exp( mPen2, list( data.frame( P=pp ),
+                     data.frame( P=1970 ) ), xvars='A' )[1:5,]
+ci.exp( mNs, list( data.frame( P=pp ),
+                   data.frame( P=1970 ) ), xvars="A" )[1:5,]
+ci.pred( mNs, ndp ),
 par(mfrow=c(1,2))
 matplot( aa, ci.pred( mNs, ndp ),
           log="y", xlab="Age", ylab="Incidence rate (per 100000 y)",
@@ -506,7 +512,7 @@ matplot( ndx$P, ci.exp( mNs, list(ndx,ndr) ),
           type="l", lty=1, lwd=c(3,1,1), col= c("red", "blue",  "blue") )
 matshade( ndx$P, ci.exp( mPen2, list(ndx,ndr) ), lwd=2, lty=3 )
 abline( h=1,v=1970)
-@ 
+@ %
 
 One obvious difference is found in the way the error margins for the
 period effect are displayed. In the current model

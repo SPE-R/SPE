@@ -1,6 +1,3 @@
-### R code from vignette source 'rates-rrrd-17-e.Rnw'
-### Encoding: ISO8859-1
-
 ###################################################
 ### code chunk number 1: rates-rrrd-17-e.Rnw:49-51
 ###################################################
