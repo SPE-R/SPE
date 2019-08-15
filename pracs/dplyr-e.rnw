@@ -1,0 +1,371 @@
+% \documentclass{article}
+% \begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\SweaveOpts{results=hide, prefix.string=./graph/tab}
+
+\section{Data manipulation with dplyr}
+
+\subsection{Introduction}
+
+In this chapter we will reproduce \textit{more or less} the same outputs as in chapter 1.3 using 
+\texttt{dplyr} suits. 
+The main goal is to familiarize you with some of the main dplyr features. In the meantime you will
+get more flexibility in your summary table productions.
+
+\subsection{The \texttt{births} data}
+
+A quick description of the \texttt{births} data-set (from \texttt{Epi} package) can be found in 
+chapter  1.3.2.
+First of all, load the \texttt{Epi} and \texttt{dplyr} packages. Then we should (re)load the 
+births data-set.
+
+<< >>=
+library(Epi)
+suppressPackageStartupMessages(library(dplyr))
+
+data(births) 
+@
+
+\subsubsection{\texttt{tibble} vs \texttt{data.frame}}
+
+Most \texttt{dplyr} functions outputs return \texttt{tibble} object instead of 
+\texttt{data.frame}.
+Inspect the class and characteristics of the \texttt{births} object.
+
+<< >>=
+class(births)
+head(births)
+@
+\textbf{Note:} This can be summarized using \texttt{str} function
+
+<< >>=
+str(births)
+@
+\texttt{births} object is a 500 x 8 data.frame.\\ 
+Let's convert \texttt{births} to \texttt{tibble} format with \texttt{as\_tibble} function.
+
+<< >>=
+births_tbl <- as_tibble(births)
+
+class(births_tbl)
+births_tbl
+
+## another alternative is to use the glimpse function
+glimpse(births_tbl)
+@
+As you can see \texttt{tibble} inherits from \texttt{data.frame} which implies that all functions 
+working with \texttt{data.frame} objects will work with \texttt{tibble} objects. The opposit is 
+not true. \texttt{tibble} has a couple of extra functionalities compared to classical 
+\texttt{data.frame}. For instance it has a more user-friendly readable default print and most 
+importantly it supports grouping/nesting features that we will see latter on.
+
+\subsubsection{Piping functions}
+
+This is one of the most popular features of \texttt{dplyr}. It enables function chaining in 
+\texttt{R}. Function outputs are passed as input to the following function and so on. 
+It can help to make the code more readable.
+Here is an example of classic vs piped functions.
+
+<< >>=
+head(births, 4)
+births %>% head(4)
+@
+\textbf{Note:} By default the chained object is given as the first argument to the following 
+function.
+You can use \texttt{$.$} if this is not the case.\\  
+Here is a dummy example where we check if the letter 'r' is in 'spe-r'
+
+<< >>=
+## classical way
+grepl('r', 'spe-r')
+
+## wrong chained way
+## here the test done is: does 'r' contain 'spe-r'? 
+'spe-r' %>% grepl('r')
+
+## we have to specify explicitly that the chained object is the second argument
+'spe-r' %>% grepl('r', .)
+@
+
+\subsubsection{\texttt{mutate} columns}
+
+\texttt{mutate} will allow you to add and or modify columns in your \texttt{data.frame}.
+
+<< >>=
+births_tbl <-
+  births_tbl %>%
+  mutate(
+    ## modify hyp varible (conversion into factor)
+    hyp = factor(hyp, labels = c("normal", "hyper")),
+    ## creating a new variable aggrep
+    agegrp = cut(matage, breaks = c(20, 25, 30, 35, 40, 45), right = FALSE),
+    ## modify sex variable (conversion into factor)
+    sex = factor(sex, levels = c(1, 2), labels = c("M", "F")),
+    ## creating a new variable gest4
+    gest4 = cut(gestwks, breaks = c(20, 35, 37, 39, 45), right = FALSE)
+  )
+
+births_tbl
+@
+
+\subsubsection{\texttt{select} columns, \texttt{filter} and \texttt{arrange} rows}
+
+\texttt{select} is used for column subsetting while filter is for row sub-setting. 
+They are equivalent to the \texttt{[]} in \texttt{R} base language.
+
+<< >>=
+births_tbl %>%
+  ## select only id, women age group, sex and birth weight of the baby
+  select(id, agegrp, sex, bweight) %>%
+  ## keep only babies weighing more than 4000g
+  filter(bweight > 4000) 
+@
+\texttt{select} can also be useful to reorder and rename columns.\\
+\texttt{arrange} is a nice feature to reorder observations according to chosen attributes.
+
+<< >>=
+births_tbl %>%
+  ## select only id, women age group, sex and birth weight of the baby
+  select(
+    id, 
+    'Age group' = agegrp, 
+    Sex = sex, 
+    'Birth weight' = bweight
+  ) %>%
+  ## rearrange rows to put the heaviest newborn on top
+  arrange(desc(`Birth weight`))
+@
+\textbf{Note:} tibble supports blank spaces in the column names which can be handy for final table 
+rendering. When you want to work with columns with blank spaces, do not forget to use the \texttt{$``$}
+(back-quote)
+
+<< >>=
+births_tbl %>%
+  ## select only id, women age group, sex and birth weight of the baby
+  select(
+    id, 
+    'Age group' = agegrp, 
+    Sex = sex, 
+    'Birth weight' = bweight
+  ) %>%
+  ## rearrange rows to put the heaviest newborn on top
+  arrange(Sex, desc(`Birth weight`))
+@
+
+\subsection{\texttt{group\_by} and \texttt{summarise} data}
+
+One of the most valuable features of \texttt{dplyr} is the ability to aggregate data sharing a common
+attribute to process by group operations.\\
+Here we want to compute the number of boys and girls in the data-set.
+The idea here is to split the \texttt{births} table in 2. One for boys, the other for girls and to 
+count the number of rows of each sub-table.
+
+<< >>=
+births.01 <-
+  births_tbl %>%
+  ## group the data according to the sex attribute
+  group_by(sex) %>%
+  ## count the number of rows/individuals in each group
+  summarise(
+    count = n()
+  )
+@
+\textbf{Note:} \texttt{n} functions is equivalent to \texttt{nrow}\\ 
+Now we have the number of boys and girls, we can compute the percentage of newborns in each sex 
+group.
+
+<< >>= 
+births.02 <-
+  births.01 %>%
+  mutate(
+    percent = count / sum(count) * 100
+  )
+@
+\textbf{Trick:} most of \texttt{dplyr} functions can be applied with an embedded condition (e.g. 
+\texttt{mutate\_if}, \texttt{mutate\_all}, ...). This can be very handy in some cases.\\ 
+As an illustration if you want to calculate the \texttt{sum} \texttt{birth.02} numerical columns 
+only
+
+<< >>=
+births.03 <-
+  births.02 %>%
+  summarise_if(
+    is.numeric,
+    sum
+  )
+@
+and rename all the columns at once (here we want to add \textit{.tot} at the end of each column name)
+
+<< >>=
+births.03 %>%
+  rename_all(
+    ~ paste0(., '.tot')
+  )
+@
+Let's compute the number of births and the mean birth weight according to newborn gender.
+
+<< >>=
+births.05 <-
+  births_tbl %>%
+  group_by(sex) %>%
+  summarise(
+    count = n(),
+    bweight.mean = mean(bweight)
+  )
+@
+With \texttt{births.05} table, compute the global mean new birth weight.
+With such a table the mean baby's birth weight have to be weighted by number of boys and girls. 
+
+<< >>=
+births.05 %>%
+  summarise(
+    count.tot = sum(count),
+    bweight.mean.tot = weighted.mean(bweight.mean, count)
+  )
+
+# this is equivalent to
+births_tbl %>%
+  summarise(
+    count.tot = n(),
+    bweight.mean.tot = mean(bweight)
+  )
+@
+
+
+\subsection{Multiple grouping}
+
+In some cases, we can be interested in looking at more than a single strata. This can be achieved 
+using multiple grouping.\\
+Let's count the number of people per gender and birth weight class (low vs not low)
+
+<< >>=
+births.06 <-
+  births_tbl %>%
+  group_by(sex, lowbw) %>%
+  summarise(
+    count = n()
+  )
+@
+Try then to compute the percentage of people in each group.\\
+Look at the difference between the 2 following command lines:
+
+<< >>=
+births.06 %>%
+  mutate(
+    percent = count / sum(count) * 100
+  )
+
+births.06 %>%
+  ungroup() %>%
+  mutate(
+    percent = count / sum(count) * 100
+  )
+@
+\textbf{Note:} summarizing a data-set will remove the latest level of grouping but not the deeper ones 
+if multiple grouping has been done. In some cases you might have to explicitly ungroup your
+\texttt{data.frame} before doing calculations. In the previous examples, if you do not ungroup
+the data-set, percentages are computed per gender. Ungrouping will let you compute the overall 
+percentages.\\ 
+The same exercise can be done using gestation time group (\texttt{gest4}) as stratifying variable.\\
+Lets compute number and mean birth weights according to gestation time category
+
+<< >>=
+births_tbl %>%
+  group_by(gest4) %>%
+  summarise(
+    count = n(),
+    bweight.mean = mean(bweight)
+  )
+@
+Birth weight increases with gestation time.\\
+We can also spot that in our data-set the gestation time is missing for 10 newborns. 
+We will remove this observation for the rest of the practical session. \\ 
+Lets cross-tabulate the birth weight category and the gestation time groups.
+
+<< >>=
+births_tbl %>%
+  ## keep only the newborn with defined gesational time category
+  filter(
+    !is.na(gest4)
+  ) %>%
+  group_by(lowbw, gest4) %>%
+  ## compute the number of babies in each cross category
+  summarise(
+    count = n()
+  ) %>%
+  ## compute the percentage of babies in each gestational time category per 
+  ## birth weight category
+  mutate(
+    percent = count / sum(count, na.rm = TRUE)
+  )
+@
+Similarly we can be interested in the birth weight distribution per gestational time. 
+
+<< >>=
+births_tbl %>%
+  filter(
+    !is.na(gest4)
+  ) %>%
+  group_by(gest4, lowbw) %>%
+  summarise(
+    count = n()
+  ) %>%
+  ## compute the percentage of babies in each birth weight category per gestational 
+  ## time category
+  mutate(
+    percent = count / sum(count, na.rm = TRUE)
+  )
+@
+\textbf{Note:} grouping order matters!
+
+\subsection{Bonus: Rendering tables}
+
+Once you have produced a nice data-set we can be interested in rendering it in a nice format that can
+meet presentation/publication expectations. The \texttt{kableExtra} table can be useful to achieve 
+this goal.
+
+<< >>=
+if(!require(kableExtra)) install.packages('kableExtra')
+library(kableExtra)
+
+births.08 <-
+  births_tbl %>%
+  filter(
+    !is.na(gest4)
+  ) %>%
+  group_by(gest4) %>%
+  summarise(
+    N = n()
+  ) %>%
+  mutate(
+    `(%)` = (N / sum(N)) %>% scales::percent()
+  )
+
+## default
+births.08
+
+## markdown flavour (useful fo automatic repport production with knitr)
+births.08 %>%
+  knitr::kable(fromat = 'markdown')
+
+## create an html version of the table and save it on the hard drive
+births.08 %>%
+  kable() %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE
+  ) %>%
+  save_kable(file = 'births.08.html', self_contained = TRUE)
+@
+
+<<echo=FALSE, eval=FALSE>>=
+## trick to create dplyr-s.rnw file.
+## this part have to be lauch manually
+dplyr_e.path <- '/mnt/data/georgesd/_PROJECTS/_SPE/SPE/pracs/dplyr-e.rnw'
+dplyr_e <- readLines(dplyr_e.path)
+dplyr_s <- purrr::map_chr(dplyr_e, ~ sub('results=hide', 'results=verbatim', .x))
+writeLines(dplyr_s, sub('-e.rnw$', '-s.rnw', dplyr_e.path))
+@
+
+% \end{document}
