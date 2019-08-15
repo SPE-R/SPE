@@ -34,7 +34,8 @@ if(!length(args)){
   message('Latest stable version of the packages will be installed')
   pkg.missing <- checkpoint:::scanForPackages()
   if(length(pkg.missing$pkgs)){
-    install.packages(pkg.missing$pkgs, dependencies = TRUE)
+    #install.packages(pkg.missing$pkgs, dependencies = TRUE)
+    install.packages(pkg.missing$pkgs)
   }
 } else { 
   checkpoint.date <- args[1] 
