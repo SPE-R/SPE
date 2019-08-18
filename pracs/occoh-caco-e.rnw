@@ -65,24 +65,18 @@ This exercise is divided into five main parts:
   (ii) collection of exposure data for cases and controls 
    from the pertinent data base of the whole cohort to the
   case-control data set using function {\tt merge()}, and (iii)
-  analysis of case-control data using function {\tt clogit()}
+  analysis of the case-control data set with stratified Cox model using function {\tt clogit()}
   in package {\tt survival()},
 \item[(3)]
  Case-cohort study within the cohort:
  (i) selection of a subcohort by simple random sampling from
  the cohort,
- (ii) fitting the Cox model to the data by weighted partial
- likelihood using function {\tt coxph()} in package {\tt survival()}
- with appropriate weighting and correction of estimated
- covariance matrix for the model coefficients; also
- using function {\tt cch()} in package {\tt survival()}
- for the same task. % with specification  {\tt method "LinYing"},
-%  (iii) fitting the same Cox model to the data by Prentice's
-% pseudo-likelihood using function {\tt coxph()} 
-%  with appropriate data specification and correction of estimated
-% covariance; also
-% using function {\tt cch()} in {\tt survival()}
-% for the same task.
+ (ii) collection of exposure data for subcohort members and cases, and
+ (iii) analysis of the case-cohort data set with Cox model by weighted partial
+ likelihood  
+  including appropriate weighting and correction of estimated
+  covariance matrix for the model coefficients using
+  function {\tt cch()} in package {\tt survival()}.
  \item[(4)]
  Comparison of results from all previous analyses,
  also with those from a full cohort design.
@@ -104,7 +98,7 @@ See its structure and print the univariate summaries.
 <<Read in occoh data, echo=TRUE>>=
 library(Epi)
 library(survival)
-url <- "http://bendixcarstensen.com/SPE/data"
+url <- "https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data"
 oc <- read.table( paste(url, "occoh.txt", sep = "/"), header=TRUE)
 str(oc)
 summary(oc)
@@ -141,29 +135,32 @@ summary(oc.lex)
 \item
 At this stage it is informative to examine a graphical
 presentation of the follow-up lines and outcome cases in a conventional 
-Lexis diagram. To rationalize your work we have created a separate source file
+Lexis diagram. Make use of the \texttt{plot} method for \texttt{Lexis} objects. 
+Gray lifelines are drawn and a bullet is put at the exit point of those lifelines
+that end with the outcome event.
+\begin{comment}
+To rationalize your work we have created a separate source file
 {\tt plots-caco-ex.R} to do the graphics for this tas as well as for some forthcoming ones. 
 The source source file is found in the same folder % {\tt http://bendixcarstensen.com/SPE/data/} 
-where the data sets are.located -- Load the source file and have a look at the content of the first function in it
-<<plotfile, echo=TRUE, fig=FALSE>>=
-source( paste(url,"plots-caco-ex.R", sep = "/") )
-plot1
-@ 
+where the data sets are.located 
+-- Load the source file and have a look at the content of the first function in it
 Function {\tt plot1()} makes the graph required here. No arguments are needed when calling the function
-<<plotlexis, echo=TRUE, fig = F>>=
-plot1()
+\end{comment}
+<<plotlexis, echo=TRUE, fig = FALSE>>=
+par(mfrow=c(1,1))
+plot( oc.lex, xlim=c(1990, 2010),grid=TRUE )
+points( oc.lex, pch=c(NA, 16)[oc.lex$lex.Xst+1] )
 @
-
 \item
 As age is here the main time axis, 
-we shall illustrate the {\it study base} 
-or the follow-up lines and outcome events 
-along the age scale, being ordered by age at exit.
-Function {\tt plot2()} in the same source file does the work.
+we shall graphically illustrate the {\bf study base}, \textit{i.e.} 
+the follow-up lines and outcome events, 
+only along the age scale, being ordered by age at exit.
+%% Function {\tt plot2()} in the same source file does the work.
 Vertical lines at those ages when new coronary
 deaths occur are drawn to identify the pertinent
-{\it risk sets}. For that purpose it is useful first 
- to sort the data frame and the {\tt lexis} object 
+{\bf risk sets}. For that purpose it is useful first 
+ to sort the data frame and the {\tt Lexis} object 
  jointly by age at exit \& age at entry, 
  and to give a new ID number according to that order.
 <<plotlexage, echo=TRUE, fig=FALSE>>=
@@ -172,25 +169,31 @@ oc.lexord <- Lexis( entry = list( age = agentry ),
                      exit = list( age = agexit),
               exit.status = chdeath,
                        id = ID, data = oc.ord)
-plot2
-plot2()
+plot(oc.lexord, "age")
+points(oc.lexord, pch=ifelse(oc.lexord$lex.Xst==1, 16, NA) )
+with( subset(oc.lexord, lex.Xst==1), 
+      abline( v=agexit, lty=3))
 @
-
-Using function {\tt plot3()} in the same source file we now
+\item
+For a closer look, we now
  zoom the graphical illustration of the risk sets into
-event times occurring between 50 to 58 years.
+event times occurring between 50 to 58 years. -- 
+Copy the last four lines from the previous item and add arguments \texttt{xlim} and \texttt{ylim}
+to the call of \texttt{plot()}.
 <<plotlexage2, echo=TRUE, fig=FALSE>>=
-plot3
-plot3()
+plot(oc.lexord, "age", xlim=c(50, 58), ylim=c(5, 65))
+points(oc.lexord, "age", pch=ifelse(oc.lexord$lex.Xst==1, 16, NA))
+with( subset(oc.lexord, lex.Xst==1), 
+      abline( v=agexit, lty=3))
 @
 
 \end{enumerate} % [resume]
 
 \subsection{Nested case-control study}
 
-We shall now employ the strategy of {\it risk-set sampling}
-or {\it time-matched} sampling of controls, {\it i.e.}
-we are conducting a {\it nested case-control study}
+We shall now employ the strategy of {\bf risk-set sampling}
+or {\bf time-matched} sampling of controls, {\it i.e.}
+we are conducting a {\bf nested case-control study}
 within the cohort.
 
 \begin{enumerate}[resume]
@@ -214,7 +217,7 @@ make a call of this function and see
 the structure of the resulting data frame {\tt cactrl} 
 containing the cases and the chosen individual controls. 
 <<risksetsample, echo=TRUE>>=
-set.seed(9863157)
+set.seed(98623)
 cactrl <- 
    ccwc(entry=agentry, exit=agexit, fail=chdeath, 
         controls = 2, match= agen2, 
@@ -291,8 +294,10 @@ oc.ncc$smok <- factor(oc.ncc$smok,
 It is useful to start the analysis of case-control data by 
 simple tabulations by the categorized risk factors. 
 Crude estimates of the rate ratios associated with them,
-in which matching is ignored, can be obtained as instructed in Janne's lecture
-on Poisson and logistic models on Saturday 23 May. We shall focus on smoking
+in which matching is ignored, can be obtained as follows. 
+%% instructed in Janne's lecture
+%% on Poisson and logistic models on Saturday 23 May. 
+We shall focus on smoking
 <<cccrude smok, echo=TRUE>>=
 stat.table( index = list( smok, Fail ), 
           contents = list( count(), percent(smok) ),
@@ -306,7 +311,7 @@ round(ci.exp(smok.crncc), 3)
 \item
 A proper analysis takes into account matching that was employed 
 in the selection of controls for each case from the 
-pertinent risk set further restricted to 
+pertinent risk set, further restricted to 
 subjects who were about the same age at entry as the case was.
 Also, adjustment for the other risk factors is desirable.
 In this analysis function {\tt clogit()} in {\tt survival} package is
@@ -341,9 +346,9 @@ selected will be stored in vector {\tt subcids}, and
 {\tt subcind} is an indicator for inclusion to the subcohort. 
 <<subc sample, echo=TRUE>>= 
 N <- 1501; n <- 260
-set.seed(1579863)
+set.seed(15792)
 subcids <- sample(N, n )
-oc.lex$subcind <- 1*(oc.lex$id %in% subcids)
+oc.lexord$subcind <- 1*(oc.lexord$id %in% subcids)
 @
 
 \item
@@ -354,23 +359,24 @@ and the case group from the data frame of the full cohort.
 After that we collect the data of the risk factors from the
 data storehouse for the  subjects in the case-cohort data 
 <<casecoh data, echo=TRUE>>= 
-oc.cc <- subset( oc.lex, subcind==1 | chdeath ==1)
+oc.cc <- subset( oc.lexord, subcind==1 | chdeath ==1)
 oc.cc <- merge( oc.cc, ocX[, c("id", "smok", "tchol", "sbp")], 
    by ="id")
 str(oc.cc) 
 @ 
 
-\item Function {\tt plot4()} in the same source file
-creates a graphical illustration of 
+\item We shall now create a graphical illustration of 
  the lifelines contained in the case-cohort data.
-% in a subset covering failures between 54 and 61 years of age.
 Lines for the subcohort non-cases are grey without bullet at exit,
 those for subcohort cases are blue with blue bullet at exit, and
-for cases outside the subcohort the lines are black and dotted with
-black bullets at exit. 
+for cases outside the subcohort the lines are red and dotted with
+red bullets at exit. 
 <<casecoh-lines, echo=TRUE, fig=FALSE>>= 
-plot4
-plot4()
+plot( subset(oc.cc, chdeath==0), "age")    
+lines( subset(oc.cc, chdeath==1 & subcind==1), col="blue")  
+lines( subset(oc.cc, chdeath==1 & subcind==0), col="red")   
+points(subset(oc.cc, chdeath==1), pch=16, 
+       col=c("blue", "red")[oc.cc$subcind+1])
 @
 
 \item Define the categorical smoking variable again.
@@ -401,79 +407,29 @@ print(sm.cc, digits = c(sum=0, ratio=1))
 HRcc <- (sm.cc[ 1, -5]/sm.cc[ 1, 1])/(sm.cc[ 2, -5]/sm.cc[2, 1])		
 round(HRcc, 3)			
 @
-
+Do these estimates resemble those obtained from nested case-control data?
 \item
-To estimate jointly the rate ratios associated with the 
-categorized risk factors we now fit the pertinent Cox model 
+To estimate the rate ratios associated with smoking and adjusted for the
+other risk factors we now fit the pertinent Cox model 
 applying the method of {\it weighted partial likelihood} as 
 presented by Ling \& Ying (1993) and Barlow (1994).
-The weights for all cases and non-cases in the subcohort
-are first computed and added to the data frame.
-<<weights, echo=TRUE>>=
-N.nonc <- N-sum(oc.lex$chdeath)  # non-cases in whole cohort
-n.nonc <- sum(oc.cc$subcind * (1-oc.cc$chdeath)) # non-cases in subcohort
-wn <- N.nonc/n.nonc          # weight for non-cases in subcohort
-c(N.nonc, n.nonc, wn)
-oc.cc$w <- ifelse(oc.cc$subcind==1 & oc.cc$chdeath==0, wn, 1)
-@
-
-Next, the Cox model is fitted by the method of 
- weighted partial likelihood using {\tt coxph()},
-such that the robust covariance matrix will be used
-as the source of standard errors for the coefficients.
-
-<<weighted cox, echo=TRUE>>=
-oc.cc$surob <- with(oc.cc, Surv(agentry, agexit, chdeath) )
-cc.we <- coxph( surob ~  smok + I(sbp/10)  + tchol, robust = T,  
-       weight = w, data = oc.cc)
-summary(cc.we)
-round( ci.exp(cc.we), 3)
-@
-
-The covariance matrix for the coefficients may also be computed by the dfbeta-method. After that a comparison is made between standard errors
-from the naive, robust and dfbeta covariance matrix, respectively.
-You will see that the naive SEs are essentially smaller than those
-obtained by the robust and the dfbeta method, respectively.
-
-<<weighted cox dfb, echo=TRUE>>=
-dfbw <- resid(cc.we, type='dfbeta')
-covdfb.we <- cc.we$naive.var + 
-   (n.nonc*(N.nonc-n.nonc)/N.nonc)*var(dfbw[ oc.cc$chdeath==0, ] )
-cbind( sqrt(diag(cc.we$naive.var)), sqrt(diag(cc.we$var)),  
-    sqrt(diag(covdfb.we))  )
-@
- 
-\item
-The same analysis can also be done using function {\tt cch()} 
-in package {\tt survival} with {\tt method = "LinYing"}
-as follows:
+This analysis can be done using function {\tt cch()} 
+in package {\tt survival} with \texttt{method = "LinYing"}
 
 <<weighted cox LinYing, echo=TRUE>>= 
-cch.LY <- cch( surob ~  smok + I(sbp/10)  + tchol, stratum=NULL,
+oc.cc$survobj <- with(oc.cc, Surv(agentry, agexit, chdeath) )
+cch.LY <- cch( survobj ~  smok + I(sbp/10)  + tchol, stratum=NULL,
    subcoh = ~subcind, id = ~id,  cohort.size = N, data = oc.cc, 
     method ="LinYing" )
 summary(cch.LY)
 @
 
-\item
-The {\tt summary()} method for the {\tt cch()} object does not 
-print the standard errors for the coefficients. The following comparison
-demonstrates numerically that the method of Lin \& Ying
-is the same as weighted partial likelihood coupled with
-dfbeta covariance matrix.  
-<<weighted cox SEs, echo=TRUE>>= 
-cbind( coef( cc.we), coef(cch.LY) )
-round( cbind( sqrt(diag(cc.we$naive.var)), sqrt(diag(cc.we$var)),  
-    sqrt(diag(covdfb.we)), sqrt(diag(cch.LY$var))  ), 3)
-@    
-
-
 \end{enumerate} % [resume]
 
 \subsection{Full cohort analysis and comparisons}
 
-Finally, suppose the investigators could afford to collect the
-data of risk factors from the storehouse for the whole cohort.
+Finally, suppose the investigators after all could afford to collect the
+data on risk factors from the storehouse for the whole cohort.
 
 \begin{enumerate}[resume]
 \item
@@ -499,7 +455,7 @@ round(HRcoh, 3)
 
 
 \item
-Fit now the Cox model to the full cohort, and there is no need
+Fit now the ordinary Cox model to the full cohort. There is no need
 to employ extra tricks upon the ordinary {\tt coxph()} fit.
 
 <<cox full, echo=TRUE>>=
@@ -513,31 +469,23 @@ Lastly, a comparison of the point estimates and standard errors between
 the different designs, including variants of analysis for the case-cohort design, can be performed.
 
 <<comparison, echo=TRUE>>=
-betas <- round(cbind( coef(cox.coh), 
-     coef(m.clogit),
-     coef(cc.we), coef(cch.LY) ), 3)
-colnames(betas) <-  c("coh", "ncc", "cc.we", "cch.LY")
-betas
+betas <- cbind( coef(cox.coh), coef(m.clogit), coef(cch.LY) )
+colnames(betas) <-  c("coh", "ncc", "cch.LY")
+round(betas, 3)
 
-SEs <- round(cbind( sqrt(diag(cox.coh$var)), 
-    sqrt(diag(m.clogit$var)), sqrt(diag(cc.we$naive.var)),
-    sqrt(diag(cc.we$var)),  sqrt(diag(covdfb.we)),
-    sqrt(diag(cch.LY$var)) ), 3)
-colnames(SEs) <- c("coh", "ncc", "ccwe-nai", 
-       "ccwe-rob", "ccwe-dfb", "cch-LY")
-SEs
+SEs <- cbind( sqrt( diag( cox.coh$var ) ), 
+              sqrt( diag( m.clogit$var ) ),
+              sqrt( diag( cch.LY$var ) ) )
+colnames(SEs) <- colnames(betas) 
+round(SEs, 3)
 @
 
 You will notice that the point estimates of the coefficients
 obtained from the full cohort, nested case-control, and case-cohort analyses, 
-respectively, are somewhat variable. 
+respectively, are somewhat variable.  However,  
+the standard errors from the NCC and CC
+ analyses should be quite similar when the numbers of cases and non-cases are similar.
 
-However,  
-the standard errors across the NCC and different proper CC
- analyses are relatively similar. Those from a naive covariance matrix of a CC analysis,
-though, are practically equal to the SEs from the full cohort analysis,
-reflecting the fact that the naive analysis implicitly assumes
-there being as much information available as there is with full cohort data.
 \end{enumerate}
 
 \subsection{Further exercises and homework}
@@ -547,7 +495,8 @@ there being as much information available as there is with full cohort data.
 \item
 If you have time, you could run both the NCC study and CC study 
 again but now with a larger control group or subcohort;
-for example 4 controls per case in NCC and $n=520$ as the subcohort size in CC. Remember resetting the seed first. 
+for example 4 controls per case in NCC and $n=520$ as the subcohort size in CC. 
+Remember resetting the seed first. 
 Pay attention in the results to how much closer 
 will be the point estimates and the proper SEs to those
 obtained from the full cohort design. 
@@ -559,18 +508,12 @@ A popular alternative to weighted partial likelihood
 in the analysis of case-cohort data is the {\it pseudo-likelihood method}
 (Prentice 1986), which is based on ``late entry'' to follow-up 
 of the case subjects not belonging to 
-the subcohort. A longer way of applying this
-approach, which you could try at home after the course,
- would first require manipulation of the {\tt oc.cc} data frame,
-as outlined on slide 34. Then  {\tt coxph()} would be 
-called like in model object {\tt cc.we} above 
-but now with weights = 1. Similar corrections
- on the covariance matrix are needed, too.
-However, a shorter way is provided by function {\tt cch()} which
+the subcohort. 
+The way to do this is provided by function {\tt cch()} which
 you can apply directly to the case-cohort data {\tt oc.cc} as before
 but now with {\tt method = "Prentice"}. -- Try this and compare the results
-with those obtained by weighted partial likelihood in models
-{\tt cc.we} and  {\tt cch.LY}. 
+with those obtained by weighted partial likelihood in model
+{\tt cch.LY}. 
 \item
 Yet another computational solution for
 maximizing weighted partial likelihood is provided by 
@@ -590,8 +533,6 @@ the key indicator variables in {\tt oc.lex2}:
 subcohort membership (cf. variable {\tt subcind} above)
 and case status ({\tt chdeath}). 
 Based on these items, 
-% the design is first specified on all members of 
-% the whole cohort using 
 a call of function {\tt twophase()} with appropriate
 arguments creates an object
  of class {\tt twophase}, named e.g. {\tt oc.2ph}, that
@@ -605,9 +546,9 @@ instead of the {\tt data} argument, one would specify {\tt design = oc.2ph}.
 \end{comment}
 The approach is illustrated with an example
  in a vignette ``Two-phase designs in epidemiology'' by Thomas Lumley
-(see {\tt http://cran.r-project.org/web/packages/survey/vignettes/epi.pdf}, p. 4--7).
+(see {\tt http://cran.r-project.org/web/packages/survey/vignettes/epi.pdf}).
 -- You can try this at home and check that you would obtain similar results as
-with models {\tt cc.we} and {\tt cch.LY}. 
+with model {\tt cch.LY}. 
 
 \end{enumerate} % [resume]
 
