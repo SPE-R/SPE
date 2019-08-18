@@ -1,11 +1,16 @@
 \SweaveOpts{results=verbatim,keep.source=TRUE,include=FALSE,eps=FALSE}
 %% ,prefix.string=./graph/crv}
 
-%%  LaTeX script for the lecture "Fitting generalized linear models"
-%%  in SPE, Saturday 18 June, 2016 -- Esa Läärä
+%%  LaTeX script for the lecture "Linea and generalized linear models"
+%%  in SPE, Saturday 24 August, 2019 -- Esa Läärä
 
-\documentclass[12pt,t,dvipsnames,handout% Uncomment ",handout" when doing handouts
+%% \documentclass[12pt,t,dvipsnames,handout% Uncomment ",handout" when doing handouts
+%% ]{beamer}
+
+\documentclass[12pt,dvipsnames,t,handout% (Un)comment ",handout" when (not) doing handouts
+,aspectratio=169% Comment out if you want 4 by 3 (default)
 ]{beamer}
+
 
 \newcommand{\toggle}[1]{%
 \addtocounter{framenumber}{-1}#1 % Comment this out if extra slides should be omitted
@@ -236,14 +241,14 @@ births <- subset(births, !is.na(gestwks))
 \begin{frame}[fragile]
 
 <<par, echo=F, results=hide>>=
-par(mar= c(5,4,1,1)+0.1)
+par(mar= c(5,5,1,1)+0.1)
 @
 \frametitle{Birth weight and gestational age}
-\ \\[-3em]
-\includegraphics[height=0.8\textheight,keepaspectratio]{lm-bw-by-gw}
+%% \ \\[-3em]
+\includegraphics[height=0.75\textheight,keepaspectratio]{lm-bw-by-gw}
 \ \\[-2em]
 {\small
-<<bw-by-gw, fig = T, echo=T>>=
+<<bw-by-gw, fig = TRUE, echo=TRUE>>=
 with(births, plot(bweight ~ gestwks, xlim = c(24,45), pch = 16, cex.axis=1.5, cex.lab = 1.5, 
  xlab= "Gestational age (wk)", ylab= "Birth weight (g)" ) )
 @	
@@ -367,7 +372,7 @@ aimed at acting on objects of class ``{\tt lm}''.
 
 \begin{frame}[fragile]
 \frametitle{Fitted values, confidence \& prediction intervals}
-\ \\[-3em]
+%% \ \\[-3em]
 \includegraphics[height=0.65\textheight,keepaspectratio]{lm-bw-by-gw-pr1}
 \ \\[-2em]
 {\scriptsize
@@ -386,7 +391,7 @@ matlines( nd$gestwks, pr.p1, lty=1, lwd=c(3,2,2), col=c('red','green','green'))
 
 \begin{frame}[fragile]
 \frametitle{A couple of diagnostic plots}
-\ \\[-2em]
+%% \ \\[-2em]
 \includegraphics[height=0.65\textheight,width=1.3\textheight, keepaspectratio ]{lm-bw-by-gw-diag}
 \ \\[-2em]
 <<bw-by-gw-diag, fig=T, height=6, width=12>>=
@@ -1047,12 +1052,14 @@ Function \texttt{glm()} fits {\bf generalized linear models} (GLM).
 \item
 Requires specification of the  
 \bi
-\item {\bf family} 
+{\normalsize
+\item[--] {\bf family} 
 -- i.e. the assumed ``error'' distribution for $Y_i$s, %% and the
-\item
+\item[--]
 {\bf link} function -- a transformation of the expected $Y_i$.
+}
 \ei
-\medskip
+% \medskip
 \item
 Covers common models for other types
 of response variables and distributions, too, e.g.
@@ -1061,7 +1068,7 @@ for counts.
 \medskip
 \item
 Fitting: method of {\bf maximum likelihood}.  
-\medskip
+% \medskip
 \item
 Many extractor functions
 for a {\tt glm} object similar to those 
@@ -1101,12 +1108,11 @@ What if dependence of $Y$ on $X$ is non-linear?
 }
 \ei
 %% \medskip
-\item Use a {\bf spline} model: smooth function $s(X;\beta)$.
+\item Use a {\bf spline} model: smooth function $s(X;\beta)$. -- See Martyn's lecture
 \bi
 {%% \normalsize
 \item[--] More flexible models that act locally.
 \item[--] Effect of $X$ reported by graphing $\widehat s(X;\beta)$ \& its CI
-\item[--] See Martyn's lecture
 }
 \ei
 \end{itemize}
@@ -1202,7 +1208,7 @@ mpen <- gam( bweight ~ s(gestwks), data = births)
 @
 }
 <<mPen-plot, echo=F, fig=T, results=hide>>=				
-pr.pen <- predict( mpen, newdata=nd, se.fit=T)
+pr.pen <- predict( mpen, newdata=nd, se.fit=TRUE)
 with( births, plot( bweight ~ gestwks, xlim = c(24, 45), cex.axis= 1.5, cex.lab = 1.5 )  )
 matlines( nd$gestwks, cbind(pr.pen$fit, pr.pen$fit - 2*pr.pen$se.fit, pr.pen$fit + 2*pr.pen$se.fit),  
   lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
@@ -1210,8 +1216,7 @@ matlines( nd$gestwks, cbind(pr.pen$fit, pr.pen$fit - 2*pr.pen$se.fit, pr.pen$fit
 \ \\[-2em]
 \begin{itemize}
 \item Looks quite nice.
-\item Model degrees of freedom $\approx 4.2$;  \\ 
-almost 4, as in the 3rd degree polynomial model
+\item Model df $\approx 4.2$; close to $4$, as in the 3rd degree polynomial model.
 \end{itemize}
 
 
