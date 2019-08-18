@@ -1,148 +1,170 @@
-\SweaveOpts{results=verbatim, prefix.string=./graph/cont-eff}
+\SweaveOpts{results=verbatim,keep.source=TRUE,include=FALSE,eps=FALSE,prefix.string=./graph/cont-eff}
+% With extensions by BxC 12 March 2018
+<<echo=FALSE>>=
+options( width=90,
+         SweaveHooks=list( fig=function()
+         par(mar=c(3,3,1,1),mgp=c(3,1,0)/1.6,las=1,bty="n") ) )
+@ 
+\renewcommand{\rwpre}{./graph/cont-eff}
 
 \section{Estimation and reporting of curved effects}
 
-This exercise deals with modelling of curved effects of continuous explanatory variables
-both on a metric response assuming the Gaussian distribution 
-and on a count or rate outcome based on the Poisson family.
+This exercise deals with modelling of curved effects of continuous
+explanatory variables both on a metric response assuming the Gaussian
+distribution and on a count or rate outcome based on the Poisson
+family.
 
-In the first part we continue our analysis on gestational age on birth weight
-focussing on fitting spline models, both unpenalized and a penalized one.
+In the first part we continue our analysis on gestational age on birth
+weight focussing on fitting spline models, both unpenalized and a
+penalized one.
 
 In the second part we analyse the \texttt{testisDK} data found in the
-\texttt{Epi} package. % already introduced and analyzed in the previous lecture, 
-It contains the numbers of cases of testis
-cancer and mid-year populations (person-years) in 1-year age groups
- in Denmark during 1943--96. In this analysis we apply Poisson regression 
-on the incidence rates treating 
-age and calendar time, first as categorical but then fitting a penalized spline model.
+\texttt{Epi} package.
+% already introduced and analyzed in the previous lecture, 
+It contains the numbers of cases of testis cancer and mid-year
+populations (person-years) in 1-year age groups in Denmark during
+1943--96. In this analysis we apply Poisson regression on the
+incidence rates treating age and calendar time, first as categorical
+but then fitting a penalized spline model.
 
 \subsection{Data {\tt births}: Simple linear regression and 3rd degree polynomial}
 
-Recall what was done in items 17 to 24 of the Exercise on simple estimation of effects,
-in which a simple linear regression and a 3rd degree polynomial were fitted.
-The main results are also shown on slides 6, 8, 9, and 20 of the lecture
-on linear models.
+Recall what was done in items 17 to 24 of the Exercise on simple
+estimation of effects, in which a simple linear regression and a 3rd
+degree polynomial were fitted.  The main results are also shown on
+slides 6, 8, 9, and 20 of the lecture on linear models.
 \begin{enumerate}
-\item
-Make a basic scatter plot and draw the fitted line from a simple linear regression on it.
-<<data-births, fig=TRUE>>=
+\item Make a basic scatter plot and draw the fitted line from a simple
+  linear regression on it.
+<<data-births, echo=TRUE, fig=TRUE>>=
 library(Epi)
 data(births)
 par(mfrow=c(1,1))
 with(births, plot(gestwks, bweight))
-mlin <- lm(bweight ~ gestwks, data = births )
-abline(mlin)
+mlin <- lm( bweight ~ gestwks, data = births )
+abline( mlin )
 @
-\item
-Repeat also the diagnostic plots of this simple model
-<<diag-lin, fig=TRUE>>=
-par(mfrow=c(2,2))
-plot(mlin)
-@
+\item Repeat also the diagnostic plots of this simple model
+<<diag-lin, echo=TRUE, fig=TRUE>>=
+par( mfrow=c(2,2) )
+plot( mlin )
+@ 
 Some deviation from the linear model is apparent.
 \end{enumerate}
 
 \subsection{Fitting a natural cubic spline}
 
-A popular approach for flexible modelling is based on natural regression splines, which have
- more reasonable tail behaviour than
+A popular approach for flexible modelling is based on natural
+regression splines, which have more reasonable tail behaviour than
 polynomial regression.
 \begin{enumerate}[resume]
-\item
-By the following piece of code you can fit
-a \textit{natural cubic spline} with 5 pre-specified knots 
-to be put at 28, 34, 38, 40 and 43 weeks of gestation, respectively, 
-determining the degree of smoothing. 
+\item By the following piece of code you can fit a \textit{natural
+    cubic spline} with 5 pre-specified knots to be put at 28, 34, 38,
+  40 and 43 weeks of gestation, respectively, determining the degree
+  of smoothing.
 <<bweight-gestwks-Ns5>>=
 library(splines)
-mNs5 <- lm( bweight ~ Ns( gestwks, 
-        knots = c(28,34,38,40,43)), data = births)
-round(ci.lin(mNs5)[ , c(1,5,6)], 1)
+mNs5 <- lm( bweight ~ Ns( gestwks, knots = c(28,34,38,40,43)), 
+            data = births )
+round( ci.exp( mNs5, Exp=FALSE ), 1)
 @ 
-These regression coefficients are even less interpretable than those in the 
-polynomial model. 
-\item
-A graphical presentation of the fitted curve
-together with the confidence and prediction intervals is more informative:
-<<Ns5-pred, fig=TRUE>>=
+These regression coefficients are even less interpretable than those
+in the polynomial model.
+
+\item 
+  A graphical presentation of the fitted curve together with the
+  confidence and prediction intervals is more informative. 
+  As this kind of presentation will be repeated, let us write a
+  short function script to facilitate the task. We utilize function \texttt{matshade()} 
+  in \texttt{Epi}, which creates shaded areas, and function \texttt{matlines()} which draws 
+  lines joining the pertinent end points over the $x$-values for which the
+  predictions are computed.
+<<plotFitPredInt, ECHO=TRUE>>=
+plotFitPredInt <- function( xval, fit, pred, ...)
+{
+    matshade( xval, fit,  lwd=2, alpha=0.2)
+    matshade( xval, pred, lwd=2, alpha=0.2)
+    matlines( xval, fit,  lty=1, lwd=c(3,2,2), col=c("red","blue","blue") )
+    matlines( xval, pred, lty=1, lwd=c(3,2,2), col=c("red","green","green") )
+}
+@
+\iten Now, create a vector of $x$-values and compute the fitted/predicted values as well
+as the interval limits at these points from the fitted model object utilizing
+function {\tt predict()}. This function creates a matrix of three columns: (1) fitted/predicted
+values, (2) lower limits, (3) upper limits
+<<Ns5-pred, ECHO=TRUE, fig=TRUE>>=
 nd <- data.frame(gestwks = seq(24, 45, by = 0.25) ) 
 fit.Ns5 <- predict( mNs5, newdata=nd, interval="conf" )
 pred.Ns5 <- predict( mNs5, newdata=nd, interval="pred" )
 par(mfrow=c(1,1))
-with(births, plot(bweight ~ gestwks, xlim=c(23, 46),cex.axis= 1.5,cex.lab = 1.5 ) )
-# matshade gives you semitransparent areas
-matshade( nd$gestwks, fit.Ns5, lwd=2, alpha=0.2 )
-matshade( nd$gestwks, pred.Ns5, lwd=2, alpha=0.2 )
-# matlines puts lines for the intervals
-matlines( nd$gestwks, fit.Ns5, lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
-matlines( nd$gestwks, pred.Ns5, lty=1, lwd=c(3,2,2), col=c('red','green','green') )
-@
-Compare this with the 3rd order curve previously fitted (see slide 20 of the lecture).
-In a natural spline the curve is constrained to be linear beyond the extreme knots.
-\item
-Take a look at the basic diagnostic plots from the spline model.
-<<cubic-diag, fig=TRUE>>=
+with( births, plot(bweight ~ gestwks, xlim=c(23, 46), 
+                   cex.axis=1.5, cex.lab=1.5 ) )
+plotFitPredInt(xval=nd$gestwks, fit=fit.Ns5, pred=pred.Ns5)
+@ 
+
+Compare this with the 3rd order curve previously fitted (see slide 20
+of the lecture).  In a natural spline the curve is constrained to be
+linear beyond the extreme knots.
+\item Take a look at the basic diagnostic plots from the spline model.
+<<cubic-diag, echo=TRUE, fig=TRUE>>=
 par(mfrow=c(2,2))
 plot(mNs5)
 @
+
 How would you interpret these plots?
 
-The choice of the number of knots and their locations can be quite arbitrary,
-and the results are often sensitive to these choices. 
+The choice of the number of knots and their locations can be quite
+arbitrary, and the results are often sensitive to these choices.
 
-\item
-To illustrate arbitrariness and associated 
-problems with specification of knots, you may now fit 
-another natural spline model like the one above but now with 10 knots
-at the following sequence of points: \texttt{seq(25, 43, by = 2)}.
-Display graphically the results 
-<<bweigth-gestwks-Ns10, echo=TRUE, fig=TRUE>>=		 
-mNs10 <- lm( bweight ~ Ns( gestwks, knots = seq(25, 43, by = 2)), 
-             data = births)
+\item To illustrate arbitrariness and associated problems with
+  specification of knots, you may now fit another natural spline model
+  like the one above but now with 10 knots at the following sequence
+  of points: \texttt{seq(25, 43, by = 2)}.  Display graphically the
+  results
+<<bweigth-gestwks-Ns10, echo = TRUE, fig=TRUE>>=		 
+mNs10 <- lm( bweight ~ Ns( gestwks, 
+        knots = seq(25, 43, by = 2)), data = births)
 round(ci.lin(mNs10)[ , c(1,5,6)], 1)
 fit.Ns10 <- predict( mNs10, newdata=nd, interval="conf" )
 pred.Ns10 <- predict( mNs10, newdata=nd, interval="pred" )
 par(mfrow=c(1,1))
-with( births, plot( bweight ~ gestwks, xlim = c(23, 46), cex.axis= 1.5, cex.lab = 1.5 )  )
-matshade( nd$gestwks, fit.Ns10, lwd=2, alpha=0.2 )
-matshade( nd$gestwks, pred.Ns10, lwd=2, alpha=0.2 )
-matlines( nd$gestwks, fit.Ns10, lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
-matlines( nd$gestwks, pred.Ns10, lty=1, lwd=c(3,2,2), col=c('red','green','green') )
-@
-The behaviour of the curve is really wild for small values of \texttt{gestwks}!
+with( births, plot( bweight ~ gestwks, xlim = c(23, 46), 
+                    cex.axis= 1.5, cex.lab = 1.5 )  )
+plotFitPredInt( nd$gestwks, fit.Ns10, pred.Ns10)
+@ 
+
+The behaviour of the curve is really wild for small values of
+\texttt{gestwks}!
 \end{enumerate}
 
 \subsection{Penalized spline model}
 
-One way to go around the arbitrariness in the specification of knots is to fit
-a \textit{penalized spline} model, which imposes a ``roughness penalty'' on
-the curve. Even though a big number of knots are initially allowed, 
-the resulting fitted curve will be optimally smooth. 
+One way to go around the arbitrariness in the specification of knots
+is to fit a \textit{penalized spline} model, which imposes a
+``roughness penalty'' on the curve. Even though a big number of knots
+are initially allowed, the resulting fitted curve will be optimally
+smooth.
 
-You cannot fit a penalized spline model with \texttt{lm()} or \texttt{glm()}, 
-Instead, function \texttt{gam()} in package \texttt{mgcv} can be used 
-for this purpose. 
+You cannot fit a penalized spline model with \texttt{lm()} or
+\texttt{glm()}, Instead, function \texttt{gam()} in package
+\texttt{mgcv} can be used for this purpose.
 \begin{enumerate}[resume]
-\item
-You must first install
-R package \texttt{mgcv} into your computer. 
-\item
-When calling \texttt{gam()}, the model formula contains expression '\texttt{s(X)}'
-for any explanatory variable \texttt{X}, for which you wish to
-fit a smooth function
+\item You must first load package \texttt{mgcv}.
+ %%%%%FIXME: mgcv is a recommended package
+\item When calling \texttt{gam()}, the model formula contains
+  expression '\texttt{s(X)}' for any explanatory variable \texttt{X},
+  for which you wish to fit a smooth function
 <<bweight-gestwks-mPs>>= 
 library(mgcv)
 mPs <- gam( bweight ~ s(gestwks), data = births)		
 summary(mPs)	
-@
-From the output given by \texttt{summary()} you find that
-the estimated intercept is here, too,
- equal to the overall mean birth weight in the data.
-The estimated residual variance is given by ``\texttt{Scale est.}''
-or from subobject \texttt{sig2} of the fitted \texttt{gam} object.
-Taking square root you will obtain the estimated residual standard
-deviation: 445.2 g.
+@ 
+From the output given by \texttt{summary()} you find that the
+estimated intercept is here, too, equal to the overall mean birth
+weight in the data.  The estimated residual variance is given by
+``\texttt{Scale est.}''  or from subobject \texttt{sig2} of the fitted
+\texttt{gam} object.  Taking square root you will obtain the estimated
+residual standard deviation: 445.2 g.
 <<mPs-sig2>>=
 mPs$sig2
 sqrt(mPs$sig2)
@@ -151,30 +173,25 @@ The degrees of freedom in this model are not computed as simply as in previous
 models, and they typically are not integer-valued. However,
 the fitted spline seems to consume only a little more degrees of freedom
 as the 3rd degree polynomial above.
-\item
-As in previous models we shall plot the fitted curve together with
-95 \% confidence intervals for the mean responses and 
-95 \% prediction intervals for individual responses. Obtaining these
-quantities from the fitted \texttt{gam} object requires a bit more work than
-with \texttt{lm} objects
+
+\item As in previous models we shall plot the fitted curve together
+  with 95 \% confidence intervals for the mean responses and 95 \%
+  prediction intervals for individual responses. Obtaining the
+  prediction intervals from the fitted \texttt{gam} object requires a bit more
+  work than with \texttt{lm} objects. 
 <<bweight-gestwks-mPs-plot, fig=TRUE>>=	
-pr.Ps <- predict( mPs, newdata=nd, se.fit=TRUE)
+pr.Ps <- predict( mPs, newdata=nd, se.fit=TRUE )
+str(pr.Ps) # with se.fit=TRUE, only two columns: fitted value and its SE
+fit.Ps <- cbind(pr.Ps$fit, 
+                pr.Ps$fit - 2*pr.Ps$se.fit, 
+                pr.Ps$fit + 2*pr.Ps$se.fit)
+pred.Ps <- cbind(pr.Ps$fit,  # must add residual variance to se.fit^2
+                 pr.Ps$fit - 2*sqrt( pr.Ps$se.fit^2 + mPs$sig2), 
+                 pr.Ps$fit + 2*sqrt( pr.Ps$se.fit^2 + mPs$sig2))
 par(mfrow=c(1,1))
-with(births, plot(bweight ~ gestwks, xlim=c(24, 45), cex.axis=1.5, cex.lab=1.5) )
-matshade( nd$gestwks, cbind(pr.Ps$fit, 
-                            pr.Ps$fit - 2*pr.Ps$se.fit, 
-                            pr.Ps$fit + 2*pr.Ps$se.fit), lwd=2 )
-matshade( nd$gestwks, cbind(pr.Ps$fit,
-                            pr.Ps$fit - 2*sqrt( pr.Ps$se.fit^2 + mPs$sig2), 
-                            pr.Ps$fit + 2*sqrt( pr.Ps$se.fit^2 + mPs$sig2)), lwd=2 )
-matlines( nd$gestwks, cbind(pr.Ps$fit, 
-                            pr.Ps$fit - 2*pr.Ps$se.fit, 
-                            pr.Ps$fit + 2*pr.Ps$se.fit),  
-          lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
-matlines( nd$gestwks, cbind(pr.Ps$fit, 
-                            pr.Ps$fit - 2*sqrt( pr.Ps$se.fit^2 + mPs$sig2), 
-                            pr.Ps$fit + 2*sqrt( pr.Ps$se.fit^2 + mPs$sig2)),  
-          lty=1, lwd=c(3,2,2), col=c('red','green','green')  )
+with(births, plot(bweight ~ gestwks, xlim=c(24, 45), 
+                  cex.axis=1.5, cex.lab=1.5) )
+plotFitPredInt(nd$gestwks, fit.Ps, pred.Ps)
 @   
 The fitted curve is indeed clearly more reasonable than the polynomial.
 
@@ -182,8 +199,8 @@ The fitted curve is indeed clearly more reasonable than the polynomial.
 
 \subsection{Testis cancer: Data input and housekeeping}
 
-We shall now switch to analyzing the incidence of testis cancer in Denmark during 1943--1998
-by age and calendar time or period.
+We shall now switch to analyzing the incidence of testis cancer in
+Denmark during 1943--1998 by age and calendar time or period.
 
 \begin{enumerate}[resume]
 %----------------------------------------------------------------------
@@ -191,24 +208,24 @@ by age and calendar time or period.
 Load the data and inspect its structure:
 <<data-input>>=
  library( Epi )
- data( testisDK )
- str( testisDK )
- summary( testisDK )
- head( testisDK )
+   data( testisDK )
+    str( testisDK )
+summary( testisDK )
+   head( testisDK )
 @
-\item There are nearly 5000 observations from 90 one-year age groups and 54 calendar years.
-To get a clearer picture of what's going one we 
-do some housekeeping. The age range will be limited to 15--79 years, and age and period
-are both categorised into 5-year intervals -- according to the time-honoured practice in epidemiology.
+\item There are nearly 5000 observations from 90 one-year age groups
+  and 54 calendar years. To get a clearer picture of what's going one
+  we do some housekeeping. The age range will be limited to 15--79
+  years, and age and period are both categorised into 5-year intervals
+  -- according to the time-honoured practice in epidemiology.
 <<housekeeping>>=
 tdk <- subset(testisDK, A > 14 & A < 80)
-tdk$Age <- cut(tdk$A, br = 5*(3:16), 
+tdk$Age <- cut(tdk$A, br = 5*(3:16), include.lowest=TRUE, right=FALSE)
+   nAge <- length(levels(tdk$Age))
+tdk$Per <- cut(tdk$P, br = seq(1943,1998,by=5), 
                include.lowest=TRUE, right=FALSE)
-nAge <- length(levels(tdk$Age))
-tdk$Per <- cut(tdk$P, br = seq(1943, 1998, by = 5),   
-               include.lowest=TRUE, right=FALSE)
-nPer <- length(levels(tdk$Per))
-@ %
+   nPer <- length(levels(tdk$Per))
+@ 
 \end{enumerate}
 
 \subsection{Some descriptive analysis}
@@ -216,50 +233,39 @@ nPer <- length(levels(tdk$Per))
 Computation and tabulation of incidence rates
 
 \begin{enumerate}[resume]
-\item
-Tabulate numbers of cases and person-years, and 
-compute the incidence rates (per 100,000 y)
- in each 5 y $\times$ 5 y cell
- using \texttt{stat.table()}
+\item Tabulate numbers of cases and person-years, and compute the
+  incidence rates (per 100,000 y) in each 5 y $\times$ 5 y cell using
+  \texttt{stat.table()}
 <<tabulation>>=
 tab <- stat.table(  index = list(Age, Per),
                  contents = list(D = sum(D), 
                                  Y = sum(Y/1000),
                               rate = ratio(D, Y, 10^5) ),
-     margins = TRUE, data = tdk ) 
+                  margins = TRUE, 
+                     data = tdk ) 
 print(tab, digits=c(sum=0, ratio=1))	
-@
-
-Look at the incidence rates in the column margin and in the row margin.
-In which age group is the marginal age-specific rate highest?
+@ 
+Look at the incidence rates in the column margin and in the row
+margin.  In which age group is the marginal age-specific rate highest?
 Do the period-specific marginal rates have any trend over time?
 
-\item
-From the saved table object \texttt{tab}
- you can plot an age-incidence curve for each period separately,
- after you have checked the structure of the table, so that you know the
-relevant dimensions in it.
+\item From the saved table object \texttt{tab} you can plot an
+  age-incidence curve for each period separately, after you have
+  checked the structure of the table, so that you know the relevant
+  dimensions in it. There is a function {\tt rateplot()} in \texttt{Epi}
+  that does default plotting of tables of rates (see the help page of
+ {\tt rateplot})
 <<plot-rates, fig=TRUE>>=
 str(tab)
 par(mfrow=c(1,1))
-plot( c(15,80), c(1,30), type='n', log='y', cex.lab = 1.5, cex.axis = 1.5, 
-   xlab = "Age (years)", ylab = "Incidence rate (per 100000 y)") 
-for (p in 1:nPer)
-   lines( seq(17.5, 77.5, by = 5), tab[3, 1:nAge, p], type = 'o', pch = 16 ,
-	   lty = rep(1:6, 2)[p] )
-@ %
-There is also a function \texttt{rateplot} that does default plotting of
-rate tables (see the help page for \texttt{rateplot}):
-<<rateplot,fig=TRUE>>=
-par( mfrow=c(1,1) )
-rateplot( tab[3,1:nAge,1:nPer], "ap", ylim=c(1,30),
-          age = seq(15,75,5), per=seq(1943,1993,5),
-          col=heat.colors(16), ann=TRUE )
-@ %
+rateplot( rates=tab[3, 1:nAge, 1:nPer], which="ap", ylim=c(1,30), 
+           age=seq(15, 75, 5), per=seq(1943, 1993, 5), 
+           col=heat.colors(16), ann=TRUE )
+@	
+
 Is there any common pattern in the age-incidence curves across the periods?
 
 \end{enumerate}
-%----------------------------------------------------------------------
 
 \subsection{Age and period as categorical factors}
 
@@ -271,109 +277,122 @@ It is useful to scale the person-years to be expressed in $10^5$ y.
 \begin{enumerate}[resume]
 \item
 <<mCat>>=
-mCat <- glm( D ~ Age + Per, offset=log(Y/100000), family=poisson, data= tdk )
+tdk$Y <- tdk$Y/100000
+mCat <- glm( cbind(D,Y) ~ Age + Per, 
+             family=poisreg(link=log), data= tdk )
 round( ci.exp( mCat ), 2)
-@
+@ 
 What do the estimated rate ratios tell about the age and period effects? 
 
-\item
-A graphical inspection of point estimates and confidence intervals
-can be obtained as follows. In the beginning it is useful to
-define shorthands for the pertinent mid-age and mid-period values of the
-different intervals  
+\item A graphical inspection of point estimates and confidence
+  intervals can be obtained as follows. In the beginning it is useful
+  to define shorthands for the pertinent mid-age and mid-period values
+  of the different intervals
 <<mCat-est, fig=TRUE>>=
 aMid <- seq(17.5, 77.5, by = 5)
 pMid <- seq(1945, 1995, by = 5)
 par(mfrow=c(1,2))
-plot( c(15,80), c(0.6, 6), type='n', log='y', cex.lab = 1.5, cex.axis = 1.5, 
+plot( c(15,80), c(0.6, 6), type="n", log="y", 
+      cex.lab = 1.5, cex.axis = 1.5, 
    xlab = "Age (years)", ylab = "Rate ratio") 
-lines( aMid,  c( 1, ci.exp(mCat)[2:13, 1] ), type = 'o', pch = 16 )
-segments( aMid[-1],  ci.exp(mCat)[2:13, 2], aMid[-1], ci.exp(mCat)[2:13, 3] ) 
-plot( c(1943, 1998), c(0.6, 6), type='n', log='y', cex.lab = 1.5, cex.axis = 1.5, 
-   xlab = "Calendar year", ylab = "Rate ratio") 
-lines( pMid,  c( 1, ci.exp(mCat)[14:23, 1] ), type = 'o', pch = 16 )
-segments( pMid[-1],  ci.exp(mCat)[14:23, 2], pMid[-1], ci.exp(mCat)[14:23, 3] ) 
-@
-\item
-In the fitted model the reference category for each factor was the first one.
-As age is the dominating factor, it may be  more informative to remove the intercept from the model.
-As a  consequence the age effects describe fitted rates at the reference level
-of the period factor. For the latter one could choose the middle period 1968-72.
+lines( aMid,  c( 1, ci.exp(mCat)[2:13, 1] ), type = "o", pch = 16 )
+segments( aMid[-1],  ci.exp(mCat)[2:13, 2], 
+          aMid[-1], ci.exp(mCat)[2:13, 3] ) 
+plot( c(1943,1998), c(0.6, 6), type="n", log="y", 
+      cex.lab = 1.5, cex.axis = 1.5, 
+   xlab = "Calendar year - 1900", ylab = "Rate ratio") 
+lines( pMid,c( 1, ci.exp(mCat)[14:23, 1] ), type = 'o', pch = 16 )
+segments( pMid[-1],  ci.exp(mCat)[14:23, 2], 
+          pMid[-1],  ci.exp(mCat)[14:23, 3] ) 
+@ 
+\item In the fitted model the reference category for each factor was
+  the first one.  As age is the dominating factor, it may be more
+  informative to remove the intercept from the model.  As a
+  consequence the age effects describe fitted rates at the reference
+  level of the period factor. For the latter one could choose the
+  middle period 1968-72.
 <<mCat2-new-ref>>=
 tdk$Per70 <- Relevel(tdk$Per, ref = 6)
-mCat2 <- glm( D ~ -1 + Age +Per70, offset=log(Y/100000), family=poisson, data= tdk )
+mCat2 <- glm( cbind(D,Y) ~ -1 + Age +Per70, 
+              family=poisreg(link=log), data= tdk )
 round( ci.exp( mCat2 ), 2)
-@
+@ 
 We shall plot just the point estimates from the latter model
-<<mCat2-plot, fig=TRUE>>=
+<<mCat2-plot, fig =TRUE>>=
 par(mfrow=c(1,2))
-plot( c(15,80), c(2, 20), type='n', log='y', cex.lab = 1.5, cex.axis = 1.5, 
+plot( c(15,80), c(2, 20), type="n", log="y", cex.lab = 1.5, cex.axis = 1.5, 
    xlab = "Age (years)", ylab = "Incidence rate (per 100000 y)") 
-lines( aMid,  c(ci.exp(mCat2)[1:13, 1] ), type = 'o', pch = 16 )
-plot( c(1943, 1998), c(0.4, 2), type='n', log='y', cex.lab = 1.5, cex.axis = 1.5, 
-   xlab = "Calendar year - 1900", ylab = "Rate ratio") 
+lines( aMid,  c(ci.exp(mCat2)[1:13, 1] ), type = "o", pch = 16) 
+plot( c(1943,1998), c(0.4, 2), type="n", log="y", 
+      cex.lab = 1.5, cex.axis = 1.5, 
+   xlab = "Calendar year", ylab = "Rate ratio") 
 lines( pMid, c(ci.exp(mCat2)[14:18, 1], 1, ci.exp(mCat2)[19:23, 1]),  
-   type = 'o', pch = 16 )
+   type = "o", pch = 16 )
+abline(h=1, col="gray")
 @
 \end{enumerate}
 
 \subsection{Generalized additive model with penalized splines}
 
-It is obvious that the age effect on the log-rate scale 
-is highly non-linear, but it is less clear whether
- the true period effect deviates from linearity. Nevertheless,
-there are good indications to try fitting smooth continuous functions
-for both. 
+It is obvious that the age effect on the log-rate scale is highly
+non-linear. Yet, it is less clear whether the true period effect
+deviates from linearity. Nevertheless, there are good indications to
+try fitting smooth continuous functions for both.
+
 \begin{enumerate}[resume]
-\item
-As the next task we fit
-a generalized additive model for the log-rate on continuous age and period
-applying penalized splines with default settings of function \texttt{gam()} in
-package \texttt{mgcv}. In this fitting an ``optimal'' value for the penalty
-parameter is chosen based on an AIC-like criterion known as UBRE.
+
+\item As the next task we fit a generalized additive model for the
+  log-rate on continuous age and period applying penalized splines
+  with default settings of function \texttt{gam()} in package
+  \texttt{mgcv}. In this fitting an ``optimal'' value for the penalty
+  parameter is chosen based on an AIC-like criterion known as UBRE.
 <<mPen>>=
 library(mgcv)
-mPen <- gam( D ~ s(A) + s(P), offset = log(Y/100000), 
-           family = poisson, data = tdk)
+mPen <- gam( cbind(D, Y) ~ s(A) + s(P),  
+           family = poisreg(link=log), data = tdk)
 summary(mPen)					
 @ 
 The summary is quite brief, and the only estimated coefficient is the
-intercept, which sets the baseline level for the log-rates, against which
-the relative age effects and period effects will be contrasted.
-On the rate scale the baseline level (per 100000 y) is obtained by \texttt{exp(1.7096)}
-\item
-See also the default plot for the fitted curves (solid lines) describing the age and the period effects
-which are interpreted as contrasts to the baseline level on the log-rate scale.
+intercept, which sets the baseline level for the log-rates, against
+which the relative age effects and period effects will be contrasted.
+On the rate scale the baseline level 5.53 per 100000 y is obtained by
+\texttt{exp(1.7096)}.
+
+\item See also the default plot for the fitted curves (solid lines)
+  describing the age and the period effects which are interpreted as
+  contrasts to the baseline level on the log-rate scale.
 <<mPen-plot, fig=TRUE>>=
 par(mfrow=c(1,2))
 plot(mPen, seWithMean=TRUE)
-abline(v = 1968, lty=3)
-abline(h = 0, lty=3)
-@ %
-The dashed lines describe the 95 \% confidence band for the
-pertinent curve.  One could get the impression that year 1968 would be
-some kind of reference value for the period effect, as it was in the
-categorical model previously fitted. This is not the case, however,
-because {\tt gam()} by default parametrizes the spline effects such
-that the reference level, at which the spline effect is nominally
-zero, is the overall ``grand mean'' value of the log-rate in the
-data. This corresponds to the principle of {\it sum contrasts} ({\tt
-  contr.sum}) for categorical explanatory factors.
+@ 
+The dashed lines describe the 95 \% confidence band for the pertinent
+curve.  One could get the impression that year 1968 would be some kind
+of reference value for the period effect, like period 1968-72 chosen as the reference 
+in the categorical
+model previously fitted. This is not the case, however, because {\tt
+  gam()} by default parametrizes the spline effects such that the
+reference level, at which the spline effect is nominally zero, is the
+overall ``grand mean'' value of the log-rate in the data. This
+corresponds to the principle of {\it sum contrasts} ({\tt contr.sum})
+for categorical explanatory factors.
 
-% The confidence band indicates, namely,
-% that there is uncertainty about the true age effect curve about the overall (``grand mean'')
-% log-rate both in vertical and in horizontal direction, and there is no fixed reference level.  
+% The confidence band indicates, namely, that there is uncertainty
+% about the true age effect curve about the overall (``grand mean'')
+% log-rate both in vertical and in horizontal direction, and there is
+% no fixed reference level.
 
-From the summary you will also find that the degrees of freedom value required for the age effect
-is nearly the same as the default dimension $k-1 = 9$ of the part of the model matrix (or basis)
+From the summary you will also find that the degrees of freedom value
+required for the age effect is nearly the same as the default
+dimension $k-1 = 9$ of the part of the model matrix (or basis)
 initially allocated for each smooth function. (Here $k$ refers to the
-relevant argument that determines the basis dimension when specifying a smooth term by \texttt{s()}
-in the model formula). 
-On the other hand the period effect takes just about 3 df.
+relevant argument that determines the basis dimension when specifying
+a smooth term by \texttt{s()} in the model formula).  On the other
+hand the period effect takes just about 3 df.
 
-\item
-It is a good idea to do some diagnostic checking of the fitted model
-<<mPen-check>>=
+\item It is a good idea to do some diagnostic checking of the fitted
+  model
+<<mPen-check, fig=TRUE>>=
+par(mfrow=c(2,2))
 gam.check(mPen)					
 @ 
 The four diagnostic plots are analogous to some of those used in
@@ -383,44 +402,57 @@ given in the printed output about the value of \texttt{k}.
 
 \item
 Let us refit the model but now with an increased \texttt{k} for age:
-<<mPen2>>=
-mPen2 <- gam( D ~ s(A, k=20) + s(P), offset = log(Y/100000), 
-           family = poisson, data = tdk)
+<<mPen2, fig=TRUE>>=
+mPen2 <- gam( cbind(D,Y) ~ s(A, k=20) + s(P),  
+           family = poisreg(link=log), data = tdk)
 summary(mPen2)
+par(mfrow=c(2,2))
 gam.check(mPen2)					
 @ 
-With this choice of \texttt{k} the df value for age became about 11, which is well below 
-$k-1 = 19$. Let us plot the fitted curves from this fitting, too
+With this choice of \texttt{k} the df value for age became about 11,
+which is well below $k-1 = 19$. Let us plot the fitted curves from
+this fitting, too
 <<mPen2-plot, fig=TRUE>>=
-par(mfrow=c(1,2))
-plot(mPen2, seWithMean=TRUE)
-abline(v = 1968, lty=3)
-abline(h = 0, lty=3)
-@ %
-There does not seem to have happened any essential changes from the previously fitted curves,
-so maybe 8 df could, after all,  be quite enough for the age effect.
-
-\item
-Graphical presentation of the effects can be improved from that supported by \texttt{plot.gam()}.
-We can, for instance, present the age curve to describe the ``mean'' incidence rates by age, 
-averaged over the 54 years. 
-For that purpose we need to merge the intercept with the age effect.
-The period curve will be expressed in terms of rate ratios in relation to the fitted baseline rate,
-as determined by the model intercept.
-
-In order to produce these plots one needs to extract certain items from the fitted \texttt{gam}
-object \texttt{mPen2} and do some calculations. A source script named ``\texttt{plotPenSplines.R}''
-that does all of that can be found from the \texttt{/R} subdirectory on the course website.
-<<mPen2-plotAge, fig=TRUE>>=
-source("http://bendixcarstensen.com/SPE/R/plotPenSplines.R")
+par( mfrow=c(1,2) )
+plot( mPen2, seWithMean=TRUE )
+abline( v=1968, h=0, lty=3 )
 @ 
+There does not seem to have happened any essential changes from the
+previously fitted curves, so maybe 8 df could, after all, be quite
+enough for the age effect.
+
+\item Graphical presentation of the effects using \texttt{plot.gam()}
+ can be improved. For instance, we may present the
+  age effect to describe the ``mean'' incidence rates by age, averaged
+  over the whole time span of 54 years. This is obtained by adding the estimated intercept
+  to the estimated smooth curve for the age effect and showing
+  the antilogarithms of the ordinates of the curve.
+  For that purpose we need to extract the intercept and modify the
+  labels of the $y$-axis accordingly. The estimated period curve 
+  can also be expressed in terms of
+ relative indidence rates in relation to the fitted baseline rate, 
+ as determined  by the model intercept.
+<<mPen2-newplot, fig=TRUE>>=
+par( mfrow=c(1,2) )
+icpt <- coef(mPen2)[1]  #  estimated intecept
+plot( mPen2, seWithMean=TRUE, select=1, rug=FALSE,       
+      yaxt="n", ylim= c(log(1),log(20)) - icpt, 
+      xlab="Age (y)", ylab="Mean rate (/100000 y)" )
+axis(2, at = log( c(1, 2, 5, 10, 20)) - icpt, labels=c(1, 2, 5, 10, 20) )
+plot( mPen2, seWithMean=TRUE, select=2, rug=FALSE, 
+      yaxt="n", ylim=c( log(0.4), log(2) ), 
+      xlab="Calendat year", ylab="Relative rate")
+axis(2, at=log( c(0.5, 0.75, 1, 1.5, 2)), labels = c(0.5, 0.75, 1, 1.5, 2))
+abline( v=1968, h=0, lty=3 )
+@
+
 \end{enumerate}
-One could continue the analysis of these data by fitting an age-cohort model as an alternative to the 
-age-period model, as well as an age-cohort-period model. 
 
-\begin{comment}
+One could continue the analysis of these data by fitting an age-cohort
+model as an alternative to the age-period model, as well as an
+age-cohort-period model.
 
-\subsection{Generalized additive model with natural regression splines}
+\subsection{Extra: Generalized additive model with natural regression splines}
 
 \item 
 Instead of penalized splines one may 
@@ -430,9 +462,9 @@ and their locations. We prefer natural splines for the purpose.
 Fitting these models can be done with \texttt{glm()} such that
 in the model formula the spline components are defined by function \texttt{Ns()} 
 <<mNs>>=
-mNs <- glm( D ~ Ns(A, knots = seq(15, 75, 10)) +
+mNs <- glm( cbind(D,Y) ~ Ns(A, knots = seq(15, 75, 10)) +
                 Ns(P, knots = seq(1950, 1990, 10)),
-                offset=log(Y), family=poisson, data=tdk )
+                 family=poisreg, data=tdk )
 summary( mNs)
 @
 
@@ -454,21 +486,15 @@ help page for \texttt{ci.exp}).
 What is needed are data frames with values for the covariates
 \texttt{A}, \texttt{P} and \texttt{Y}, one data frame for the
 predictions and two data frames representing the rate ratios we want:
-<<predRR>>=
+<<>>=
 summary( mNs )
 aa <- 15:79
 pp <- 1943:1996
 # for the prediction
-ndp <- data.frame( A=aa, P=1970, Y=10^5 )
+ndp <- data.frame( A=aa, P=1970, Y=1 )
 # for the RR between pp and 1970
-ndx <- data.frame( A=50, P=pp  , Y=10^5 )
-ndr <- data.frame( A=50, P=1970, Y=10^5 )
-ci.pred( mPen2, data.frame( A=aa, P=1970 ) )
-ci.exp( mPen2, list( data.frame( P=pp ),
-                     data.frame( P=1970 ) ), xvars='A' )[1:5,]
-ci.exp( mNs, list( data.frame( P=pp ),
-                   data.frame( P=1970 ) ), xvars="A" )[1:5,]
-ci.pred( mNs, ndp )
+ndx <- data.frame( A=50, P=pp  , Y=1 )
+ndr <- data.frame( A=50, P=1970, Y=1 )
 par(mfrow=c(1,2))
 matplot( aa, ci.pred( mNs, ndp ),
           log="y", xlab="Age", ylab="Incidence rate (per 100000 y)",
@@ -512,7 +538,7 @@ matplot( ndx$P, ci.exp( mNs, list(ndx,ndr) ),
           type="l", lty=1, lwd=c(3,1,1), col= c("red", "blue",  "blue") )
 matshade( ndx$P, ci.exp( mPen2, list(ndx,ndr) ), lwd=2, lty=3 )
 abline( h=1,v=1970)
-@ %
+@ 
 
 One obvious difference is found in the way the error margins for the
 period effect are displayed. In the current model
@@ -535,7 +561,6 @@ and comment the difference to our first spline model.
 
 \end{enumerate}
 
-\end{comment}
 
 \begin{comment}
 
