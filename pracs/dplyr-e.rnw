@@ -1,5 +1,5 @@
-% \documentclass{article}
-% \begin{document}
+\documentclass{article}
+\begin{document}
 \SweaveOpts{concordance=TRUE}
 
 \SweaveOpts{results=hide, prefix.string=./graph/tab}
@@ -319,6 +319,36 @@ births_tbl %>%
 @
 \textbf{Note:} grouping order matters!
 
+\subsection{Bind and merge tables}
+
+<< >>=
+library(Epi)
+data("births")
+births
+
+age <-
+  tibble(
+    pid = 1:6,
+    age = sample(15:25, size = 6, replace = TRUE)
+  )
+
+center <-
+  tibble(
+    pid = c(1, 2, 3, 4, 10),
+    center = c('A', 'B', 'A', 'B', 'C')
+  )
+
+bind_rows(age, center)
+
+full_join(age, center)
+
+inner_join(age, center)
+
+left_join(age, center)
+@
+
+
+
 \subsection{Bonus: Rendering tables}
 
 Once you have produced a nice data-set we can be interested in rendering it in a nice format that can
@@ -368,4 +398,4 @@ dplyr_s <- purrr::map_chr(dplyr_e, ~ sub('results=hide', 'results=verbatim', .x)
 writeLines(dplyr_s, sub('-e.rnw$', '-s.rnw', dplyr_e.path))
 @
 
-% \end{document}
+\end{document}
