@@ -1,8 +1,9 @@
 \documentclass[handout,12pt,dvipsnames,t]{beamer}
 \setbeamertemplate{footline}[frame number]
-\title{Statistical Practice in Epidemiology \newline }
-\subtitle{Poisson and Logistic Regression} % \\[10mm]
-\author{Janne Pitk\"aniemi \newline \newline (inherited from Esa L\"a\"ar\"a) }
+\title{Poisson and Logistic Regression \newline }
+\author{Janne Pitk\"aniemi (initial slides EL) \newline \newline }
+\institute{Finnish Cancer Registry \newline \newline
+\normalsize Statistical Practice in Epidemiology (2019, Tartu) }
 \date{}
 
 \usepackage{listings}
@@ -92,7 +93,7 @@ Follow-up time for 60 random individuals aged 75-103 at recruitment (time-scale:
 
 
 \begin{frame}[fragile]
-\frametitle{Crude overall rate computed in two ways}
+\frametitle{Crude overall rate computed by hand and model}
 
 Total no. cases, person-years \& rate (/1000 y):
 \small
@@ -102,22 +103,33 @@ Total no. cases, person-years \& rate (/1000 y):
    D      Y         R 
   884.00 11678.24    75.70 
 \end{lstlisting}
-%\pause
-\normalsize
-Poisson regression model with only intercept
-(``{\tt 1}'').
+Two R-implementations of the rate estimation with Poisson regression:\vspace*{-0.5cm}
+\begin{columns}
+\setlength{\partopsep}{0pt}
+\begin{column}[t]{0.5\textwidth}
+\setlength{\partopsep}{0pt}
 \small
 \begin{lstlisting}
-> m1 <- glm( d ~ 1, family=poisson, offset=log(y))
+A model with offset term
+> m1 <- glm( D ~ 1, family=poisson, offset=log(Y))
+
 > coef(m1)
 (Intercept) 
-  -2.581025 
-
-> exp( coef(m1) )*1000
-(Intercept) 
-   75.69636 
+  -2.581
 \end{lstlisting}
-\normalsize
+\end{column}
+\begin{column}[t]{0.5\textwidth}
+\small
+\begin{lstlisting}
+A model with poisreg-family
+> glm(cbind(D, Y) ~1, family=poisreg)
+
+Coefficients:
+(Intercept)  
+     -2.581  
+\end{lstlisting}
+\end{column}
+\end{columns}
 \emph{Why do we get the same results?}
 \end{frame}
 
@@ -131,10 +143,10 @@ Constant rate: $\lambda(y)=\frac{f(y;\lambda)}{S(y;\lambda)}=\lambda$
 
 Observed data $ \left\{ (y_i,\delta_i); i=1,...,n \right\}$.
 
-The likelihood \vspace*{0.2in} $L(\lambda)=\prod_{i=1}^{n} \lambda^{\delta_i} e^{-\lambda y_i}$ and $log(L)= \sum_{i=1}^{n} \left[  \delta_i log(\lambda)-\lambda y_i \right]$
+The likelihood \vspace*{0.2in} $L(\lambda)=\prod_{i=1}^{n} \lambda^{\delta_i} e^{-\lambda y_i}$ and $log(L)= \sum\limits_{i=1}^{n} \left[  \delta_i log(\lambda)-\lambda y_i \right]$
 
 Solving the {\it score equations}: \ $\frac{\partial \log L(\lambda)}{\partial \lambda} = \sum \left[  \frac{\delta_i}{\lambda} -y_i \right] $ \\ %\vspace*{0.2in}
- $=  \frac{D}{\lambda} - Y = 0 $ and $  D-\lambda Y   =  0   $
+ $=  \frac{D}{\lambda} - Y = 0 $ and $  D-\lambda Y   =  0   $ \vspace*{0.5cm}
 
 $\rightarrow$
 {\bf maximum likelihood estimator} (MLE) of $\lambda$:
@@ -392,7 +404,7 @@ Th vs. Ct     1.488  1.347  1.644
 \end{itemize}
 
 Treatment/Placebo given to diabetes patients, the design is
-propective and outcome is measured better/worse. Is the probability of outcome more than 15\% -- yes, then use the risk difference or risk ratio (RR) 
+prospective and outcome is measured better(Y)/worse(N). Is the probability of outcome more than 15\% -- yes, then use the risk difference or risk ratio (RR) 
 
 %\begin{center}
 %\begin{tabular}{rcc}
@@ -470,7 +482,6 @@ kable(twoby2( dlt ),"latex")
 \begin{footnotesize}
 \begin{lstlisting}
 2 by 2 table analysis:
-/.../
     Better Worse    P(Better) 95% conf. interval
 Dal     29    14       0.6744    0.5226   0.7967
 Pl      20    22       0.4762    0.3316   0.6249
@@ -480,7 +491,7 @@ Pl      20    22       0.4762    0.3316   0.6249
          Sample Odds Ratio: 2.2786    0.9456   5.4907
 Conditional MLE Odds Ratio: 2.2560    0.8675   6.0405
     Probability difference: 0.1982   -0.0110   0.3850
-
+             
              Exact P-value: 0.0808
         Asymptotic P-value: 0.0665
 \end{lstlisting}
@@ -527,7 +538,7 @@ trtDal         2.2786 0.9456 5.4907
 intercept: $20/22=0.9090$) and the \textbf{odds-ratio}
 ($(29/14)/(20/22)=2.28$).
 
-\item This is not what you want, because odds ratio is biased estimate of the
+\item This is \textbf{NOT} what you want, because odds ratio is biased estimate of the
  risk ratio.(recall if p>10\% $\frac{p}{1-p} \not \approx p$)
 \end{itemize}
 
@@ -590,55 +601,6 @@ Diabetics with Dalterapin treatment are 1.4 times likely to get better than thos
 % \end{itemize}
 
 
-%----------------------------------
-\begin{frame}[fragile]
-\frametitle{Logistic regression in case-control studies}
-
-\begin{itemize}
-
-\item Model for disease occurrence in the target population:
-\begin{center}
-$ \ln\left[\frac{p}{1-p}\right] = \beta_0 + \beta_1 x_1 + \beta_2 x_2 $
-\end{center}
-
-\item Sampling fractions:
-  P(inclusion in study $\mid$ control)  =  $s_\text{ctr}$ 
-  P(inclusion in study  $\mid$ case)  =  $s_\text{case}$ 
-
-\item  Model for observed case-control data:
-  \begin{align*}
- \ln[\mbox{odds ( case | incl.) }]
-  & = \ln\left[\frac{p}{1-p}\right] +
-      \ln\left[\frac{s_\text{cas}}{s_\text{ctr}}\right] \\ \\
-  & =  \left( \ln\left[\frac{s_\text{cas}}{s_\text{ctr}}\right] + \beta_0 \right)
-         + \beta_1 x_1 + \beta_2 x_2
-  \end{align*}
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{Logistic regression in case-control studies}
-  
-  Analysis of $P(case | inclusion)$ --- \textit{i.e.} binary
-observations:
-$$
-Y=\left\{ \begin{array}{ll}
-          1 \quad \sim & \mbox{case}\\
-          0 \quad \sim & \mbox{control}
-                    \end{array} \right.
-$$
-$\ln[\mbox{odds ( case | incl.) }] =
- \left( \ln\left[\frac{s_\text{cas}}{s_\text{ctr}}\right] + \beta_0 \right)
-         + \beta_1 x_1 + \beta_2 x_2$
-\vspace*{1cm}
-\begin{itemize}
-\item Effect of covariates is estimated correctly.
-\item Intercept is meaningless \newline
-\hspace*{0.5cm} depends on $s_\text{cas}$ and $s_\text{ctr}$
-  that are often unknown.
-
-\end{itemize}
-\end{frame}
 
 \begin{frame}[fragile]
 \frametitle{Case-control study: Food-poisoning outbreak}
@@ -749,6 +711,56 @@ ci.exp(glm(cc~exposed,weights=count,family="binomial",data=mousse))
 }
 \end{frame}
 
+%----------------------------------
+\begin{frame}[fragile]
+\frametitle{Logistic regression in case-control studies}
+
+\begin{itemize}
+
+\item Model for disease occurrence in the target population:
+\begin{center}
+$ \ln\left[\frac{p}{1-p}\right] = \beta_0 + \beta_1 x_1 + \beta_2 x_2 $
+\end{center}
+
+\item Sampling fractions:
+  P(inclusion in study $\mid$ control)  =  $s_\text{ctr}$ 
+  P(inclusion in study  $\mid$ case)  =  $s_\text{case}$ 
+
+\item  Model for observed case-control data:
+  \begin{align*}
+ \ln[\mbox{odds ( case | incl.) }]
+  & = \ln\left[\frac{p}{1-p}\right] +
+      \ln\left[\frac{s_\text{cas}}{s_\text{ctr}}\right] \\ \\
+  & =  \left( \ln\left[\frac{s_\text{cas}}{s_\text{ctr}}\right] + \beta_0 \right)
+         + \beta_1 x_1 + \beta_2 x_2
+  \end{align*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Logistic regression in case-control studies}
+  
+  Analysis of $P(case | inclusion)$ --- \textit{i.e.} binary
+observations:
+$$
+Y=\left\{ \begin{array}{ll}
+          1 \quad \sim & \mbox{case}\\
+          0 \quad \sim & \mbox{control}
+                    \end{array} \right.
+$$
+$\ln[\mbox{odds ( case | incl.) }] =
+ \left( \ln\left[\frac{s_\text{cas}}{s_\text{ctr}}\right] + \beta_0 \right)
+         + \beta_1 x_1 + \beta_2 x_2$
+\vspace*{1cm}
+\begin{itemize}
+\item Effect of covariates is estimated correctly.
+\item Intercept is meaningless \newline
+\hspace*{0.5cm} depends on $s_\text{cas}$ and $s_\text{ctr}$
+  that are often unknown.
+
+\end{itemize}
+\end{frame}
+
 \begin{frame}
 \frametitle{Conclusion: What did we learn?}
 \begin{itemize} %[<+->]
@@ -756,11 +768,12 @@ ci.exp(glm(cc~exposed,weights=count,family="binomial",data=mousse))
 \item In Poisson models the response can be either:
   \begin{itemize}
     \item case indicator {\tt d} with {\tt offset = log(y)}, or
-    \item rate {\tt d/y} with {\tt weights = y}.
+    \item rate {\tt d/y} with {\tt weights = y} or
+    \item case and person-years {\tt c(d,y)} as response in glm with poisreg-family (Epi-package)
   \end{itemize}
 \item Both may be fitted on either grouped data, or individual
   records.
-\item Binary date can be modeled with odds.
+\item Binary outcome can be modeled with odds.
 \item Case-control studies:\\
   Odds-ratios can be computed by logistic
   regression models, but \textbf{Intercept} from model is \textbf{meaningless}.
