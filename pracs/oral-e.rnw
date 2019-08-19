@@ -1,7 +1,8 @@
- % \documentclass{article}
- % \usepackage{amsmath}
- % \usepackage{graphicx, subfig}
- % \begin{document}
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{graphicx, subfig}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
 %\SweaveOpts{concordance=TRUE,keep.source=TRUE,eps=FALSE,include=TRUE}
 \SweaveOpts{keep.source=TRUE,eps=FALSE,include=TRUE, prefix.string=./graph/oral}
 
@@ -44,7 +45,7 @@ library(popEpi)
 library(data.table)
 library(knitr)
 library(survival)
-@ %
+@ 
 
 \item Read the datafile {\tt oralca2.txt} from
 a website, whose precise address  will be given in the practical,
@@ -54,7 +55,7 @@ Using function \texttt{table()} count the numbers of censorings
 as well as deaths from oral cancer and other causes, respectively,
  from the \texttt{event} variable.
 <<dinput, echo=T,eval=FALSE>>=
-orca <- read.table("oralca2.txt", header=T)
+orca <- read.table("pracs/data/oralca2.txt", header=T)
 head(orca) ; str(orca) ; summary(orca)
 @
 \end{enumerate}
@@ -376,54 +377,54 @@ summary(m2fg2, Exp=T)
 \end{enumerate}
 
 
-\subsection{Analysis of relative survival} 
- 
-\begin{enumerate}
- 
-\item Load package {\tt popEpi} for the estimation of relative survival. 
-Use the (simulated) female Finnish breast cancer patients diagnosed 
-between 1993-2012, called {\tt sibr}.
-<<test,echo=T,eval=FALSE>>=
-library(popEpi)
-head(sibr)
-@
- 
-
-\item Prepare the data by using {\tt lexpand} command in the {\tt popEpi} package, define follow-up time intervals,
-(calendar time) period that you are interested and where are the population mortality figures.
-Calculate 5-year observed survival (2008-2012) using period method by Ederer II (default)
-<<test,echo=T,eval=FALSE>>=
-## pretend some are male
-set.seed(1L)
-sire$sex <- rbinom(nrow(sire), 1, 0.01)
-
-BL <- list(fot = seq(0, 5, 1/12))
-
-x <- lexpand(sire,
-             birth = bi_date,
-             entry = dg_date,
-             exit = ex_date,
-             status = status,
-             breaks = BL,
-             pophaz = popmort,
-             aggre = list(sex, fot))
-@
-
-
-\item
-Calculate 5-year relative survival (2008-2012) using period method by Ederer II (default)
-<<test,echo=T,fig=TRUE,eval=FALSE>>=
-
-st.e2 <- survtab_ag(fot ~ sex, data = x,
-                    surv.type = "surv.rel",
-                    pyrs = "pyrs", n.cens = "from0to0",
-                    d = c("from0to1", "from0to2"))
-
-plot(st.e2, y = "r.e2", col = c("black", "red"),lwd=4)
-
-@
-
-\end{enumerate}
+% \subsection{Analysis of relative survival} 
+%  
+% \begin{enumerate}
+%  
+% \item Load package {\tt popEpi} for the estimation of relative survival. 
+% Use the (simulated) female Finnish breast cancer patients diagnosed 
+% between 1993-2012, called {\tt sibr}.
+% <<test,echo=T,eval=FALSE>>=
+% library(popEpi)
+% head(sibr)
+% @
+%  
+% 
+% \item Prepare the data by using {\tt lexpand} command in the {\tt popEpi} package, define follow-up time intervals,
+% (calendar time) period that you are interested and where are the population mortality figures.
+% Calculate 5-year observed survival (2008-2012) using period method by Ederer II (default)
+% <<test,echo=T,eval=FALSE>>=
+% ## pretend some are male
+% set.seed(1L)
+% sire$sex <- rbinom(nrow(sire), 1, 0.01)
+% 
+% BL <- list(fot = seq(0, 5, 1/12))
+% 
+% x <- lexpand(sire,
+%              birth = bi_date,
+%              entry = dg_date,
+%              exit = ex_date,
+%              status = status,
+%              breaks = BL,
+%              pophaz = popmort,
+%              aggre = list(sex, fot))
+% @
+% 
+% 
+% \item
+% Calculate 5-year relative survival (2008-2012) using period method by Ederer II (default)
+% <<test,echo=T,fig=TRUE,eval=FALSE>>=
+% 
+% st.e2 <- survtab_ag(fot ~ sex, data = x,
+%                     surv.type = "surv.rel",
+%                     pyrs = "pyrs", n.cens = "from0to0",
+%                     d = c("from0to1", "from0to2"))
+% 
+% plot(st.e2, y = "r.e2", col = c("black", "red"),lwd=4)
+% 
+% @
+% 
+% \end{enumerate}
 
 \subsection{Lexis object with multi-state set-up}
 
@@ -580,4 +581,4 @@ matplot( news$stime, exp(blh95), type = "l", lty = c(1,1,1), lwd = c(2,1,1) ,
 \end{enumerate}
 
 
-% \end{document}
+\end{document}
