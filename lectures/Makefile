@@ -9,7 +9,7 @@ SHELL = /bin/sh
 .SUFFIXES: .pdf
 
 ## The master file
-MAIN = SPE-2018-lectures-3x1
+MAIN = SPE-2019-lectures-3x1
 
 ## The rnw depencencies
 PDFINCLUDES = \
@@ -22,8 +22,9 @@ PDFINCLUDES = \
 	Survival_competing_risk/Survival_competing_risk.pdf \
 	time-rep/time-rep.pdf \
 	casecontrol/NCC-CC-studies.pdf \
-	causal/spe2017-CIlect-kf.pdf \
+	causal/spe2018-CIlect-kf.pdf \
 	multistate/multistate.pdf
+
 	
 ## PDFINCLUDES = \
 	linmodels/lm.pdf \
@@ -51,8 +52,11 @@ $(MAIN).pdf: $(3x1pdf)
 	pdfjam --papersize '{5.04in,3.78in}' --outfile $@ $<
 	##pdfjam --papersize '{5.04in,3.78in}' --suffix 'scaled' $< 
 
-%-3x1.pdf: %-scaled.pdf 
+%-3x1s.pdf: %-scaled.pdf 
 	pdfjam-slides3up --outfile $@ $<
+	
+%-3x1.pdf: %.pdf 
+	pdfjam-slides3up --trim '0cm 0cm 3cm 0cm' --frame false --outfile $@ $<
 
 scale: builddir; $(MAKE) -C ${BUILDDIR} $(scaledpdf) 
 
