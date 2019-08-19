@@ -4,10 +4,14 @@
 %\usepackage{pgfpages}
 %\pgfpagesuselayout{4 on 1}[a4paper,border shrink=5mm,landscape]
 \SweaveOpts{out.width = "\\textwidth"}
-\title{Statistical Practice in Epidemiology 2018 \newline }
-\subtitle{Survival analysis with competing risks} % \\[10mm]
-\author{Janne Pitk\"aniemi (EL) }
+
+\title{Survival analysis with competing risks \newline }
+\author{Janne Pitk\"aniemi (initial slides EL) \newline \newline }
+\institute{Finnish Cancer Registry \newline \newline
+\normalsize Statistical Practice in Epidemiology (2019, Tartu) }
 \date{}
+
+
 \begin{document}
 \SweaveOpts{concordance=TRUE}
 
@@ -907,121 +911,121 @@ where
 
 \end{frame}
 
-\begin{frame}[fragile]
-   \frametitle{Rectal cancer}
-
-Ex. rectal cancers in females in Finland 2008-2012. Calculate observed mortality,
-excess mortality and relative mortality.
-{\footnotesize
-<<em,echo=TRUE>>=
-library(popEpi) # R-package for population-based cancer analysis- CRAN
-library(Epi)
-library(survival)
-
-data("sire")
-head(sire)
-@
-}
-\end{frame}
-
-\begin{frame}[fragile]
-   \frametitle{Rectal cancer}
-
-{\footnotesize
-<<em2,echo=TRUE,eval=TRUE>>=
-data(sire)
- ## split data
- fotcut <- c(0,3/12,6/12,1,2,3,4,5)
- lex.split <- lexpand(sire, birth = bi_date, entry = dg_date,
-                      exit = ex_date, 
-                      status=status %in% 1:2, 
-                      breaks = list(fot=fotcut), 
-                      pophaz=popmort,# population mortality
-                      pp=F, # weights for survival estimation
-                      aggre = list(fot) )
-head(lex.split)
-@
-}
-
-\end{frame}
-
-
-\begin{frame}[fragile]
-   \frametitle{Rectal cancer -- mortality models}
-
-Modeling mortality by splitted follow-up time since cancer diagnosis (fot)
-
-Estimate excess mortality $\lambda_E(t)$ (link function d.exp)
-
-{\scriptsize
-<<excess,echo=TRUE,eval=TRUE>>=
-excess.mort <- relpois_ag(formula = from0to1 ~ -1 + fot,  
-data = lex.split, 
-d.exp = d.exp, 
-offset = log(pyrs))
-@
-}
-
-Estimate relative mortality (offset=log(d.exp))
-{\scriptsize
-<<relative,echo=TRUE,eval=TRUE>>=
-relative.mort <- glm(formula = from0to1 ~ -1 + as.factor(fot),
-family=poisson(link="log"),
-data=lex.split,
-offset=log(d.exp))
-@
-}
-Estimate observed mortality (offset=log(pyrs))
-{\scriptsize
-<<obs.mort,echo=TRUE,eval=TRUE>>=
-obs.mort <- glm(formula = from0to1 ~ -1 + as.factor(fot),
-family=poisson(link="log"),
-data=lex.split,
-offset=log(pyrs))
-@ 
-}
-
-
-\end{frame}
-
-\begin{frame}[fragile]
-   \frametitle{Rectal cancer mortality}
-
-Observed, expected, excess and relative mortality
-
-{\footnotesize
-<<em3,echo=FALSE,eval=TRUE,fig=TRUE,height=11,width=14>>=
-
-par(mfrow=c(1,3),lwd=2,cex=1.4)
-
-x <- fotcut
-y <- ci.exp(obs.mort)[,1]*100
-plot(x,c(y[1],y),type="n",xlim=c(0,5),ylim=c(0,37),ylab="Observed mortality /100 py",xlab="")
-segments(x[-length(x)],y[-length(x)],x[-1],y[-length(x)],lwd=4) 
-abline(h=0)
-
-y <- ci.exp(obs.mort)[,1]*100-ci.exp(excess.mort)[,1]*100
-segments(x[-length(x)],y[-length(x)],x[-1],y[-length(x)],col="violet",lwd=4) 
-mtext("Observed and population",side=3,cex=1.5)
-#legend("topright",c("Total mortality","Population mortality"),col=c("black","gray"),lty=1,lwd=2,y.intersp = 2,seg.len = 3,text.width=3.3)
-
-y <- ci.exp(excess.mort)[,1]*100
-plot(x,c(y[1],y),type="n",xlim=c(0,5),ylim=c(0,37),ylab="Excess mortality /100 py",xlab="Time since diagnoses (years)")
-#,ylab="Excess mortality per 100 person-years",xlab="Time since diagnoses (years)")
-segments(x[-length(x)],y[-length(x)],x[-1],y[-length(x)],lwd=4) 
-abline(h=0)
-mtext("Excess",side=3,cex=1.5)
-
-y <- ci.exp(relative.mort)[,1]
-plot(x,c(y[1],y),type="n",xlim=c(0,5),ylim=c(0,11),ylab="Relative mortality",xlab="")
-#,ylab="Relative mortality",xlab="Time since diagnoses (years)")Excess mortality per 100 person-years
-segments(x[-length(x)],y[-length(x)],x[-1],y[-length(x)],lwd=4) 
-abline(h=1)
-mtext("Relative",side=3,cex=1.5)
-
-@
-}
-
-\end{frame}
+% \begin{frame}[fragile]
+%    \frametitle{Rectal cancer}
+% 
+% Ex. rectal cancers in females in Finland 2008-2012. Calculate observed mortality,
+% excess mortality and relative mortality.
+% {\footnotesize
+% <<em,echo=TRUE>>=
+% library(popEpi) # R-package for population-based cancer analysis- CRAN
+% library(Epi)
+% library(survival)
+% 
+% data("sire")
+% head(sire)
+% @
+% }
+% \end{frame}
+% 
+% \begin{frame}[fragile]
+%    \frametitle{Rectal cancer}
+% 
+% {\footnotesize
+% <<em2,echo=TRUE,eval=TRUE>>=
+% data(sire)
+%  ## split data
+%  fotcut <- c(0,3/12,6/12,1,2,3,4,5)
+%  lex.split <- lexpand(sire, birth = bi_date, entry = dg_date,
+%                       exit = ex_date, 
+%                       status=status %in% 1:2, 
+%                       breaks = list(fot=fotcut), 
+%                       pophaz=popmort,# population mortality
+%                       pp=F, # weights for survival estimation
+%                       aggre = list(fot) )
+% head(lex.split)
+% @
+% }
+% 
+% \end{frame}
+% 
+% 
+% \begin{frame}[fragile]
+%    \frametitle{Rectal cancer -- mortality models}
+% 
+% Modeling mortality by splitted follow-up time since cancer diagnosis (fot)
+% 
+% Estimate excess mortality $\lambda_E(t)$ (link function d.exp)
+% 
+% {\scriptsize
+% <<excess,echo=TRUE,eval=TRUE>>=
+% excess.mort <- relpois_ag(formula = from0to1 ~ -1 + fot,  
+% data = lex.split, 
+% d.exp = d.exp, 
+% offset = log(pyrs))
+% @
+% }
+% 
+% Estimate relative mortality (offset=log(d.exp))
+% {\scriptsize
+% <<relative,echo=TRUE,eval=TRUE>>=
+% relative.mort <- glm(formula = from0to1 ~ -1 + as.factor(fot),
+% family=poisson(link="log"),
+% data=lex.split,
+% offset=log(d.exp))
+% @
+% }
+% Estimate observed mortality (offset=log(pyrs))
+% {\scriptsize
+% <<obs.mort,echo=TRUE,eval=TRUE>>=
+% obs.mort <- glm(formula = from0to1 ~ -1 + as.factor(fot),
+% family=poisson(link="log"),
+% data=lex.split,
+% offset=log(pyrs))
+% @ 
+% }
+% 
+% 
+% \end{frame}
+% 
+% \begin{frame}[fragile]
+%    \frametitle{Rectal cancer mortality}
+% 
+% Observed, expected, excess and relative mortality
+% 
+% {\footnotesize
+% <<em3,echo=FALSE,eval=TRUE,fig=TRUE,height=11,width=14>>=
+% 
+% par(mfrow=c(1,3),lwd=2,cex=1.4)
+% 
+% x <- fotcut
+% y <- ci.exp(obs.mort)[,1]*100
+% plot(x,c(y[1],y),type="n",xlim=c(0,5),ylim=c(0,37),ylab="Observed mortality /100 py",xlab="")
+% segments(x[-length(x)],y[-length(x)],x[-1],y[-length(x)],lwd=4) 
+% abline(h=0)
+% 
+% y <- ci.exp(obs.mort)[,1]*100-ci.exp(excess.mort)[,1]*100
+% segments(x[-length(x)],y[-length(x)],x[-1],y[-length(x)],col="violet",lwd=4) 
+% mtext("Observed and population",side=3,cex=1.5)
+% #legend("topright",c("Total mortality","Population mortality"),col=c("black","gray"),lty=1,lwd=2,y.intersp = 2,seg.len = 3,text.width=3.3)
+% 
+% y <- ci.exp(excess.mort)[,1]*100
+% plot(x,c(y[1],y),type="n",xlim=c(0,5),ylim=c(0,37),ylab="Excess mortality /100 py",xlab="Time since diagnoses (years)")
+% #,ylab="Excess mortality per 100 person-years",xlab="Time since diagnoses (years)")
+% segments(x[-length(x)],y[-length(x)],x[-1],y[-length(x)],lwd=4) 
+% abline(h=0)
+% mtext("Excess",side=3,cex=1.5)
+% 
+% y <- ci.exp(relative.mort)[,1]
+% plot(x,c(y[1],y),type="n",xlim=c(0,5),ylim=c(0,11),ylab="Relative mortality",xlab="")
+% #,ylab="Relative mortality",xlab="Time since diagnoses (years)")Excess mortality per 100 person-years
+% segments(x[-length(x)],y[-length(x)],x[-1],y[-length(x)],lwd=4) 
+% abline(h=1)
+% mtext("Relative",side=3,cex=1.5)
+% 
+% @
+% }
+% 
+% \end{frame}
 
 \end{document}
