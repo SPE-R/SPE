@@ -1,6 +1,6 @@
 % \documentclass{article}
 % \begin{document}
-\SweaveOpts{concordance=TRUE}
+% \SweaveOpts{concordance=TRUE}
 
 \SweaveOpts{results=hide, prefix.string=./graph/tab}
 
@@ -9,14 +9,14 @@
 \subsection{Introduction}
 
 In this chapter we will reproduce \textit{more or less} the same outputs as in chapter 1.3 using 
-\texttt{dplyr} suits. 
+\texttt{dplyr} package. 
 The main goal is to familiarize you with some of the main dplyr features. In the meantime you will
-get more flexibility in your summary table productions.
+get more flexibility in your summary table productions and everyday data manipulation.
 
 \subsection{The \texttt{births} data}
 
 A quick description of the \texttt{births} data-set (from \texttt{Epi} package) can be found in 
-chapter  1.3.2.
+chapter  1.3.2.\newline
 First of all, load the \texttt{Epi} and \texttt{dplyr} packages. Then we should (re)load the 
 births data-set.
 
@@ -30,7 +30,7 @@ data(births)
 \subsubsection{\texttt{tibble} vs \texttt{data.frame}}
 
 Most \texttt{dplyr} functions outputs return \texttt{tibble} object instead of 
-\texttt{data.frame}.
+\texttt{data.frame}.\newline
 Inspect the class and characteristics of the \texttt{births} object.
 
 << >>=
@@ -42,7 +42,7 @@ head(births)
 << >>=
 str(births)
 @
-\texttt{births} object is a 500 x 8 data.frame.\\ 
+\texttt{births} object is a 500 x 8 data.frame.\newline 
 Let's convert \texttt{births} to \texttt{tibble} format with \texttt{as\_tibble} function.
 
 << >>=
@@ -73,7 +73,7 @@ births %>% head(4)
 @
 \textbf{Note:} By default the chained object is given as the first argument to the following 
 function.
-You can use \texttt{$.$} if this is not the case.\\  
+You can use \texttt{$.$} if this is not the case.\newline  
 Here is a dummy example where we check if the letter 'r' is in 'spe-r'
 
 << >>=
@@ -90,7 +90,18 @@ grepl('r', 'spe-r')
 
 \subsubsection{\texttt{mutate} columns}
 
-\texttt{mutate} will allow you to add and or modify columns in your \texttt{data.frame}.
+\texttt{mutate} will allow you to add and or modify columns in a \texttt{data.frame}.\newline
+Let's create 2 new variables :
+\begin{itemize}
+  \item \texttt{agegrp} (5 years mother's age group) 
+  \item \texttt{gest4} (gestation time splitted in 4 categories)
+\end{itemize}
+And modify 2 others:
+\begin{itemize}
+  \item \texttt{hyp} (factor version of \texttt{hyp}; \texttt{normal} vs \texttt{hyper}) 
+  \item \texttt{sex} (factor version of \texttt{sex}; \texttt{M} vs \texttt{F}) 
+\end{itemize}
+
 
 << >>=
 births_tbl <-
@@ -112,7 +123,9 @@ births_tbl
 \subsubsection{\texttt{select} columns, \texttt{filter} and \texttt{arrange} rows}
 
 \texttt{select} is used for column subsetting while filter is for row sub-setting. 
-They are equivalent to the \texttt{[]} in \texttt{R} base language.
+They are equivalent to the \texttt{[]} in \texttt{R} base language.\newline
+Let's display a table where only babies' \texttt{id}, \texttt{sex}, \texttt{bweight} and mothers' 
+\texttt{agegrp} are kept for babies with a \texttt{bweight} grater than 4000g.
 
 << >>=
 births_tbl %>%
@@ -121,8 +134,11 @@ births_tbl %>%
   ## keep only babies weighing more than 4000g
   filter(bweight > 4000) 
 @
-\texttt{select} can also be useful to reorder and rename columns.\\
-\texttt{arrange} is a nice feature to reorder observations according to chosen attributes.
+\texttt{select} can also be useful to reorder and rename columns.\newline
+\texttt{arrange} is a nice feature to reorder observations according to chosen attributes.\newline
+Let's reaname \texttt{agegrp}, \texttt{sex} and \texttt{bweight} with more explicit labels and reorder 
+the table acording to babies' decreasing birth weight.
+
 
 << >>=
 births_tbl %>%
@@ -136,9 +152,10 @@ births_tbl %>%
   ## rearrange rows to put the heaviest newborn on top
   arrange(desc(`Birth weight`))
 @
-\textbf{Note:} tibble supports blank spaces in the column names which can be handy for final table 
+\textbf{Note:} \texttt{tibble} supports blank spaces in the column names which can be handy for final table 
 rendering. When you want to work with columns with blank spaces, do not forget to use the \texttt{$``$}
-(back-quote)
+(back-quote).\newline
+Let's do the same but arranging the table by decreasing birth weights within each sex.
 
 << >>=
 births_tbl %>%
@@ -156,10 +173,10 @@ births_tbl %>%
 \subsection{\texttt{group\_by} and \texttt{summarise} data}
 
 One of the most valuable features of \texttt{dplyr} is the ability to aggregate data sharing a common
-attribute to process by group operations.\\
-Here we want to compute the number of boys and girls in the data-set.
+attribute to process by group operations.\newline
+Here we want to compute the number of boys and girls in the data-set.\newline
 The idea here is to split the \texttt{births} table in 2. One for boys, the other for girls and to 
-count the number of rows of each sub-table.
+count the number of rows of each sub-table.\newline
 
 << >>=
 births.01 <-
@@ -170,8 +187,9 @@ births.01 <-
   summarise(
     count = n()
   )
+births.01
 @
-\textbf{Note:} \texttt{n} functions is equivalent to \texttt{nrow}\\ 
+\textbf{Note:} \texttt{n} function is equivalent to \texttt{nrow}\newline 
 Now we have the number of boys and girls, we can compute the percentage of newborns in each sex 
 group.
 
@@ -183,9 +201,9 @@ births.02 <-
   )
 @
 \textbf{Trick:} most of \texttt{dplyr} functions can be applied with an embedded condition (e.g. 
-\texttt{mutate\_if}, \texttt{mutate\_all}, ...). This can be very handy in some cases.\\ 
-As an illustration if you want to calculate the \texttt{sum} \texttt{birth.02} numerical columns 
-only
+\texttt{mutate\_if}, \texttt{mutate\_all}, ...). This can be very handy in some cases.\newline 
+As an illustration if you want to calculate the \texttt{sum} of every \texttt{birth.02} numerical 
+columns
 
 << >>=
 births.03 <-
@@ -194,8 +212,9 @@ births.03 <-
     is.numeric,
     sum
   )
+births.03
 @
-and rename all the columns at once (here we want to add \textit{.tot} at the end of each column name)
+or rename all the columns at once (here we want to add \textit{.tot} at the end of each column name)
 
 << >>=
 births.03 %>%
@@ -213,9 +232,11 @@ births.05 <-
     count = n(),
     bweight.mean = mean(bweight)
   )
+births.05
 @
-With \texttt{births.05} table, compute the global mean new birth weight.
-With such a table the mean baby's birth weight have to be weighted by number of boys and girls. 
+With \texttt{births.05} table, compute the global mean new birth weight.\newline
+\textbf{Note:} with such a table the mean baby's birth weight have to be weighted by number of boys 
+and girls. 
 
 << >>=
 births.05 %>%
@@ -236,7 +257,7 @@ births_tbl %>%
 \subsection{Multiple grouping}
 
 In some cases, we can be interested in looking at more than a single strata. This can be achieved 
-using multiple grouping.\\
+using multiple grouping.\newline
 Let's count the number of people per gender and birth weight class (low vs not low)
 
 << >>=
@@ -246,8 +267,9 @@ births.06 <-
   summarise(
     count = n()
   )
+births.06
 @
-Try then to compute the percentage of people in each group.\\
+Try then to compute the percentage of people in each group.\newline
 Look at the difference between the 2 following command lines:
 
 << >>=
@@ -266,8 +288,8 @@ births.06 %>%
 if multiple grouping has been done. In some cases you might have to explicitly ungroup your
 \texttt{data.frame} before doing calculations. In the previous examples, if you do not ungroup
 the data-set, percentages are computed per gender. Ungrouping will let you compute the overall 
-percentages.\\ 
-The same exercise can be done using gestation time group (\texttt{gest4}) as stratifying variable.\\
+percentages.\newline 
+The same exercise can be done using gestation time group (\texttt{gest4}) as stratifying variable.\newline
 Lets compute number and mean birth weights according to gestation time category
 
 << >>=
@@ -278,9 +300,9 @@ births_tbl %>%
     bweight.mean = mean(bweight)
   )
 @
-Birth weight increases with gestation time.\\
+Birth weight increases with gestation time.\newline
 We can also spot that in our data-set the gestation time is missing for 10 newborns. 
-We will remove this observation for the rest of the practical session. \\ 
+We will remove this observation for the rest of the practical session. \newline 
 Lets cross-tabulate the birth weight category and the gestation time groups.
 
 << >>=
@@ -319,13 +341,19 @@ births_tbl %>%
 @
 \textbf{Note:} grouping order matters!
 
-\subsection{Bind and merge tables}
+\subsection{Bind and join tables}
+
+Another nice feature of \texttt{dplyr} is tables binding and joining functionalities. To practice we
+will create 2 fake \texttt{tibble}:
+
+\begin{itemize}
+  \item \texttt{age} an individual database wich contains \texttt{pid} (unique individuals id) 
+  and \texttt{age} in year
+  \item \texttt{center} an study center database wich contains \texttt{pid} (unique individuals id)
+  and \texttt{center} (the center where an individual is registered)
+\end{itemize}
 
 << >>=
-library(Epi)
-data("births")
-births
-
 age <-
   tibble(
     pid = 1:6,
@@ -338,15 +366,42 @@ center <-
     center = c('A', 'B', 'A', 'B', 'C')
   )
 
-bind_rows(age, center)
-
-full_join(age, center)
-
-inner_join(age, center)
-
-left_join(age, center)
+age
+center
 @
+Now the tables are deifined we will try to make the linkage between individuals ages and the center
+they belong to.\newline
+First of all let's have a look to \texttt{bind\_rows} function.
 
+<< >>=
+bind_rows(age, center)
+@
+Is it usfeful?\newline
+Here not really but that can be in other situations (e.g. several individuals data base to merge..).\newline
+\textbf{Note:} in \texttt{bind\_rows}, if columns names do not match, they are fill with \texttt{NA}.  
+
+Here we want to join the 2 \texttt{tibble} according to the common attribute \texttt{pid}. Depending
+on the context you can be interested in joining tables differently. Have a look at the differences
+between \texttt{left\_join}, \texttt{full\_join} and \texttt{inner\_join}.
+
+<< >>=
+## all individuals from ages are kept
+left_join(age, center)
+## everithing is kept
+full_join(age, center)
+## only the individuals present in both dataset are kept
+inner_join(age, center)
+@
+Can you spot the differences between the commands above?\newline
+As a last exercise, try to compute the individuals' mean age per center.
+
+<< >>=
+inner_join(age, center) %>%
+  group_by(center) %>%
+  summarise(
+    mean_age = mean(age)
+  )
+@
 
 
 \subsection{Bonus: Rendering tables}
