@@ -15,6 +15,7 @@ MAIN = SPE-2019-lectures-3x1
 PDFINCLUDES = \
 	ecology/R-history-ecology.pdf \
 	language-index/spe2018-lang_index.pdf \
+	dplyr/dplyr-pres.pdf \
 	poisson-logistic/SPE-Poisson-Logistic-Regression.pdf \
 	linmodels/lm.pdf \
 	splines/splines.pdf \
