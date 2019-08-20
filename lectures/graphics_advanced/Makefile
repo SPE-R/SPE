@@ -16,7 +16,7 @@ handout: $(handoutfiles)
 	TEXINPUTS=${HOME}/texinputs: pdflatex handouts.tex \\input $<
 	mv handouts.pdf $@
 %-2x2.pdf: %-handout.pdf
-	pdfnup --nup 2x2 --orient landscape --outfile $@ $<
+	pdfnup --nup 2x2 --landscape --outfile $@ $<
 clean:
 	rm -f *.vrb *.aux *.toc *.dvi *.log *.nav *.snm *~ *.out
 realclean: clean
