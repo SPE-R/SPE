@@ -14,7 +14,7 @@ MAIN = SPE-2019-lectures-3x1
 ## The rnw depencencies
 PDFINCLUDES = \
 	ecology/R-history-ecology.pdf \
-	language-index/spe2018-lang_index.pdf \
+	language-index/spe2019-lang_index.pdf \
 	dplyr/dplyr-pres.pdf \
 	poisson-logistic/SPE-Poisson-Logistic-Regression.pdf \
 	linmodels/lm.pdf \
@@ -23,7 +23,7 @@ PDFINCLUDES = \
 	Survival_competing_risk/Survival_competing_risk.pdf \
 	time-rep/time-rep.pdf \
 	casecontrol/NCC-CC-studies.pdf \
-	causal/spe2018-CIlect-kf.pdf \
+	causal/spe2019-CIlect-kf.pdf \
 	multistate/multistate.pdf
 
 	
