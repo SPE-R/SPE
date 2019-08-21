@@ -6,7 +6,7 @@
 SHELL = /bin/sh
 
 ## the files suffixes to consider
-.SUFFIXES: .tex .pdf .rnw .R
+.SUFFIXES: .tex .pdf .rnw .R .rmd .html
 
 ## The master file
 MAIN = pracs
@@ -19,10 +19,15 @@ RNWINCLUDES = basic-e dinput-e tab-e dplyr-e graph-intro-e simulation-e rates-rr
 TEX = $(RNWINCLUDES:=.tex)
 RFILES = $(RNWINCLUDES:=.R)
 RNWFILES = $(RNWINCLUDES:=.rnw)
+RMDFILES = $(RNWINCLUDES:=.rmd)
+HTMLFILES = $(RNWINCLUDES:=.html)
+
 
 RFILESSOL = $(filter %-s.R, $(RFILES))
 TEXFILESEX = $(filter %-e.tex, $(TEX))
 TEXFILESSOL = $(filter %-s.tex, $(TEX))
+RMDFILESEX = $(filter %-e.rmd, $(RMDFILES))
+HTMLFILESEX = $(filter %-e.html, $(HTMLFILES))
 
 SRCDIR   = pracs
 BUILDDIR = build
@@ -37,6 +42,10 @@ R: builddir; $(MAKE) -C ${BUILDDIR} $(RFILES)
 
 Rsol: builddir; $(MAKE) -C ${BUILDDIR} $(RFILESSOL)
 
+Rmd: builddir; $(MAKE) -C ${BUILDDIR} $(RMDFILESEX)
+
+html: builddir; $(MAKE) -C ${BUILDDIR} $(HTMLFILESEX)
+
 config: builddir
 
 view: all
@@ -50,6 +59,12 @@ view: all
   
 .tex.pdf:
 	latexmk -pdflatex='pdflatex -file-line-error -synctex=1 -recorder -halt-on-error -interaction=nonstopmode' -pdf -pv $<
+	
+.rnw.rmd:
+	perl rnw2rmd.pl $< > $(patsubst %.rnw,%.rmd,$<)
+
+.rmd.html:
+	R -e 'try(rmarkdown::render("$<", "html_document"))'
 
 .PHONY: clean builddir
 
