@@ -2,7 +2,8 @@
 ### code chunk number 1: Reading the data
 ###################################################
 library(Epi)
-mel <- read.table("http://bendixcarstensen.com/SPE/data/melanoma.dat", header=TRUE, na.strings=".")
+mel <- read.table("http://bendixcarstensen.com/SPE/data/melanoma.dat",
+ header=TRUE, na.strings=".")
 str(mel)
 head(mel, n=20)
 

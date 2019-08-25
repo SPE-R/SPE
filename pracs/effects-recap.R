@@ -10,7 +10,7 @@ str(births)
 
 
 ###################################################
-### code chunk number 2: housekeeping
+### code chunk number 2: effects-s.rnw:80-86
 ###################################################
 births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
 births$sex <- factor(births$sex, labels = c("M", "F"))
@@ -28,9 +28,9 @@ with(births, sd(bweight) )
 
 
 ###################################################
-### code chunk number 4: t-test for sex on bweight
+### code chunk number 4: t test for sex on bweight
 ###################################################
-with( births, t.test(bweight ~ sex, var.equal=TRUE) )
+with( births, t.test(bweight ~ sex, var.equal=T) )
 
 
 ###################################################
@@ -67,13 +67,13 @@ effx(response=bweight, type="metric", exposure=hyp, data=births)
 ###################################################
 ### code chunk number 10: Effects of gest4 (four levels) on bweight
 ###################################################
-effx(response=bweight, typ="metric", exposure=gest4, data=births)
+effx(response=bweight,typ="metric",exposure=gest4,data=births)
 
 
 ###################################################
 ### code chunk number 11: Table of mean bweight by gest4
 ###################################################
-stat.table(gest4, mean(bweight), data=births)
+stat.table(gest4,mean(bweight),data=births)
 
 
 ###################################################
@@ -84,8 +84,7 @@ round( ci.lin(m2)[ , c(1,5,6)] , 1)
 
 
 ###################################################
-### code chunk number 13: Interaction plot of bweight by hyp 
-###                       in gest4 groups
+### code chunk number 13: bweight-by-hyp-gest4
 ###################################################
 par(mfrow=c(1,1))
 with( births, interaction.plot(gest4, hyp, bweight) )
@@ -94,13 +93,13 @@ with( births, interaction.plot(gest4, hyp, bweight) )
 ###################################################
 ### code chunk number 14: Effect of hyp on bweight stratified by gest4
 ###################################################
-effx(bweight, type="metric", exposure=hyp, strata=sex, data=births)
+effx(bweight, type="metric", exposure=hyp, strata=gest4,data=births)
 
 
 ###################################################
 ### code chunk number 15: lm for hyp on bweight stratified by gest4
 ###################################################
-m3 <- lm(bweight ~ gest4 / hyp, data = births)
+m3 <- lm(bweight ~ gest4/hyp, data = births)
 round( ci.lin(m3)[ , c(1,5,6)], 1) 
 
 
@@ -120,7 +119,7 @@ round( ci.lin(m3Ib)[ , c(1,5,6)], 1)
 
 
 ###################################################
-### code chunk number 18: lmI for hyp on bweight adjusted for gest4
+### code chunk number 18: lmI for hyp on bweight stratified by gest4
 ###################################################
 m3M <- lm(bweight ~ gest4 + hyp, data = births)
 round( ci.lin(m3M)[ , c(1,5,6)], 1) 
@@ -158,9 +157,14 @@ ci.lin(m4)[ , c(1,5,6)]
 ###################################################
 ### code chunk number 23: Linear effect of gestwks on bweight
 ###################################################
-effx(response=bweight, type="metric", exposure=gestwks, data=births)
-m5 <- lm(bweight ~ gestwks, data=births) 
-ci.lin(m5)[ , c(1,5,6)]
+effx(response=bweight, type="metric", exposure=gestwks,data=births)
+m5 <- lm(bweight ~ gestwks, data=births) ; ci.lin(m5)[ , c(1,5,6)]
+
+
+###################################################
+### code chunk number 24: Linear effect of gestwks on lowbw
+###################################################
+effx(response=lowbw, type="binary", exposure=gestwks,data=births)
 
 
 ###################################################
@@ -172,26 +176,26 @@ effx(bweight, type="metric", exposure=gestwks, strata=agegrp, data=births)
 ###################################################
 ### code chunk number 26: Plot-bweight-by-gestwks
 ###################################################
-with(births, plot(gestwks, bweight))
+with(births, plot(gestwks,bweight))
 abline(m5)
 
 
 ###################################################
-### code chunk number 27: bweight-gestwks diagnostic plots
+### code chunk number 27: bweight-gestwks-m5-diag
 ###################################################
 par(mfrow=c(2,2))
 plot(m5)
 
 
 ###################################################
-### code chunk number 28: bweight-by-gestwks cubic model
+### code chunk number 28: bweight-by-gestwks-cubic
 ###################################################
 m6 <- update(m5, . ~ .  + I(gestwks^2) + I(gestwks^3))
 round(ci.lin(m6)[, c(1,5,6)], 1)
 
 
 ###################################################
-### code chunk number 29: bweight-by-gestwks cubic with ortog polynomials
+### code chunk number 29: bweight-by-gestwks-cubic-ortog
 ###################################################
 births2 <- subset(births, !is.na(gestwks))
 m.ortpoly <- lm(bweight ~ poly(gestwks, 3), data= births2 )
@@ -200,7 +204,7 @@ anova(m5, m.ortpoly)
 
 
 ###################################################
-### code chunk number 30: bweight-by-gestwks cubic model prediction
+### code chunk number 30: bweight-by-gestwks-cubic-pred
 ###################################################
 nd <- data.frame(gestwks = seq(24, 45, by = 0.25) ) 
 fit.poly <- predict( m.ortpoly, newdata=nd, interval="conf" )
@@ -209,6 +213,76 @@ par(mfrow=c(1,1))
 with( births, plot( bweight ~ gestwks, xlim = c(23, 46), cex.axis= 1.5, cex.lab = 1.5 )  )
 matlines( nd$gestwks, fit.poly, lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
 matlines( nd$gestwks, pred.poly, lty=1, lwd=c(3,2,2), col=c('red','green','green') )
+
+
+###################################################
+### code chunk number 31: bweight-gestwks-Ns5
+###################################################
+library(splines)
+mNs5 <- lm( bweight ~ Ns( gestwks, 
+        knots = c(28,34,38,40,43)), data = births)
+round(ci.lin(mNs5)[ , c(1,5,6)], 1)
+
+
+###################################################
+### code chunk number 32: Ns5-pred
+###################################################
+fit.Ns5 <- predict( mNs5, newdata=nd, interval="conf" )
+pred.Ns5 <- predict( mNs5, newdata=nd, interval="pred" )
+with( births, plot( bweight ~ gestwks, xlim = c(23, 46), cex.axis= 1.5, cex.lab = 1.5 )  )
+matlines( nd$gestwks, fit.Ns5, lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
+matlines( nd$gestwks, pred.Ns5, lty=1, lwd=c(3,2,2), col=c('red','green','green') )
+
+
+###################################################
+### code chunk number 33: cubic-diag
+###################################################
+par(mfrow=c(2,2))
+plot(mNs5)
+
+
+###################################################
+### code chunk number 34: bweigth-gestwks-Ns10
+###################################################
+mNs10 <- lm( bweight ~ Ns( gestwks, 
+        knots = seq(25, 43, by = 2)), data = births)
+round(ci.lin(mNs10)[ , c(1,5,6)], 1)
+fit.Ns10 <- predict( mNs10, newdata=nd, interval="conf" )
+pred.Ns10 <- predict( mNs10, newdata=nd, interval="pred" )
+par(mfrow=c(1,1))
+with( births, plot( bweight ~ gestwks, xlim = c(23, 46), cex.axis= 1.5, cex.lab = 1.5 )  )
+matlines( nd$gestwks, fit.Ns10, lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
+matlines( nd$gestwks, pred.Ns10, lty=1, lwd=c(3,2,2), col=c('red','green','green') )
+
+
+###################################################
+### code chunk number 35: bweight-gestwks-mPen
+###################################################
+library(mgcv)
+mPen <- gam( bweight ~ s(gestwks), data = births)		
+summary(mPen)	
+
+
+###################################################
+### code chunk number 36: mPen-sig2
+###################################################
+mPen$sig2
+sqrt(mPen$sig2)
+
+
+###################################################
+### code chunk number 37: bweight-gestwks-mPen-plot
+###################################################
+pr.Pen <- predict( mPen, newdata=nd, se.fit=T)
+par(mfrow=c(1,1))
+with( births, plot( bweight ~ gestwks, xlim = c(24, 45), cex.axis= 1.5, cex.lab = 1.5 )  )
+matlines( nd$gestwks, cbind(pr.Pen$fit, 
+  pr.Pen$fit - 2*pr.Pen$se.fit, pr.Pen$fit + 2*pr.Pen$se.fit),  
+  lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
+matlines( nd$gestwks, cbind(pr.Pen$fit, 
+  pr.Pen$fit - 2*sqrt( pr.Pen$se.fit^2 + mPen$sig2), 
+  pr.Pen$fit + 2*sqrt( pr.Pen$se.fit^2 + mPen$sig2)),  
+  lty=1, lwd=c(3,2,2), col=c('red','green','green')  )
 
 
 ###################################################
@@ -225,7 +299,7 @@ head(ucb)
 
 
 ###################################################
-### code chunk number 40: Convert Admit to numeric coded as 0/1
+### code chunk number 40: Convert Admit to numeric coded 0/1
 ###################################################
 ucb$Admit <- as.numeric(ucb$Admit)-1
 
