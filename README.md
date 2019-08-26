@@ -36,7 +36,7 @@ For SPE tagged release, the [SPE's Travis-ci platform](https://travis-ci.org/SPE
 
 -----
 
-[data](https://github.com/SPE-R/SPE/tree/master/data) contains datasets used which are not in the Epi package
+[data](https://github.com/SPE-R/SPE/tree/master/pracs/data) contains datasets used which are not in the Epi package
 
 -----
 
