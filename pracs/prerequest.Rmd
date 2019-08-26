@@ -1,0 +1,57 @@
+---
+title: "SPE-R software requirement"
+output: 
+  html_document: 
+    keep_md: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Software required
+
+## R version
+
+We recommand to install  `r R.version$version.string` (or newer)
+
+## R packages
+
+```{r pkgs list, include=FALSE}
+## install checkpoint package if not available
+if(!require(checkpoint)){ 
+  install.packages('checkpoint') 
+  library(checkpoint)
+}
+
+if(!require(purrr)){ 
+  install.packages('rlang') 
+  library(rlang)
+}
+
+
+required.pkg <- checkpoint:::scanForPackages(project = '../pracs/')
+
+required.pkg
+paste0(sort(required.pkg$pkgs), collapse = ', ')
+command.str <- 
+  paste0(
+    '```r \n', 
+    'install.package(c("', 
+    paste0(sort(required.pkg$pkgs), collapse = '", "'), 
+    '")) \n',
+    '```\n')
+
+```
+
+the packages to be installed are:
+
+`r paste0('- ', paste(required.pkg$pkgs, collapse = "\n- "))`
+
+which can be done with the following command:
+
+`r command.str`
+
+
