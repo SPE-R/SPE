@@ -6,14 +6,15 @@
 ###################################################
 library(Epi)
 library(survival)
-url <- "http://bendixcarstensen.com/SPE/data"
-oc <- read.table( paste(url, "occoh.txt", sep = "/"), header=T)
+url <- "https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data"
+oc <- read.table( paste(url, "occoh.txt", sep = "/"), header=TRUE)
 str(oc)
 summary(oc)
 
 
+
 ###################################################
-### code chunk number 2: applying cal.yr
+### code chunk number 2: cal.yr
 ###################################################
 oc$ybirth <- cal.yr(oc$birth) 
 oc$yentry <- cal.yr(oc$entry) 
@@ -21,14 +22,14 @@ oc$yexit <- cal.yr(oc$exit)
 
 
 ###################################################
-### code chunk number 3: Computing age.yr
+### code chunk number 3: age.yr
 ###################################################
 oc$agentry <- oc$yentry - oc$ybirth
 oc$agexit <- oc$yexit - oc$ybirth 
 
 
 ###################################################
-### code chunk number 4: Creating a Lexis object oclexis
+### code chunk number 4: oclexis
 ###################################################
 oc.lex <- Lexis( entry = list( per = yentry, 
                                age = yentry - ybirth ), 
@@ -40,65 +41,63 @@ summary(oc.lex)
 
 
 ###################################################
-### code chunk number 5: Inviting the source file for plots
+### code chunk number 5: plotlexis
 ###################################################
-source( paste(url,"plots-caco-ex.R", sep = "/") )
-plot1
+par(mfrow=c(1,1))
+plot( oc.lex, xlim=c(1990, 2010),grid=TRUE )
+points( oc.lex, pch=c(NA, 16)[oc.lex$lex.Xst+1] )
 
 
 ###################################################
-### code chunk number 6: plotting the lexis object by year and age
-###################################################
-plot1()
-
-
-###################################################
-### code chunk number 7: plotting the lifelines of the whole cohort
-##                       ordered by age at exit and age at entry
+### code chunk number 6: plotlexage
 ###################################################
 oc.ord <- cbind(ID = 1:1501, oc[ order( oc$agexit, oc$agentry), ] )  
 oc.lexord <- Lexis( entry = list( age = agentry ), 
                      exit = list( age = agexit),
               exit.status = chdeath,
                        id = ID, data = oc.ord)
-plot2
-plot2()
+plot(oc.lexord, "age")
+points(oc.lexord, pch=ifelse(oc.lexord$lex.Xst==1, 16, NA) )
+with( subset(oc.lexord, lex.Xst==1), 
+      abline( v=agexit, lty=3))
 
 
 ###################################################
-### code chunk number 8: Zooming the previous plot
+### code chunk number 7: plotlexage2
 ###################################################
-plot3
-plot3()
+plot(oc.lexord, "age", xlim=c(50, 58), ylim=c(5, 65))
+points(oc.lexord, "age", pch=ifelse(oc.lexord$lex.Xst==1, 16, NA))
+with( subset(oc.lexord, lex.Xst==1), 
+      abline( v=agexit, lty=3))
 
 
 ###################################################
-### code chunk number 9: Categorizing age at entry
+### code chunk number 8: agentry2
 ###################################################
 oc.lex$agen2 <- cut(oc.lex$agentry, br = seq(40, 62, 1) )
 
 
 ###################################################
-### code chunk number 10: Sampling matched controls from risk sets
+### code chunk number 9: risksetsample
 ###################################################
-set.seed(9863157)
+set.seed(98623)
 cactrl <- 
    ccwc(entry=agentry, exit=agexit, fail=chdeath, 
         controls = 2, match= agen2, 
         include = list(id, agentry), 
-        data=oc.lex, silent=F)
+        data=oc.lex, silent=FALSE)
 str(cactrl)
 
 
 ###################################################
-### code chunk number 11: Collecting the data on risk factors
+### code chunk number 10: ocX
 ###################################################
-ocX <- read.table( paste(url, "occoh-Xdata.txt", sep = "/"), header=T)
+ocX <- read.table( paste(url, "occoh-Xdata.txt", sep = "/"), header=TRUE)
 str(ocX)
 
 
 ###################################################
-### code chunk number 12: Merging the two files
+### code chunk number 11: merge
 ###################################################
 oc.ncc <- merge(cactrl, ocX[, c("id", "smok", "tchol", "sbp")], 
    by = "id")
@@ -106,24 +105,24 @@ str(oc.ncc)
 
 
 ###################################################
-### code chunk number 13: Smoking is a categorical factor
+### code chunk number 12: factor smol
 ###################################################
 oc.ncc$smok <- factor(oc.ncc$smok, 
     labels = c("never", "ex", "1-14/d", ">14/d"))          
 
 
 ###################################################
-### code chunk number 14: Crude estimates for smoking effect
+### code chunk number 13: cccrude smok
 ###################################################
 stat.table( index = list( smok, Fail ), 
           contents = list( count(), percent(smok) ),
            margins = T, data = oc.ncc )
 smok.crncc <- glm( Fail ~ smok, family=binomial, data = oc.ncc)
-round(ci.lin(smok.crncc, Exp=T)[, 5:7], 3) 
+round(ci.exp(smok.crncc), 3) 
 
 
 ###################################################
-### code chunk number 15: Fitting conditional logistic model
+### code chunk number 14: clogit
 ###################################################
 m.clogit <- clogit( Fail ~ smok + I(sbp/10) + tchol + 
        strata(Set), data = oc.ncc )
@@ -132,39 +131,42 @@ round(ci.exp(m.clogit), 3)
 
 
 ###################################################
-### code chunk number 16: Sampling the subcohort 
+### code chunk number 15: subc sample
 ###################################################
 N <- 1501; n <- 260
-set.seed(1579863)
+set.seed(15792)
 subcids <- sample(N, n )
-oc.lex$subcind <- 1*(oc.lex$id %in% subcids)
+oc.lexord$subcind <- 1*(oc.lexord$id %in% subcids)
 
 
 ###################################################
-### code chunk number 17: Forming the case-subcohort data
+### code chunk number 16: casecoh data
 ###################################################
-oc.cc <- subset( oc.lex, subcind==1 | chdeath ==1)
+oc.cc <- subset( oc.lexord, subcind==1 | chdeath ==1)
 oc.cc <- merge( oc.cc, ocX[, c("id", "smok", "tchol", "sbp")], 
    by ="id")
 str(oc.cc) 
 
 
 ###################################################
-### code chunk number 18: Plotting lifelines by case/subcohort status
+### code chunk number 17: casecoh-lines
 ###################################################
-plot4
-plot4()
+plot( subset(oc.cc, chdeath==0), "age")    
+lines( subset(oc.cc, chdeath==1 & subcind==1), col="blue")  
+lines( subset(oc.cc, chdeath==1 & subcind==0), col="red")   
+points(subset(oc.cc, chdeath==1), pch=16, 
+       col=c("blue", "red")[oc.cc$subcind+1])
 
 
 ###################################################
-### code chunk number 19: Smoking again
+### code chunk number 18: grouping
 ###################################################
 oc.cc$smok <- factor(oc.cc$smok, 
     labels = c("never", "ex", "1-14/d", ">14/d"))
 
 
 ###################################################
-### code chunk number 20: Crude HR estimates by smoking
+### code chunk number 19: cc-crude HR by smok
 ###################################################
 sm.cc <- stat.table( index = smok, 
    contents = list( Cases = sum(lex.Xst), Pyrs = sum(lex.dur) ),
@@ -175,55 +177,17 @@ round(HRcc, 3)
 
 
 ###################################################
-### code chunk number 21: Weights for the case-cohort data
+### code chunk number 20: weighted cox LinYing
 ###################################################
-N.nonc <- N-sum(oc.lex$chdeath)  # non-cases in whole cohort
-n.nonc <- sum(oc.cc$subcind * (1-oc.cc$chdeath)) # non-cases in subcohort
-wn <- N.nonc/n.nonc          # weight for non-cases in subcohort
-c(N.nonc, n.nonc, wn)
-oc.cc$w <- ifelse(oc.cc$subcind==1 & oc.cc$chdeath==0, wn, 1)
-
-
-###################################################
-### code chunk number 22: Weighted Cox model fitted
-###################################################
-oc.cc$surob <- with(oc.cc, Surv(agentry, agexit, chdeath) )
-cc.we <- coxph( surob ~  smok + I(sbp/10)  + tchol, robust = T,  
-       weight = w, data = oc.cc)
-summary(cc.we)
-round( ci.exp(cc.we), 3)
-
-
-###################################################
-### code chunk number 23: Weighted Cox regression with 
-###                       covariance matrix from dfbeta residuals
-###################################################
-dfbw <- resid(cc.we, type='dfbeta')
-covdfb.we <- cc.we$naive.var + 
-   (n.nonc*(N.nonc-n.nonc)/N.nonc)*var(dfbw[ oc.cc$chdeath==0, ] )
-cbind( sqrt(diag(cc.we$naive.var)), sqrt(diag(cc.we$var)),  
-    sqrt(diag(covdfb.we))  )
-
-
-###################################################
-### code chunk number 24: Weighted Cox by Lin-Ying method
-###################################################
-cch.LY <- cch( surob ~  smok + I(sbp/10)  + tchol, stratum=NULL,
+oc.cc$survobj <- with(oc.cc, Surv(agentry, agexit, chdeath) )
+cch.LY <- cch( survobj ~  smok + I(sbp/10)  + tchol, stratum=NULL,
    subcoh = ~subcind, id = ~id,  cohort.size = N, data = oc.cc, 
     method ="LinYing" )
 summary(cch.LY)
 
 
 ###################################################
-### code chunk number 25: Standard errors from Cox models
-###################################################
-cbind( coef( cc.we), coef(cch.LY) )
-round( cbind( sqrt(diag(cc.we$naive.var)), sqrt(diag(cc.we$var)),  
-    sqrt(diag(covdfb.we)), sqrt(diag(cch.LY$var))  ), 3)
-
-
-###################################################
-### code chunk number 26: Full cohort data recovereds
+### code chunk number 21: fullcoh
 ###################################################
 oc.full <- merge( oc.lex, ocX[, c("id", "smok", "tchol", "sbp")], 
    by.x = "id", by.y = "id") 
@@ -232,7 +196,7 @@ oc.full$smok <- factor(oc.full$smok,
 
 
 ###################################################
-### code chunk number 27: Full cohort: Crude HR estimates by smoking
+### code chunk number 22: cox-crude HR by smok
 ###################################################
 sm.coh <- stat.table( index = smok, 
    contents = list( Cases = sum(lex.Xst), Pyrs = sum(lex.dur) ),
@@ -243,7 +207,7 @@ round(HRcoh, 3)
 
 
 ###################################################
-### code chunk number 28: Cox model for full cohort data
+### code chunk number 23: cox full
 ###################################################
 cox.coh <- coxph( Surv(agentry, agexit, chdeath) ~ 
         smok + I(sbp/10)  + tchol, data = oc.full)
@@ -251,22 +215,16 @@ summary(cox.coh)
 
 
 ###################################################
-### code chunk number 29: Comparison of point estimates & SEs of 
-###                       beta = log(HR) estimates from full cohort,
-###                       nested case-control and case-cohort data 
+### code chunk number 24: comparison
 ###################################################
-betas <- round(cbind( coef(cox.coh), 
-     coef(m.clogit),
-     coef(cc.we), coef(cch.LY) ), 3)
-colnames(betas) <-  c("coh", "ncc", "cc.we", "cch.LY")
-betas
+betas <- cbind( coef(cox.coh), coef(m.clogit), coef(cch.LY) )
+colnames(betas) <-  c("coh", "ncc", "cch.LY")
+round(betas, 3)
 
-SEs <- round(cbind( sqrt(diag(cox.coh$var)), 
-    sqrt(diag(m.clogit$var)), sqrt(diag(cc.we$naive.var)),
-    sqrt(diag(cc.we$var)),  sqrt(diag(covdfb.we)),
-    sqrt(diag(cch.LY$var)) ), 3)
-colnames(SEs) <- c("coh", "ncc", "ccwe-nai", 
-       "ccwe-rob", "ccwe-dfb", "cch-LY")
-SEs
+SEs <- cbind( sqrt( diag( cox.coh$var ) ), 
+              sqrt( diag( m.clogit$var ) ),
+              sqrt( diag( cch.LY$var ) ) )
+colnames(SEs) <- colnames(betas) 
+round(SEs, 3)
 
 
