@@ -24,17 +24,26 @@ str(s.all)
 ###################################################
 plot(s.all)
 lines(s.all, fun = "event", mark.time=T, conf.int=F)
-
+abline(h=0.5)
 ###################################################
 s.stg  <- survfit(suob ~ stage, data= orca)
 col5 <- c("green", "blue", "black", "red", "gray")
 plot(s.stg, col= col5, fun="event", mark.time=F )
+legend(10, 0.4, legend=levels(orca$stage),
+       col=col5, lty=1, cex=0.8,
+       title="Stage", text.font=4, bg='white')
 s.stg
 
 ###################################################
 par(mfrow=c(1,2))
 plot(s.stg, col= col5, fun="cumhaz", main="cum. hazards" )
-plot(s.stg, col= col5, fun="cloglog", main = "cloglog: log cum.haz"  )
+#legend(0,3.5, legend=levels(orca$stage),
+#       col=col5, lty=1, cex=0.8,
+#       title="Stage", text.font=4, bg='white')
+plot(s.stg, col= col5, fun="cloglog", main = "cloglog: log cum.haz")
+#legend(10,-2, legend=levels(orca$stage),
+#       col=col5, lty=1, cex=0.8,
+#       title="Stage", text.font=4, bg='white')
 
 ###################################################
 orca$agegr <- cut(orca$age, br=c(0,55,75, 95))
@@ -44,8 +53,14 @@ stat.table( list( sex, agegr), list( count(), percent(agegr) ),
 ###################################################
 s.agrx <- survfit(suob ~ agegr + sex, data=orca)
 par(mfrow=c(1,1))
-plot(s.agrx, fun="event", mark.time=F, xlim = c(0,15),
+plot(s.agrx, fun="event", mark.time=F, xlim = c(0,15), lwd=3,
              col=rep(c("red", "blue"),3), lty=c(2,2, 1,1, 5,5))
+legend(10,0.3, legend=c("(0,55] Female "," (0,55] Male",
+                       "(55,75] Female "," (55,75] Male",
+                       "(75,95] Female "," (75,95] Male" ),
+       col=rep(c("red", "blue"),3), lty=c(2,2, 1,1, 5,5), cex=0.8)
+       
+#title="Line types", text.font=4, bg='white')
 
 ###################################################
 cif1 <- survfit( Surv( time, event, type="mstate") ~ 1,
@@ -78,6 +93,131 @@ options(show.signif.stars = F)
 m1 <- coxph(suob ~ sex + I(age/10) + stage, data= orca)
 summary( m1 )
 round( ci.exp( m1 ), 4 )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ###################################################
 cox.zph( m1 )
@@ -124,34 +264,6 @@ summary(m2fg1, Exp=T)
 ###################################################
 m2fg2 <- crr(time, event, cov1 = model.matrix(m2), failcode=2)
 summary(m2fg2, Exp=T)
-
-###################################################
-library(popEpi)
-head(sibr)
-
-###################################################
-## pretend some are male
-set.seed(1L)
-sire$sex <- rbinom(nrow(sire), 1, 0.01)
-
-BL <- list(fot = seq(0, 5, 1/12))
-
-x <- lexpand(sire,
-             birth = bi_date,
-             entry = dg_date,
-             exit = ex_date,
-             status = status,
-             breaks = BL,
-             pophaz = popmort,
-             aggre = list(sex, fot))
-
-###################################################
-st.e2 <- survtab_ag(fot ~ sex, data = x,
-                    surv.type = "surv.rel",
-                    pyrs = "pyrs", n.cens = "from0to0",
-                    d = c("from0to1", "from0to2"))
-
-plot(st.e2, y = "r.e2", col = c("black", "red"),lwd=4)
 
 ###################################################
 orca.lex <- Lexis(exit = list(stime = time),
