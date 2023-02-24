@@ -64,7 +64,7 @@ In `R`, first check if your GitHub account is correctly setup.
 usethis::gh_token_help()
 ```
 
-If you see '<uset>' in `Personal access token for 'https://github.com':`
+If you see `<uset>` in `Personal access token for 'https://github.com':`
 
 ![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-010.png)
 
