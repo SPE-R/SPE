@@ -5,7 +5,7 @@ SPE git - quick start
 
 This is a quick and basic guide to work on [SPE repository](https://github.com/SPE-R/SPE) using git.
 
-For ease of use, I decided to use [GitKraken](https://www.gitkraken.com/) software.
+For ease of use, I decided to use git through [RStudio](https://www.gitkraken.com/) software.
 
 For any question/issue please send me a mail at georgesd at iarc.fr
 
@@ -31,7 +31,7 @@ For any question/issue please send me a mail at georgesd at iarc.fr
 The usual git workflow is the following:
 
 -----
-1. `pull` (get the latest online version of the repository)
+1. `pull` (get the latest online version of the repository or `clone` it if you do not have any copy of the repository on your hard drive)
 2. Work on your files, make your changes, ...
 3. `commit` your changes (locally commit and comment your changes)
 4. `pull` again (to prevent from file conflicts)
