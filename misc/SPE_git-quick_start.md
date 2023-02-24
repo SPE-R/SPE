@@ -16,7 +16,7 @@ For any question/issue please send me a mail at georgesd at iarc.who.int
 - [Workflow](#workflow)
 - [Prerequest](#prerequest)
 - [Setting-up acount and repository](#setting-up-acount-and-repository)
-  * [Linking GitKraken to your github account](#linking-gitkraken-to-your-github-account)
+  * [Setting-up GitHub credential](#setting-up-github-credential)
   * [Cloning SPE repository](#cloning-spe-repository)
   * [Opening SPE repository](#opening-spe-repository)
 - [Git actions](#git-actions)
@@ -54,7 +54,7 @@ The usual git workflow is the following:
 
 # Setting-up acount and repository
 
-## [Setting-up GitHub credential]
+## Setting-up GitHub credential
 
 Since mid 2021, github do not support anymore the classical login + password authentication for https repositories. We have now to use a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token). This can be easily done within `R` using `usethis` and `gitcreds` packages.
 
