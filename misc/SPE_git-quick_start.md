@@ -53,7 +53,53 @@ The usual git workflow is the following:
   organization ([list of SPE-R members](https://github.com/orgs/SPE-R/people))
 
 # Setting-up acount and repository
+
+## [Setting-up GitHub credential]
+
+Since mid 2021, github do not support anymore the classical login + password authentication for https repositories. We have now to use a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token). This can be easily done within `R` using `usethis` and `gitcreds` packages.
+
+In `R`, first check if your GitHub account is correctly setup.
+
+```r
+usethis::gh_token_help()
+```
+
+If you see '<uset>' in `Personal access token for 'https://github.com':`
+
+![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-010.png)
+
+then type:
+
+```r
+usethis::create_github_token()
+```
+
+This will open a web page. Enter your GitHub credential then chose the token name in `Note` (e.g. `SPE token`) and a token expiration (e.g. 90 days). Then go to the bottom of the page and click on `Generate token`
  
+![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-011.png)
+
+Copy the generated key (this will be the only chance to copy it, if you do not do it now, you will have to generate a new key)
+
+![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-012.png)
+
+Then in `R` type:
+
+```r
+gitcreds::gitcreds_set()
+```
+
+and paste the key of the personal access token
+
+![](https://github.com/SPE-R/SPE/blob/master/misc/SPE_git-quick_start-images/spe_git-quick_start-009.png)
+
+Check you are all done typing:
+
+```r
+usethis::gh_token_help()
+```
+
+If the procedure is completed you should see `<discovered>` in `Personal access token for 'https://github.com': ` and your GitHub users information (username, mail, ...).
+
 ## [Cloning](https://git-scm.com/docs/git-clone) [SPE repository](https://github.com/SPE-R/SPE)
 
 1. Open `RStudio` software
