@@ -32,6 +32,36 @@ jobs:
         uses: r-lib/actions/setup-r@v2
       - name: Install tinytex
         uses: r-lib/actions/setup-tinytex@v2
+      - name: Build SPE material
+        run: |
+          echo 'Installing dependencies'
+          Rscript pracs/install-dependencies.R
+          echo 'Build an compile all the practicals pdf'
+          make -f pracs/Makefile
+          echo 'Build the practicals solutions R files'
+          make -f pracs/Makefile Rsol
+          echo 'Compile lectures handout'
+          make -f lectures/Makefile
+          echo 'Update the software and package requirement page'
+          Rscript -e 'rmarkdown::render("pracs/prerequest.Rmd", output_dir = "build")'
+          echo 'keep only the outputs we are interested in'
+          mkdir -p deploy
+          mkdir -p deploy/Rsolutions
+          cp build/pracs.pdf deploy/
+          cp build/pracs-sol.pdf deploy/
+          cp build/*-s.R deploy/Rsolutions
+          cp build/prerequest.md deploy/
+          cp -r pracs/data  deploy/
+          cp build-lectures/SPE-2019-lectures-3x1.pdf deploy/
+          echo 'zip data and Rsolutions directory'
+          cd deploy
+          zip -r SPE-all-material.zip *
+          zip -r data.zip data
+          zip -r Rsolutions.zip Rsolutions
+          echo 'clean the build environement'
+          cd ..
+          make -f pracs/Makefile clean
+          make -f lectures/Makefile clean
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Build with Jekyll
