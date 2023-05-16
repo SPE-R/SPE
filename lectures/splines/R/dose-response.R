@@ -3,13 +3,13 @@ y <- plogis(x - mean(x))
 N <- length(x)
 
 png("dose-response-points.png")
-plot(x, y, xaxt="n", yaxt="n", xlab="Dose", ylab="Response", pch=16,
+plot(x, y, xaxt="n", yaxt="n", xlab="Dose x", ylab="Response f(x)", pch=16,
      cex.lab=1.5)
 text(x, y+0.02, 1:N)
 dev.off()
 
 png("dose-response-linear.png")
-plot(x, y, xaxt="n", yaxt="n", xlab="Dose", ylab="Response", pch=16,
+plot(x, y, xaxt="n", yaxt="n", xlab="Dose x", ylab="Response f(x)", pch=16,
      cex.lab=1.5)
 lines(x,y)
 dev.off()
