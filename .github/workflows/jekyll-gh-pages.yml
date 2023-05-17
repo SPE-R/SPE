@@ -1,10 +1,10 @@
 # Sample workflow for building and deploying a Jekyll site to GitHub Pages
-name: Deploy Jekyll with GitHub Pages dependencies preinstalled
+name: Deploy SPE-R GitHub Pages using Jekyll
 
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["setup-ghactions"]
+    branches: ["master-gh-actions"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -28,14 +28,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install R
-        uses: r-lib/actions/setup-r@v2
+      - name: Setup TeX Live 2023
+        uses: teatimeguest/setup-texlive-action@v2
+        with:
+          version: 2023
       - name: Install tinytex
         uses: r-lib/actions/setup-tinytex@v2
+      - name: Install latex libraries
+        run: |
+          tlmgr install caption currfile datetime enumitem eso-pic fancyhdr floatflt fmtcount grfext grffile needspace nth oberdiek pdflscape pdfpages subfig
+          echo 'Make the latex R style libs accessible'
+          cp -rf /usr/share/texmf/tex/latex/R/tex /home/runner/.TinyTeX/texmf-dist
+          texhash
+      - name: Install R
+        uses: r-lib/actions/setup-r@v2
+      - name: Install R packages
+        uses: r-lib/actions/setup-renv@v2
       - name: Build SPE material
         run: |
-          echo 'Installing dependencies'
-          Rscript pracs/install-dependencies.R
           echo 'Build an compile all the practicals pdf'
           make -f pracs/Makefile
           echo 'Build the practicals solutions R files'
@@ -62,15 +72,22 @@ jobs:
           cd ..
           make -f pracs/Makefile clean
           make -f lectures/Makefile clean
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
         with:
-          source: ./
-          destination: ./_site
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+          name: SPE-all-material
+          path: deploy
+      
+          
+      # - name: Setup Pages
+      #   uses: actions/configure-pages@v3
+      # - name: Build with Jekyll
+      #   uses: actions/jekyll-build-pages@v1
+      #   with:
+      #     source: ./
+      #     destination: ./_site
+      # - name: Upload artifact
+      #   uses: actions/upload-pages-artifact@v1
 
   # Deployment job
   deploy:
