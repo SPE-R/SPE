@@ -1,5 +1,5 @@
 # Sample workflow for building and deploying a Jekyll site to GitHub Pages
-name: Deploy SPE-R GitHub Pages using Jekyll
+name: Compile and build SPE-R GitHub material
 
 on:
   # Runs on pushes targeting the default branch
@@ -28,6 +28,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Test Deploy
+        uses: s0/git-publish-subdir-action@develop
+        env:
+          REPO: self
+          BRANCH: gh-spe-material
+          FOLDER: lectures
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Install curl
         run: |
           sudo apt-get install -y libcurl4-openssl-dev
@@ -81,6 +88,13 @@ jobs:
           cd ..
           make -f pracs/Makefile clean
           make -f lectures/Makefile clean
+      # - name: Deploy
+      #   uses: s0/git-publish-subdir-action@develop
+      #   env:
+      #     REPO: self
+      #     BRANCH: gh-spe-material
+      #     FOLDER: deploy
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -98,14 +112,14 @@ jobs:
       # - name: Upload artifact
       #   uses: actions/upload-pages-artifact@v1
 
-  # Deployment job
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
+  # # Deployment job
+  # deploy:
+  #   environment:
+  #     name: github-pages
+  #     url: ${{ steps.deployment.outputs.page_url }}
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   steps:
+  #     - name: Deploy to GitHub Pages
+  #       id: deployment
+  #       uses: actions/deploy-pages@v2
