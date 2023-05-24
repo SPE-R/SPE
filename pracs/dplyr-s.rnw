@@ -49,7 +49,7 @@ Let's convert \texttt{births} to \texttt{tibble} format with \texttt{as\_tibble}
 births_tbl <- as_tibble(births)
 
 class(births_tbl)
-births_tbl
+head(births_tbl)
 
 ## another alternative is to use the glimpse function
 glimpse(births_tbl)
@@ -117,7 +117,7 @@ births_tbl <-
     gest4 = cut(gestwks, breaks = c(20, 35, 37, 39, 45), right = FALSE)
   )
 
-births_tbl
+head(births_tbl)
 @
 
 \subsubsection{\texttt{select} columns, \texttt{filter} and \texttt{arrange} rows}
@@ -132,7 +132,8 @@ births_tbl %>%
   ## select only id, women age group, sex and birth weight of the baby
   select(id, agegrp, sex, bweight) %>%
   ## keep only babies weighing more than 4000g
-  filter(bweight > 4000) 
+  filter(bweight > 4000) %>%
+  head()
 @
 \texttt{select} can also be useful to reorder and rename columns.\newline
 \texttt{arrange} is a nice feature to reorder observations according to chosen attributes.\newline
@@ -150,7 +151,8 @@ births_tbl %>%
     'Birth weight' = bweight
   ) %>%
   ## rearrange rows to put the heaviest newborn on top
-  arrange(desc(`Birth weight`))
+  arrange(desc(`Birth weight`)) %>%
+  head()
 @
 \textbf{Note:} \texttt{tibble} supports blank spaces in the column names which can be handy for final table 
 rendering. When you want to work with columns with blank spaces, do not forget to use the \texttt{$``$}
@@ -167,7 +169,8 @@ births_tbl %>%
     'Birth weight' = bweight
   ) %>%
   ## rearrange rows to put the heaviest newborn on top
-  arrange(Sex, desc(`Birth weight`))
+  arrange(Sex, desc(`Birth weight`)) %>%
+  head()
 @
 
 \subsection{\texttt{group\_by} and \texttt{summarise} data}
@@ -187,7 +190,8 @@ births.01 <-
   summarise(
     count = n()
   )
-births.01
+births.01 %>%
+  head()
 @
 \textbf{Note:} \texttt{n} function is equivalent to \texttt{nrow}\newline 
 Now we have the number of boys and girls, we can compute the percentage of newborns in each sex 
@@ -220,7 +224,8 @@ or rename all the columns at once (here we want to add \textit{.tot} at the end 
 births.03 %>%
   rename_all(
     ~ paste0(., '.tot')
-  )
+  ) %>%
+  head()
 @
 Let's compute the number of births and the mean birth weight according to newborn gender.
 
@@ -232,7 +237,8 @@ births.05 <-
     count = n(),
     bweight.mean = mean(bweight)
   )
-births.05
+births.05 %>%
+  head()
 @
 With \texttt{births.05} table, compute the global mean new birth weight.\newline
 \textbf{Note:} with such a table the mean baby's birth weight have to be weighted by number of boys 
@@ -267,7 +273,8 @@ births.06 <-
   summarise(
     count = n()
   )
-births.06
+births.06 %>%
+  head()
 @
 Try then to compute the percentage of people in each group.\newline
 Look at the difference between the 2 following command lines:
@@ -282,7 +289,8 @@ births.06 %>%
   ungroup() %>%
   mutate(
     percent = count / sum(count) * 100
-  )
+  ) %>%
+  head()
 @
 \textbf{Note:} summarizing a data-set will remove the latest level of grouping but not the deeper ones 
 if multiple grouping has been done. In some cases you might have to explicitly ungroup your
@@ -298,7 +306,8 @@ births_tbl %>%
   summarise(
     count = n(),
     bweight.mean = mean(bweight)
-  )
+  ) %>%
+  head()
 @
 Birth weight increases with gestation time.\newline
 We can also spot that in our data-set the gestation time is missing for 10 newborns. 
@@ -320,7 +329,8 @@ births_tbl %>%
   ## birth weight category
   mutate(
     percent = count / sum(count, na.rm = TRUE)
-  )
+  ) %>%
+  head()
 @
 Similarly we can be interested in the birth weight distribution per gestational time. 
 
@@ -337,7 +347,8 @@ births_tbl %>%
   ## time category
   mutate(
     percent = count / sum(count, na.rm = TRUE)
-  )
+  ) %>%
+  head()
 @
 \textbf{Note:} grouping order matters!
 
@@ -411,37 +422,37 @@ meet presentation/publication expectations. The \texttt{kableExtra} table can be
 this goal.
 
 << >>=
-if(!require(kableExtra)) install.packages('kableExtra')
-library(kableExtra)
-
-births.08 <-
-  births_tbl %>%
-  filter(
-    !is.na(gest4)
-  ) %>%
-  group_by(gest4) %>%
-  summarise(
-    N = n()
-  ) %>%
-  mutate(
-    `(%)` = (N / sum(N)) %>% scales::percent()
-  )
-
-## default
-births.08
-
-## markdown flavour (useful fo automatic repport production with knitr)
-births.08 %>%
-  knitr::kable(fromat = 'markdown')
-
-## create an html version of the table and save it on the hard drive
-births.08 %>%
-  kable() %>%
-  kable_styling(
-    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-    full_width = FALSE
-  ) %>%
-  save_kable(file = 'births.08.html', self_contained = TRUE)
+# if(!require(kableExtra)) install.packages('kableExtra')
+# library(kableExtra)
+# 
+# births.08 <-
+#   births_tbl %>%
+#   filter(
+#     !is.na(gest4)
+#   ) %>%
+#   group_by(gest4) %>%
+#   summarise(
+#     N = n()
+#   ) %>%
+#   mutate(
+#     `(%)` = (N / sum(N)) %>% scales::percent()
+#   )
+# 
+# ## default
+# births.08
+# 
+# ## markdown flavour (useful fo automatic repport production with knitr)
+# births.08 %>%
+#   knitr::kable(fromat = 'markdown')
+# 
+# ## create an html version of the table and save it on the hard drive
+# births.08 %>%
+#   kable() %>%
+#   kable_styling(
+#     bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+#     full_width = FALSE
+#   ) %>%
+#   save_kable(file = 'births.08.html', self_contained = TRUE)
 @
 
 <<echo=FALSE, eval=FALSE>>=

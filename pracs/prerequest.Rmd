@@ -28,34 +28,13 @@ Any code editing software can be used during the course.
 
 ```{r pkgs list, include=FALSE}
 ## install checkpoint package if not available
-if(!require(checkpoint)){ 
-  install.packages('checkpoint') 
-  library(checkpoint)
-}
-
-if(!require(purrr)){ 
-  install.packages('rlang') 
-  library(rlang)
-}
-
-
-required.pkg <- checkpoint:::scanForPackages(project = '../pracs/')
-
-required.pkg
-paste0(sort(required.pkg$pkgs), collapse = ', ')
-command.str <- 
-  paste0(
-    '```r \n', 
-    'install.package(c("', 
-    paste0(sort(required.pkg$pkgs), collapse = '", "'), 
-    '")) \n',
-    '```\n')
-
+required.pkg <- sort(unique(unlist(renv::dependencies()[, 'Package'])))
+command.str <- paste0("install.packages(c('", paste0(required.pkg, collapse = "', '"), "'))")
 ```
 
 During the practical session, the following list of `R`the packages will be required:
 
-`r paste0('- ', paste(required.pkg$pkgs, collapse = "\n- "))`
+`r paste0('- ', paste(required.pkg, collapse = "\n- "))`
 
 which can be installed with the following command:
 

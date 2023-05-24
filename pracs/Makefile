@@ -69,7 +69,7 @@ view: all
 .PHONY: clean builddir
 
 builddir:
-	mkdir -p ${BUILDDIR} && cp -r $(SRCDIR)/* ${BUILDDIR} 
+	mkdir -p ${BUILDDIR} && cp -r $(SRCDIR)/* ${BUILDDIR}  && echo 'renv::activate("../")' > ${BUILDDIR}/.Rprofile
 
   
 clean:
