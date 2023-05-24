@@ -1,104 +1,92 @@
 ### R code from vignette source '/home/runner/work/SPE/SPE/build/dplyr-s.rnw'
 
 ###################################################
-### code chunk number 1: dplyr-s.rnw:30-33
+### code chunk number 1: dplyr-s.rnw:23-27
 ###################################################
 library(Epi)
 suppressPackageStartupMessages(library(dplyr))
+
 data(births) 
 
 
 ###################################################
-### code chunk number 2: dplyr-s.rnw:42-44
+### code chunk number 2: dplyr-s.rnw:36-38
 ###################################################
 class(births)
 head(births)
 
 
 ###################################################
-### code chunk number 3: dplyr-s.rnw:48-49
+### code chunk number 3: dplyr-s.rnw:42-43
 ###################################################
 str(births)
 
 
 ###################################################
-### code chunk number 4: dplyr-s.rnw:54-61
+### code chunk number 4: dplyr-s.rnw:48-55
 ###################################################
 births_tbl <- as_tibble(births)
 
 class(births_tbl)
-births_tbl
+head(births_tbl)
 
-## another way to visualize data set is to use glimpse function
+## another alternative is to use the glimpse function
 glimpse(births_tbl)
 
 
 ###################################################
-### code chunk number 5: dplyr-s.rnw:77-79
+### code chunk number 5: dplyr-s.rnw:70-72
 ###################################################
 head(births, 4)
 births %>% head(4)
 
 
 ###################################################
-### code chunk number 6: dplyr-s.rnw:85-86
+### code chunk number 6: dplyr-s.rnw:79-88
 ###################################################
-4 %>% head(births, .)
+## classical way
+grepl('r', 'spe-r')
+
+## wrong chained way
+## here the test done is: does 'r' contain 'spe-r'? 
+'spe-r' %>% grepl('r')
+
+## we have to specify explicitly that the chained object is the second argument
+'spe-r' %>% grepl('r', .)
 
 
 ###################################################
-### code chunk number 7: dplyr-s.rnw:104-125
+### code chunk number 7: dplyr-s.rnw:106-120
 ###################################################
 births_tbl <-
   births_tbl %>%
   mutate(
     ## modify hyp varible (conversion into factor)
-    hyp = factor(hyp, levels = c(0, 1), labels = c("normal", "hyper")),
+    hyp = factor(hyp, labels = c("normal", "hyper")),
     ## creating a new variable aggrep
     agegrp = cut(matage, breaks = c(20, 25, 30, 35, 40, 45), right = FALSE),
     ## modify sex variable (conversion into factor)
     sex = factor(sex, levels = c(1, 2), labels = c("M", "F")),
-    ## creating a new variable gest4 with case_when instead of cut
-    gest4 = 
-      case_when(
-        gestwks < 25 ~ 'less than 25 weeks',
-        gestwks >= 25 & gestwks < 30  ~ '25-30 weeks',
-        gestwks >= 30 & gestwks < 35  ~ '30-35 weeks',
-        gestwks >= 35 & gestwks < 40  ~ '35-40 weeks',
-        gestwks >= 40  ~ 'more than 40 weeks'
-      ) 
+    ## creating a new variable gest4
+    gest4 = cut(gestwks, breaks = c(20, 35, 37, 39, 45), right = FALSE)
   )
 
-births_tbl
+head(births_tbl)
 
 
 ###################################################
-### code chunk number 8: dplyr-s.rnw:145-150
+### code chunk number 8: dplyr-s.rnw:130-136
 ###################################################
 births_tbl %>%
   ## select only id, women age group, sex and birth weight of the baby
   select(id, agegrp, sex, bweight) %>%
   ## keep only babies weighing more than 4000g
-  filter(bweight > 4000) 
+  filter(bweight > 4000) %>%
+  head()
 
 
 ###################################################
-### code chunk number 9: dplyr-s.rnw:158-168
-###################################################
-births_tbl %>%
-  ## select only id, women age group, sex and birth weight of the baby
-  select(
-    id, 
-    'Age group' = agegrp, 
-    Sex = sex, 
-    'Birth weight' = bweight
-  ) %>%
-  ## rearrange rows to put the heaviest newborn on top
-  arrange(desc(`Birth weight`))
-
-
-###################################################
-### code chunk number 10: dplyr-s.rnw:175-185
+### code chunk number 9: dplyr-s.rnw:144-155
 ###################################################
 births_tbl %>%
   ## select only id, women age group, sex and birth weight of the baby
@@ -109,11 +97,28 @@ births_tbl %>%
     'Birth weight' = bweight
   ) %>%
   ## rearrange rows to put the heaviest newborn on top
-  arrange(Sex, desc(`Birth weight`))
+  arrange(desc(`Birth weight`)) %>%
+  head()
 
 
 ###################################################
-### code chunk number 11: dplyr-s.rnw:196-205
+### code chunk number 10: dplyr-s.rnw:162-173
+###################################################
+births_tbl %>%
+  ## select only id, women age group, sex and birth weight of the baby
+  select(
+    id, 
+    'Age group' = agegrp, 
+    Sex = sex, 
+    'Birth weight' = bweight
+  ) %>%
+  ## rearrange rows to put the heaviest newborn on top
+  arrange(Sex, desc(`Birth weight`)) %>%
+  head()
+
+
+###################################################
+### code chunk number 11: dplyr-s.rnw:184-194
 ###################################################
 births.01 <-
   births_tbl %>%
@@ -123,11 +128,12 @@ births.01 <-
   summarise(
     count = n()
   )
-births.01
+births.01 %>%
+  head()
 
 
 ###################################################
-### code chunk number 12: dplyr-s.rnw:211-216
+### code chunk number 12: dplyr-s.rnw:200-205
 ###################################################
 births.02 <-
   births.01 %>%
@@ -137,31 +143,29 @@ births.02 <-
 
 
 ###################################################
-### code chunk number 13: dplyr-s.rnw:223-235
+### code chunk number 13: dplyr-s.rnw:212-219
 ###################################################
 births.03 <-
-  births_tbl %>%
-  select(gest4, sex, gestwks, bweight, matage) %>%
-  group_by(gest4, sex) %>%
-  summarise(
-    across(
-      where(is.numeric),
-      ~ mean(.x, na.rm = TRUE)
-    ),
-    .groups = 'drop'
+  births.02 %>%
+  summarise_if(
+    is.numeric,
+    sum
   )
 births.03
 
 
 ###################################################
-### code chunk number 14: dplyr-s.rnw:245-247
+### code chunk number 14: dplyr-s.rnw:223-228
 ###################################################
 births.03 %>%
-  rename_with(toupper, where(~ !is.numeric(.x)))
+  rename_all(
+    ~ paste0(., '.tot')
+  ) %>%
+  head()
 
 
 ###################################################
-### code chunk number 15: dplyr-s.rnw:252-260
+### code chunk number 15: dplyr-s.rnw:232-241
 ###################################################
 births.05 <-
   births_tbl %>%
@@ -170,11 +174,12 @@ births.05 <-
     count = n(),
     bweight.mean = mean(bweight)
   )
-births.05
+births.05 %>%
+  head()
 
 
 ###################################################
-### code chunk number 16: dplyr-s.rnw:266-278
+### code chunk number 16: dplyr-s.rnw:247-259
 ###################################################
 births.05 %>%
   summarise(
@@ -191,7 +196,7 @@ births_tbl %>%
 
 
 ###################################################
-### code chunk number 17: dplyr-s.rnw:288-295
+### code chunk number 17: dplyr-s.rnw:269-277
 ###################################################
 births.06 <-
   births_tbl %>%
@@ -199,11 +204,12 @@ births.06 <-
   summarise(
     count = n()
   )
-births.06
+births.06 %>%
+  head()
 
 
 ###################################################
-### code chunk number 18: dplyr-s.rnw:300-310
+### code chunk number 18: dplyr-s.rnw:282-293
 ###################################################
 births.06 %>%
   mutate(
@@ -214,43 +220,24 @@ births.06 %>%
   ungroup() %>%
   mutate(
     percent = count / sum(count) * 100
-  )
+  ) %>%
+  head()
 
 
 ###################################################
-### code chunk number 19: dplyr-s.rnw:321-337
-###################################################
-## this tibble will still be grouped by sex
-births_tbl %>%
-  group_by(sex, lowbw) %>%
-  summarise(
-    count = n()
-  )
-
-## this tibble will be group free
-births_tbl %>%
-  group_by(sex, lowbw) %>%
-  summarise(
-    count = n(),
-    .groups = 'drop'
-  )
-
-
-
-
-###################################################
-### code chunk number 20: dplyr-s.rnw:344-350
+### code chunk number 19: dplyr-s.rnw:303-310
 ###################################################
 births_tbl %>%
   group_by(gest4) %>%
   summarise(
     count = n(),
     bweight.mean = mean(bweight)
-  )
+  ) %>%
+  head()
 
 
 ###################################################
-### code chunk number 21: dplyr-s.rnw:357-372
+### code chunk number 20: dplyr-s.rnw:317-333
 ###################################################
 births_tbl %>%
   ## keep only the newborn with defined gesational time category
@@ -266,11 +253,12 @@ births_tbl %>%
   ## birth weight category
   mutate(
     percent = count / sum(count, na.rm = TRUE)
-  )
+  ) %>%
+  head()
 
 
 ###################################################
-### code chunk number 22: dplyr-s.rnw:376-389
+### code chunk number 21: dplyr-s.rnw:337-351
 ###################################################
 births_tbl %>%
   filter(
@@ -284,11 +272,12 @@ births_tbl %>%
   ## time category
   mutate(
     percent = count / sum(count, na.rm = TRUE)
-  )
+  ) %>%
+  head()
 
 
 ###################################################
-### code chunk number 23: dplyr-s.rnw:405-419
+### code chunk number 22: dplyr-s.rnw:367-381
 ###################################################
 age <-
   tibble(
@@ -307,13 +296,13 @@ center
 
 
 ###################################################
-### code chunk number 24: dplyr-s.rnw:425-426
+### code chunk number 23: dplyr-s.rnw:387-388
 ###################################################
 bind_rows(age, center)
 
 
 ###################################################
-### code chunk number 25: dplyr-s.rnw:436-442
+### code chunk number 24: dplyr-s.rnw:398-404
 ###################################################
 ## all individuals from ages are kept
 left_join(age, center)
@@ -324,7 +313,7 @@ inner_join(age, center)
 
 
 ###################################################
-### code chunk number 26: dplyr-s.rnw:447-452
+### code chunk number 25: dplyr-s.rnw:409-414
 ###################################################
 inner_join(age, center) %>%
   group_by(center) %>%
@@ -334,7 +323,7 @@ inner_join(age, center) %>%
 
 
 ###################################################
-### code chunk number 27: dplyr-s.rnw:462-493
+### code chunk number 26: dplyr-s.rnw:424-455
 ###################################################
 # if(!require(kableExtra)) install.packages('kableExtra')
 # library(kableExtra)
@@ -370,11 +359,11 @@ inner_join(age, center) %>%
 
 
 ###################################################
-### code chunk number 28: dplyr-s.rnw:496-502 (eval = FALSE)
+### code chunk number 27: dplyr-s.rnw:458-464 (eval = FALSE)
 ###################################################
 ## ## trick to create dplyr-s.rnw file.
 ## ## this part have to be lauch manually
-## dplyr_e.path <- '~/OneDrive - IARC/PROJECT/_SPE/SPE/pracs/dplyr-e.rnw'
+## dplyr_e.path <- '/mnt/data/georgesd/_PROJECTS/_SPE/SPE/pracs/dplyr-e.rnw'
 ## dplyr_e <- readLines(dplyr_e.path)
 ## dplyr_s <- purrr::map_chr(dplyr_e, ~ sub('results=verbatim', 'results=verbatim', .x))
 ## writeLines(dplyr_s, sub('-e.rnw$', '-s.rnw', dplyr_e.path))
