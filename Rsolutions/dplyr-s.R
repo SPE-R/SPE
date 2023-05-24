@@ -12,7 +12,7 @@ data(births)
 ### code chunk number 2: dplyr-s.rnw:42-44
 ###################################################
 class(births)
-births
+head(births)
 
 
 ###################################################
