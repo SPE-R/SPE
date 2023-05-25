@@ -1,4 +1,8 @@
 % \documentclass{article}
+% 
+% \usepackage[utf8]{inputenc}
+% \DeclareUnicodeCharacter{2139}{$\iota$}
+% 
 % \begin{document}
 % \SweaveOpts{concordance=TRUE}
 
@@ -9,9 +13,12 @@
 \subsection{Introduction}
 
 In this chapter we will reproduce \textit{more or less} the same outputs as in chapter 1.3 using 
-\texttt{dplyr} package. 
-The main goal is to familiarize you with some of the main dplyr features. In the meantime you will
-get more flexibility in your summary table productions and everyday data manipulation.
+\texttt{tidyverse} packages suit.
+
+The main goal is to familiarize you with some of the main \texttt{dplyr} and \texttt{tidyverse} features.
+This is an optional practical for participants that have already good basic R basis. 
+All the rest of the course can be done without knowing \texttt{dplyr}.
+
 
 \subsection{The \texttt{births} data}
 
@@ -23,7 +30,6 @@ births data-set.
 << >>=
 library(Epi)
 suppressPackageStartupMessages(library(dplyr))
-
 data(births) 
 @
 
@@ -51,18 +57,19 @@ births_tbl <- as_tibble(births)
 class(births_tbl)
 births_tbl
 
-## another alternative is to use the glimpse function
+## another way to visualize data set is to use glimpse function
 glimpse(births_tbl)
 @
 As you can see \texttt{tibble} inherits from \texttt{data.frame} which implies that all functions 
-working with \texttt{data.frame} objects will work with \texttt{tibble} objects. The opposit is 
-not true. \texttt{tibble} has a couple of extra functionalities compared to classical 
-\texttt{data.frame}. For instance it has a more user-friendly readable default print and most 
-importantly it supports grouping/nesting features that we will see latter on.
+working with \texttt{data.frame} objects will work with \texttt{tibble} objects. The opposite is 
+not necessary true. \texttt{tibble} has a couple of extra features compared to classical 
+\texttt{data.frame}. One of them is a slightly more user-friendly console print. The main 
+differences being that \texttt{tibble} objects supports grouping/nesting features. 
+Some examples we be done will see latter on.
 
 \subsection{Piping functions}
 
-This is one of the most popular features of \texttt{dplyr}. It enables function chaining in 
+This is one of the most popular features of \texttt{tidyverse} grammar. It enables function chaining in 
 \texttt{R}. Function outputs are passed as input to the following function and so on. 
 It can help to make the code more readable.
 Here is an example of classic vs piped functions.
@@ -74,18 +81,9 @@ births %>% head(4)
 \textbf{Note:} By default the chained object is given as the first argument to the following 
 function.
 You can use \texttt{$.$} if this is not the case.\newline  
-Here is a dummy example where we check if the letter 'r' is in 'spe-r'
-
+Here is a dummy example where we do not give the first argument to a function but the second one.
 << >>=
-## classical way
-grepl('r', 'spe-r')
-
-## wrong chained way
-## here the test done is: does 'r' contain 'spe-r'? 
-'spe-r' %>% grepl('r')
-
-## we have to specify explicitly that the chained object is the second argument
-'spe-r' %>% grepl('r', .)
+4 %>% head(births, .)
 @
 
 \subsection{\texttt{mutate} columns}
@@ -94,7 +92,7 @@ grepl('r', 'spe-r')
 Let's create 2 new variables :
 \begin{itemize}
   \item \texttt{agegrp} (5 years mother's age group) 
-  \item \texttt{gest4} (gestation time splitted in 4 categories)
+  \item \texttt{gest4} (gestation time split in 4 categories)
 \end{itemize}
 And modify 2 others:
 \begin{itemize}
@@ -108,21 +106,38 @@ births_tbl <-
   births_tbl %>%
   mutate(
     ## modify hyp varible (conversion into factor)
-    hyp = factor(hyp, labels = c("normal", "hyper")),
+    hyp = factor(hyp, levels = c(0, 1), labels = c("normal", "hyper")),
     ## creating a new variable aggrep
     agegrp = cut(matage, breaks = c(20, 25, 30, 35, 40, 45), right = FALSE),
     ## modify sex variable (conversion into factor)
     sex = factor(sex, levels = c(1, 2), labels = c("M", "F")),
-    ## creating a new variable gest4
-    gest4 = cut(gestwks, breaks = c(20, 35, 37, 39, 45), right = FALSE)
+    ## creating a new variable gest4 with case_when instead of cut
+    gest4 = 
+      case_when(
+        gestwks < 25 ~ 'less than 25 weeks',
+        gestwks >= 25 & gestwks < 30  ~ '25-30 weeks',
+        gestwks >= 30 & gestwks < 35  ~ '30-35 weeks',
+        gestwks >= 35 & gestwks < 40  ~ '35-40 weeks',
+        gestwks >= 40  ~ 'more than 40 weeks'
+      ) 
   )
 
 births_tbl
 @
 
+You can see in the table columns header the type of data contained in each column. 
+For instance \texttt{<dbl>} stands for double (i.e. numeric value) and \texttt{fct}
+stands for factor. In \texttt{R} \texttt{data.frame} (/ \texttt{tibble}) data type
+have to be the same within a column (e.g. numeric only) but can be of different type across 
+columns.
+
+Notes than \texttt{case\_when} function do not return a \texttt{factor} but a \texttt{character} variable in this case.
+You will have to force the conversion to \texttt{factor} if needed.
+
+
 \subsection{\texttt{select} columns, \texttt{filter} and \texttt{arrange} rows}
 
-\texttt{select} is used for column subsetting while filter is for row sub-setting. 
+\texttt{select} is used for column sub-setting while filter is for row sub-setting. 
 They are equivalent to the \texttt{[]} in \texttt{R} base language.\newline
 Let's display a table where only babies' \texttt{id}, \texttt{sex}, \texttt{bweight} and mothers' 
 \texttt{agegrp} are kept for babies with a \texttt{bweight} grater than 4000g.
@@ -136,8 +151,8 @@ births_tbl %>%
 @
 \texttt{select} can also be useful to reorder and rename columns.\newline
 \texttt{arrange} is a nice feature to reorder observations according to chosen attributes.\newline
-Let's reaname \texttt{agegrp}, \texttt{sex} and \texttt{bweight} with more explicit labels and reorder 
-the table acording to babies' decreasing birth weight.
+Let's rename \texttt{agegrp}, \texttt{sex} and \texttt{bweight} with more explicit labels and reorder 
+the table according to babies' decreasing birth weight.
 
 
 << >>=
@@ -200,29 +215,39 @@ births.02 <-
     percent = count / sum(count) * 100
   )
 @
-\textbf{Trick:} most of \texttt{dplyr} functions can be applied with an embedded condition (e.g. 
-\texttt{mutate\_if}, \texttt{mutate\_all}, ...). This can be very handy in some cases.\newline 
+\textbf{Trick:} most of \texttt{dplyr} functions can be applied with an embedded condition using
+\texttt{across} function. This can be very handy in some cases.\newline 
 As an illustration if you want to calculate the \texttt{sum} of every \texttt{birth.02} numerical 
 columns
 
 << >>=
 births.03 <-
-  births.02 %>%
-  summarise_if(
-    is.numeric,
-    sum
+  births_tbl %>%
+  select(gest4, sex, gestwks, bweight, matage) %>%
+  group_by(gest4, sex) %>%
+  summarise(
+    across(
+      where(is.numeric),
+      ~ mean(.x, na.rm = TRUE)
+    ),
+    .groups = 'drop'
   )
 births.03
 @
-or rename all the columns at once (here we want to add \textit{.tot} at the end of each column name)
+
+\texttt{across} function supports the purrr-style lambda format, e.g. \texttt{~ mean(.x, na.rm = TRUE)}
+where \texttt{.x} refers to the values from the data set to be passed to the function.
+
+Some other functions ending by \texttt{\_with} can be used conditionally within \texttt{dplyr}.
+As an example we can rename only columns which are not numeric at once (here we want to make all column names using upper characters) using
+the combination of \texttt{rename\_with} and \texttt{where}.
 
 << >>=
 births.03 %>%
-  rename_all(
-    ~ paste0(., '.tot')
-  )
+  rename_with(toupper, where(~ !is.numeric(.x)))
 @
-Let's compute the number of births and the mean birth weight according to newborn gender.
+
+Let's now compute the number of births and the mean birth weight according to newborn gender.
 
 << >>=
 births.05 <-
@@ -289,6 +314,30 @@ if multiple grouping has been done. In some cases you might have to explicitly u
 \texttt{data.frame} before doing calculations. In the previous examples, if you do not ungroup
 the data-set, percentages are computed per gender. Ungrouping will let you compute the overall 
 percentages.\newline 
+
+\textbf{Trick:} a good practice is to ungroup all the summarized dataset in order to prevent form 
+confusion. You can do it using the \texttt{.group = 'drop'} option in \texttt{summarize()}. 
+
+<< >>=
+## this tibble will still be grouped by sex
+births_tbl %>%
+  group_by(sex, lowbw) %>%
+  summarise(
+    count = n()
+  )
+
+## this tibble will be group free
+births_tbl %>%
+  group_by(sex, lowbw) %>%
+  summarise(
+    count = n(),
+    .groups = 'drop'
+  )
+
+
+@
+
+
 The same exercise can be done using gestation time group (\texttt{gest4}) as stratifying variable.\newline
 Lets compute number and mean birth weights according to gestation time category
 
@@ -339,17 +388,17 @@ births_tbl %>%
     percent = count / sum(count, na.rm = TRUE)
   )
 @
-\textbf{Note:} grouping order matters!
+\textbf{Note:} grouping order matters! and can be confusing so think about ungrouping intermediate tables.
 
 \subsection{Bind and join tables}
 
-Another nice feature of \texttt{dplyr} is tables binding and joining functionalities. To practice we
+Another nice feature of \texttt{dplyr} is tables binding and joining functions. To practice we
 will create 2 fake \texttt{tibble}:
 
 \begin{itemize}
-  \item \texttt{age} an individual database wich contains \texttt{pid} (unique individuals id) 
+  \item \texttt{age} an individual database which contains \texttt{pid} (unique individuals id) 
   and \texttt{age} in year
-  \item \texttt{center} an study center database wich contains \texttt{pid} (unique individuals id)
+  \item \texttt{center} an study center database which contains \texttt{pid} (unique individuals id)
   and \texttt{center} (the center where an individual is registered)
 \end{itemize}
 
@@ -369,14 +418,14 @@ center <-
 age
 center
 @
-Now the tables are deifined we will try to make the linkage between individuals ages and the center
+Now the tables are define we will try to make the linkage between individuals ages and the center
 they belong to.\newline
 First of all let's have a look to \texttt{bind\_rows} function.
 
 << >>=
 bind_rows(age, center)
 @
-Is it usfeful?\newline
+Is it useful?\newline
 Here not really but that can be in other situations (e.g. several individuals data base to merge..).\newline
 \textbf{Note:} in \texttt{bind\_rows}, if columns names do not match, they are fill with \texttt{NA}.  
 
@@ -386,23 +435,26 @@ between \texttt{left\_join}, \texttt{full\_join} and \texttt{inner\_join}.
 
 << >>=
 ## all individuals from ages are kept
-left_join(age, center)
+left_join(age, center, by = c('pid'))
 ## everithing is kept
-full_join(age, center)
+full_join(age, center, by = c('pid'))
 ## only the individuals present in both dataset are kept
-inner_join(age, center)
+inner_join(age, center, by = c('pid'))
 @
 Can you spot the differences between the commands above?\newline
-As a last exercise, try to compute the individuals' mean age per center.
+As an exercise, you can try to compute the individuals' mean age per center.
 
 << >>=
-inner_join(age, center) %>%
+inner_join(age, center, by = c('pid')) %>%
   group_by(center) %>%
   summarise(
     mean_age = mean(age)
   )
 @
 
+\textbf{Note:} the \texttt{by} argument indicates which column should be use to make the join. In some 
+cases, you might have to uses several columns to match (e.g. per sex and age group), this
+can be easily done specifying a vector of column names.
 
 \subsection{Bonus: Rendering tables}
 
@@ -412,42 +464,42 @@ this goal.
 
 << >>=
 # if(!require(kableExtra)) install.packages('kableExtra')
-# library(kableExtra)
-# 
-# births.08 <-
-#   births_tbl %>%
-#   filter(
-#     !is.na(gest4)
-#   ) %>%
-#   group_by(gest4) %>%
-#   summarise(
-#     N = n()
-#   ) %>%
-#   mutate(
-#     `(%)` = (N / sum(N)) %>% scales::percent()
-#   )
-# 
-# ## default
-# births.08
-# 
-# ## markdown flavour (useful fo automatic repport production with knitr)
+library(kableExtra)
+
+births.08 <-
+  births_tbl %>%
+  filter(
+    !is.na(gest4)
+  ) %>%
+  group_by(gest4) %>%
+  summarise(
+    N = n()
+  ) %>%
+  mutate(
+    `(%)` = (N / sum(N)) %>% scales::percent()
+  )
+
+## default
+births.08
+
+## markdown flavor (useful fo automatic report production with knitr)
 # births.08 %>%
 #   knitr::kable(fromat = 'markdown')
-# 
-# ## create an html version of the table and save it on the hard drive
-# births.08 %>%
-#   kable() %>%
-#   kable_styling(
-#     bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-#     full_width = FALSE
-#   ) %>%
-#   save_kable(file = 'births.08.html', self_contained = TRUE)
+
+## create an html version of the table and save it on the hard drive
+births.08 %>%
+  kable() %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE
+  ) %>%
+  save_kable(file = 'births.08.html', self_contained = TRUE)
 @
 
 <<echo=FALSE, eval=FALSE>>=
 ## trick to create dplyr-s.rnw file.
 ## this part have to be lauch manually
-dplyr_e.path <- '/mnt/data/georgesd/_PROJECTS/_SPE/SPE/pracs/dplyr-e.rnw'
+dplyr_e.path <- '~/OneDrive - IARC/PROJECT/_SPE/SPE/pracs/dplyr-e.rnw'
 dplyr_e <- readLines(dplyr_e.path)
 dplyr_s <- purrr::map_chr(dplyr_e, ~ sub('results=hide', 'results=verbatim', .x))
 writeLines(dplyr_s, sub('-e.rnw$', '-s.rnw', dplyr_e.path))

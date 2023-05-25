@@ -1,8 +1,6 @@
 SPE
 ================
 
-[![Build Status](https://travis-ci.org/SPE-R/SPE.svg?branch=master)](https://travis-ci.org/SPE-R/SPE)
-
 **Material for the course Statistical Practice in Epidemiology with R**
 
 -----
@@ -30,9 +28,9 @@ To produce the R source code from solutions .rnw files:
 
 `make -f pracs/Makefile Rsol`
 
-Automatic build of practicals pdf and R solutions files is preformed threw [SPE's Travis-ci platform](https://travis-ci.org/SPE-R/SPE).
+Automatic build of practicals pdf and R solutions files is preformed using [GitHub Actions](https://docs.github.com/fr/actions).
 
-For SPE tagged release, the [SPE's Travis-ci platform](https://travis-ci.org/SPE-R/SPE) will deploy pracs.pdf and R solutions files on the [travis-build branch](https://github.com/SPE-R/SPE-R.github.io/tree/travis-build) of [SPE-R github page](https://spe-r.github.io/).
+For SPE tagged release, the [SPE's GitHub Actions workflow](https://github.com/SPE-R/SPE/actions) will deploy pracs.pdf and R solutions files on the [gh-spe-material branch](https://github.com/SPE-R/SPE/tree/gh-spe-material). This material can be downloaded direcly from [gh-spe-material branch](https://github.com/SPE-R/SPE/tree/gh-spe-material) or via the dedicated [SPE-R github page](https://spe-r.github.io/).
 
 -----
 
@@ -48,10 +46,11 @@ For SPE tagged release, the [SPE's Travis-ci platform](https://travis-ci.org/SPE
 
 -----
 
-[slides](https://github.com/SPE-R/SPE/tree/master/slides) is supposed to contain slides; one folder per lecture
+[slides](https://github.com/SPE-R/SPE/tree/master/slides) is supposed to contain slides; one folder per lecture; the lectures should be
+compiled in PDF format. Theses PDF files will be combined in a single file for those who want to print the lectures.
 
 -----
 
-[misc](https://github.com/SPE-R/SPE/tree/master/misc) contains misclaneous documents:
+[misc](https://github.com/SPE-R/SPE/tree/master/misc) contains miscellaneous documents:
 
-- [SPE git quick statr guide](https://github.com/SPE-R/SPE/tree/master/misc/SPE_git-quick_start.md): coulpe of instructions to setup and use git on SPE repos
+- [SPE git quick statr guide](https://github.com/SPE-R/SPE/tree/master/misc/SPE_git-quick_start.md): coulpe of instructions to setup and use git on SPE repository
