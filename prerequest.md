@@ -37,11 +37,13 @@ During the practical session, the following list of `R`the packages will be requ
 - foreign
 - ggplot2
 - grid
+- kableExtra
 - knitr
 - mgcv
 - popEpi
 - renv
 - rmarkdown
+- scales
 - sem
 - splines
 - survival
@@ -49,7 +51,7 @@ During the practical session, the following list of `R`the packages will be requ
 
 which can be installed with the following command:
 
-install.packages(c('checkpoint', 'cmprsk', 'cowplot', 'cranly', 'dplyr', 'Epi', 'foreign', 'ggplot2', 'grid', 'knitr', 'mgcv', 'popEpi', 'renv', 'rmarkdown', 'sem', 'splines', 'survival', 'tools'))
+install.packages(c('checkpoint', 'cmprsk', 'cowplot', 'cranly', 'dplyr', 'Epi', 'foreign', 'ggplot2', 'grid', 'kableExtra', 'knitr', 'mgcv', 'popEpi', 'renv', 'rmarkdown', 'scales', 'sem', 'splines', 'survival', 'tools'))
 
 ---
 This page have been automatically generated. Do not modify
