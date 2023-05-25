@@ -6,11 +6,15 @@
 ## combine these into a list of all R packages ever published on
 ## CRAN with the date of first release.
 
+## The script saves the package data at the end so you don't need to
+## scrape the web every time to produce a plot.
+
 ## CRAN mirror to use
 CRAN_page <- function(...) {
     ##file.path('https://cran.rstudio.com/src/contrib', ...)
     ##file.path('https://cran.ma.imperial.ac.uk/src/contrib', ...)
-    file.path('https://www.stats.bris.ac.uk/R/src/contrib', ...)
+    ##file.path('https://www.stats.bris.ac.uk/R/src/contrib', ...)
+    file.path('https://anorien.csc.warwick.ac.uk/CRAN/src/contrib', ...)
 }
 
 parse_apache_directory_listing <- function(url) {
@@ -27,6 +31,7 @@ library(data.table)
 ## get list of currently available packages on CRAN
 library(reticulate)
 use_python('/usr/bin/python3', required = TRUE)
+## Use "pip install htmllistparse" on the command line to install this Python module
 htmllistparse <- import('htmllistparse')
 time <- import('time')
 
@@ -107,14 +112,25 @@ pkgs[c(250, 500, (1:13)*1000)]
 
 ## plot trend
 library(ggplot2)
+
+## This version looks better now as recent growth appears linear
 ggplot(pkgs, aes(as.Date(first_release), index)) +
     geom_line(size = 2) +
-###    scale_x_date(date_breaks = '1 year', date_labels = '%Y') +
     scale_x_date(date_breaks = '2 years', date_labels = '%Y') +
-    scale_y_continuous(breaks = c(10,100,1000,10000), trans="log") +
-    xlab('') + ylab('') + theme_bw() +
-    ggtitle('Number of R packages ever published on CRAN')
+    scale_y_continuous(breaks = c(0,5000,10000,15000,20000,25000)) +
+    ylab('Number of R packages ever published') + xlab('First publication') + theme_bw() +
+    ggtitle('Number of R packages by first publication')
 ggsave('number-of-submitted-packages-to-CRAN.png')
 
+## Older version on a log scale
+ggplot(pkgs, aes(as.Date(first_release), index)) +
+    geom_line(size = 2) +
+    scale_x_date(date_breaks = '2 years', date_labels = '%Y') +
+    scale_y_continuous(breaks = c(10,100,1000,10000), trans="log") +
+    ylab('Number of R packages ever published') + xlab('First publication') + theme_bw() +
+    ggtitle('Number of R packages by first publication')
+ggsave('number-of-submitted-packages-to-CRAN-log.png')
+
 ## store report
+save(pkgs, file="pkgs.rda")
 write.csv(pkgs, 'results.csv', row.names = FALSE)

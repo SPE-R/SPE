@@ -12,7 +12,7 @@
 
 \setbeamertemplate{footline}[frame number]
 
-\usepackage[english]{babel}
+\usepackage{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{times}
 \usepackage[T1]{fontenc}
@@ -40,8 +40,8 @@
     University of Warwick, UK
 }
 
-\date[SPE 2019] % (optional)
-{SPE 2019, Tartu}
+\date[SPE 2023] % (optional)
+{SPE 2023, Tartu}
 
 
 %% Does this do anything with Singapore theme??
@@ -110,19 +110,37 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Lattice Graphics}
+%\begin{frame}
+%  \frametitle{Lattice Graphics}
 
-  \begin{itemize}
-  \item A high-level data visualization system with an emphasis on
-     multivariate data
-  \item An implementation of Trellis graphics, first described
-     by William Cleveland in the book {\em Visualizing Data}, 1993.
-  \item Implemented in the base package \code{lattice}.
-  \item More fully described by the \code{lattice} package author
-      Deepayan Sarkar in the book {\em Lattice: Multivariate Data
-      Visualization with R}, 2008.  
-\end{itemize}
+%  \begin{itemize}
+%  \item A high-level data visualization system with an emphasis on
+%     multivariate data
+%  \item An implementation of Trellis graphics, first described
+%     by William Cleveland in the book {\em Visualizing Data}, 1993.
+%  \item Implemented in the base package \code{lattice}.
+%  \item More fully described by the \code{lattice} package author
+%      Deepayan Sarkar in the book {\em Lattice: Multivariate Data
+%      Visualization with R}, 2008.  
+%\end{itemize}
+
+\begin{frame}
+   \frametitle{Grid Graphics}
+
+   \begin{itemize}
+   \item A complete rewrite of the graphics system of R, independent of
+      base graphics.
+   \item Programming with graphics:
+      \begin{itemize}
+      \item Grid graphics commands create graphical objects (Grobs)
+      \item Printing a Grob displays it on a graphics device
+      \item Functions can act on grobs to modify or combine them
+      \end{itemize}
+   \item Implemented in the base package \code{grid}, and extended
+      by CRAN packages \code{gridExtra}, \code{gridDebug}, ...
+   \item Described by the package author Paul Murrell in the book
+       {\em R Graphics (2nd edition)}, 2011.
+   \end{itemize}
 
 \end{frame}
 
@@ -148,25 +166,6 @@
 
 \end{frame}
 
-\begin{frame}
-   \frametitle{Grid Graphics}
-
-   \begin{itemize}
-   \item A complete rewrite of the graphics system of R, independent of
-      base graphics.
-   \item Programming with graphics:
-      \begin{itemize}
-      \item Grid graphics commands create graphical objects (Grobs)
-      \item Printing a Grob displays it on a graphics device
-      \item Functions can act on grobs to modify or combine them
-      \end{itemize}
-   \item Implemented in the base package \code{grid}, and extended
-      by CRAN packages \code{gridExtra}, \code{gridDebug}, ...
-   \item Described by the package author Paul Murrell in the book
-       {\em R Graphics (2nd edition)}, 2011.
-   \end{itemize}
-
-\end{frame}
 
 \begin{frame}
    \frametitle{Putting It All Together}
@@ -174,15 +173,13 @@
    \begin{itemize}
    \item Base graphics are the default, and are used almost exclusively
          in this course
-   \item \code{lattice} and \code{ggplot2} are alternate, high-level
-         graphics packages
    \item \code{grid} provides alternate low-level graphics functions. 
       \begin{itemize}
-      \item A {\em domain-specific language} for graphics within R
-      \item Underlies both \code{lattice} and \code{ggplot}
       \item Experts only
       \end{itemize}
-   \item All graphics packages take time to learn...
+   \item \code{ggplot2} is an alternate, high-level graphics package
+       built on \code{grid}.
+  \item All graphics packages take time to learn...
    \end{itemize}
 
 \end{frame}
@@ -191,11 +188,12 @@
 
 \begin{frame}
   \frametitle{Graphics Devices}
-  Graphics devices are used by all graphics systems (base, lattice, ggplot2, grid).
+  Graphics devices are used by all graphics systems.
   \begin{itemize}      
   \item Plotting commands will draw on the current {\em graphics device}
-  \item This default graphics device is a window on your screen:
+  \item The {\em default} graphics device is a window on your screen:
   \begin{description}
+  \item[In RStudio] RStudioGD()
   \item[On Windows] windows()
   \item[On Unix/Linux] x11()
   \item[On Mac OS X] quartz()
@@ -216,7 +214,7 @@
      by clicking the zoom button.
      \item You can write the contents directly to a file with the export
      menu
-     \item Sometimes small size of the RStudioGD causes problems. Open
+     \item Sometimes the small size of the RStudioGD device causes problems. Open
      up a new device calling \texttt{RStudioGD()}. This will appear in
      its own window, free from the GUI.
   \end{itemize}
@@ -268,7 +266,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Basic x-y Plots}
+  \frametitle{Base x-y Plots}
   \begin{itemize}
   \item The \code{plot} function with one or two numeric arguments
   \item Scatterplot or line plot (or both) depending on \code{type}
@@ -281,7 +279,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Customizing Plots}
+  \frametitle{Customizing Plots in Base}
   \begin{itemize}
   \item Most plotting functions take optional parameters to change the
     appearance of the plot
@@ -302,7 +300,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Adding to Plots}
+  \frametitle{Adding to Plots in Base}
     \begin{itemize}
     \item \code{title()} add a title above the plot
     \item \code{points()}, \code{lines()} adds points and (poly-)lines
@@ -315,7 +313,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Approach to Customization}
+  \frametitle{Strategy for Customization of Base Graphics}
   \begin{itemize}
   \item Start with default plots
   \item Modify parameters (using \code{par()} settings or plotting
@@ -388,100 +386,100 @@ mtext(paste("side",1:4), side=1:4, line=-1,font=2)
   \centerline{\includegraphics[width=4in]{layout}}
 \end{frame}
 
-\section{Lattice graphics}
+%\section{Lattice graphics}
 
-\begin{frame}
+%\begin{frame}
 
-   The \code{lattice} package provides functions that produce similar
-   plots to base graphics (with a different ``look and feel'')
+%   The \code{lattice} package provides functions that produce similar
+%   plots to base graphics (with a different ``look and feel'')
 
-   \begin{center}
-   \begin{tabular}{ll}
-    & \\
-   \hline
-   \code{base} & \code{lattice} \\
-   \hline
-   plot & xyplot \\
-   hist & histogram \\
-   boxplot & bwplot \\
-   barplot & barchart \\
-   heatmap, contour & levelplot \\
-   dotchart & dotplot \\
-   \hline
-   \end{tabular}
-   \end{center}
+%   \begin{center}
+%   \begin{tabular}{ll}
+%    & \\
+%   \hline
+%   \code{base} & \code{lattice} \\
+%   \hline
+%   plot & xyplot \\
+%   hist & histogram \\
+%   boxplot & bwplot \\
+%   barplot & barchart \\
+%   heatmap, contour & levelplot \\
+%   dotchart & dotplot \\
+%   \hline
+%   \end{tabular}
+%   \end{center}
 
-   Lattice graphics can also be used to explore {\em multi-dimensional data}
+%   Lattice graphics can also be used to explore {\em multi-dimensional data}
 
-\end{frame}
+%\end{frame}
 
-\begin{frame}
-   \frametitle{Panels}
+%\begin{frame}
+%   \frametitle{Panels}
 
-   \begin{itemize}
-   \item Plotting functions in \code{lattice} consistently use a formula
-      interface, e.g \code{y\textasciitilde x} to plot $y$ against $x$
-   \item The formula allows conditioning variables, e.g. 
-      \code{y\textasciitilde x|g1*g2*...}
-   \item Conditioning variables create an array of {\em panels}, 
-      \begin{itemize}
-      \item One panel for each value of the conditioning variables
-      \item Continuous conditioning variables are divided into 
-      {\em shingles} (slightly overlapping ranges, named after the roof covering)
-      \item All panels have the same scales on the $x$ and $y$ axes.
-      \end{itemize}
-   \end{itemize}     
+%   \begin{itemize}
+%   \item Plotting functions in \code{lattice} consistently use a formula
+%      interface, e.g \code{y\textasciitilde x} to plot $y$ against $x$
+%   \item The formula allows conditioning variables, e.g. 
+%      \code{y\textasciitilde x|g1*g2*...}
+%   \item Conditioning variables create an array of {\em panels}, 
+%      \begin{itemize}
+%      \item One panel for each value of the conditioning variables
+%      \item Continuous conditioning variables are divided into 
+%      {\em shingles} (slightly overlapping ranges, named after the roof covering)
+%      \item All panels have the same scales on the $x$ and $y$ axes.
+%      \end{itemize}
+%   \end{itemize}     
 
-\end{frame}
+%\end{frame}
 
-\begin{frame}
-   \frametitle{Ozone Concentration by Solar Radiation}
-   \code{xyplot(log(Ozone)\textasciitilde Solar.R, data=airquality)}
+%\begin{frame}
+%   \frametitle{Ozone Concentration by Solar Radiation}
+%   \code{xyplot(log(Ozone)\textasciitilde Solar.R, data=airquality)}
 
-   \centerline{\includegraphics[width=6cm]{ozone1.pdf}}
-\end{frame}
+%   \centerline{\includegraphics[width=6cm]{ozone1.pdf}}
+%\end{frame}
 
-\begin{frame}[fragile]
-   \frametitle{Conditioned on Temperature}
-   \code{xyplot(log(Ozone)\textasciitilde Solar.R | equal.count(Temp), data=airquality)}
+%\begin{frame}[fragile]
+%   \frametitle{Conditioned on Temperature}
+%   \code{xyplot(log(Ozone)\textasciitilde Solar.R | equal.count(Temp), data=airquality)}
 
-   \centerline{\includegraphics[width=6cm]{ozone2.pdf}}
-\end{frame}
+%   \centerline{\includegraphics[width=6cm]{ozone2.pdf}}
+%\end{frame}
 
-\begin{frame}
-   \frametitle{Coloured by Month}
-   \code{xyplot(log(Ozone)\textasciitilde Solar.R | equal.count(Temp), group=Month, data=airquality)}
+%\begin{frame}
+%   \frametitle{Coloured by Month}
+%   \code{xyplot(log(Ozone)\textasciitilde Solar.R | equal.count(Temp), group=Month, data=airquality)}
 
-   \centerline{\includegraphics[width=6cm]{ozone3.pdf}}
-\end{frame}
+%   \centerline{\includegraphics[width=6cm]{ozone3.pdf}}
+%\end{frame}
 
-\begin{frame}[fragile]
-  \frametitle{Customizing Panels}
-  \begin{itemize}
-  \item What goes inside each panel of a Lattice plot is controlled by
-    a \emph{panel function}
-  \item There are many standard functions: \code{panel.xyplot},
-    \code{panel.lmline}, etc.
- \item You can write your own panel functions, most often by
-    combining standard ones
-  \end{itemize}
-  \begin{vcode}
-  mypanel <- function(x,y,...){
-     panel.xyplot(x,y,...) #Scatter plot
-     panel.lmline(x,y,type="l") #Regression line
-  }
-  \end{vcode}
-\end{frame}
+%\begin{frame}[fragile]
+%  \frametitle{Customizing Panels}
+%  \begin{itemize}
+%  \item What goes inside each panel of a Lattice plot is controlled by
+%    a \emph{panel function}
+%  \item There are many standard functions: \code{panel.xyplot},
+%    \code{panel.lmline}, etc.
+% \item You can write your own panel functions, most often by
+%    combining standard ones
+%  \end{itemize}
+%  \begin{vcode}
+%  mypanel <- function(x,y,...){
+%     panel.xyplot(x,y,...) #Scatter plot
+%     panel.lmline(x,y,type="l") #Regression line
+%  }
+%  \end{vcode}
+%\end{frame}
 
-\begin{frame}
-   \frametitle{With Custom Panel}
-   \code{xyplot(log(Ozone)\textasciitilde Solar.R | equal.count(Temp), 
-         panel=mypanel, data=airquality)}
-   \centerline{\includegraphics[width=5cm]{ozone4.pdf}}
+%\begin{frame}
+%   \frametitle{With Custom Panel}
+%   \code{xyplot(log(Ozone)\textasciitilde Solar.R | equal.count(Temp), 
+%         panel=mypanel, data=airquality)}
+%   \centerline{\includegraphics[width=5cm]{ozone4.pdf}}
 
-   Each panel shows a scatter plot (\code{panel.xyplot}) and a regression
-   line (\code{panel.lmline})
-\end{frame}
+%   Each panel shows a scatter plot (\code{panel.xyplot}) and a regression
+%   line (\code{panel.lmline})
+%\end{frame}
 
 \section{Grid graphics}
 
@@ -490,7 +488,7 @@ mtext(paste("side",1:4), side=1:4, line=-1,font=2)
 
   \begin{itemize}
   \item Experts only, but \dots
-  \item Recall that \code{lattice} and \code{ggplot2} both use \code{grid}
+  \item Recall that \code{ggplot2} uses \code{grid}
   \item The key concepts you need are {\em grobs} and {\em viewports}
   \end{itemize}
 
@@ -500,8 +498,7 @@ mtext(paste("side",1:4), side=1:4, line=-1,font=2)
   \frametitle{Grobs: Graphical Objects}
 
   \begin{itemize}
-  \item Grobs are created by plotting functions in \code{grid}, \code{lattice},
-        \code{ggplot2}
+  \item Grobs are created by plotting functions in \code{grid}, and \code{ggplot2}
   \item Grobs are only displayed when they are printed
   \item Grobs can be modified or combined before being displayed
   \item The \code{ggplot2} package uses the \code{+} operator to combine
@@ -516,8 +513,6 @@ mtext(paste("side",1:4), side=1:4, line=-1,font=2)
   \begin{itemize}
   \item The plotting region is divided into viewports
   \item Grobs are displayed inside a viewport
-  \item The panels in lattice graphics are examples of viewports, but
-        in general
         \begin{itemize}
         \item Viewports can be different sizes (inches, centimetres,
         lines of text, or relative units)

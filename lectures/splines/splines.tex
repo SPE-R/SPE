@@ -1,5 +1,6 @@
-\documentclass{beamer}
-\usepackage{animate}
+\documentclass[aspectratio=169]{beamer}
+%\usepackage{animate}
+\usefonttheme[onlymath]{serif}
 
 \mode<presentation>
 {
@@ -10,14 +11,14 @@
   % or whatever (possibly just delete it)
 }
 
-\usepackage[english]{babel}
+\usepackage{babel}
 \usepackage[latin1]{inputenc}
 \usepackage{multirow}
 
 %Beamer automatically puts the title up quite high where it appears
 %over the background image of IARC: Keep adding empty lines until
 %it appears in the right position
-\title{~ \\ ~ \\ ~ \\ Everything You Ever Wanted to Know about Splines...}
+\title{Everything you ever wanted to know about splines but were too afraid to ask}
 
 \author{Martyn Plummer}
 % - Use the \inst{?} command only if the authors have different
@@ -28,7 +29,7 @@
   University of Warwick
 }
 
-\date[Tartu]{August 2019}
+\date[Tartu]{03 June 2023}
 
 %\newcommand{\thetavec}{\boldsymbol \theta}
 %\newcommand{\Yvec}{\mathbf Y}
@@ -130,8 +131,8 @@
   \frametitle{Join the dots}
 
   \begin{center}
-    \includegraphics<1>[scale=0.1]{figures/join-the-dots.png}
-    \includegraphics<2>[scale=0.1]{figures/join-the-dots-solved.png}
+    \includegraphics<1>[height=6cm]{figures/join-the-dots.png}
+    \includegraphics<2>[height=7cm]{figures/join-the-dots-solved.png}
   \end{center}
   
 \end{frame}
@@ -140,16 +141,18 @@
   \frametitle{Linear interpolation}
 
   \begin{columns}
-    \begin{column}{5cm}
+    \begin{column}{6cm}
       \includegraphics<1>[scale=0.4]{figures/dose-response-points.png}
-      \includegraphics<2>[scale=0.4]{figures/dose-response-linear.png}
+      \includegraphics<2->[scale=0.4]{figures/dose-response-linear.png}
     \end{column}
-    \begin{column}{4cm}
+    \begin{column}{6cm}
       \begin{itemize}
       \item Suppose a dose response curve is known exactly at certain
         points
       \item<2-> We can fill in the gaps (interpolate) by drawing a straight
         (linear) line between adjacent points
+      \item<3-> This creates a mathematical function $f()$ which gives
+        a response value $f(x)$ for every dose value $x$.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -198,8 +201,8 @@
     \end{column}
     \begin{column}{4cm}
       \begin{itemize}
-      \item Linear interpolation fits a linear dose-response curve exactly
-      \item<3-> But it breaks down when we try to extrapolate
+      \item Linear interpolation fits a linear dose-response curve exactly.
+      \item<3-> But it breaks down when we extrapolate.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -251,7 +254,7 @@
     \begin{column}{5cm}
       \includegraphics[scale=0.4]{figures/penalty2.png}
     \end{column}
-    \begin{column}{4cm}
+    \begin{column}{6cm}
       \begin{itemize}
       \item The contribution to the penalty at each point depends on the
         curvature (represented by a colour gradient)
@@ -267,11 +270,11 @@
   \frametitle{An interpolating cubic spline}
 
     \begin{columns}
-    \begin{column}{5cm}
+    \begin{column}{6cm}
       \includegraphics<1>[scale=0.4]{figures/dose-response-points.png}
       \includegraphics<2>[scale=0.4]{figures/dose-response-cubic.png}
     \end{column}
-    \begin{column}{4cm}
+    \begin{column}{6cm}
       \begin{itemize}
         \item The smoothest curve that goes through the observed
           points is a cubic spline.
@@ -282,24 +285,264 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Properties of cubic splines}
+  \frametitle{What is a cubic spline?}
 
+  Splines are piecewise cubic curves
   \begin{itemize}
-  \item A cubic spline consists of a sequence of curves of the form
+  \item Every observed point is a knot.
+  \item The knots divide the curve into sections
+  \item Each section is a cubic function
     \[
     f(x) = a + b x + c x^2 + d x^3
     \]
-    for some coefficients $a, b, c, d$, in between each observed point.
-  \item The cubic curves are joined at the observed points (knots)
-  \item The cubic curves match where they meet at the knots
+  \item The parameters $a, b, c, d$ are different for different sections
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Boundary conditions}
+
+  \begin{columns}
+    \begin{column}{6cm}
+      \includegraphics<1>[scale=0.4]{figures/spline-constraint1.png}
+      \includegraphics<2>[scale=0.4]{figures/spline-constraint2.png}
+      \includegraphics<3>[scale=0.4]{figures/spline-constraint3.png}
+    \end{column}
+    \begin{column}{6cm}
+      Sections need to join up smoothly.
+      \begin{itemize}
+      \item Both sides must go through the knot.
+      \item<2-> The slope cannot change at a knot
+      \item<3-> The curvature cannot change at a knot
+      \end{itemize}
+    \end{column}
+  \end{columns}
+       
+\end{frame}
+
+%    for some coefficients $a, b, c, d$, in between each observed point.
+%  \item The cubic curves are joined at the observed points (knots)
+%  \item The cubic curves match where they meet at the knots
+%    \begin{itemize}
+%    \item Same value $f(x)$
+%    \item Same slope $\partial f/ \partial x$
+%    \item Same curvature $\partial^2 f / \partial x^2$
+%    \end{itemize}
+%  \end{itemize}
+%\end{frame}
+
+  
+\section{Smoothing splines}
+
+\begin{frame}
+  \frametitle{Dose response with error}
+
+    \begin{columns}
+    \begin{column}{6cm}
+      \includegraphics<1>[scale=0.4]{figures/smooth1.png}
+      \includegraphics<2>[scale=0.4]{figures/smooth2.png}
+    \end{column}
+    \begin{column}{6cm}
+      In practice we never know the dose response curve exactly at any
+      point but always measure with error. A spline model is then
+      a compromise between
+      \begin{itemize}
+      \item Model fit
+      \item Smoothness of the spline
+      \end{itemize}
+    \end{column}
+    \end{columns}
+    
+\end{frame}
+
+\begin{frame}
+  \frametitle{Fitting a smoothing spline}
+
+  Minimize
+  \[
+  \sum_i \left[ y_i - f(x_i) \right]^2 + \lambda
+  \int \left(
+  \frac{\partial^2 f}{\partial x^2}
+  \right)^2 dx
+  \]
+  Or, more generally
+  \[
+  \text{Deviance } + \lambda \times \text{Roughness penalty}
+  \]
+  Size of tuning parameter $\lambda$ determines compromise between model fit
+  (small $\lambda$) and smoothness (large $\lambda$).
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Smoothing and degrees of freedom}
+  
+  Software will choose the smoothing parameter $\lambda$ for you
+  automatically using cross-validation.
+
+  ~\\
+  The smoothing parameter is adapted to the data.
+
+  ~\\
+  Smoothness of the model can be measured with the {\em effective
+    degrees of freedom} (EDF)
+  \begin{itemize}
+  \item Linear model: maximally smooth
     \begin{itemize}
-    \item Same value $f(x)$
-    \item Same slope $\partial f/ \partial x$
-    \item Same curvature $\partial^2 f / \partial x^2$
+    \item EDF=2 (intercept + slope parameter)
     \end{itemize}
+  \item Intepolating mode: best fit
+    \begin{itemize}
+    \item EDF=n (one parameter for every observation)
+    \end{itemize}
+  \end{itemize}
+  
+\end{frame}
+  
+%\begin{frame}
+%  \frametitle{How to choose the tuning parameter $\lambda$}
+
+%  Software will choose the 
+%  This is a statistical problem. There are various statistical
+%  approaches:
+%  \begin{itemize}
+%  \item Restricted maximum likelihood (REML)
+%  \item Cross-validation
+%  \item Bayesian approach (with prior on smoothness)
+%  \end{itemize}
+%  At least the first two should be available in most software.
+  
+%\end{frame}
+
+\section{Splines in R}
+
+%\begin{frame}
+%  \frametitle{Spline models done badly}
+
+%  \begin{columns}
+%    \begin{column}{5cm}
+%      \begin{itemize}
+%      \item Choose number and placement of knots
+%      \item Create a spline bases
+%      \item Use spline basis as the design matrix in a generalized linear model%.
+%      \end{itemize}
+%    \end{column}
+%    \begin{column}{5cm}
+%      \begin{itemize}
+%      \item Without penalization, model will underfit (too few knots)
+%        or overfit (too many knots)
+%      \item Placement of knots may create artefacts in the dose-response
+%        relationship
+%      \end{itemize}
+%    \end{column}
+%  \end{columns}
+
+%\end{frame}
+
+%\begin{frame}
+%  \frametitle{Spline models done well}
+
+%  \begin{columns}
+%    \begin{column}{5cm}
+%      \begin{itemize}
+%      \item A knot for every observed value (remember: knots are a
+%        product of the observation process).
+%      \item Use penalization: find the right compromise between model fit
+%        and model complexity.
+%      \end{itemize}
+%    \end{column}
+%    \begin{column}{5cm}
+%      \begin{itemize}
+%      \item In practice we can get a good approximation to this ``ideal''
+%        model with fewer knots.
+%      \item This assumption should be tested
+%      \end{itemize}
+%    \end{column}
+%  \end{columns}
+
+%\end{frame}
+
+\begin{frame}
+  \frametitle{Spline models in R}
+
+  \begin{itemize}
+  \item Do not use the \textsf{splines} package.
+  \item Use the \texttt{gam} function from the \textsf{mgcv}
+    package to fit your spline models.
+  \item The \texttt{gam} function chooses number and placement of knots
+    for you and estimates the size of the tuning parameter $\lambda$
+    automatically.
+  \item You can use the \texttt{gam.check} function to see if you have
+    enough knots. Also re-fit the model explicitly setting a larger
+    number of knots (e.g. double) to see if the fit changes.
   \end{itemize}
 
 \end{frame}
+
+\begin{frame}
+  \frametitle{Penalized spline}
+
+  \begin{columns}
+    \begin{column}{6cm}
+      \includegraphics<1>[scale=0.4]{figures/gam-points.png}
+      \includegraphics<2>[scale=0.4]{figures/gam-7.png}
+    \end{column}
+    \begin{column}{6cm}
+      \begin{itemize}
+      \item A gam fit to some simulated data
+      \item Model has 9 degrees of freedom
+      \item Smoothing reduces this to 2.88 effective degrees of freedom
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Unpenalized spline}
+
+  \begin{columns}
+    \begin{column}{6cm}
+      \includegraphics<1>[scale=0.4]{figures/gam-points.png}
+      \includegraphics<2>[scale=0.4]{figures/gam-nonsmoothed.png}
+    \end{column}
+    \begin{column}{6cm}
+      \begin{itemize}
+      \item An unpenalized spline using the same spline basis as the
+        gam fit.
+      \item Model has 9 degrees of freedom
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Conclusions}
+  
+  \begin{itemize}
+  \item Epidemiologists like to turn continuous variables into categories.
+  \item Statisticians do not like categorization because it loses information.
+  \item Splines are a flexible class of models that avoid categorization
+    but also avoid making strong assumptions about the shape of a
+    dose-response relationship.
+  \item Penalized regression splines are based on compromise between
+    goodness-of-fit and smoothness.
+  \item Most of the decisions in fitting a penalized regression spline
+    can be made for you
+    \begin{itemize}
+    \item Degree of smoothing
+    \item Number of knots
+    \item Placement of knots
+    \end{itemize}
+  \end{itemize}
+  
+\end{frame}
+
+\end{document}
+
+%%% Discarded material on underlying Brownian motion model
 
 \section{Brownian motion}
 
@@ -355,7 +598,7 @@
       \includegraphics<2>[scale=0.4]{figures/linear2.png}
       \includegraphics<3>[scale=0.4]{figures/linear3.png}
     \end{column}
-    \begin{column}{4cm}
+    \begin{column}{6cm}
       \begin{itemize}
       \item Suppose we observe a Brownian motion at three points
       \item<2-> Grey lines show a sample of possible paths through the points
@@ -389,7 +632,7 @@
     \begin{column}{5cm}
       \includegraphics[scale=0.4]{figures/integrated.png}
     \end{column}
-    \begin{column}{4cm}
+    \begin{column}{6cm}
       \begin{itemize}
       \item The value of an integrated Brownian motion is the area
         under the curve (AUC) of a Brownian motion up to that point.
@@ -471,187 +714,3 @@
   \end{itemize}
 
 \end{frame}
-  
-\section{Smoothing splines}
-
-\begin{frame}
-  \frametitle{Dose response with error}
-
-    \begin{columns}
-    \begin{column}{6cm}
-      \includegraphics<1>[scale=0.4]{figures/smooth1.png}
-      \includegraphics<2>[scale=0.4]{figures/smooth2.png}
-    \end{column}
-    \begin{column}{4cm}
-      In practice we never know the dose response curve exactly at any
-      point but always measure with error. A spline model is then
-      a compromise between
-      \begin{itemize}
-      \item Model fit
-      \item Smoothness of the spline
-      \end{itemize}
-    \end{column}
-    \end{columns}
-    
-\end{frame}
-
-\begin{frame}
-  \frametitle{Fitting a smoothing spline}
-
-  Minimize
-  \[
-  \sum_i \left( y_i - f(x_i) \right)^2 + \lambda
-  \int \left(
-  \frac{\partial^2 f}{\partial x^2}
-  \right)^2 dx
-  \]
-  Or, more generally
-  \[
-  \text{Deviance } + \lambda * \text{Roughness penalty}
-  \]
-  Size of tuning parameter $\lambda$ determines compromise between model fit
-  (small $\lambda$) and smoothness (large $\lambda$).
-
-\end{frame}
-
-\begin{frame}
-  \frametitle{How to choose the tuning parameter $\lambda$}
-
-  This is a statistical problem. There are various statistical
-  approaches:
-  \begin{itemize}
-  \item Restricted maximum likelihood (REML)
-  \item Cross-validation
-  \item Bayesian approach (with prior on smoothness)
-  \end{itemize}
-  At least the first two should be available in most software.
-  
-\end{frame}
-
-\section{Conclusions}
-
-\begin{frame}
-  \frametitle{Spline models done badly}
-
-  \begin{columns}
-    \begin{column}{5cm}
-      \begin{itemize}
-      \item Choose number and placement of knots
-      \item Create a spline bases
-      \item Use spline basis as the design matrix in a generalized linear model.
-      \end{itemize}
-    \end{column}
-    \begin{column}{5cm}
-      \begin{itemize}
-      \item Without penalization, model will underfit (too few knots)
-        or overfit (too many knots)
-      \item Placement of knots may create artefacts in the dose-response
-        relationship
-      \end{itemize}
-    \end{column}
-  \end{columns}
-
-\end{frame}
-
-\begin{frame}
-  \frametitle{Spline models done well}
-
-  \begin{columns}
-    \begin{column}{5cm}
-      \begin{itemize}
-      \item A knot for every observed value (remember: knots are a
-        product of the observation process).
-      \item Use penalization: find the right compromise between model fit
-        and model complexity.
-      \end{itemize}
-    \end{column}
-    \begin{column}{5cm}
-      \begin{itemize}
-      \item In practice we can get a good approximation to this ``ideal''
-        model with fewer knots.
-      \item This assumption should be tested
-      \end{itemize}
-    \end{column}
-  \end{columns}
-
-\end{frame}
-
-\begin{frame}
-  \frametitle{Spline models in R}
-
-  \begin{itemize}
-  \item Do not use the \textsf{splines} package.
-  \item Use the \texttt{gam} function from the \textsf{mgcv}
-    package to fit your spline models.
-  \item The \texttt{gam} function chooses number and placement of knots
-    for you and estimates the size of the tuning parameter $\lambda$
-    automatically.
-  \item You can use the \texttt{gam.check} function to see if you have
-    enough knots. Also re-fit the model explicitly setting a larger
-    number of knots (e.g. double) to see if the fit changes.
-  \end{itemize}
-
-\end{frame}
-
-\begin{frame}
-  \frametitle{Penalized spline}
-
-  \begin{columns}
-    \begin{column}{6cm}
-      \includegraphics<1>[scale=0.4]{figures/gam-points.png}
-      \includegraphics<2>[scale=0.4]{figures/gam-7.png}
-    \end{column}
-    \begin{column}{4cm}
-      \begin{itemize}
-      \item A gam fit to some simulated data
-      \item Model has 9 degrees of freedom
-      \item Smoothing reduces this to 2.88 effective degrees of freedom
-      \end{itemize}
-    \end{column}
-  \end{columns}
-  
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{Unpenalized spline}
-
-  \begin{columns}
-    \begin{column}{6cm}
-      \includegraphics<1>[scale=0.4]{figures/gam-points.png}
-      \includegraphics<2>[scale=0.4]{figures/gam-nonsmoothed.png}
-    \end{column}
-    \begin{column}{4cm}
-      \begin{itemize}
-      \item An unpenalized spline using the same spline basis as the
-        gam fit.
-      \item Model has 9 degrees of freedom
-      \end{itemize}
-    \end{column}
-  \end{columns}
-  
-\end{frame}
-
-\begin{frame}
-  \frametitle{Conclusions}
-  
-  \begin{itemize}
-  \item Epidemiologists like to turn continuous variables into categories.
-  \item Statisticians do not like categorization because it loses information.
-  \item Splines are a flexible class of models that avoid categorization
-    but also avoid making strong assumptions about the shape of a
-    dose-response relationship.
-  \item Penalized regression splines are based on compromise between
-    goodness-of-fit and smoothness.
-  \item Most of the decisions in fitting a penalized regression spline
-    can be made for you
-    \begin{itemize}
-    \item Degree of smoothing
-    \item Number of knots
-    \item Placement of knots
-    \end{itemize}
-  \end{itemize}
-  
-\end{frame}
-
-\end{document}
