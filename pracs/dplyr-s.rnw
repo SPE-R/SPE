@@ -396,9 +396,9 @@ Another nice feature of \texttt{dplyr} is tables binding and joining functions. 
 will create 2 fake \texttt{tibble}:
 
 \begin{itemize}
-  \item \texttt{age} an individual database wich contains \texttt{pid} (unique individuals id) 
+  \item \texttt{age} an individual database which contains \texttt{pid} (unique individuals id) 
   and \texttt{age} in year
-  \item \texttt{center} an study center database wich contains \texttt{pid} (unique individuals id)
+  \item \texttt{center} an study center database which contains \texttt{pid} (unique individuals id)
   and \texttt{center} (the center where an individual is registered)
 \end{itemize}
 
@@ -425,7 +425,7 @@ First of all let's have a look to \texttt{bind\_rows} function.
 << >>=
 bind_rows(age, center)
 @
-Is it usfeful?\newline
+Is it useful?\newline
 Here not really but that can be in other situations (e.g. several individuals data base to merge..).\newline
 \textbf{Note:} in \texttt{bind\_rows}, if columns names do not match, they are fill with \texttt{NA}.  
 
@@ -435,23 +435,26 @@ between \texttt{left\_join}, \texttt{full\_join} and \texttt{inner\_join}.
 
 << >>=
 ## all individuals from ages are kept
-left_join(age, center)
+left_join(age, center, by = c('pid'))
 ## everithing is kept
-full_join(age, center)
+full_join(age, center, by = c('pid'))
 ## only the individuals present in both dataset are kept
-inner_join(age, center)
+inner_join(age, center, by = c('pid'))
 @
 Can you spot the differences between the commands above?\newline
-As a last exercise, try to compute the individuals' mean age per center.
+As an exercise, you can try to compute the individuals' mean age per center.
 
 << >>=
-inner_join(age, center) %>%
+inner_join(age, center, by = c('pid')) %>%
   group_by(center) %>%
   summarise(
     mean_age = mean(age)
   )
 @
 
+\textbf{Note:} the \texttt{by} argument indicates which column should be use to make the join. In some 
+cases, you might have to uses several columns to match (e.g. per sex and age group), this
+can be easily done specifying a vector of column names.
 
 \subsection{Bonus: Rendering tables}
 
@@ -461,36 +464,36 @@ this goal.
 
 << >>=
 # if(!require(kableExtra)) install.packages('kableExtra')
-# library(kableExtra)
-# 
-# births.08 <-
-#   births_tbl %>%
-#   filter(
-#     !is.na(gest4)
-#   ) %>%
-#   group_by(gest4) %>%
-#   summarise(
-#     N = n()
-#   ) %>%
-#   mutate(
-#     `(%)` = (N / sum(N)) %>% scales::percent()
-#   )
-# 
-# ## default
-# births.08
-# 
-# ## markdown flavour (useful fo automatic repport production with knitr)
+library(kableExtra)
+
+births.08 <-
+  births_tbl %>%
+  filter(
+    !is.na(gest4)
+  ) %>%
+  group_by(gest4) %>%
+  summarise(
+    N = n()
+  ) %>%
+  mutate(
+    `(%)` = (N / sum(N)) %>% scales::percent()
+  )
+
+## default
+births.08
+
+## markdown flavor (useful fo automatic report production with knitr)
 # births.08 %>%
 #   knitr::kable(fromat = 'markdown')
-# 
-# ## create an html version of the table and save it on the hard drive
-# births.08 %>%
-#   kable() %>%
-#   kable_styling(
-#     bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-#     full_width = FALSE
-#   ) %>%
-#   save_kable(file = 'births.08.html', self_contained = TRUE)
+
+## create an html version of the table and save it on the hard drive
+births.08 %>%
+  kable() %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    full_width = FALSE
+  ) %>%
+  save_kable(file = 'births.08.html', self_contained = TRUE)
 @
 
 <<echo=FALSE, eval=FALSE>>=
