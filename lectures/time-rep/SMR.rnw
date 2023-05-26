@@ -22,13 +22,13 @@ compared with reference rates obtained from:
 %----------------------------------------------------------------------
 \begin{frame}{Cohort rates vs. population rates: RSR}
   \begin{itemize}
-  \item \textbf{Additive:} $\lambda(a) = \delta(a) + \lambda_\text{pop}(a)$
+  \item \textbf{Additive:} $\lambda(a) = \delta(a) + \lambda_\text{p}(a)$
   \item Note that the survival (since $a=a_0$, say) is: \vspace*{-1ex}
 \begin{align*}
-     S(a) &= \exp\Bigl(-\!\!\int_{a_0}^a\!\! \delta(a) + \lambda_\text{pop}(a) \dif a\Bigr)\\
-          &= \exp\Bigl(-\!\!  \int_{a_0}^a\!\! \delta(a) \dif a\Bigr) \times S_\text{pop}(a)\\
+     S(a) &= \exp\Bigl(-\!\!\int_{a_0}^a\!\! \delta(a) + \lambda_\text{p}(a) \dif a\Bigr)\\
+          &= \exp\Bigl(-\!\!  \int_{a_0}^a\!\! \delta(a) \dif a\Bigr) \times S_\text{p}(a)\\
     \Rightarrow \quad
-    r(a) = S(a)/S_\text{pop}(a) &= \exp\Bigl(-\!\!\int_{a_0}^a\!\! \delta(a) \dif a\Bigr)
+    r(a) = S(a)/S_\text{p}(a) &= \exp\Bigl(-\!\!\int_{a_0}^a\!\! \delta(a) \dif a\Bigr)
   \end{align*}
 
   \item \textbf{Additive} model for \textbf{rates} $\Leftrightarrow$ \textbf{Relative survival} model.
@@ -38,35 +38,33 @@ compared with reference rates obtained from:
 %----------------------------------------------------------------------
 \begin{frame}{Cohort rates vs. population rates: SMR}
   \begin{itemize}
-  \item \textbf{Multiplicative:} $\lambda(a) = \theta \times \lambda_\text{pop}(a)$
-  %% \item Cohort rates proportional to reference rates, $\lambda_\text{pop}$:\\
-  %%   $\lambda(a) = \theta \times \lambda_\text{pop}(a)$ --- $\theta$ the same in all
-  %%   age-bands.
+  \item \textbf{Multiplicative:} $\lambda(a) = \theta \times \lambda_\text{p}(a)$
+  \item Cohort rates proportional to reference rates, $\lambda_\text{p}$:\\
+    $\lambda(a) = \theta \times \lambda_\text{p}(a)$ --- $\theta$ the same in all
+    age-bands.
   \item $D_a$ deaths during $Y_a$ person-years an age-band $a$ gives
     the likelihood:
-    \[ D_a \log\big(\lambda(a)\big) - \lambda(a) Y_a = D_a \log\big(\theta\lambda_\text{pop}(a)\big) - \theta\lambda_\text{pop}(a) Y_a
-    \]
-%% \begin{eqnarray*}
-%%     D_a \log(\lambda(a)) - \lambda(a) Y_a
-%%   & = & D_a \log(\theta\lambda_\text{pop}(a)) - \theta\lambda_\text{pop}(a) Y_a \\
-%%   & = & D_a \log(\theta)+ D_a \log(\lambda_\text{pop}(a)) % \\ & &
-%%         - \theta(\lambda_\text{pop}(a) Y_a) 
-%% \end{eqnarray*}
-%% \item The constant $D_a \log(\lambda_\text{pop}(a))$ does not involve $\theta$,
-%%   and so can be dropped.
-%% \end{itemize}
-%% \end{frame}
+ \begin{eqnarray*}
+    D_a \log(\lambda(a)) - \lambda(a) Y_a
+  & = & D_a \log(\theta\lambda_\text{p}(a)) - \theta\lambda_\text{p}(a) Y_a \\
+  & = & D_a \log(\theta)+ D_a \log(\lambda_\text{p}(a)) % \\ & &
+        - \theta(\lambda_\text{p}(a) Y_a)
+\end{eqnarray*}
+\item The constant $D_a \log(\lambda_\text{p}(a))$ does not involve $\theta$,
+  and so can be dropped.
+\end{itemize}
+\end{frame}
 
-%% %----------------------------------------------------------------------
-%% \begin{frame}
-%%   \begin{itemize}
-  \item $\lambda_\text{pop}(a)Y_a = E_a$ is the ``expected'' number of cases in
+%----------------------------------------------------------------------
+\begin{frame}
+  \begin{itemize}
+  \item $\lambda_\text{p}(a)Y_a = E_a$ is the ``expected'' number of cases in
     age $a$, so the log-likelihood contribution from age $a$ is:
 \[
- D_a \log(\theta) - \theta\big(\lambda_\text{pop}(a) Y_a\big) =
- D_a \log(\theta) - \theta(E_a) 
+ D_a \log(\theta) - \theta\big(\lambda_\text{p}(a) Y_a\big) =
+ D_a \log(\theta) - \theta(E_a)
 \]
-%% \item \textbf{Note:} $\lambda_\text{pop}(a)$ is known for all values of $a$.
+%% \item \textbf{Note:} $\lambda_\text{p}(a)$ is known for all values of $a$.
 \item The log-likelihood is similar to the log-likelihood for a rate, so:
 \[
   \hat\theta = \sum_aD_a / \sum_aE_a =
@@ -84,10 +82,10 @@ compared with reference rates obtained from:
   \begin{itemize}[<+->]
   \item As for the rates, the SMR can be modelled using individual
     data.
-  \item Response is $d_i$, the event indicator (\texttt{lex.Xst}).
+  \item Response is $d_i$, the event indicator (\code{lex.Xst}).
   \item $\log$-offset is the expected value for each piece of
-    follow-up, $e_i=y_i \times \lambda_\text{pop}$ (\texttt{lex.dur * rate})
-  \item $\lambda_\text{pop}$ is the population rate corresponding to the age,
+    follow-up, $e_i=y_i \times \lambda_\text{p}$ (\code{lex.dur * rate})
+  \item $\lambda_\text{p}$ is the population rate corresponding to the age,
     period and sex of the follow-up period $y_i$.
   \end{itemize}
 \end{frame}
@@ -119,7 +117,7 @@ thL <- Lexis( entry = list( age = injecdat-birthdat,
 <<>>=
 thad <- splitMulti(thL, age=seq(0,90,5), dte=seq(1938,2038,5) )
 summary( thad )
-@ 
+@
 \pause
 \vspace*{-1em}
 Create variables to fit with the population data
@@ -128,7 +126,7 @@ Create variables to fit with the population data
 thad$agr <- timeBand( thad, "age", "left" )
 thad$per <- timeBand( thad, "dte", "left" )
 round( thad[1:5,c("lex.id","age","agr","dte","per","lex.dur","lex.Xst","sex")], 2 )
-@ 
+@
 \end{frame}
 
 %----------------------------------------------------------------------
@@ -142,43 +140,43 @@ gmortDK$per <- gmortDK$per+1900
 thadx <- merge( thad, gmortDK[,c("agr","per","sex","rt")] )
 #
 thadx$E <- thadx$lex.dur * thadx$rt / 1000
-@   
+@
 \end{frame}
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile]
 <<>>=
-stat.table( contrast,
-            list( D = sum( lex.Xst ),
-                  Y = sum( lex.dur ),
-                  E = sum( E ),
-                SMR = ratio( lex.Xst, E ) ),
-             margin = TRUE,
-               data = thadx )
-@   
+stat.table(contrast,
+           list( D = sum(lex.Xst),
+                 Y = sum(lex.dur),
+                 E = sum(E),
+               SMR = ratio(lex.Xst, E)),
+            margin = TRUE,
+              data = thadx)
+@
 \end{frame}
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile]
 <<echo=FALSE>>=
-stat.table( contrast,
-            list( D = sum( lex.Xst ),
-                  Y = sum( lex.dur ),
-                  E = sum( E ),
-                SMR = ratio( lex.Xst, E ) ),
-               data = thadx )
+stat.table(contrast,
+           list(D = sum(lex.Xst),
+                Y = sum(lex.dur),
+                E = sum(E),
+              SMR = ratio(lex.Xst, E)),
+             data = thadx)
 @
 \vspace*{-1em}
 <<>>=
-m.SMR <- glm( cbind(lex.Xst,E) ~ factor(contrast) - 1,
-              family = poisreg, 
-                data = thadx )
-round( ci.exp( m.SMR ), 2 )
-@ 
+m.SMR <- glm(cbind(lex.Xst, E) ~ factor(contrast) - 1,
+             family = poisreg,
+               data = thadx)
+round(ci.exp(m.SMR), 2)
+@
 \pause
 \begin{itemize}[<+->]
 \item Analysis of SMR is like analysis of rates:
-\item Replace $Y$ with $E$ --- that's all! 
+\item Replace $Y$ with $E$ --- that's all! (\code{glm.Lexis} not usable)
 \item \ldots it's the calculation of $E$ that is difficult
 \end{itemize}
 \end{frame}
