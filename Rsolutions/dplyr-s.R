@@ -4,7 +4,7 @@
 ### code chunk number 1: dplyr-s.rnw:30-33
 ###################################################
 library(Epi)
-suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyverse))
 data(births) 
 
 
@@ -334,7 +334,95 @@ inner_join(age, center, by = c('pid')) %>%
 
 
 ###################################################
-### code chunk number 27: dplyr-s.rnw:465-496
+### code chunk number 27: dplyr-s.rnw:469-470
+###################################################
+birth_per_ageg <- births_tbl %>% group_by(agegrp) %>% summarise(total_births = n())
+
+
+###################################################
+### code chunk number 28: dplyr-s.rnw:473-476
+###################################################
+(gg.01 <- 
+   ggplot(birth_per_ageg, aes(x = agegrp, y = total_births)) + 
+   geom_bar(stat = "identity"))
+
+
+###################################################
+### code chunk number 29: dplyr-s.rnw:480-485
+###################################################
+(gg.02 <- 
+   gg.01 +  
+   xlab("Women Age Group") + 
+   ylab("Total Births") + 
+   ggtitle("Number of Births per Women Age Group"))
+
+
+###################################################
+### code chunk number 30: dplyr-s.rnw:496-497
+###################################################
+countries <- c("Estonia", "Finland", "Denmark", "United Kingdom")
+
+
+###################################################
+### code chunk number 31: dplyr-s.rnw:501-502
+###################################################
+country_initials <- str_sub(countries, start = 1, end = 3)
+
+
+###################################################
+### code chunk number 32: dplyr-s.rnw:506-507
+###################################################
+countries_upper <- str_to_upper(countries)
+
+
+###################################################
+### code chunk number 33: dplyr-s.rnw:511-512
+###################################################
+countries_modified <- str_replace(countries, "United", "Utd")
+
+
+###################################################
+### code chunk number 34: dplyr-s.rnw:516-517
+###################################################
+a_positions <- str_locate_all(countries, "n")
+
+
+###################################################
+### code chunk number 35: dplyr-s.rnw:527-528
+###################################################
+character_counts <- str_length(countries)
+
+
+###################################################
+### code chunk number 36: dplyr-s.rnw:544-551
+###################################################
+grades <- 
+  list(
+    c1 = c(80, 85, 90), 
+    c2 = c(75, 70, 85, 88), 
+    c3 = c(90, 85, 95)
+  )
+mean_grades <- map(grades, mean)
+
+
+###################################################
+### code chunk number 37: dplyr-s.rnw:558-562
+###################################################
+map(grades, mean)
+map_dbl(grades, mean)
+map_chr(grades, mean)
+map_df(grades, mean)
+
+
+###################################################
+### code chunk number 38: dplyr-s.rnw:575-577
+###################################################
+1:10 %>% reduce(`*`)
+1:10 %>% accumulate(`*`)
+
+
+###################################################
+### code chunk number 39: dplyr-s.rnw:591-622
 ###################################################
 # if(!require(kableExtra)) install.packages('kableExtra')
 library(kableExtra)
@@ -370,7 +458,7 @@ births.08 %>%
 
 
 ###################################################
-### code chunk number 28: dplyr-s.rnw:499-505 (eval = FALSE)
+### code chunk number 40: dplyr-s.rnw:625-631 (eval = FALSE)
 ###################################################
 ## ## trick to create dplyr-s.rnw file.
 ## ## this part have to be lauch manually
