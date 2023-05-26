@@ -7,7 +7,7 @@ Setting up a dedicated `R` project for a SPE-R course can help you organize your
 
 ## Prerequisites:
 
-Before proceeding with this tutorial, ensure that you have the latest release of `R` and [RStudio installed](https://posit.co/download/rstudio-desktop/)  on your system. Additionally, make sure you have the `renv` package installed by running `install.packages("renv")` in the R console.
+Before proceeding with this tutorial, ensure that you have `R` and [RStudio installed](https://posit.co/download/rstudio-desktop/)  on your system. We recommend to have get the latest releases of `R` and Rstudio. Additionally, make sure you have the `renv` package installed by running `install.packages("renv")` in the R console.
 
 ## Step 1: Creating a New `R` Project
 
