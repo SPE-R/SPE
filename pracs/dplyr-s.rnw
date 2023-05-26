@@ -29,7 +29,7 @@ births data-set.
 
 << >>=
 library(Epi)
-suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyverse))
 data(births) 
 @
 
@@ -455,6 +455,132 @@ inner_join(age, center, by = c('pid')) %>%
 \textbf{Note:} the \texttt{by} argument indicates which column should be use to make the join. In some 
 cases, you might have to uses several columns to match (e.g. per sex and age group), this
 can be easily done specifying a vector of column names.
+
+\subsection{Data Visualization with ggplot2}
+
+One of the package that have contributed to \texttt{tidyverse} success is for sure \texttt{ggplot2}.
+We will go more into the details on how to produce graphs with \texttt{ggplot2} in another practical.
+Just a quick example of graphic using \texttt{ggplot2}.
+
+Let's Create a bar plot to visualize the number of births by women age group.
+
+First you have to create a table with the number of birth per age group.
+
+<< >>=
+birth_per_ageg <- births_tbl %>% group_by(agegrp) %>% summarise(total_births = n())
+@
+
+<< >>=
+(gg.01 <- 
+   ggplot(birth_per_ageg, aes(x = agegrp, y = total_births)) + 
+   geom_bar(stat = "identity"))
+@
+
+This graph can be customize adding labels and title to the plot:
+<< >>=
+(gg.02 <- 
+   gg.01 +  
+   xlab("Women Age Group") + 
+   ylab("Total Births") + 
+   ggtitle("Number of Births per Women Age Group"))
+@
+
+As you can see, plots from \texttt{ggplot} family are built sequentially using the \texttt{+} operator for each additional element.
+
+\subsection{String manipulation with stringr}
+
+Another popular \texttt{tidyverse} popular package is \texttt{stringr} package. This package is 
+specialized in the string manipulation. Here are couple of examples.
+
+Let's create a character vector with the following elements representing country names: "Estonia", "Finland", "Denmark", "United Kingdom".
+<<>>=
+countries <- c("Estonia", "Finland", "Denmark", "United Kingdom")
+@
+
+Extract the first three characters from each country name:
+<<>>=
+country_initials <- str_sub(countries, start = 1, end = 3)
+@
+
+Convert all country names to uppercase:
+<<>>=
+countries_upper <- str_to_upper(countries)
+@
+
+Replace "United" with "Utd" in each country name:
+<<>>=
+countries_modified <- str_replace(countries, "United", "Utd")
+@
+
+Find the positions of the letter "n" in each country name:
+<<>>=
+a_positions <- str_locate_all(countries, "n")
+@
+
+As you can see, the output of \texttt{str\_locate\_all} is a list (one element per character string) containing
+a 2 column table with one line for each match. The first column (start) being the position of the beginning
+of the match and the second one (end) being the end of the match. In our case, since we are searching for
+a single character match, this 2 indexes are always the same.
+
+
+Count the number of characters in each country name:
+<<>>=
+character_counts <- str_length(countries)
+@
+
+These examples demonstrate various string manipulation operations using the \texttt{stringr} package. You can modify the exercises, combine several operations or explore other string manipulation functions provided by \texttt{stringr} to further practice and enhance your skills in manipulating and analyzing text data.
+
+\subsection{purrrr package to apply functions to list}
+
+Among my favorite \texttt{tidyverse} packages, you will find \texttt{purrr}. This package contains
+several functions that are very similar to \texttt{lapply} function.
+
+The simplest example could be to apply the same function to a list of elements.
+As an example let's add "country: " in front of all our 
+
+Apply a function to each element of the vector using map(). Here producing the mean of some grades per 
+class:
+
+<<>>=
+grades <- 
+  list(
+    c1 = c(80, 85, 90), 
+    c2 = c(75, 70, 85, 88), 
+    c3 = c(90, 85, 95)
+  )
+mean_grades <- map(grades, mean)
+@
+
+By default \texttt{map()} return a list. One of the nice feature of \texttt{purrr} functions is to be
+able to specify the type of output you want (e.g. \texttt{\_dbl} for numeric, \texttt{\_chr} for characters, ...).
+Check and try to explain the differences between the following command lines:
+
+<<>>=
+map(grades, mean)
+map_dbl(grades, mean)
+map_chr(grades, mean)
+map_df(grades, mean)
+@
+
+Other nice features of \texttt{map} like functions is he availability to support more than one argument.
+\texttt{map2()} for 2 arguments and \texttt{pmap()} for more than 2. This can be very handy in some conditions.
+If you are interested you can have a look to this function help file and play with the examples.
+
+\texttt{purrr} package has also a set of functions that can be used to apply iteratively a function using
+\texttt{reduce} and/or \texttt{accumulate}. The 2 function behave he same way, it takes the 2 first element of
+a list, apply a function. The results of the first operation is combine with the third element of the list in the 
+same function and so on.. The only difference is that accumulate return intermediate results while reduce return only the final results.
+
+Here an example of the cumulative product of the 10 first numbers.
+<<>>=
+1:10 %>% reduce(`*`)
+1:10 %>% accumulate(`*`)
+@
+
+% \subsection{reading files with readr}
+% 
+% \subsection{pivoting data with tidyr}
+
 
 \subsection{Bonus: Rendering tables}
 
