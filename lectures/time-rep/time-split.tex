@@ -215,10 +215,10 @@ If follow-up is long, stratification by categories of\\
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}{Dividing time into bands:}
+\begin{frame}{Dividing time into bands requires:}
 
-  If we want to compute $D$ and $Y$ in intervals on some timescale we
-  must decide on:
+  %% If we want to compute $D$ and $Y$ in intervals on some timescale we
+  %% must decide on:
 
 \pause
 \textbf{Origin:} The date where the time scale is $0$: \pause
@@ -236,13 +236,14 @@ If follow-up is long, stratification by categories of\\
   \end{itemize}
 
 \pause
-\textbf{Aim:} Separate rate in each interval, mimicking continuous time
+\textbf{Aim:} Separate rate in each interval, mimicking continuous
+time by using small intervals:\\---time at the beginning of interval as
+quantitative variable.
 
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]
-  \frametitle{Example: cohort with 3 persons:}
+\begin{frame}[fragile]{Example: cohort with 3 persons:}
 \small
 \renewcommand{\baselinestretch}{0.9}
 \begin{verbatim}
@@ -265,8 +266,7 @@ If follow-up is long, stratification by categories of\\
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]
-  \frametitle{Splitting the follow up}
+\begin{frame}[fragile]{Splitting the follow-up}
 \begin{center}
 \begin{tabular}{@{\extracolsep{1em}}rrrr}
               & subj. 1
@@ -314,7 +314,6 @@ $\sum$ &31.89& 1 & 22.70 & 0 &  6.58 & 1 & 60.17 & 2 \\
 {\footnotesize
 \renewcommand{\baselinestretch}{0.8}
 \begin{verbatim}
-
 id       Bdate       Entry        Exit  St     risk  int
 
  1  14/07/1952  03/08/1965  14/07/1972   0   6.9432   10
@@ -366,7 +365,7 @@ id       Bdate       Entry        Exit  St     risk  int
           --- if time of treatment is the entry, this is $0$ for all.
   \end{itemize}
 
-  \item \alert<7->{Response variable} in analysis of rates:\\[-0.5ex]
+  \item \alert<7->{Response variable} in analysis of rates:\\[-1em]
 \[ (d,y) \qquad (\alert<7->{\text{event}, \text{duration}}) \]
 
   \item \textcolor{forestgreen}{Covariates} in analysis of rates:
@@ -397,12 +396,12 @@ id       Bdate       Entry        Exit  St     risk  int
 \end{Soutput}
 \end{Schunk}
 \ \\[-1em]
-Timescales of interest:
-  \begin{itemize}
-  \item Age
-  \item Calendar time
-  \item Time since injection of contrast medium (time since entry)
-  \end{itemize}
+%% Timescales of interest:
+%%   \begin{itemize}
+%%   \item Age
+%%   \item Calendar time
+%%   \item Time since injection of contrast medium (time since entry)
+%%   \end{itemize}
 %% <<results=hide,echo=FALSE>>=
 \begin{Schunk}
 \begin{Sinput}
@@ -418,13 +417,17 @@ NOTE: entry.status has been set to 0 for all.
 NOTE: Dropping  2  rows with duration of follow up < tol
 \end{Soutput}
 \begin{Sinput}
-> summary( thL )
+> summary(thL, timeScales = TRUE)
 \end{Sinput}
 \begin{Soutput}
 Transitions:
      To
 From   0    1  Records:  Events: Risk time:  Persons:
    0 504 1964      2468     1964   51934.08      2468
+
+Timescales:
+age dte tfi 
+ ""  ""  "" 
 \end{Soutput}
 \end{Schunk}
 \end{frame}
@@ -435,12 +438,12 @@ From   0    1  Records:  Events: Risk time:  Persons:
  \vspace*{-1em}
 \renewcommand{\baselinestretch}{0.9}
 \begin{semiverbatim}
-thL <- Lexis( \alert<2>{entry = list( age = injecdat-birthdat,
-                            \alert<5->{dte = injecdat},
-                            tfi = 0 )},
-               \alert<3>{exit = list( \alert<5->{dte = exitdat} )},
-        exit.status = as.numeric(exitstat==1),
-               data = thoro )
+thL <- Lexis(\alert<2>{entry = list(age = injecdat-birthdat,
+                          \alert<5->{dte = injecdat},
+                          tfi = 0)},
+              \alert<3>{exit = list(\alert<5->{dte = exitdat})},
+       exit.status = as.numeric(exitstat==1),
+              data = thoro)
 \end{semiverbatim}
 \renewcommand{\baselinestretch}{1.0}
 \normalsize
@@ -448,7 +451,7 @@ thL <- Lexis( \alert<2>{entry = list( age = injecdat-birthdat,
 \alert<2>{\texttt{entry}} is defined on \textbf{three}
 timescales,} \onslide<3->{\\ but
 \alert<3>{\texttt{exit}} is only needed on \textbf{one}
-timescale}: \onslide<4->{\\
+timescale (or vice versa)}: \onslide<4->{\\
 \alert<4->{Follow-up time} is the same on all timescales:}
 \onslide<5->{\alert<5->{\hfill \small \texttt{exitdat - injecdat}}}
 
@@ -469,7 +472,7 @@ same name (\alert<6->{\texttt{dte}}).}
 4 20.80 1957.61   0 \alert<3>{  34.52} \alert<5>{      0} \alert<4>{      0}      4
 ...
 \pause
-> summary( thL )
+> summary(thL)
 Transitions:
      \alert<4>{To}
 \alert<5>{From} \alert<4>{  0    1} Records:  \alert<4>{Events:}  \alert<3>{Risk time:}  Persons:
@@ -480,7 +483,7 @@ Transitions:
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile]
-\includegraphics[height=0.90\textheight,keepaspectratio]{thL-lexis0}
+\includegraphics[height=0.95\textheight,keepaspectratio]{thL-lexis0}
 \vspace*{-1.5ex}
 {\scriptsize
 \begin{verbatim}
@@ -545,7 +548,7 @@ Transitions:
 \begin{semiverbatim}
 > spl1 <- splitLexis( thL, time.scale="age", breaks=seq(0,100,20) )
 > round(spl1,1)
-   age    dte  tfi lex.dur lex.Cst lex.Xst    id sex birthdat contrast injecdat volume
+   age    dte  tfi lex.dur lex.Cst lex.Xst   id sex birthdat contrast injecdat volume
 \alert<2>{1 22.2 1938.8  0.0    17.8       0       0    1   2   1916.6        1   1938.8     22}
 \alert<2>{2 40.0 1956.6 17.8    20.0       0       0    1   2   1916.6        1   1938.8     22}
 \alert<2>{3 60.0 1976.6 37.8     0.2       0       1    1   2   1916.6        1   1938.8     22}
@@ -603,9 +606,9 @@ Transitions:
 \includegraphics<6|handout:0>[width=\textwidth]{thL-lexis2a5}
 \includegraphics<7|handout:0>[width=\textwidth]{thL-lexis2a6}
 {\scriptsize
-\vspace*{-1.5em}
+\vspace*{-3em}
 \begin{verbatim}
-plot( spl2, c(1,3), col="black", lwd=2 )
+plot(spl2, c(1, 3), col = "black", lwd = 2)
 \end{verbatim}}
   \end{minipage}
 \hfill
@@ -660,16 +663,18 @@ From    0    1  Records:  Events: Risk time:  Persons:
 %----------------------------------------------------------------------
 \begin{frame}[fragile]{Likelihood for time-split data}
   \begin{itemize}[<+->]
-  \item The setup is for a situation where it is assumed that rates are
-    constant in each of the intervals.
+  \item We assume that rates are constant in each (small) intervals
   \item Each observation in the dataset represents an interval,
-    contributing a term to the (log)likelihood.
-  \item Each term looks like a contribution from a Poisson variate
+    contributing a term to the (log-)likelihood for the rate
+  \item Each \textbf{term} \alert<4->{looks like} a contribution from a Poisson variate
     (albeit with values only $0$ or $1$)
-  \item Rates can vary along several timescales simultaneously.
-  \item Models can include fixed covariates, as well as the timescales
-    (the left end-points of the intervals) as continuous variables.
-  \item The latter is where we will need splines.
+  \item So the likelihood from a single \textbf{person}
+    \alert<4->{looks like} the likelihood from several independent
+    Poisson variates
+  \item \ldots but the data are neither independent nor Poisson
+  %% \item Rates can vary along several timescales simultaneously
+  %% \item Models can include fixed covariates, as well as the timescales
+  %%   (the left end-points of the intervals) as quantitative variables
   \end{itemize}
 \end{frame}
 
@@ -770,8 +775,7 @@ From    0    1  Records:  Events: Risk time:  Persons:
 \begin{frame}[fragile]{Analysis of time-split data}
 Observations (records) classified by $p$---person and $i$---interval
 \begin{itemize}[<+->]
-\item $d_{pi}$ --- events in the variable: \code{lex.Xst}
- and $\mcode{lex.Xst} \neq \mcode{lex.Cst}$
+\item $d_{pi}$ --- events in the variable: \code{lex.Xst \& lex.Xst!=lex.Cst}
 %     In the model as response: \code{lex.Xst==1}
 \item $y_{pi}$ --- risk time: \code{lex.dur} (duration)\\
 %     In the model as\\
@@ -783,10 +787,11 @@ Observations (records) classified by $p$---person and $i$---interval
 \item timescales (age, period, time in study)
 \item other variables for this person (constant in each interval).
 \end{itemize}
-\item Likelihood for rates for one person is identical to Poisson
-  likelihood for many independent Poisson variates.
-\item Modeling rates using the covariates in \code{glm}:\\
-  --- no difference between time-scales and other covariates.
+
+\item Likelihood for rates for one person is identical to a Poisson
+  likelihood for many independent Poisson variates
+\item Modeling rates using \code{glm} or \code{gam}:\\
+  time-scales and other covariates are treated alike
 \end{itemize}
 \end{frame}
 
@@ -809,8 +814,7 @@ Observations (records) classified by $p$---person and $i$---interval
 % \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]
-  \frametitle{Fitting a simple model}
+\begin{frame}[fragile]{Fitting a simple model---data:}
 \begin{Schunk}
 \begin{Sinput}
 > stat.table(contrast,
@@ -894,8 +898,9 @@ factor(contrast)2      3.25 3.06  3.46
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile]{Fitting a simple model}
+\small
 The wrapper \code{glm.Lexis} requires that \code{lex.Cst} and \code{lex.Xst}
-are factors---use \code{factorize}
+are factors\\---use \code{factorize} to make them:
 \begin{Schunk}
 \begin{Sinput}
 > splf <- factorize(spl2)
@@ -934,6 +939,7 @@ person-years in a \code{Lexis} object
 \end{Soutput}
 \end{Schunk}
 \vspace*{-1em}
+\small
 As long as we only use covariates that take only a few values, we can
 model the aggregate data directly:
 \begin{Schunk}
