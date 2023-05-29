@@ -1,9 +1,4 @@
-\SweaveOpts{results=verbatim,keep.source=TRUE,include=FALSE,eps=FALSE}
-<<echo=FALSE>>=
-options( width=90,
-         SweaveHooks=list( fig=function()
-         par(mar=c(3,3,1,1),mgp=c(3,1,0)/1.6,las=1,bty="n") ) )
-@ %
+
 
 %----------------------------------------------------------------------
 \begin{frame}{A more complicated multistate model}
@@ -17,37 +12,6 @@ options( width=90,
 \end{frame}
 %----------------------------------------------------------------------
 
-<<states-col,eval=TRUE,echo=FALSE,results=hide,fig=TRUE,height=4>>=
-# setwd("/home/bendix/teach/SPE/git/SPE/lectures/multistate")
-library( Epi )
-library( mgcv )
-library( foreign )
-renal <- read.dta( "../../pracs/data/renal.dta" )
-renal <- read.dta("https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/renal.dta")
-
-renal$sex <- factor(renal$sex, labels = c("M", "F"))
-renal <- transform(renal, dob = ifelse(dob > 2000, dob - 100, dob))
-Lr <- Lexis( entry = list( per = doe,
-                           age = doe-dob,
-                           tfi = 0 ),
-              exit = list( per = dox ),
-       exit.status = factor( event>0, labels=c("NRA","ESRD") ),
-              data = renal )
-# plot(Lr)
-# subset(Lr, age < 0)
-Lc <- cutLexis( Lr, cut = Lr$dor, # where to cut follow up
-              timescale = "per",  # what timescale are we referring to
-              new.state = "Rem",  # name of the new state
-            split.state = TRUE,   # state subdivided by origin of transition
-       precursor.states = "NRA" ) # which states are less severe
-summary( Lc )
-clr <- c("forestgreen","orange")
-clr <- c(clr,adjustcolor(rev(clr),alpha=0.35))
-bw <- rep(c("white","black"),each=2)
-boxes(Lc, boxpos=list(x=c(15,85,15,85),y=c(85,85,15,15)),
-       scale.R=100, show.BE=TRUE, col.bg=clr[c(1,2,4,3)],
-       col.txt=bw, col.border=c(clr[1:2], rep("black",2)) )
-@ %
 
 %----------------------------------------------------------------------
 \begin{frame}
@@ -61,40 +25,67 @@ Each transition modeled by a model for rates\\ (Cox-model,
 Poisson-model for split data, \texttt{glm} or \texttt{gam})
 
 Requires that follow-up is split in small intervals:
-<<>>=
-sLc <- splitLexis(Lc, "tfi", breaks = seq(0, 30, 1/12))
-summary(sLc)
-@
+\begin{Schunk}
+\begin{Sinput}
+> sLc <- splitLexis(Lc, "tfi", breaks = seq(0, 30, 1/12))
+> summary(sLc)
+\end{Sinput}
+\begin{Soutput}
+Transitions:
+     To
+From   NRA  Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
+  NRA 9854   29   69         0      9952       98     824.77       122
+  Rem    0 3139    0         8      3147        8     259.90        32
+  Sum 9854 3168   69         8     13099      106    1084.67       125
+\end{Soutput}
+\end{Schunk}
 \end{frame}
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile]{Modeling rates in a multistate model}
-<<>>=
-# Rem-rate
-mr <- gam(cbind(lex.Xst == "Rem", lex.dur)
-          ~ s(tfi, k = 10) + sex,
-          family = poisreg,
-            data = subset(sLc, lex.Cst == "NRA"))
-# ESRD-rates
-mx <- gam(cbind(lex.Xst %in% c("ESRD", "ESRD(Ren)"), lex.dur)
-          ~ s(tfi, k = 10) + sex + I((doe - dob - 40) / 10) + I(lex.Cst == "Rem"),
-          family = poisreg,
-            data = subset(sLc, lex.Cst %in% c("NRA", "Rem")))
-@ %
+\begin{Schunk}
+\begin{Sinput}
+> # Rem-rate
+> mr <- gam(cbind(lex.Xst == "Rem", lex.dur)
++           ~ s(tfi, k = 10) + sex,
++           family = poisreg,
++             data = subset(sLc, lex.Cst == "NRA"))
+> # ESRD-rates
+> mx <- gam(cbind(lex.Xst %in% c("ESRD", "ESRD(Ren)"), lex.dur)
++           ~ s(tfi, k = 10) + sex + I((doe - dob - 40) / 10) + I(lex.Cst == "Rem"),
++           family = poisreg,
++             data = subset(sLc, lex.Cst %in% c("NRA", "Rem")))
+\end{Sinput}
+\end{Schunk}
 \end{frame}
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile]{\ldots using the \texttt{Lexis} properties}
 \vspace*{-1em}
-<<>>=
-# Remisson-rate
-mr <- gam.Lexis(sLc, from = "NRA", to = "Rem",
-                formula = ~ s(tfi, k = 10) + sex)
-# ESRD-rates
-mx <- gam.Lexis(sLc,
-                formula = ~ s(tfi,k=10) + sex +
-                            I((doe - dob - 40) / 10) + I(lex.Cst == "Rem"))
-@ %
+\begin{Schunk}
+\begin{Sinput}
+> # Remisson-rate
+> mr <- gam.Lexis(sLc, from = "NRA", to = "Rem",
++                 formula = ~ s(tfi, k = 10) + sex)
+\end{Sinput}
+\begin{Soutput}
+mgcv::gam Poisson analysis of Lexis object sLc with log link:
+Rates for the transition:
+NRA->Rem
+\end{Soutput}
+\begin{Sinput}
+> # ESRD-rates
+> mx <- gam.Lexis(sLc,
++                 formula = ~ s(tfi,k=10) + sex +
++                             I((doe - dob - 40) / 10) + I(lex.Cst == "Rem"))
+\end{Sinput}
+\begin{Soutput}
+mgcv::gam Poisson analysis of Lexis object sLc with log link:
+Rates for transitions:
+NRA->ESRD
+Rem->ESRD(Rem)
+\end{Soutput}
+\end{Schunk}
 \vspace*{-1em}
 Default is to model all transitions to absorbing states
 \end{frame}
@@ -214,11 +205,13 @@ Default is to model all transitions to absorbing states
 \vspace*{-1ex}
 \renewcommand{\baselinestretch}{0.8}
 \small
-<<>>=
-Tr <- list("NRA" = list("ESRD"      = mx,
-                        "Rem"       = mr),
-           "Rem" = list("ESRD(Rem)" = mx))
-@ %
+\begin{Schunk}
+\begin{Sinput}
+> Tr <- list("NRA" = list("ESRD"      = mx,
++                         "Rem"       = mr),
++            "Rem" = list("ESRD(Rem)" = mx))
+\end{Sinput}
+\end{Schunk}
 \normalsize
 \renewcommand{\baselinestretch}{1.0}
 
@@ -252,52 +245,126 @@ representing a person with the desired covariate values.
 
 Must have same structure as the one used for estimation --- time
 scales must be initiated even if not used in models\\[-1ex]
-<<simul>>=
-init <- sLc[NULL, c(timeScales(sLc), "lex.Cst")]
-init[1,"per"] <- 1994
-init[1,"age"] <- 40
-init[1,"tfi"] <- 0
-init[1,"lex.Cst"] <- "NRA"
-init[1,"sex"] <- "M"
-init[1,"dob"] <- 1954
-init[1,"doe"] <- 1994
-init
-system.time(sim1 <- simLexis(Tr, init, N = 10000, t.range = 15))
-summary(sim1)
-@ %
+\begin{Schunk}
+\begin{Sinput}
+> init <- sLc[NULL, c(timeScales(sLc), "lex.Cst")]
+> init[1,"per"] <- 1994
+> init[1,"age"] <- 40
+> init[1,"tfi"] <- 0
+> init[1,"lex.Cst"] <- "NRA"
+> init[1,"sex"] <- "M"
+> init[1,"dob"] <- 1954
+> init[1,"doe"] <- 1994
+> init
+\end{Sinput}
+\begin{Soutput}
+  per age tfi lex.Cst sex  dob  doe
+ 1994  40   0     NRA   M 1954 1994
+\end{Soutput}
+\begin{Sinput}
+> system.time(sim1 <- simLexis(Tr, init, N = 10000, t.range = 15))
+\end{Sinput}
+\begin{Soutput}
+   user  system elapsed 
+  24.69    1.52   26.21 
+\end{Soutput}
+\begin{Sinput}
+> summary(sim1)
+\end{Sinput}
+\begin{Soutput}
+Transitions:
+     To
+From  NRA  Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
+  NRA 969 1847 7184         0     10000     9031   72599.26     10000
+  Rem   0 1224    0       623      1847      623   15654.67      1847
+  Sum 969 3071 7184       623     11847     9654   88253.94     10000
+\end{Soutput}
+\end{Schunk}
 \pause
 This is a simulated cohort of 10,000 persons with NRA aged 40 in 1994.
 \end{frame}
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile,allowframebreaks]{Using a simulated \texttt{Lexis} object --- \texttt{pState}}
-<<nw1,fig=TRUE,width=7>>=
-NN <- nState(sim1, at = seq(0, 15, 0.1),
-                 from = 0,
-           time.scale = "tfi")
-head(NN)
-nw1 <- pState(NN, perm = c(1, 2, 4, 3))
-head(nw1, 3)
-tail(nw1, 3)
-par(mar = c(3, 3, 0.5, 2), mgp = c(3, 1, 0) / 1.6, las = 1)
-plot(nw1, col = clr[c(2, 1, 4, 3)] )
-lines(as.numeric(rownames(nw1)), nw1[,2], lwd = 2)
-axis(side = 4, at = 0:5 / 5)
-axis(side = 4, at = 0:10 / 10, labels = NA)
-axis(side = 4, at = 0:20 / 20, labels = NA, tcl = -0.3)
-axis(side = 4, at = 0:100/100, labels = NA, tcl = -0.2)
-@ %
-<<nw2,fig=TRUE,width=7>>=
-nw2 <- pState( NN, perm = c(4,2,1,3) )
-head( nw2, 3 )
-tail( nw2, 3 )
-par(mar = c(3, 3, 0.5, 2), mgp = c(3, 1, 0) / 1.6, las = 1)
-plot(nw2, col = clr[c(4, 1, 2, 3)])
-axis(side = 4, at = 0:5 / 5)
-axis(side = 4, at = 0:10 / 10, labels = NA)
-axis(side = 4, at = 0:20 / 20, labels = NA, tcl = -0.3)
-axis(side = 4, at = 0:100/100, labels = NA, tcl = -0.2)
-@
+\begin{Schunk}
+\begin{Sinput}
+> NN <- nState(sim1, at = seq(0, 15, 0.1),
++                  from = 0,
++            time.scale = "tfi")
+> head(NN)
+\end{Sinput}
+\begin{Soutput}
+     State
+when    NRA   Rem  ESRD ESRD(Rem)
+  0   10000     0     0         0
+  0.1  9940    25    35         0
+  0.2  9888    61    51         0
+  0.3  9848    84    68         0
+  0.4  9789   114    97         0
+  0.5  9737   135   128         0
+\end{Soutput}
+\begin{Sinput}
+> nw1 <- pState(NN, perm = c(1, 2, 4, 3))
+> head(nw1, 3)
+\end{Sinput}
+\begin{Soutput}
+     State
+when     NRA    Rem ESRD(Rem) ESRD
+  0   1.0000 1.0000    1.0000    1
+  0.1 0.9940 0.9965    0.9965    1
+  0.2 0.9888 0.9949    0.9949    1
+\end{Soutput}
+\begin{Sinput}
+> tail(nw1, 3)
+\end{Sinput}
+\begin{Soutput}
+      State
+when      NRA        Rem ESRD(Rem) ESRD
+  14.8 0.1020 0.22450000 0.2859000    1
+  14.9 0.0992 0.22180000 0.2836000    1
+  15   0.0000 0.06970925 0.1439466    1
+\end{Soutput}
+\begin{Sinput}
+> par(mar = c(3, 3, 0.5, 2), mgp = c(3, 1, 0) / 1.6, las = 1)
+> plot(nw1, col = clr[c(2, 1, 4, 3)] )
+> lines(as.numeric(rownames(nw1)), nw1[,2], lwd = 2)
+> axis(side = 4, at = 0:5 / 5)
+> axis(side = 4, at = 0:10 / 10, labels = NA)
+> axis(side = 4, at = 0:20 / 20, labels = NA, tcl = -0.3)
+> axis(side = 4, at = 0:100/100, labels = NA, tcl = -0.2)
+\end{Sinput}
+\end{Schunk}
+\begin{Schunk}
+\begin{Sinput}
+> nw2 <- pState( NN, perm = c(4,2,1,3) )
+> head( nw2, 3 )
+\end{Sinput}
+\begin{Soutput}
+     State
+when  ESRD(Rem)    Rem    NRA ESRD
+  0           0 0.0000 1.0000    1
+  0.1         0 0.0025 0.9965    1
+  0.2         0 0.0061 0.9949    1
+\end{Soutput}
+\begin{Sinput}
+> tail( nw2, 3 )
+\end{Sinput}
+\begin{Soutput}
+      State
+when    ESRD(Rem)       Rem       NRA ESRD
+  14.8 0.06140000 0.1839000 0.2859000    1
+  14.9 0.06180000 0.1844000 0.2836000    1
+  15   0.07423737 0.1439466 0.1439466    1
+\end{Soutput}
+\begin{Sinput}
+> par(mar = c(3, 3, 0.5, 2), mgp = c(3, 1, 0) / 1.6, las = 1)
+> plot(nw2, col = clr[c(4, 1, 2, 3)])
+> axis(side = 4, at = 0:5 / 5)
+> axis(side = 4, at = 0:10 / 10, labels = NA)
+> axis(side = 4, at = 0:20 / 20, labels = NA, tcl = -0.3)
+> axis(side = 4, at = 0:100/100, labels = NA, tcl = -0.2)
+\end{Sinput}
+\end{Schunk}
 \end{frame}
 
 %----------------------------------------------------------------------

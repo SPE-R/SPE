@@ -5,16 +5,17 @@
 Hovind P, Tarnow L, Rossing P, Carstensen B, and Parving H-H:
  Improved survival in patients obtaining remission of nephrotic range
   albuminuria in diabetic nephropathy.
-{\em Kidney Int.}, 66(3):1180--1186, 2004.}
+  {\em Kidney Int.}, 66(3):1180--1186, 2004.}
+\pause
 \begin{itemize}[<+->]
+\item Endpoint of interest: Death or end stage renal disease (ESRD),
+  i.e. dialysis or kidney transplant.
+
 \item 96 patients entering at nephrotic range albuminuria (NRA),
   i.e. U-alb$>300$mg/day.
 
 \item Is remission from this condition (i.e return to
   U-alb$<300$mg/day) predictive of the prognosis?
-
-\item Endpoint of interest: Death or end stage renal disease (ESRD),
-  i.e. dialysis or kidney transplant.
 \end{itemize}
 \end{frame}
 
@@ -89,14 +90,14 @@ Note patient 26, 33 and 42 obtain remission.
 \renewcommand{\baselinestretch}{0.8}
 \footnotesize
 \begin{verbatim}
-> Lr <- Lexis( entry = list( per=doe,
-+                            age=doe-dob,
-+                            tfi=0 ),
-+               exit = list( per=dox ),
-+        exit.status = event>0,
-+             states = c("NRA","ESRD"),
-+               data = renal )
-> summary( Lr )
+> Lr <- Lexis(entry = list(per = doe,
++                          age = doe-dob,
++                          tfi = 0),
++              exit = list(per = dox),
++       exit.status = event>0,
++            states = c("NRA", "ESRD"),
++              data = renal)
+> summary(Lr)
 
 Transitions:
      To
@@ -112,14 +113,14 @@ From  NRA ESRD  Records:  Events: Risk time:  Persons:
 \renewcommand{\baselinestretch}{0.8}
 \footnotesize
 \begin{verbatim}
-> boxes( Lr, boxpos=list(x=c(25,75),
-+                        y=c(75,25)),
-+            scale.R=100, show.BE=TRUE )
+> boxes(Lr, boxpos = list(x = c(25, 75),
++                         y = c(75, 25)),
++           scale.R = 100, show.BE = TRUE )
 \end{verbatim}
 \normalsize
 \renewcommand{\baselinestretch}{1.0}
 \begin{center}
-\includegraphics[height=0.8\textheight,keepaspectratio]{./NRA-mort}
+\includegraphics[height=0.7\textheight,keepaspectratio]{./NRA-mort}
 \end{center}
 \end{frame}
 
@@ -143,11 +144,11 @@ $\mu_\text{rem}$: & mortality/ESRD rate \textbf{after} remission.
 \renewcommand{\baselinestretch}{0.8}
 \footnotesize
 \begin{verbatim}
-> Lc <- cutLexis( Lr, cut=Lr$dor,
-+               timescale="per",
-+               new.state="Rem",
-+        precursor.states="NRA" )
-> summary( Lc )
+> Lc <- cutLexis(Lr, cut = Lr$dor,
++                timescale = "per",
++                new.state = "Rem",
++         precursor.states = "NRA")
+> summary(Lc)
 
 Transitions:
      To
@@ -166,9 +167,9 @@ From  NRA Rem ESRD  Records:  Events: Risk time:  Persons:
 \renewcommand{\baselinestretch}{0.8}
 \footnotesize
 \begin{verbatim}
-> boxes( Lc, boxpos=list(x=c(15,85,50),
-+                        y=c(85,85,20)),
-             scale.R=100, show.BE=TRUE )
+> boxes(Lc, boxpos = list(x = c(15, 85, 50),
++                         y = c(85, 85, 20)),
++           scale.R = 100, show.BE = TRUE)
 \end{verbatim}
 \normalsize
 \renewcommand{\baselinestretch}{1.0}
@@ -177,23 +178,23 @@ From  NRA Rem ESRD  Records:  Events: Risk time:  Persons:
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile]
-  \frametitle{Splitting states: \texttt{cutLexis}}
+  \frametitle{Cutting follow up at events: \texttt{cutLexis}}
 \renewcommand{\baselinestretch}{0.8}
 \footnotesize
 \begin{semiverbatim}
-> Lc <- cutLexis( Lr, cut=Lr$dor,
-+               timescale="per",
-+               new.state="Rem",
-+        precursor.states="NRA",
-+            \alert<1->{split.states=TRUE} )
+> Lc <- cutLexis( Lr, cut = Lr$dor,
++               timescale = "per",
++               new.state = "Rem",
++        precursor.states = "NRA",
++            \alert<2->{split.states = TRUE} )
 > summary( Lc )
 
 Transitions:
      To
-From  NRA Rem ESRD\alert<2>{ ESRD(Rem)}  Records:  Events: Risk time:  Persons:
-  NRA  24  29   69\alert<2>{         0}       122       98     824.77       122
-  Rem   0  24    0\alert<2>{         8}        32        8     259.90        32
-  Sum  24  53   69\alert<2>{         8}       154      106    1084.67       125
+From  NRA Rem ESRD\alert<3>{ ESRD(Rem)}  Records:  Events: Risk time:  Persons:
+  NRA  24  29   69\alert<3>{         0}       122       98     824.77       122
+  Rem   0  24    0\alert<3>{         8}        32        8     259.90        32
+  Sum  24  53   69\alert<3>{         8}       154      106    1084.67       125
 \end{semiverbatim} %$
 \normalsize
 \renewcommand{\baselinestretch}{1.0}
@@ -205,8 +206,9 @@ From  NRA Rem ESRD\alert<2>{ ESRD(Rem)}  Records:  Events: Risk time:  Persons:
 \renewcommand{\baselinestretch}{0.8}
 \footnotesize
 \begin{verbatim}
-> boxes( Lc, boxpos=list(x=c(15,85,15,85),
-+                        y=c(85,85,20,20)), scale.R=100 )
+> boxes(Lc, boxpos = list(x = c(15, 85, 15, 85),
++                         y = c(85, 85, 20, 20)), 
++          scale.R = 100)
 \end{verbatim}
 \normalsize
 \renewcommand{\baselinestretch}{1.0}
@@ -265,7 +267,7 @@ Cox-analysis with remission as time-dependent covariate:
 
 %----------------------------------------------------------------------
 \begin{frame}
-   \frametitle{Calculus of probabilities}
+   \frametitle{Calculating state probabilities}
 \ \\[-3em]
 \begin{eqnarray*}
  \lefteqn{ \ptxt{Remission \textbf{before} time $t$} } \\ & = &
@@ -286,55 +288,39 @@ Note $\mu_\text{rem}$ could also depend on $u$, time since obtained remission.
   Sketch of programming, assuming that 
 $\lambda$ (\texttt{lambda}), 
 $\mu_\text{NRA}$ (\texttt{mu.nra}) and
-$\mu_\text{rem}$ (\texttt{mu.rem}) are known for each age (stored in vectors)
+$\mu_\text{rem}$ (\texttt{mu.rem}) are known at any age (stored in vectors)
 \renewcommand{\baselinestretch}{0.85}
 \footnotesize
 \begin{verbatim}
-c.rem      <- cumsum( lambda )
-c.mort.nra <- cumsum( mu.nra )
-c.mort.rem <- cumsum( mu.rem )
-pr1  <- cumsum( lambda * exp( -( c.rem + c.mort.nra ) ) )
+c.rem      <- cumsum(lambda)
+c.mort.nra <- cumsum(mu.nra)
+c.mort.rem <- cumsum(mu.rem)
+pr1 <- cumsum(lambda * exp(-(c.rem + c.mort.nra)))
 
-intgr(t,s) <- function(t,s){
-           lambda[s] * exp( -( c.rem[s] + c.mort.nra[s] ) ) *
-                    exp( -( c.mort.rem[t]-c.mort.rem[s] ) ) }
-for( t in 1:100 ) p2[t] <- sum( intgr(t,1:t) )
+intgr(t,s) <- 
+function(t,s){
+lambda[s] * exp(-(c.rem[s] + c.mort.nra[s])) *
+            exp(-(c.mort.rem[t] - c.mort.rem[s]))
+             }
+for(t in 1:100) p2[t] <- sum(intgr(t,1:t))
 \end{verbatim}
 \normalsize
 \renewcommand{\baselinestretch}{1.00}
-If $\mu_\text{rem}$ depends on time of remission, then
-\texttt{c.mort.rem} should have an extra argument.
+If $\mu_\text{rem}$ also depends on time since remission, then
+\texttt{c.mort.rem} should have an extra argument---technically very complicated
 \end{frame}
 
-%----------------------------------------------------------------------
-\begin{frame}
-   \frametitle{Calculation of integrals}
-The possibility of computing the state-occupancy probabilities relies
-on:
-   \begin{itemize}[<+->]
-   \item Availablity of closed-form formulae for the probailities
-     in terms of the transition rates
-   \item Transition rates are assumed to be continuous functions of time
-   \item Transition rates can be calulated at any point of time\ldots
-   \item This will allow simple calulation of the integrals from the
-     closed-form expressions.
-   \end{itemize}
-\end{frame}
-
-%----------------------------------------------------------------------
-\begin{frame}
-   \frametitle{Semi-Markov models}
-   \begin{itemize}[<+->]
-   \item \textbf{if} we only have one time scale, which is common for
-     \textbf{all} transitions
-   \item --- in practical terms: transition intensities only
-     depend on state and the current time.
-   \item then we can construct transition matrices for each tiny time
-     interval
-\[
-  P_{ij}(t,t+h) = \ptxt{state $j$ at $t+h$ $|$ state $i$ at $t$}
-\]
-   \item Simple matrix multiplication then gives the matrix of
-     transition probabilities between states between any two timepoints.
-   \end{itemize}
-\end{frame}
+% %----------------------------------------------------------------------
+% \begin{frame}
+%    \frametitle{Calculation of state probabilities}
+% The possibility of computing the state-occupancy probabilities relies
+% on:
+%    \begin{itemize}[<+->]
+%    \item Availablity of closed-form formulae for the probailities
+%      in terms of the transition rates
+%    \item Transition rates are assumed to be continuous functions of time
+%    \item Transition rates can be calulated at any point of time\ldots
+%    \item This will allow simple calulation of the integrals from the
+%      closed-form expressions.
+%    \end{itemize}
+% \end{frame}
