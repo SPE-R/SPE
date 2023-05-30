@@ -26,16 +26,6 @@ PDFINCLUDES = \
 	causal-two/causal-two.pdf \
 	multistate/multistate.pdf
 
-	
-## PDFINCLUDES = \
-	linmodels/lm.pdf \
-	graphics_advanced/Graphics.pdf \
-	time-rep/time-rep.pdf \
-	casecontrol/NCC-CC-studies.pdf \
-	causal/spe2017-CIlect-kf.pdf \
-	multistate/multistate.pdf
-
-
 ##inpdf = $(FILEINCLUDES:.=.pdf)
 scaledpdf = $(PDFINCLUDES:.pdf=-scaled.pdf)
 3x1pdf = $(PDFINCLUDES:.pdf=-3x1.pdf)
