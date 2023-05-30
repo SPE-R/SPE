@@ -1,4 +1,4 @@
-### R code from vignette source '/home/runner/work/SPE/SPE/build/renal-s.rnw'
+### R code from vignette source 'renal-s.rnw'
 
 ###################################################
 ### code chunk number 1: renal-s.rnw:12-16
@@ -93,9 +93,8 @@ subset( Lc, lex.id %in% c(2:4,21) )[,c(1:9,12)]
 ###################################################
 ### code chunk number 10: Lc-boxes
 ###################################################
-# boxes( Lc, boxpos=TRUE, scale.R=100, show.BE=TRUE, hm=1.5, wm=1.5 )
-boxes( Relevel(Lc,c(1,2,4,3)),
-       boxpos=TRUE, scale.R=100, show.BE=TRUE, hm=1.5, wm=1.5 )
+boxes(Relevel(Lc, c(1,2,4,3)),
+      boxpos = TRUE, scale.R = 100, show.BE = TRUE)
 
 
 ###################################################
@@ -112,7 +111,7 @@ points( Lc, pch=c(NA,NA,1,1)[Lc$lex.Xst],
 
 
 ###################################################
-### code chunk number 12: renal-s.rnw:403-411
+### code chunk number 12: renal-s.rnw:402-410
 ###################################################
 ( EP <- levels(Lc)[3:4] )
 m1 <- coxph( Surv( tfi,                  # from
@@ -125,7 +124,7 @@ summary( m1 )
 
 
 ###################################################
-### code chunk number 13: renal-s.rnw:446-449
+### code chunk number 13: renal-s.rnw:445-448
 ###################################################
 sLc <- splitLexis( Lc, "tfi", breaks=seq(0,30,1/12) )
 summary( Lc, scale=100 )
@@ -133,29 +132,25 @@ summary(sLc, scale=100 )
 
 
 ###################################################
-### code chunk number 14: renal-s.rnw:476-483
+### code chunk number 14: renal-s.rnw:472-475
 ###################################################
-library( splines )
-mp <- glm( lex.Xst %in% EP ~ Ns( tfi, knots=c(0,2,5,10) ) +
-           sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem"),
-           offset = log(lex.dur),
-           family = poisson,
-             data = sLc )
+mp <- glm.Lexis(sLc, ~ Ns(tfi, knots = c(0,2,5,10)) +
+                       sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem"))
 ci.exp( mp )
 
 
 ###################################################
-### code chunk number 15: renal-s.rnw:503-508
+### code chunk number 15: renal-s.rnw:495-500
 ###################################################
 library( mgcv )
-mx <- gam.Lexis(sLc, 
+mx <- gam.Lexis(sLc,
                 ~ s(tfi, k=10) + sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem"))
 ci.exp( mp, subset=c("Cst","doe","sex") )
 ci.exp( mx, subset=c("Cst","doe","sex") )
 
 
 ###################################################
-### code chunk number 16: renal-s.rnw:524-527
+### code chunk number 16: renal-s.rnw:516-519
 ###################################################
 ci.exp( mx, subset=c("sex","dob","Cst"), pval=TRUE )
 ci.exp( m1 )
@@ -175,27 +170,27 @@ nd <- data.frame( tfi = seq(0,20,.1),
                   sex = "M",
                   doe = 1990,
                   dob = 1940,
-              lex.Cst = "NRA",
-              lex.dur = 100 )
-str( nd )
-matshade( nd$tfi, cbind( ci.pred( mp, newdata=nd ),
-                         ci.pred( mx, newdata=nd ) ), plot=TRUE,
-          type="l", lwd=3:4, col=c("black","forestgreen"),
-          log="y", xlab="Time since entry (years)",
-                   ylab="ESRD rate (per 100 PY) for 50 year man" )
+              lex.Cst = "NRA")
+str(nd)
+matshade(nd$tfi, cbind(ci.pred(mp, newdata = nd),
+                       ci.pred(mx, newdata = nd)) * 100,
+         plot = TRUE,
+         type="l", lwd = 3:4, col = c("black", "forestgreen"),
+         log = "y", xlab = "Time since entry (years)",
+         ylab = "ESRD rate (per 100 PY) for 50 year man")
 
 
 ###################################################
 ### code chunk number 19: rem-inc-mgcv
 ###################################################
 mr <- gam.Lexis(sLc, ~ s( tfi, k=10 ) + sex,
-                     from = "NRA", 
+                     from = "NRA",
                        to = "Rem")
 ci.exp(mr, pval = TRUE)
 
 
 ###################################################
-### code chunk number 20: renal-s.rnw:732-749
+### code chunk number 20: renal-s.rnw:724-741
 ###################################################
 inL <- subset( sLc, select=1:11 )[NULL,]
 str( inL )
@@ -217,7 +212,7 @@ str( inL )
 
 
 ###################################################
-### code chunk number 21: renal-s.rnw:758-761
+### code chunk number 21: renal-s.rnw:750-753
 ###################################################
 Tr <- list("NRA" = list("Rem"       = mr,
                         "ESRD"      = mx ),

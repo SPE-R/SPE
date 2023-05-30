@@ -1,4 +1,4 @@
-### R code from vignette source '/home/runner/work/SPE/SPE/build/DMDK-s.rnw'
+### R code from vignette source 'DMDK-s.rnw'
 
 ###################################################
 ### code chunk number 1: DMDK-s.rnw:20-24
