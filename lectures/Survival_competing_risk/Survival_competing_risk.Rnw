@@ -1,13 +1,12 @@
-
-\documentclass[handout,12pt,dvipsnames,t]{beamer}
+\documentclass[12pt,dvipsnames,t,aspectratio=169]{beamer}
 \setbeamertemplate{footline}[frame number]
 %\usepackage{pgfpages}
 %\pgfpagesuselayout{4 on 1}[a4paper,border shrink=5mm,landscape]
 \SweaveOpts{out.width = "\\textwidth"}
 
 \title{Survival analysis with competing risks \newline }
-\author{Janne Pitk\"aniemi (initial slides EL) \newline \newline }
-\institute{Finnish Cancer Registry \newline \newline
+\author{Janne Pitk\"aniemi \newline \newline }
+\institute{Finnish Cancer Registry \newline Tampere University \newline
 \normalsize Statistical Practice in Epidemiology (2019, Tartu) }
 \date{}
 
@@ -167,9 +166,9 @@ In other words, during a short interval
 \textbf{Survival function} 
 %\textcolor{red}{
 \[ S(t) =  P( T  >  t) , \]
-= probability of avoiding the event at least up to $t$
-$\qquad\qquad{}$ (the event occurs
-only after $t$).  
+\small{= probability of avoiding the event at least up to $t$
+%$\qquad\qquad{}$ 
+(the event occurs only after $t$).}  \newline \newline 
 
 The \textbf{cumulative hazard} (or integrated intensity):
 \[ \Lambda(t) = \int_0^t \lambda(u)du \]
@@ -197,7 +196,6 @@ $\quad U_i$ = time to censoring.\\
  Censoring is assumed \textbf{noninformative}, \textit{i.e.} \\ independent 
  from occurrence of events.
  
- \pause\bigskip
 We observe 
 \begin{itemize}
 \item[ ]
@@ -228,7 +226,7 @@ L & = \prod_{i=1}^n \lambda(y_i)^{\delta_i} S(y_i)
 \textbf{Piecewise constant rate} model on $\lambda(t)$ \\ 
 -- see Bendix's lecture on time-splitting (Poisson likelihood). 
 \medskip
-\pause
+%\pause
 \item 
 \textbf{Non-parametric} methods, 
 like \\ Kaplan--Meier (KM) % and Aalen--Johansen (AJ) 
@@ -247,7 +245,7 @@ proportional hazards model on $\lambda(t)$.
 \frametitle{R package \texttt{survival} }
 
 Tools for analysis with one outcome event.
-
+\footnotesize{
 \begin{itemize}
 \item 
 \texttt{Surv(time, event) -> sobj} \\ 
@@ -258,31 +256,30 @@ containing pairs $(y_i, \delta_i)$,
 \texttt{Surv(entry, exit, event) -> sobj2} \\
  creates a survival object from
   \texttt{entry} and \texttt{exit} times, % \& event indicator,
-  \pause \medskip
+  %\pause 
+  \medskip
 \item 
 \verb!survfit(sobj ~ x) -> sfo! \\
 creates a \textbf{survfit} object {\tt sfo}
 containing KM or other non-parametric estimates
 % from survival object  \texttt{sobj} 
 (also from a fitted Cox model), 
- \pause  \medskip
+ \medskip
 \item 
 \texttt{plot(sfo)} \\
 % applied to \texttt{survfit} object \texttt{sfo}
  plot method for survival curves and related graphs, 
-\pause
   \medskip
 \item 
 \verb|coxph(sobj ~ x1 + x2)| \\ 
 fits a Cox model
 % for the relative hazards to depend 
 with covariates \texttt{x1} and \texttt{x2}. 
-\pause
     \medskip
 \item 
 \texttt{survreg()} -- parametric survival models.
 \end{itemize}   
-
+}
 \end{frame}
 
 
@@ -328,9 +325,9 @@ summary(km1)     #  detailed KM-estimate
 \begin{frame}[fragile]
 \frametitle{Oral cancer: Kaplan-Meier estimates}
 
-<<km,echo=FALSE,eval=TRUE,fig=TRUE>>=
+<<km,echo=FALSE,eval=TRUE,fig=TRUE,height=4>>=
 par(mfcol=c(1,1))
-plot(survfit(orca$suob~orca$sex), ylab="Proportion",xlab="Time (years)",lwd=c(2,1.5,1.5,2,1.5,1.5),lty=c(1,3,3,1,3,3),conf.int = T,col=c("red","blue"),main="Estimated survival (95% CI) and CDF")
+plot(survfit(orca$suob~orca$sex), ylab="Proporton",xlab="Time (years)",lwd=c(2,1.5,1.5,2,1.5,1.5),lty=c(1,3,3,1,3,3),conf.int = T,col=c("red","blue"),main="Estimated survival (95% CI) and CDF")
 text(3,0.9,"KM for S(t)")
 legend(x=10, y=1,
             c("Female","Male"),
@@ -650,7 +647,7 @@ should be used
 
 
 {\scriptsize 
-<<boxplot,echo=FALSE,eval=TRUE,fig=TRUE>>=
+<<boxplot,echo=FALSE,eval=TRUE,fig=TRUE,height=4>>=
 library(Epi)
 knitr::opts_chunk$set(message = FALSE)
  orca.lex <- Lexis(exit = list(stime = time), 
@@ -745,7 +742,7 @@ Regression models for hazards can be defined \textit{e.g.} for
 $\lambda_0(t; \alpha)$ = baseline hazard and \\
 $r(\eta_i)$ = relative rate function, typically $\exp(\eta_i)$
 \medskip
-\pause
+%\pause
 \item[(b)] hazards, additively: 
 $$ \lambda_i(t) = \lambda_0(t; \alpha) + \eta_i. $$
 \end{itemize}
