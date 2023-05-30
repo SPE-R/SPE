@@ -4,14 +4,15 @@
 ### code chunk number 1: Run births-house
 ###################################################
 library(Epi)
+library(mgcv)
 data(births)
 str(births)
 
 
 ###################################################
-### code chunk number 2: effects-s.rnw:80-86
+### code chunk number 2: effects-s.rnw:92-98
 ###################################################
-births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
+births$hyp <- factor(births$hyp, labels = c("Normo", "Hyper"))
 births$sex <- factor(births$sex, labels = c("M", "F"))
 births$agegrp <- cut(births$matage, 
     breaks = c(20, 25, 30, 35, 40, 45), right = FALSE)
@@ -29,7 +30,7 @@ with(births, sd(bweight) )
 ###################################################
 ### code chunk number 4: t test for sex on bweight
 ###################################################
-with( births, t.test(bweight ~ sex, var.equal=T) )
+with( births, t.test(bweight ~ sex, var.equal=TRUE) )
 
 
 ###################################################
@@ -187,137 +188,117 @@ plot(m5)
 
 
 ###################################################
-### code chunk number 28: bweight-by-gestwks-cubic
+### code chunk number 28: bweight-gestwks-mPs
 ###################################################
-m6 <- update(m5, . ~ .  + I(gestwks^2) + I(gestwks^3))
-round(ci.lin(m6)[, c(1,5,6)], 1)
+mPs <- gam( bweight ~ s(gestwks), data = births)		
+summary(mPs)	
 
 
 ###################################################
-### code chunk number 29: bweight-by-gestwks-cubic-ortog
+### code chunk number 29: mPs-sig2
 ###################################################
-births2 <- subset(births, !is.na(gestwks))
-m.ortpoly <- lm(bweight ~ poly(gestwks, 3), data= births2 )
-round(ci.lin(m.ortpoly)[, c(1,5,6)], 1)
-anova(m5, m.ortpoly)
+mPs$sig2
+sqrt(mPs$sig2)
 
 
 ###################################################
-### code chunk number 30: bweight-by-gestwks-cubic-pred
+### code chunk number 30: plotFitPredInt
 ###################################################
-nd <- data.frame(gestwks = seq(24, 45, by = 0.25) ) 
-fit.poly <- predict( m.ortpoly, newdata=nd, interval="conf" )
-pred.poly <- predict( m.ortpoly, newdata=nd, interval="pred" )
+plotFitPredInt <- function( xval, fit, pred, ...)
+{
+    matshade( xval, fit,  lwd=2, alpha=0.2)
+    matshade( xval, pred, lwd=2, alpha=0.2)
+    matlines( xval, fit,  lty=1, lwd=c(3,2,2), col=c("red","blue","blue") )
+    matlines( xval, pred, lty=1, lwd=c(3,2,2), col=c("red","green","green") )
+}
+
+
+###################################################
+### code chunk number 31: bweight-gestwks-mPs-plot
+###################################################
+nd <- data.frame(gestwks = seq(24, 45, by = 0.25) ) 	
+pr.Ps <- predict( mPs, newdata=nd, se.fit=TRUE )
+str(pr.Ps) # with se.fit=TRUE, only two columns: fitted value and its SE
+fit.Ps <- cbind(pr.Ps$fit, 
+                pr.Ps$fit - 2*pr.Ps$se.fit, 
+                pr.Ps$fit + 2*pr.Ps$se.fit)
+pred.Ps <- cbind(pr.Ps$fit,  # must add residual variance to se.fit^2
+                 pr.Ps$fit - 2*sqrt( pr.Ps$se.fit^2 + mPs$sig2), 
+                 pr.Ps$fit + 2*sqrt( pr.Ps$se.fit^2 + mPs$sig2))
 par(mfrow=c(1,1))
-with( births, plot( bweight ~ gestwks, xlim = c(23, 46), cex.axis= 1.5, cex.lab = 1.5 )  )
-matlines( nd$gestwks, fit.poly, lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
-matlines( nd$gestwks, pred.poly, lty=1, lwd=c(3,2,2), col=c('red','green','green') )
+with(births, plot(bweight ~ gestwks, xlim=c(24, 45), 
+                  cex.axis=1.5, cex.lab=1.5) )
+plotFitPredInt(nd$gestwks, fit.Ps, pred.Ps)
 
 
 ###################################################
-### code chunk number 31: bweight-gestwks-Ns5
+### code chunk number 32: lowbw-hyp-table
 ###################################################
-library(splines)
-mNs5 <- lm( bweight ~ Ns( gestwks, 
-        knots = c(28,34,38,40,43)), data = births)
-round(ci.lin(mNs5)[ , c(1,5,6)], 1)
+stat.table( index=list(hyp, lowbw), 
+            contents=list(count(), percent(lowbw)),
+            margins=TRUE, data=births)
 
 
 ###################################################
-### code chunk number 32: Ns5-pred
+### code chunk number 33: lowbw-hyp-comp
 ###################################################
-fit.Ns5 <- predict( mNs5, newdata=nd, interval="conf" )
-pred.Ns5 <- predict( mNs5, newdata=nd, interval="pred" )
-with( births, plot( bweight ~ gestwks, xlim = c(23, 46), cex.axis= 1.5, cex.lab = 1.5 )  )
-matlines( nd$gestwks, fit.Ns5, lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
-matlines( nd$gestwks, pred.Ns5, lty=1, lwd=c(3,2,2), col=c('red','green','green') )
+binRD <- glm(lowbw ~ hyp, family=binomial(link="identity"), data=births)
+round(ci.lin(binRD)[, c(1,2,5:6)], 3)
+binRR <- glm(lowbw ~ hyp, family=binomial(link="log"), data=births)
+round(ci.lin(binRR, Exp=TRUE)[, c(1,2,5:7)], 3)
+binOR <- glm(lowbw ~ hyp, family=binomial(link="logit"), data=births)
+round(ci.lin(binOR, Exp=TRUE)[, c(1,2,5:7)], 3)
+effx(response=lowbw, type="binary", exposure=hyp, data=births)
 
 
 ###################################################
-### code chunk number 33: cubic-diag
+### code chunk number 34: lowbw-gestwks-table
 ###################################################
-par(mfrow=c(2,2))
-plot(mNs5)
+stat.table( index=list(gest4, lowbw),
+          contents=list(count(), percent(lowbw)),
+          margins=TRUE, data=births)
 
 
 ###################################################
-### code chunk number 34: bweigth-gestwks-Ns10
+### code chunk number 35: lowbw-gestwks-spline
 ###################################################
-mNs10 <- lm( bweight ~ Ns( gestwks, 
-        knots = seq(25, 43, by = 2)), data = births)
-round(ci.lin(mNs10)[ , c(1,5,6)], 1)
-fit.Ns10 <- predict( mNs10, newdata=nd, interval="conf" )
-pred.Ns10 <- predict( mNs10, newdata=nd, interval="pred" )
-par(mfrow=c(1,1))
-with( births, plot( bweight ~ gestwks, xlim = c(23, 46), cex.axis= 1.5, cex.lab = 1.5 )  )
-matlines( nd$gestwks, fit.Ns10, lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
-matlines( nd$gestwks, pred.Ns10, lty=1, lwd=c(3,2,2), col=c('red','green','green') )
+binm1 <- gam(lowbw ~ s(gestwks), family=binomial(link="logit"), data=births)
+summary(binm1)
+plot(binm1)
 
 
 ###################################################
-### code chunk number 35: bweight-gestwks-mPen
+### code chunk number 36: lowbw-gestwks-logitlin
 ###################################################
-library(mgcv)
-mPen <- gam( bweight ~ s(gestwks), data = births)		
-summary(mPen)	
+binm2 <- glm(lowbw ~ I(gestwks-40), family=binomial(link="logit"), data=births)
+round(ci.lin(binm2, Exp=TRUE)[, c(1,2,5:7)], 3)
 
 
 ###################################################
-### code chunk number 36: mPen-sig2
+### code chunk number 37: lowbw-gestwks-pred
 ###################################################
-mPen$sig2
-sqrt(mPen$sig2)
+predm2 <- predict(binm2, newdata=nd, type="response")
+plot( nd$gestwks, predm2, type="l")
 
 
 ###################################################
-### code chunk number 37: bweight-gestwks-mPen-plot
+### code chunk number 38: lowbw-gestwks-hyp
 ###################################################
-pr.Pen <- predict( mPen, newdata=nd, se.fit=T)
-par(mfrow=c(1,1))
-with( births, plot( bweight ~ gestwks, xlim = c(24, 45), cex.axis= 1.5, cex.lab = 1.5 )  )
-matlines( nd$gestwks, cbind(pr.Pen$fit, 
-  pr.Pen$fit - 2*pr.Pen$se.fit, pr.Pen$fit + 2*pr.Pen$se.fit),  
-  lty=1, lwd=c(3,2,2), col=c('red','blue','blue') )
-matlines( nd$gestwks, cbind(pr.Pen$fit, 
-  pr.Pen$fit - 2*sqrt( pr.Pen$se.fit^2 + mPen$sig2), 
-  pr.Pen$fit + 2*sqrt( pr.Pen$se.fit^2 + mPen$sig2)),  
-  lty=1, lwd=c(3,2,2), col=c('red','green','green')  )
+binm3 <- glm(lowbw ~ hyp*I(gestwks-40), family=binomial, data=births)
+round(ci.lin(binm3, Exp=TRUE)[, c(1,2,5:7)], 3)
 
 
 ###################################################
-### code chunk number 38: Get the UCBAdmissions data
+### code chunk number 39: lowbw-gestwks-hyp-pred
 ###################################################
-UCBAdmissions
-
-
-###################################################
-### code chunk number 39: Convert the 2x2x6 contingency table to a data frame
-###################################################
-ucb <- as.data.frame(UCBAdmissions)
-head(ucb)
-
-
-###################################################
-### code chunk number 40: Convert Admit to numeric coded 0/1
-###################################################
-ucb$Admit <- as.numeric(ucb$Admit)-1
-
-
-###################################################
-### code chunk number 41: Effect of Gender on Admit
-###################################################
-effx(Admit,type="binary",exposure=Gender,weights=Freq,data=ucb)
-
-
-###################################################
-### code chunk number 42: Effect of Gender stratified by Dept
-###################################################
-effx(Admit,type="binary",exposure=Gender,strata=Dept,weights=Freq,data=ucb)
-
-
-###################################################
-### code chunk number 43: Effect of Gender controlled for Dept
-###################################################
-effx(Admit,type="binary",exposure=Gender,control=Dept,weights=Freq,data=ucb)
+predm3hyp <- predict(binm3, 
+   newdata=data.frame(hyp="Hyper", nd), type="response")
+predm3nor <- predict(binm3, 
+   newdata=data.frame(hyp="Normo", nd), type="response")
+par(mfrow=c(1,2))
+plot( nd$gestwks, qlogis(predm3hyp), type="l")
+lines( nd$gestwks, qlogis(predm3nor), lty=2)
+plot( nd$gestwks, predm3hyp, type="l")
+lines( nd$gestwks, predm3nor, lty=2)
 
 
