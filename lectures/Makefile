@@ -24,6 +24,7 @@ PDFINCLUDES = \
 	time-rep/time-rep.pdf \
 	casecontrol/NCC-CC-studies.pdf \
 	causal/spe2019-CIlect-kf.pdf \
+	causal-two/causal-two.pdf \
 	multistate/multistate.pdf
 
 	
