@@ -324,10 +324,9 @@ subset( Lc, lex.id %in% c(2:4,21) )[,c(1:9,12)]
 
   Alternatively you can let R try to place the boxes for you, and even
   compute rates (in this case in units of events per 100 PY):
-<<Lc-boxes,fig=TRUE>>=
-# boxes( Lc, boxpos=TRUE, scale.R=100, show.BE=TRUE, hm=1.5, wm=1.5 )
-boxes( Relevel(Lc,c(1,2,4,3)),
-       boxpos=TRUE, scale.R=100, show.BE=TRUE, hm=1.5, wm=1.5 )
+<<Lc-boxes, fig=TRUE, width = 9>>=
+boxes(Relevel(Lc, c(1,2,4,3)),
+      boxpos = TRUE, scale.R = 100, show.BE = TRUE)
 @ % $
 \insfig{Lc-boxes}{0.7}{States and transitions between them.\\
   The numbers in each box are the person-years and the number of
@@ -453,17 +452,14 @@ summary(sLc, scale=100 )
   these were preserved by the splitting.
 
 %% \item Try to fit the Poisson-model corresponding to the Cox-model
-%%   we fitted previously. The function \texttt{ns()} produces a model
+%%   we fitted previously. The function \texttt{Ns()} produces a model
 %%   matrix corresponding to a piece-wise cubic function, modeling the
 %%   baseline hazard explicitly (think of the \texttt{ns} terms as the
-%%   baseline hazard that is not visible in the Cox-model)
+%%   baseline hazard that is not visible in the Cox-model). Use teh
+%%   wrapper function \code{glm.Lexis}
 %% <<>>=
-%% library( splines )
-%% mp <- glm( lex.Xst %in% EP ~ ns( tfi, df=4 ) +
-%%            sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem"),
-%%            offset = log(lex.dur),
-%%            family = poisson,
-%%              data = sLc )
+%% mp <- glm.Lexis(sLc, ~ Ns(tfi, knots = c(0,2,5,10)) +
+%%                        sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem"))
 %% ci.exp( mp )
 %% @ %
 %% How does the effects of sex change from the Cox-model?
@@ -474,12 +470,8 @@ summary(sLc, scale=100 )
   baseline hazard explicitly (think of the \texttt{Ns} terms as the
   baseline hazard that is not visible in the Cox-model)
 <<>>=
-library( splines )
-mp <- glm( lex.Xst %in% EP ~ Ns( tfi, knots=c(0,2,5,10) ) +
-           sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem"),
-           offset = log(lex.dur),
-           family = poisson,
-             data = sLc )
+mp <- glm.Lexis(sLc, ~ Ns(tfi, knots = c(0,2,5,10)) +
+                       sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem"))
 ci.exp( mp )
 @ %
 We see that the effects are pretty much the same as from the
@@ -490,7 +482,7 @@ Cox-model.
 %%   \texttt{Lexis} objects as well:
 %% <<>>=
 %% library( mgcv )
-%% mx <- gam.Lexis(sLc, 
+%% mx <- gam.Lexis(sLc,
 %%                 ~ s(tfi, k=10) + sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem"))
 %% ci.exp( mp, subset=c("Cst","doe","sex") )
 %% ci.exp( mx, subset=c("Cst","doe","sex") )
@@ -502,7 +494,7 @@ Cox-model.
   \texttt{mgcv} package. There is convenience wrapper for this as well:
 <<>>=
 library( mgcv )
-mx <- gam.Lexis(sLc, 
+mx <- gam.Lexis(sLc,
                 ~ s(tfi, k=10) + sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem"))
 ci.exp( mp, subset=c("Cst","doe","sex") )
 ci.exp( mx, subset=c("Cst","doe","sex") )
@@ -564,17 +556,17 @@ plot( mx )
 %%   the prediction data frame must have these two variables and not
 %%   the age, but it is onlythe difference that matters for the prediction:
 %% <<pred,fig=TRUE>>=
-%% nd <- data.frame( tfi = seq(0,20,0.1),
-%%                   sex = "M",
-%%                   doe = 1990,
-%%                   dob = 1940,
-%%               lex.Cst = "NRA",
-%%               lex.dur = 1 )
-%% str( nd )
-%% matplot( nd$tfi, ci.pred( mx, newdata=nd )*100,
-%%          type="l", lty=1, lwd=c(3,1,1), col="black",
-%%          log="y", xlab="Time since entry (years)",
-%%                   ylab="ESRD rate (per 100 PY) for 50 year man" )
+%% nd <- data.frame(tfi = seq(0,20,0.1),
+%%                  sex = "M",
+%%                  doe = 1990,
+%%                  dob = 1940,
+%%              lex.Cst = "NRA")
+%% str(nd)
+%% matshade(nd$tfi, cbind(ci.pred(mp, newdata = nd),
+%%                        ci.pred(mx, newdata = nd)) * 100, plot = TRUE,
+%%          type="l", lwd = 3:4, col = c("black", "forestgreen"),
+%%          log = "y", xlab = "Time since entry (years)",
+%%          ylab = "ESRD rate (per 100 PY) for 50 year man")
 %% @ %
 %% Try to overlay with the corresponding prediction from the
 %% \texttt{glm} model using \texttt{Ns}.
@@ -587,14 +579,14 @@ nd <- data.frame( tfi = seq(0,20,.1),
                   sex = "M",
                   doe = 1990,
                   dob = 1940,
-              lex.Cst = "NRA",
-              lex.dur = 100 )
-str( nd )
-matshade( nd$tfi, cbind( ci.pred( mp, newdata=nd ),
-                         ci.pred( mx, newdata=nd ) ), plot=TRUE,
-          type="l", lwd=3:4, col=c("black","forestgreen"),
-          log="y", xlab="Time since entry (years)",
-                   ylab="ESRD rate (per 100 PY) for 50 year man" )
+              lex.Cst = "NRA")
+str(nd)
+matshade(nd$tfi, cbind(ci.pred(mp, newdata = nd),
+                       ci.pred(mx, newdata = nd)) * 100,
+         plot = TRUE,
+         type="l", lwd = 3:4, col = c("black", "forestgreen"),
+         log = "y", xlab = "Time since entry (years)",
+         ylab = "ESRD rate (per 100 PY) for 50 year man")
 @ %
 \insfig{pred}{0.7}{Rates of ESRD by time since NRA for a man aged 50 at
   start of NRA. The green line is the curve fitted by \texttt{gam}, the
@@ -631,7 +623,7 @@ occurrence rate of remission itself.
 %%   \texttt{gam.Lexis} function
 %% <<rem-inc-mgcv>>=
 %% mr <- gam.Lexis(sLc, ~ s( tfi, k=10 ) + sex,
-%%                      from = "NRA", 
+%%                      from = "NRA",
 %%                        to = "Rem")
 %% ci.exp(mr, pval = TRUE)
 %% @
@@ -647,7 +639,7 @@ occurrence rate of remission itself.
   can be used; this is done with the \texttt{from} argument to \texttt{gam.Lexis}:
 <<rem-inc-mgcv>>=
 mr <- gam.Lexis(sLc, ~ s( tfi, k=10 ) + sex,
-                     from = "NRA", 
+                     from = "NRA",
                        to = "Rem")
 ci.exp(mr, pval = TRUE)
 @
