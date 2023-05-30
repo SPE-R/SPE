@@ -41,18 +41,22 @@ During the practical session, the following list of `R`the packages will be requ
 - knitr
 - mgcv
 - popEpi
+- PSweight
 - renv
 - rmarkdown
 - scales
 - sem
 - splines
+- stdReg
+- SuperLearner
 - survival
 - tidyverse
+- tmle
 - tools
 
 which can be installed with the following command:
 
-install.packages(c('checkpoint', 'cmprsk', 'cowplot', 'cranly', 'dplyr', 'Epi', 'foreign', 'ggplot2', 'grid', 'kableExtra', 'knitr', 'mgcv', 'popEpi', 'renv', 'rmarkdown', 'scales', 'sem', 'splines', 'survival', 'tidyverse', 'tools'))
+install.packages(c('checkpoint', 'cmprsk', 'cowplot', 'cranly', 'dplyr', 'Epi', 'foreign', 'ggplot2', 'grid', 'kableExtra', 'knitr', 'mgcv', 'popEpi', 'PSweight', 'renv', 'rmarkdown', 'scales', 'sem', 'splines', 'stdReg', 'SuperLearner', 'survival', 'tidyverse', 'tmle', 'tools'))
 
 ---
 This page have been automatically generated. Do not modify
