@@ -13,8 +13,8 @@ MAIN = pracs
 
 ## The rnw depencencies
 RNWINCLUDES = basic-e dinput-e tab-e dplyr-e graph-intro-e simulation-e rates-rrrd-e logistic-e effects-e \
-  cont-eff-e graphics-e oral-e DMDK-e causal-e occoh-caco-e renal-e tab-s dplyr-s graph-intro-s simulation-s \
-  rates-rrrd-s logistic-s effects-s cont-eff-s graphics-s oral-s DMDK-s causal-s occoh-caco-s renal-s 
+  cont-eff-e graphics-e oral-e DMDK-e causal-e  causInf2-e occoh-caco-e renal-e tab-s dplyr-s graph-intro-s simulation-s \
+  rates-rrrd-s logistic-s effects-s cont-eff-s graphics-s oral-s DMDK-s causal-s causInf2-s occoh-caco-s renal-s 
 
 TEX = $(RNWINCLUDES:=.tex)
 RFILES = $(RNWINCLUDES:=.R)
