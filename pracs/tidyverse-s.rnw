@@ -6,18 +6,18 @@
 % \begin{document}
 % \SweaveOpts{concordance=TRUE}
 
-\SweaveOpts{results=verbatim, prefix.string=./graph/tab}
+\SweaveOpts{results=verbatim, prefix.string=./graph/tidyverse}
 
-\section{Data manipulation with dplyr}
+\section{Data manipulation with \textit{tidyverse}}
 
 \subsection{Introduction}
 
-In this chapter we will reproduce \textit{more or less} the same outputs as in chapter 1.3 using 
+In this chapter we will reproduce \textit{more or less} the same outputs as in chapter 1.2 and 1.4 using 
 \texttt{tidyverse} packages suit.
 
-The main goal is to familiarize you with some of the main \texttt{dplyr} and \texttt{tidyverse} features.
+The main goal is to familiarize you with some of the main \texttt{tidyverse} features.
 This is an optional practical for participants that have already good basic R basis. 
-All the rest of the course can be done without knowing \texttt{dplyr}.
+All the rest of the course can be done without knowing \texttt{tidyverse}.
 
 
 \subsection{The \texttt{births} data}
@@ -456,6 +456,8 @@ inner_join(age, center, by = c('pid')) %>%
 cases, you might have to uses several columns to match (e.g. per sex and age group), this
 can be easily done specifying a vector of column names.
 
+From now on, we will consider other packages than \texttt{dplyr} from the \texttt{tidyverse} suits.
+
 \subsection{Data Visualization with ggplot2}
 
 One of the package that have contributed to \texttt{tidyverse} success is for sure \texttt{ggplot2}.
@@ -486,6 +488,106 @@ This graph can be customize adding labels and title to the plot:
 @
 
 As you can see, plots from \texttt{ggplot} family are built sequentially using the \texttt{+} operator for each additional element.
+
+\subsection{pivoting data with tidyr}
+
+\texttt{dplyr} often comes with \texttt{tidyr} when we are performing data manipulation. \texttt{tidyr}
+main features is to reshape tables from long to wide format and vis versa. Let's have an example.
+
+Let's for instance transform in wide format the previously created \texttt{birth\_per\_ageg} table.
+We want to have a table with one column per age group containing the \texttt{total\_births} numbers
+
+<<>>=
+birth_per_ageg
+
+birth_per_ageg_wide <- 
+  birth_per_ageg %>%
+  pivot_wider(names_from = 'agegrp', values_from = 'total_births')
+
+birth_per_ageg_wide
+
+@
+
+This table can easily be format back in long format:
+
+<<>>=
+birth_per_ageg_long <- 
+  birth_per_ageg_wide %>%
+  pivot_longer(cols = 1:5, names_to = 'agegrp', values_to = 'total_births')
+
+birth_per_ageg_long
+@
+
+Are the tables \texttt{birth\_per\_ageg} and \texttt{birth\_per\_ageg\_long} identical?
+
+<<>>=
+identical(birth_per_ageg, birth_per_ageg_long)
+@
+
+Not really because the factor type of \texttt{agegrp} column has been lost during the transformation.
+Let's convert \texttt{agegrp} column into a factor. Is the new table identical to \texttt{birth\_per\_ageg} ?
+
+<<>>=
+birth_per_ageg_long_02 <-
+  birth_per_ageg_long %>%
+  mutate(agegrp = as.factor(agegrp))
+
+identical(birth_per_ageg, birth_per_ageg_long_02)
+@
+
+Here we have seen the simplest example you can have of table reshaping with \texttt{tidyr}. If you are interested check the dedicated vignette (\texttt{vignette("pivot")}) to learn how to perform more advanced tables reshaping.
+
+\subsection{reading files with readr}
+
+Another package from \texttt{tidyverse} that can be introduced here is \texttt{readr} that contains
+an equivalent function of all the core \texttt{R} data.frame reading functions (e.g. \texttt{read.table()}, \texttt{read.csv()}, \texttt{read.delim()}, ...). The main change is that data are loaded in \texttt{R} as \texttt{tibble} instead of \texttt{data.frame}, type of variables (columns) are guessed if possible, and some extra data checking tests are performed.
+
+Let's compare this differences with \texttt{fem} dataset.
+
+<<>>=
+## read a csv using core R
+fem.csv.core <- read.csv('data/fem.csv')
+## read a csv using tidyverse
+fem.csv.tidy <- read_csv('data/fem.csv')
+## compare
+fem.csv.core
+fem.csv.tidy
+## table dimensions
+dim(fem.csv.core)
+dim(fem.csv.tidy)
+## compare column types
+map(fem.csv.core, class)
+map(fem.csv.tidy, class)
+@
+
+\textbf{note:} in case you do not understand the last lines and the \texttt{map()} call, it will be explained in the next section on \texttt{purrr} pacakge. 
+
+Here we see that the only difference is the type of object loaded \texttt{data.frame} vs \texttt{tibble} and the default type chosen to cast numeric values (\texttt{integer} vs \texttt{numeric}).
+
+What about loading \texttt{occoh.txt} you will be using in some other practical in the coming days.
+
+<<>>=
+## read a csv using core R
+occoh.txt.core <- read.table('data/occoh.txt')
+## read a csv using tidyverse
+occoh.txt.tidy <- read_table('data/occoh.txt')
+occoh.txt.tidy <- read_table('data/occoh.txt')
+## compare
+occoh.txt.core
+occoh.txt.tidy
+## table dimensions
+dim(occoh.txt.core)
+dim(occoh.txt.tidy)
+## compare column types
+map(occoh.txt.core, class)
+map(occoh.txt.tidy, class)
+@
+
+As you can see in addition to inferring type of columns in the input data (here some dates), using
+\texttt{readr} to load you dataset can help you to detect inconsistencies in input data formatting even if there are no true problem here.
+
+If you are interested, you explore the other functions of \texttt{readr} and see how you can tune it.
+
 
 \subsection{String manipulation with stringr}
 
@@ -577,11 +679,6 @@ Here an example of the cumulative product of the 10 first numbers.
 1:10 %>% accumulate(`*`)
 @
 
-% \subsection{reading files with readr}
-% 
-% \subsection{pivoting data with tidyr}
-
-
 \subsection{Bonus: Rendering tables}
 
 Once you have produced a nice data-set we can be interested in rendering it in a nice format that can
@@ -625,7 +722,7 @@ births.08 %>%
 <<echo=FALSE, eval=FALSE>>=
 ## trick to create dplyr-s.rnw file.
 ## this part have to be lauch manually
-dplyr_e.path <- '~/OneDrive - IARC/PROJECT/_SPE/SPE/pracs/dplyr-e.rnw'
+dplyr_e.path <- '~/OneDrive - IARC/PROJECT/_SPE/SPE/pracs/tidyverse-e.rnw'
 dplyr_e <- readLines(dplyr_e.path)
 dplyr_s <- purrr::map_chr(dplyr_e, ~ sub('results=verbatim', 'results=verbatim', .x))
 writeLines(dplyr_s, sub('-e.rnw$', '-s.rnw', dplyr_e.path))
