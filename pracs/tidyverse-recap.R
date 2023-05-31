@@ -1,22 +1,24 @@
 ## prerequest ----
 library(Epi)
-suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyverse))
 
 data(births) 
 
-doctor.1 <-
+patients.ids <- 1:500
+  
+patients.doc1 <-
   data.frame(
-    id = sample(1:500, 345),
+    id = sample(patients.ids, 345),
     doc.id = 1
   )
 
-doctor.2 <-
+patients.doc2 <-
   data.frame(
-    id = setdiff(1:500, doctor.1$id)[-(1:20)],
+    id = setdiff(patients.ids, patients.doc1$id)[-(1:20)],
     doc.id = 2
   )
 
-doctors.ids <-
+doctors.list <-
   data.frame(
     doc.id = 1:3,
     doc.names = c('Dr Blue', 'Dr Green', 'Dr Orange')
@@ -27,22 +29,22 @@ doctors.ids <-
 ## data ---
 births %>% head()
 
-doctor.1 %>% head()
-doctor.2 %>% head()
+patients.doc1 %>% head()
+patients.doc2 %>% head()
 
-doctors.ids %>% head()
+doctors.list %>% head()
 
 ## goal ----
 ## find the number and mean birth weight of babies per doctor and gestation weeks categories
 
 ## build a doctors database
 doctor.all <-
-  doctor.1 %>%
+  patients.doc1 %>%
   bind_rows(
-    doctor.2  
+    patients.doc2  
   ) %>%
   left_join(
-    doctors.ids
+    doctors.list
   )
 
 ## build births-doc database
@@ -71,7 +73,7 @@ births.03  <-
     ) 
 )
 
-## grouping order matter
+## ungrouping matter
 births.03 %>% 
   mutate(
     n.tot = sum(n),
