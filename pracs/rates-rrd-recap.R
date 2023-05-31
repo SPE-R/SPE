@@ -1,3 +1,4 @@
+
 library( Epi )
 options(digits=4)  #  to cut down decimal points in the output
 
@@ -81,6 +82,42 @@ c( R1, R0, RD, SED, RD+c(-1,1)*1.96*SED )
 ma <- glm( cbind(D,Y) ~ factor(expos), 
            family=poisreg(link=identity) )
 ci.lin( ma )[, c(1,5,6)]
+
+###################################################
+### code chunk for Binary regression
+###################################################
+
+library(dplyr)
+library(Epi)
+data(births)
+str(births)
+
+births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
+births$sex <- factor(births$sex, labels = c("M", "F"))
+births$gest4 <- cut(births$gestwks, 
+                    breaks = c(20, 35, 37, 39, 45), right = FALSE)
+births$maged <- ifelse(births$matage<35,0,1)
+
+###################################################
+### code chunk for Binary regression
+###################################################
+
+births %>%
+  count(hyp,lowbw) %>%
+  group_by(hyp) %>% # now required with changes to dplyr::count()
+  mutate(prop = prop.table(n))
+
+###################################################
+### code chunk for Binary regression
+###################################################
+
+m<-glm(lowbw~hyp,family=binomial(link=log),data=births)
+ci.exp(m)
+m<-glm(lowbw~sex+hyp,family=binomial(link=log),data=births)
+ci.exp(m)
+m<-glm(lowbw~maged+sex+hyp,family=binomial(link=log),data=births)
+ci.exp(m)
+
 
 
 ###################################################
