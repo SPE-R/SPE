@@ -1,5 +1,5 @@
 ---
-title: "Data manipulation with dplyr"
+title: "Data manipulation with tidyverse"
 author: 'Damien Georges'
 email: 'georgesd@iarc.fr'
 institute: 'International Agency for Resarch on Cancer'
@@ -16,12 +16,12 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ![](figs/data_workflow_3.jpg)
 
-## Data manipulation tools {.build}
+## Data manipulation tools in `R` {.build}
 
 ![](figs/cisors.png)
 
 - `R` core function
-- `dplyr`
+- `tidyverse` / `dplyr`
 - `data.table`
 - `...`
 
@@ -55,9 +55,7 @@ The tidyverse is an opinionated collection of R packages designed for data scien
 
 ![](figs/tidyverse.png)
 
-
-
-## pipe functions `%>%` {.build}
+## pipe functions `%>%` or `|>` {.build}
 
 ```{r eval=FALSE, echo=TRUE}
 chill(fold(add(melt(add(chocolate, butter)),
@@ -82,6 +80,21 @@ chocolate %>%
   ) %>%
   fold() %>%
   chill()
+```
+
+## Non-standard evaluation rules for function calls
+<!-- Evaluation of expressions in the context of the calling environment rather than the function's environment.  -->
+
+- used in different R packages
+- provide flexibility and ease of use
+- more concise and expressive programming in R
+
+```{r eval=FALSE, echo=TRUE}
+dat <- data.frame(x = 1:10)
+## subset supports NSE
+subset(dat, x < 5)
+## and SE
+subset(dat, data$x < 5)
 ```
 
 <!-- ## code as you speak -->
@@ -207,7 +220,7 @@ action to be applied to a table.
 - arrange rows (`arrange`)
 - columns selection (`select`)
 - create/modify columns (`mutate`)
-- group and summarize data (`grou_by` and `summarise`)
+- group and summarize data (`group_by` and `summarise`)
 - bind different tables (`bind_rows`, `bind_cols`)
 - merge different tables (`left_join`, `right_join`, `inner_join`, `full_join`)
 
@@ -217,7 +230,7 @@ action to be applied to a table.
 - pivoting data with ![tidyr](figs/tidyr.png){height=10%} (`pivot_wider`, `pivo_longer`)
 - reading data with ![readrr](figs/readr.png){height=10%} (`read_table`, `read_csv`)
 - manipulating lists with ![purrr](figs/purrr.png){height=10%} (`map`, `map_chr`, `reduce`, ...)
-- manipulating strings with ![stringr](figs/stringr.png){height=10%} (`str_remove`)
+- manipulating strings with ![stringr](figs/stringr.png){height=10%} (`str_length`, `str_remove`, ...)
 
 ```{r eval=FALSE, echo=FALSE}
 ## trick to create tidyverse-booklet.Rmd file.
@@ -227,7 +240,7 @@ pres <- readLines(pres.path)
 pres_b <- purrr::map_chr(pres, ~ stringr::str_replace(.x, '-', '-'))
 pres_b.path <- stringr::str_replace(pres.path, 'tidyverse-pres', 'tidyverse-booklet')
 writeLines(pres_b, pres_b.path)
-knit_with_parameters(pres_b.path)
+rmarkdown::render(pres_b.path, output_file = str_replace(pres_b.path, '.Rmd', '.pdf'))
 ```
 
 
