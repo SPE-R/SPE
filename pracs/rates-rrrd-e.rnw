@@ -4,7 +4,7 @@
 \SweaveOpts{concordance=TRUE}
 
 
-\section{Analysis of hazard rates, their ratios and differences}
+\section{Analysis of hazard rates, their ratios and differences and binary regression}
 
 This exercise is \textit{very} prescriptive, so you should make an
 effort to really understand everything you type into R. Consult the
@@ -207,6 +207,66 @@ ci.lin( ma )[, c(1,5,6)]
 @ 
 
 \end{enumerate}
+
+\subsection{Binary regression}
+
+Eplore the factors associated with risk of low birth weight 
+in 500 singleton births in a London Hospital. Indicator (lowbw) for birth weight less than 2500 g. Data available from the Epi package. Factors of interest are
+maternal hypertension (hyp), mother's age at birth over 35 years and sex of the baby. \newline
+
+Load the {\tt Epi} package and the data set and look at its content
+<<Run births-house>>=
+library(dplyr)
+library(Epi)
+data(births)
+str(births)
+@
+\begin{enumerate}
+\item Because all variables are numeric we need first to do a little housekeeping. 
+Two of them are directly converted into factors,
+and categorical versions are created of two continuous variables by function {\tt cut()}.
+%% Also, express birth weights in kilograms
+<<>>=
+births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
+births$sex <- factor(births$sex, labels = c("M", "F"))
+births$gest4 <- cut(births$gestwks, 
+    breaks = c(20, 35, 37, 39, 45), right = FALSE)
+births$maged <- ifelse(births$matage<35,0,1)
+@
+
+
+\item Cross tabulate (dplyr) counts of children by hypertension and low birth weight. 
+calculate (mutate) proportions of low birth weigth children by hypertension.
+<<>>=
+births %>%
+count(hyp,lowbw) %>%
+group_by(hyp) %>% # now required with changes to dplyr::count()
+mutate(prop = prop.table(n))
+@
+
+
+\item Estimate relative risk of low birth weight for mothers with hypertension compared to those without using binary regression.
+<<>>=
+m<-glm(lowbw~hyp,family=binomial(link=log),data=births)
+ci.exp(m)
+@
+
+
+\item Adjust relative risk of low birth and hypertension with the sex of children
+<<>>=
+m<-glm(lowbw~sex+hyp,family=binomial(link=log),data=births)
+ci.exp(m)
+@
+
+
+
+\item Adjust relative risk of low birth and hypertension with the sex of children and mother beeing over 35 years.
+<<>>=
+m<-glm(lowbw~maged+sex+hyp,family=binomial(link=log),data=births)
+ci.exp(m)
+@
+\end{enumerate}
+
 \subsection{Optional/Homework: Hand calculations and calculations using matrix tools}
 
 \textit{\textbf{NB. This subsection requires some familiarity with matrix algebra. Do this only after you have done the other exercises of this session.}} 
@@ -332,5 +392,8 @@ ma <- glm( cbind(D,Y) ~ factor(expos),
                  family=poisreg(link=identity) )
 ci.lin( ma, ctr.mat=CM )[, c(1,5,6)]
 @ 
+
+
+
 \end{enumerate}
 \end{document}
