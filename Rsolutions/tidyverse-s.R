@@ -1,7 +1,7 @@
 ### R code from vignette source '/home/runner/work/SPE/SPE/build/tidyverse-s.rnw'
 
 ###################################################
-### code chunk number 1: tidyverse-s.rnw:30-33
+### code chunk number 1: tidyverse-s.rnw:28-31
 ###################################################
 library(Epi)
 suppressPackageStartupMessages(library(tidyverse))
@@ -47,7 +47,7 @@ births %>% head(4)
 
 
 ###################################################
-### code chunk number 7: tidyverse-s.rnw:104-125
+### code chunk number 7: tidyverse-s.rnw:104-124
 ###################################################
 births_tbl <-
   births_tbl %>%
@@ -64,8 +64,7 @@ births_tbl <-
         gestwks < 25 ~ 'less than 25 weeks',
         gestwks >= 25 & gestwks < 30  ~ '25-30 weeks',
         gestwks >= 30 & gestwks < 35  ~ '30-35 weeks',
-        gestwks >= 35 & gestwks < 40  ~ '35-40 weeks',
-        gestwks >= 40  ~ 'more than 40 weeks'
+        gestwks >= 35   ~ 'more than 35 weeks'
       ) 
   )
 
@@ -73,7 +72,7 @@ births_tbl
 
 
 ###################################################
-### code chunk number 8: tidyverse-s.rnw:145-150
+### code chunk number 8: tidyverse-s.rnw:142-147
 ###################################################
 births_tbl %>%
   ## select only id, women age group, sex and birth weight of the baby
@@ -83,7 +82,7 @@ births_tbl %>%
 
 
 ###################################################
-### code chunk number 9: tidyverse-s.rnw:158-168
+### code chunk number 9: tidyverse-s.rnw:153-163
 ###################################################
 births_tbl %>%
   ## select only id, women age group, sex and birth weight of the baby
@@ -98,7 +97,7 @@ births_tbl %>%
 
 
 ###################################################
-### code chunk number 10: tidyverse-s.rnw:175-185
+### code chunk number 10: tidyverse-s.rnw:170-180
 ###################################################
 births_tbl %>%
   ## select only id, women age group, sex and birth weight of the baby
@@ -113,7 +112,7 @@ births_tbl %>%
 
 
 ###################################################
-### code chunk number 11: tidyverse-s.rnw:196-205
+### code chunk number 11: tidyverse-s.rnw:190-199
 ###################################################
 births.01 <-
   births_tbl %>%
@@ -127,7 +126,7 @@ births.01
 
 
 ###################################################
-### code chunk number 12: tidyverse-s.rnw:211-216
+### code chunk number 12: tidyverse-s.rnw:204-209
 ###################################################
 births.02 <-
   births.01 %>%
@@ -137,7 +136,7 @@ births.02 <-
 
 
 ###################################################
-### code chunk number 13: tidyverse-s.rnw:223-235
+### code chunk number 13: tidyverse-s.rnw:215-227
 ###################################################
 births.03 <-
   births_tbl %>%
@@ -154,14 +153,14 @@ births.03
 
 
 ###################################################
-### code chunk number 14: tidyverse-s.rnw:245-247
+### code chunk number 14: tidyverse-s.rnw:236-238
 ###################################################
 births.03 %>%
   rename_with(toupper, where(~ !is.numeric(.x)))
 
 
 ###################################################
-### code chunk number 15: tidyverse-s.rnw:252-260
+### code chunk number 15: tidyverse-s.rnw:242-250
 ###################################################
 births.05 <-
   births_tbl %>%
@@ -174,7 +173,7 @@ births.05
 
 
 ###################################################
-### code chunk number 16: tidyverse-s.rnw:266-278
+### code chunk number 16: tidyverse-s.rnw:255-267
 ###################################################
 births.05 %>%
   summarise(
@@ -191,7 +190,7 @@ births_tbl %>%
 
 
 ###################################################
-### code chunk number 17: tidyverse-s.rnw:288-295
+### code chunk number 17: tidyverse-s.rnw:276-283
 ###################################################
 births.06 <-
   births_tbl %>%
@@ -203,7 +202,7 @@ births.06
 
 
 ###################################################
-### code chunk number 18: tidyverse-s.rnw:300-310
+### code chunk number 18: tidyverse-s.rnw:288-298
 ###################################################
 births.06 %>%
   mutate(
@@ -218,7 +217,7 @@ births.06 %>%
 
 
 ###################################################
-### code chunk number 19: tidyverse-s.rnw:321-337
+### code chunk number 19: tidyverse-s.rnw:308-322
 ###################################################
 ## this tibble will still be grouped by sex
 births_tbl %>%
@@ -236,10 +235,8 @@ births_tbl %>%
   )
 
 
-
-
 ###################################################
-### code chunk number 20: tidyverse-s.rnw:344-350
+### code chunk number 20: tidyverse-s.rnw:327-333
 ###################################################
 births_tbl %>%
   group_by(gest4) %>%
@@ -250,7 +247,7 @@ births_tbl %>%
 
 
 ###################################################
-### code chunk number 21: tidyverse-s.rnw:357-372
+### code chunk number 21: tidyverse-s.rnw:341-356
 ###################################################
 births_tbl %>%
   ## keep only the newborn with defined gesational time category
@@ -270,7 +267,7 @@ births_tbl %>%
 
 
 ###################################################
-### code chunk number 22: tidyverse-s.rnw:376-389
+### code chunk number 22: tidyverse-s.rnw:360-373
 ###################################################
 births_tbl %>%
   filter(
@@ -288,7 +285,7 @@ births_tbl %>%
 
 
 ###################################################
-### code chunk number 23: tidyverse-s.rnw:405-419
+### code chunk number 23: tidyverse-s.rnw:388-402
 ###################################################
 age <-
   tibble(
@@ -307,13 +304,13 @@ center
 
 
 ###################################################
-### code chunk number 24: tidyverse-s.rnw:425-426
+### code chunk number 24: tidyverse-s.rnw:408-409
 ###################################################
 bind_rows(age, center)
 
 
 ###################################################
-### code chunk number 25: tidyverse-s.rnw:436-442
+### code chunk number 25: tidyverse-s.rnw:419-425
 ###################################################
 ## all individuals from ages are kept
 left_join(age, center, by = c('pid'))
@@ -324,7 +321,7 @@ inner_join(age, center, by = c('pid'))
 
 
 ###################################################
-### code chunk number 26: tidyverse-s.rnw:447-452
+### code chunk number 26: tidyverse-s.rnw:430-435
 ###################################################
 inner_join(age, center, by = c('pid')) %>%
   group_by(center) %>%
@@ -334,13 +331,13 @@ inner_join(age, center, by = c('pid')) %>%
 
 
 ###################################################
-### code chunk number 27: tidyverse-s.rnw:471-472
+### code chunk number 27: tidyverse-s.rnw:450-451
 ###################################################
 birth_per_ageg <- births_tbl %>% group_by(agegrp) %>% summarise(total_births = n())
 
 
 ###################################################
-### code chunk number 28: tidyverse-s.rnw:475-478
+### code chunk number 28: tidyverse-s.rnw:454-457
 ###################################################
 (gg.01 <- 
    ggplot(birth_per_ageg, aes(x = agegrp, y = total_births)) + 
@@ -348,7 +345,7 @@ birth_per_ageg <- births_tbl %>% group_by(agegrp) %>% summarise(total_births = n
 
 
 ###################################################
-### code chunk number 29: tidyverse-s.rnw:482-487
+### code chunk number 29: tidyverse-s.rnw:460-465
 ###################################################
 (gg.02 <- 
    gg.01 +  
@@ -358,7 +355,7 @@ birth_per_ageg <- births_tbl %>% group_by(agegrp) %>% summarise(total_births = n
 
 
 ###################################################
-### code chunk number 30: tidyverse-s.rnw:500-508
+### code chunk number 30: tidyverse-s.rnw:475-482
 ###################################################
 birth_per_ageg
 
@@ -369,9 +366,8 @@ birth_per_ageg_wide <-
 birth_per_ageg_wide
 
 
-
 ###################################################
-### code chunk number 31: tidyverse-s.rnw:513-518
+### code chunk number 31: tidyverse-s.rnw:486-491
 ###################################################
 birth_per_ageg_long <- 
   birth_per_ageg_wide %>%
@@ -381,13 +377,13 @@ birth_per_ageg_long
 
 
 ###################################################
-### code chunk number 32: tidyverse-s.rnw:523-524
+### code chunk number 32: tidyverse-s.rnw:495-496
 ###################################################
 identical(birth_per_ageg, birth_per_ageg_long)
 
 
 ###################################################
-### code chunk number 33: tidyverse-s.rnw:530-535
+### code chunk number 33: tidyverse-s.rnw:501-506
 ###################################################
 birth_per_ageg_long_02 <-
   birth_per_ageg_long %>%
@@ -397,7 +393,7 @@ identical(birth_per_ageg, birth_per_ageg_long_02)
 
 
 ###################################################
-### code chunk number 34: tidyverse-s.rnw:547-560
+### code chunk number 34: tidyverse-s.rnw:516-529
 ###################################################
 ## read a csv using core R
 fem.csv.core <- read.csv('data/fem.csv')
@@ -415,7 +411,7 @@ map(fem.csv.tidy, class)
 
 
 ###################################################
-### code chunk number 35: tidyverse-s.rnw:569-583
+### code chunk number 35: tidyverse-s.rnw:537-551
 ###################################################
 ## read a csv using core R
 occoh.txt.core <- read.table('data/occoh.txt')
@@ -434,55 +430,57 @@ map(occoh.txt.tidy, class)
 
 
 ###################################################
-### code chunk number 36: tidyverse-s.rnw:598-599
+### code chunk number 36: tidyverse-s.rnw:562-563
 ###################################################
-countries <- c("Estonia", "Finland", "Denmark", "United Kingdom")
+countries <- c("Estonia", "Finland", "Denmark", "United Kingdom", "France")
 
 
 ###################################################
-### code chunk number 37: tidyverse-s.rnw:603-604
+### code chunk number 37: tidyverse-s.rnw:568-569
 ###################################################
 country_initials <- str_sub(countries, start = 1, end = 3)
 
 
 ###################################################
-### code chunk number 38: tidyverse-s.rnw:608-609
+### code chunk number 38: tidyverse-s.rnw:573-574
 ###################################################
 countries_upper <- str_to_upper(countries)
 
 
 ###################################################
-### code chunk number 39: tidyverse-s.rnw:613-614
+### code chunk number 39: tidyverse-s.rnw:578-579
 ###################################################
 countries_modified <- str_replace(countries, "United", "Utd")
 
 
 ###################################################
-### code chunk number 40: tidyverse-s.rnw:618-619
+### code chunk number 40: tidyverse-s.rnw:582-583
 ###################################################
 a_positions <- str_locate_all(countries, "n")
 
 
 ###################################################
-### code chunk number 41: tidyverse-s.rnw:629-630
+### code chunk number 41: tidyverse-s.rnw:588-589
 ###################################################
 character_counts <- str_length(countries)
 
 
 ###################################################
-### code chunk number 42: tidyverse-s.rnw:646-653
+### code chunk number 42: tidyverse-s.rnw:601-610
 ###################################################
+## define the grade dataset
 grades <- 
   list(
     c1 = c(80, 85, 90), 
     c2 = c(75, 70, 85, 88), 
     c3 = c(90, 85, 95)
   )
+## compute grades
 mean_grades <- map(grades, mean)
 
 
 ###################################################
-### code chunk number 43: tidyverse-s.rnw:660-664
+### code chunk number 43: tidyverse-s.rnw:615-619
 ###################################################
 map(grades, mean)
 map_dbl(grades, mean)
@@ -491,14 +489,14 @@ map_df(grades, mean)
 
 
 ###################################################
-### code chunk number 44: tidyverse-s.rnw:677-679
+### code chunk number 44: tidyverse-s.rnw:628-630
 ###################################################
 1:10 %>% reduce(`*`)
 1:10 %>% accumulate(`*`)
 
 
 ###################################################
-### code chunk number 45: tidyverse-s.rnw:688-719
+### code chunk number 45: tidyverse-s.rnw:638-669
 ###################################################
 # if(!require(kableExtra)) install.packages('kableExtra')
 library(kableExtra)
@@ -534,7 +532,7 @@ births.08 %>%
 
 
 ###################################################
-### code chunk number 46: tidyverse-s.rnw:722-728 (eval = FALSE)
+### code chunk number 46: tidyverse-s.rnw:673-679 (eval = FALSE)
 ###################################################
 ## ## trick to create dplyr-s.rnw file.
 ## ## this part have to be lauch manually
