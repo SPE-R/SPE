@@ -10,12 +10,11 @@ str(births)
 
 
 ###################################################
-### code chunk number 2: effects-s.rnw:92-98
+### code chunk number 2: effects-s.rnw:92-97
 ###################################################
-births$hyp <- factor(births$hyp, labels = c("Normo", "Hyper"))
+births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
 births$sex <- factor(births$sex, labels = c("M", "F"))
-births$agegrp <- cut(births$matage, 
-    breaks = c(20, 25, 30, 35, 40, 45), right = FALSE)
+births$maged <- cut(births$matage, breaks=c(22,35,44), right=FALSE)
 births$gest4 <- cut(births$gestwks, 
     breaks = c(20, 35, 37, 39, 45), right = FALSE)
 
@@ -168,9 +167,10 @@ effx(response=lowbw, type="binary", exposure=gestwks,data=births)
 
 
 ###################################################
-### code chunk number 25: Linear effect of gestwks on bweight stratified by agegrp
+### code chunk number 25: Linear effect of gestwks on bweight stratified by maged
 ###################################################
-effx(bweight, type="metric", exposure=gestwks, strata=agegrp, data=births)
+effx(bweight, type="metric", exposure=gestwks, strata=maged, 
+     data=births)
 
 
 ###################################################
@@ -292,9 +292,9 @@ round(ci.lin(binm3, Exp=TRUE)[, c(1,2,5:7)], 3)
 ### code chunk number 39: lowbw-gestwks-hyp-pred
 ###################################################
 predm3hyp <- predict(binm3, 
-   newdata=data.frame(hyp="Hyper", nd), type="response")
+   newdata=data.frame(hyp="hyper", nd), type="response")
 predm3nor <- predict(binm3, 
-   newdata=data.frame(hyp="Normo", nd), type="response")
+   newdata=data.frame(hyp="normal", nd), type="response")
 par(mfrow=c(1,2))
 plot( nd$gestwks, qlogis(predm3hyp), type="l")
 lines( nd$gestwks, qlogis(predm3nor), lty=2)
