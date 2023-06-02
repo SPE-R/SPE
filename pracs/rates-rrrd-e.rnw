@@ -1,10 +1,11 @@
-%\SweaveOpts{results=hide,keep.source=TRUE,include=FALSE,eps=FALSE, prefix.%string=./graph/rates-rrrd}
-\documentclass{article}
-\begin{document}
-\SweaveOpts{concordance=TRUE}
+%\documentclass{article}
+%\begin{document}
+%\SweaveOpts{concordance=TRUE}
+\SweaveOpts{results=hide,keep.source=TRUE,include=FALSE,eps=FALSE, prefix.%string=./graph/rates-rrrd}
 
 
-\section{Analysis of hazard rates, their ratios and differences}
+
+\section{Analysis of hazard rates, their ratios and differences and binary regression}
 
 This exercise is \textit{very} prescriptive, so you should make an
 effort to really understand everything you type into R. Consult the
@@ -28,11 +29,11 @@ $$ \widehat\lambda \pm 1.96 \times SE(\widehat\lambda) $$
   Let's  use R as a simple desk calculator to estimate the underlying hazard rate $\lambda$ (in 1000
   person-years; therefore 5.532) and to get the first version of an approximate confidence
   interval:
-<<>>=
+<<eval=FALSE>>=
 library( Epi )
 options(digits=4)  #  to cut down decimal points in the output
 @
-<<>>=
+<<eval=FALSE>>=
 D <- 15
 Y <- 5.532    # thousands of years!
 rate <- D / Y
@@ -55,12 +56,12 @@ A family object {\tt poisreg}, a modified version of the original {\tt poisson} 
 in package {\tt Epi}. When using this, the response is defined as a {\it matrix} of two columns: numbers
 of cases $D$ and person-years $Y$, these being combined into a matrix by {\tt cbind(D,Y)}. No specification
 of {\tt offset} is needed.
-<<>>=
+<<eval=FALSE>>=
 mreg <- glm( cbind(D, Y) ~ 1, family=poisreg(link=log) )
 ci.exp( mreg ) 
 @
 \item If you want confidence interval for log rate
-<<>>=
+<<eval=FALSE>>=
 mreg <- glm( cbind(D, Y) ~ 1, family=poisreg(link=log) )
 ci.lin( mreg )[,c(1,5,6)] 
 @
@@ -80,7 +81,7 @@ and their differences as with the log link.
 \item Fit a Poisson model with identity link to our simple data, and 
 use \texttt{ci.lin()} to produce the estimate and the
   confidence interval for the hazard rate from this model:
-<<>>=
+<<eval=FALSE>>=
 mid <- glm( cbind(D,Y)~ 1, family=poisreg(link="identity"))
 ci.lin( mid )
 ci.lin( mid )[, c(1,5,6)]
@@ -95,7 +96,7 @@ Now, suppose the events and person years are collected over  three distinct peri
 
 \begin{enumerate}
 \item Read in the data and compute period-specific rates
-<<>>=
+<<eval=FALSE>>=
 Dx <- c(3,7,5)
 Yx <- c(1.412,2.783,1.337)
 Px <- 1:3
@@ -105,20 +106,20 @@ rates
 \item Using these data, 
 fit the same model with log link as in section 1.6.2, assuming a common single hazard $\lambda$ 
   for the separate periods. Compare the result from the previous ones
-<<>>=
+<<eval=FALSE>>=
 m3 <- glm( cbind(Dx,Yx) ~ 1, family=poisreg(link=log) )
 ci.exp( m3 )
 @
 
 \item Now test whether the rates are the same in the three periods:
   Try to fit a model with the period as a factor in the model:
-<<>>=
+<<eval=FALSE>>=
 mp <- glm( cbind(Dx,Yx) ~ factor(Px), family=poisreg(link=log) )
 ci.exp(mp)
 @
 Compare the goodness-of-fit of the two models using \texttt{anova()} with the argument
 \texttt{test="Chisq"}:
-<<>>=
+<<eval=FALSE>>=
 anova( m3, mp, test="Chisq" )
 @
 Compare the test statistic to the deviance of the model \texttt{mp}.
@@ -165,14 +166,14 @@ Y0 <- 5.532 ; Y1 <- 4.783
 
 \item Now achieve this using a Poisson model. For that we first combine
 the group-specific numbers into pertinent vectors and specify a factor to represent the contrast between the exposed and the unexposed group
-<<>>=
+<<eval=FALSE>>=
 D <- c(D0,D1) ; Y <- c(Y0,Y1); expos <- 0:1
 mm <- glm( cbind(D,Y) ~ factor(expos), family=poisreg(link=log) )
 @
 What do the parameters mean in this model?
 
 \item You can extract the estimation results for exponentiated parameters in two ways, as before:
-<<>>=
+<<eval=FALSE>>=
 ci.exp( mm )
 ci.lin( mm, Exp=TRUE ) [,5:7]
 @
@@ -191,7 +192,7 @@ Its variance is just the sum of the variances of the two rates
 \end{eqnarray*}
 \begin{enumerate}
 \item Use this formula to compute the point estimate of the rate difference $\lambda$ and a 95\%   confidence interval for it:
-<<>>=
+<<eval=FALSE>>=
 R0<-D0/Y0
 R1<-D1/Y1
 RD <- diff( D/Y )
@@ -200,13 +201,73 @@ c( R1, R0, RD, SED, RD+c(-1,1)*1.96*SED )
 @ 
 \item Verify that this is the confidence interval you get when you fit
   an additive model (obtained by identity link) with exposure as a factor:
-<<>>=
+<<eval=FALSE>>=
 ma <- glm( cbind(D,Y) ~ factor(expos), 
            family=poisreg(link=identity) )
 ci.lin( ma )[, c(1,5,6)]
 @ 
 
 \end{enumerate}
+
+\subsection{Binary regression}
+
+Eplore the factors associated with risk of low birth weight 
+in 500 singleton births in a London Hospital. Indicator (lowbw) for birth weight less than 2500 g. Data available from the Epi package. Factors of interest are
+maternal hypertension (hyp), mother's age at birth over 35 years and sex of the baby. \newline
+
+Load the {\tt Epi} package and the data set and look at its content
+<<Run births-house,eval=FALSE>>=
+library(dplyr)
+library(Epi)
+data(births)
+str(births)
+@
+\begin{enumerate}
+\item Because all variables are numeric we need first to do a little housekeeping. 
+Two of them are directly converted into factors,
+and categorical versions are created of two continuous variables by function {\tt cut()}.
+%% Also, express birth weights in kilograms
+<<eval=FALSE>>=
+births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
+births$sex <- factor(births$sex, labels = c("M", "F"))
+births$gest4 <- cut(births$gestwks, 
+    breaks = c(20, 35, 37, 39, 45), right = FALSE)
+births$maged <- ifelse(births$matage<35,0,1)
+@
+
+
+\item Cross tabulate (dplyr) counts of children by hypertension and low birth weight. 
+calculate (mutate) proportions of low birth weigth children by hypertension.
+<<eval=FALSE>>=
+births %>%
+count(hyp,lowbw) %>%
+group_by(hyp) %>% # now required with changes to dplyr::count()
+mutate(prop = prop.table(n))
+@
+
+
+\item Estimate relative risk of low birth weight for mothers with hypertension compared to those without using binary regression.
+<<eval=FALSE>>=
+m<-glm(lowbw~hyp,family=binomial(link=log),data=births)
+ci.exp(m)
+@
+
+
+\item Adjust relative risk of low birth and hypertension with the sex of children
+<<eval=FALSE>>=
+m<-glm(lowbw~sex+hyp,family=binomial(link=log),data=births)
+ci.exp(m)
+@
+
+
+
+\item Adjust relative risk of low birth and hypertension with the sex of children and mother beeing over 35 years.
+<<eval=FALSE>>=
+m<-glm(lowbw~maged+sex+hyp,family=binomial(link=log),data=births)
+ci.exp(m)
+@
+\end{enumerate}
+
 \subsection{Optional/Homework: Hand calculations and calculations using matrix tools}
 
 \textit{\textbf{NB. This subsection requires some familiarity with matrix algebra. Do this only after you have done the other exercises of this session.}} 
@@ -217,11 +278,12 @@ First some basic hand calculations.
   Let's  use R as a simple desk calculator to estimate the underlying hazard rate $\lambda$ (in 1000
   person-years; therefore 5.532) and to get the first version of an approximate confidence
   interval:
-<<>>=
+<<eval=FALSE>>=
 library( Epi )
 options(digits=4)  #  to cut down decimal points in the output
 @
-<<>>=
+
+<<eval=FALSE>>=
 D <- 15
 Y <- 5.532    # thousands of years!
 rate <- D / Y
@@ -231,7 +293,7 @@ c(rate, SE.rate, rate + c(-1.96, 1.96)*SE.rate )
 
 \item Compute now the approximate confidence interval using the method
 based on log-transformation and compare the result with that in the previous item.
-<<>>=
+<<eval=FALSE>>=
 SE.logr <- 1/sqrt(D)
 EF <- exp( 1.96 * SE.logr )
 c(log(rate), SE.logr)
@@ -241,7 +303,7 @@ c( rate, EF, rate/EF, rate*EF )
 
 \item Calculate the incidence rates in the two groups, their ratio, and the  
 CI of the true hazard ratio $\rho$ by direct application of the above formulae:
-<<>>=
+<<eval=FALSE>>=
 D0 <- 15   ; D1 <- 28
 Y0 <- 5.532 ; Y1 <- 4.783
 R1 <- D1/Y1; R0 <- D0/Y0
@@ -263,7 +325,7 @@ c( R1, R0, RR, RR/EF, RR*EF )
   matrix multiplication (operator \verb+'%*%'+
   in R) to produce a confidence interval from an estimate and its
   standard error (or CIs from whole columns of estimates and SEs):
-<<>>=
+<<eval=FALSE>>=
 ci.mat
 ci.mat()
 @ 
@@ -275,7 +337,7 @@ a $1\times 3$ matrix containing the point estimate and the
 confidence limit. --
 Apply this method to the single rate calculations in 1.6.1;
 first creating the $1 \times 2$ matrix and then performing the matrix multiplication.
-<<>>=
+<<eval=FALSE>>=
 rateandSE <- c( rate, SE.rate ) 
 rateandSE
 rateandSE %*% ci.mat()
@@ -283,7 +345,7 @@ rateandSE %*% ci.mat()
 \item When the confidence interval is based on the log-rate and its
   standard error, the result is obtained by appropriate application of
   the exp-function on the pertinent matrix product
-<<>>=
+<<eval=FALSE>>=
 lograndSE <- c( log(rate), SE.logr )
 lograndSE
 exp( lograndSE %*% ci.mat() )
@@ -291,7 +353,7 @@ exp( lograndSE %*% ci.mat() )
 \item For computing the rate ratio and its CI as in 1.6.5, matrix
   multiplication with {\tt ci.mat()} should give the same result as
   there:
-<<>>=
+<<eval=FALSE>>=
 exp( c( log(RR), SE.lrr ) %*% ci.mat() )
 @ 
 \item The main argument in function {\tt ci.mat()} is {\tt alpha},
@@ -300,13 +362,13 @@ exp( c( log(RR), SE.lrr ) %*% ci.mat() )
   \%. If you wish to get the confidence interval for the rate ratio at
   the 90 \% level (= $1-0.1$), for instance, you may proceed as
   follows:
-<<>>=
+<<eval=FALSE>>=
 ci.mat( alpha=0.1 )
 exp( c( log(RR), SE.lrr ) %*% ci.mat(alpha=0.1) )
 @
 \item Now achieve this using a Poisson model. For that we first combine
 the group-specific numbers into pertinent vectors and specify a factor to represent the contrast between the exposed and the unexposed group
-<<>>=
+<<eval=FALSE>>=
 D <- c(D0,D1) ; Y <- c(Y0,Y1); expos <- 0:1
 @
 
@@ -314,7 +376,7 @@ D <- c(D0,D1) ; Y <- c(Y0,Y1); expos <- 0:1
   the rates and the ratio between them. This can be achieved in one go
   using the {\it contrast matrix} argument \texttt{ctr.mat} to
   \texttt{ci.lin()} or \texttt{ci.exp()}. Try:
-<<>>=
+<<eval=FALSE>>=
 
 CM <- rbind( c(1,0), c(1,1), c(0,1) )
 rownames( CM ) <- c("rate 0","rate 1","RR 1 vs. 0")
@@ -326,11 +388,14 @@ ci.exp( mm, ctr.mat=CM )
 \item Use the same machinery to the additive model to get the rates
   and the rate-difference in one go. Note that the annotation of the
   resulting estimates are via the column-names of the contrast matrix.
-<<>>=
+<<eval=FALSE>>=
 rownames( CM ) <- c("rate 0","rate 1","RD 1 vs. 0")
 ma <- glm( cbind(D,Y) ~ factor(expos),
                  family=poisreg(link=identity) )
 ci.lin( ma, ctr.mat=CM )[, c(1,5,6)]
 @ 
+
+
 \end{enumerate}
-\end{document}
+
+%\end{document}

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 \SweaveOpts{results=verbatim,keep.source=TRUE,include=FALSE,eps=FALSE,prefix.string=./graph/cont-eff}
 % With extensions by BxC 12 March 2018
 <<echo=FALSE>>=
@@ -285,3 +286,292 @@ You could continue the analysis of these data by fitting an age-cohort
 model as an alternative to the age-period model, as well as an
 age-cohort-period model utilizing function \texttt{apc.fit()} in
 \texttt{Epi}. See \url{http://bendixcarstensen.com/APC/} for details.
+=======
+\SweaveOpts{results=verbatim,keep.source=TRUE,include=FALSE,eps=FALSE,prefix.string=./graph/cont-eff}
+% With extensions by BxC 12 March 2018
+<<echo=FALSE>>=
+options( width=90,
+         SweaveHooks=list( fig=function()
+         par(mar=c(3,3,1,1),mgp=c(3,1,0)/1.6,las=1,bty="n") ) )
+@ 
+\renewcommand{\rwpre}{./graph/cont-eff}
+
+ %% FIXME: results=verbatim vs results=hide
+
+\section{Poisson regression \& analysis of curved effects}
+
+This exercise deals with modelling incidence rates
+using Poisson regression. Our special interest is in
+estimating and reporting  curved effects of continuous
+explanatory variables on the theoretical rate
+
+We analyse the \texttt{testisDK} data found in the
+\texttt{Epi} package.
+% already introduced and analyzed in the previous lecture, 
+It contains the numbers of cases of testis cancer and mid-year
+populations (person-years) in 1-year age groups in Denmark during
+1943--96. In this analysis age and calendar time
+are first treated as categorical
+but finally, a penalized spline model is fitted. 
+
+
+\subsection{Testis cancer: Data input and housekeeping}
+
+
+\begin{enumerate}%[resume]
+%----------------------------------------------------------------------
+\item 
+Load the packages and the data set, and inspect its structure:
+<<data-input>>=
+library( Epi )
+library(mgcv)
+   data( testisDK )
+    str( testisDK )
+summary( testisDK )
+   head( testisDK )
+@
+\item 
+  There are nearly 5000 observations from 90 one-year age groups
+  and 54 calendar years. To get a clearer picture of what's going on,
+  we do some housekeeping. The age range will be limited to 15--79
+  years, and age and period are both categorized into 5-year intervals
+  -- according to the time-honoured practice in epidemiology.
+<<housekeeping>>=
+tdk <- subset(testisDK, A > 14 & A < 80)
+tdk$Age <- cut(tdk$A, br = 5*(3:16), include.lowest=TRUE, right=FALSE)
+   nAge <- length(levels(tdk$Age))
+tdk$Per <- cut(tdk$P, br = seq(1943,1998,by=5), 
+               include.lowest=TRUE, right=FALSE)
+   nPer <- length(levels(tdk$Per))
+@ 
+\end{enumerate}
+
+\subsection{Some descriptive analysis}
+
+Computation and tabulation of incidence rates
+
+\begin{enumerate}%[resume]
+\item Tabulate numbers of cases and person-years, and compute the
+  incidence rates (per 100,000 y) in each 5 y $\times$ 5 y cell using
+  \texttt{stat.table()}
+<<tabulation>>=
+tab <- stat.table(  index = list(Age, Per),
+                 contents = list(D = sum(D), 
+                                 Y = sum(Y/1000),
+                              rate = ratio(D, Y, 10^5) ),
+                  margins = TRUE, 
+                     data = tdk ) 
+print(tab, digits=c(sum=0, ratio=1))	
+@ 
+Look at the incidence rates in the column margin and in the row
+margin.  In which age group is the marginal age-specific rate highest?
+Do the period-specific marginal rates have any trend over time?
+
+\item From the saved table object \texttt{tab} you can plot an
+  age-incidence curve for each period separately, after you have
+  checked the structure of the table, so that you know the relevant
+  dimensions in it. There is a function {\tt rateplot()} in \texttt{Epi}
+  that does default plotting of tables of rates (see the help page of
+ {\tt rateplot})
+<<plot-rates, fig=TRUE>>=
+str(tab)
+par(mfrow=c(1,1))
+rateplot( rates=tab[3, 1:nAge, 1:nPer], which="ap", ylim=c(1,30), 
+           age=seq(15, 75, 5), per=seq(1943, 1993, 5), 
+           col=heat.colors(16), ann=TRUE )
+@	
+
+Is there any common pattern in the age-incidence curves across the periods?
+
+\end{enumerate}
+
+\subsection{Age and period as categorical factors}
+
+We shall first  fit a Poisson regression model with log link
+on age and period model in the traditional way,
+in which both factors are treated as categorical.
+The model is additive on the log-rate scale.
+It is useful to scale the person-years to be expressed in $10^5$ y.
+In fitting the model we utilize the \texttt{poisreg} family object
+found in package \texttt{Epi}. 
+\begin{enumerate}%[resume]
+\item
+<<mCat>>=
+tdk$Y <- tdk$Y/100000
+mCat <- glm( cbind(D,Y) ~ Age + Per, 
+             family=poisreg(link=log), data= tdk )
+round( ci.exp( mCat ), 2)
+@ 
+What do the estimated rate ratios tell about the age and period effects? 
+
+\item A graphical inspection of point estimates and confidence
+  intervals can be obtained as follows. In the beginning it is useful
+  to define shorthands for the pertinent mid-age and mid-period values
+  of the different intervals
+<<mCat-est, fig=TRUE>>=
+aMid <- seq(17.5, 77.5, by = 5)
+pMid <- seq(1945, 1995, by = 5)
+par(mfrow=c(1,2))
+plot( c(15,80), c(0.6, 6), type="n", log="y", 
+      cex.lab = 1.5, cex.axis = 1.5, 
+   xlab = "Age (years)", ylab = "Rate ratio") 
+lines( aMid,  c( 1, ci.exp(mCat)[2:13, 1] ), type = "o", pch = 16 )
+segments( aMid[-1],  ci.exp(mCat)[2:13, 2], 
+          aMid[-1], ci.exp(mCat)[2:13, 3] ) 
+plot( c(1943,1998), c(0.6, 6), type="n", log="y", 
+      cex.lab = 1.5, cex.axis = 1.5, 
+   xlab = "Calendar year - 1900", ylab = "Rate ratio") 
+lines( pMid,c( 1, ci.exp(mCat)[14:23, 1] ), type = 'o', pch = 16 )
+segments( pMid[-1],  ci.exp(mCat)[14:23, 2], 
+          pMid[-1],  ci.exp(mCat)[14:23, 3] ) 
+@ 
+\item In the fitted model the reference category for each factor was
+  the first one.  As age is the dominating factor, it may be more
+  informative to remove the intercept from the model.  As a
+  consequence the age effects describe fitted rates at the reference
+  level of the period factor. For the latter one could choose the
+  middle period 1968-72.
+<<mCat2-new-ref>>=
+tdk$Per70 <- Relevel(tdk$Per, ref = 6)
+mCat2 <- glm( cbind(D,Y) ~ -1 + Age +Per70, 
+              family=poisreg(link=log), data= tdk )
+round( ci.exp( mCat2 ), 2)
+@ 
+We shall plot just the point estimates from the latter model
+<<mCat2-plot, fig =TRUE>>=
+par(mfrow=c(1,2))
+plot( c(15,80), c(2, 20), type="n", log="y", cex.lab = 1.5, cex.axis = 1.5, 
+   xlab = "Age (years)", ylab = "Incidence rate (per 100000 y)") 
+lines( aMid,  c(ci.exp(mCat2)[1:13, 1] ), type = "o", pch = 16) 
+plot( c(1943,1998), c(0.4, 2), type="n", log="y", 
+      cex.lab = 1.5, cex.axis = 1.5, 
+   xlab = "Calendar year", ylab = "Rate ratio") 
+lines( pMid, c(ci.exp(mCat2)[14:18, 1], 1, ci.exp(mCat2)[19:23, 1]),  
+   type = "o", pch = 16 )
+abline(h=1, col="gray")
+@
+\end{enumerate}
+
+\subsection{Generalized additive model with penalized splines}
+
+It is obvious that the age effect on the log-rate scale is highly
+non-linear. Yet, it is less clear whether the true period effect
+deviates from linearity. Nevertheless, there are good reasons to
+try fitting smooth continuous functions for both time scales. 
+
+\begin{enumerate}%[resume]
+
+\item As the next task we fit a generalized additive model for the
+  log-rate on continuous age and period applying penalized splines
+  with default settings of function \texttt{gam()} in package
+  \texttt{mgcv}. In this fitting an ``optimal'' value for the penalty
+  parameter is chosen based on an AIC-like criterion known as UBRE.
+<<mPen>>=
+library(mgcv)
+mPen <- gam( cbind(D, Y) ~ s(A) + s(P),  
+           family = poisreg(link=log), data = tdk)
+summary(mPen)					
+@ 
+The summary is quite brief, and the only estimated coefficient is the
+intercept, which sets the baseline level for the log-rates, against
+which the relative age effects and period effects will be contrasted.
+On the rate scale the baseline level 5.53 per 100000 y is obtained by
+\texttt{exp(1.7096)}.
+
+\item See also the default plot for the fitted curves (solid lines)
+  describing the age and the period effects which are interpreted as
+  contrasts to the baseline level on the log-rate scale.
+<<mPen-plot, fig=TRUE>>=
+par(mfrow=c(1,2))
+plot(mPen, seWithMean=TRUE)
+@ 
+The dashed lines describe the 95 \% confidence band for the pertinent
+curve.  One could get the impression that year 1968 would be some kind
+of reference value for the period effect, like period 1968-72 
+chosen as the reference  in the categorical
+model previously fitted. This is not the case, however, because {\tt
+  gam()} by default parametrizes the spline effects such that the
+reference level, at which the spline effect is nominally zero, is the
+overall ``grand mean'' value of the log-rate in the data. This
+corresponds to the principle of {\it sum contrasts} ({\tt contr.sum})
+for categorical explanatory factors.
+
+% The confidence band indicates, namely, that there is uncertainty
+% about the true age effect curve about the overall (``grand mean'')
+% log-rate both in vertical and in horizontal direction, and there is
+% no fixed reference level.
+
+From the summary you will also find that the degrees of freedom value
+required for the age effect is nearly the same as the default
+dimension $k-1 = 9$ of the part of the model matrix (or basis)
+initially allocated for each smooth function. (Here $k$ refers to the
+relevant argument that determines the basis dimension when specifying
+a smooth term by \texttt{s()} in the model formula).  On the other
+hand the period effect takes just about 3 df.
+
+\item It is a good idea to do some diagnostic checking of the fitted
+  model
+<<mPen-check>>=
+par(mfrow=c(2,2))
+gam.check(mPen)					
+@ 
+The four diagnostic plots are analogous to some of those used in
+the context of linear models for Gaussian responses, but not all of them
+may be as easy to interpret. -- Pay attention to the note
+given in the printed output about the value of \texttt{k}.
+
+\item
+Let us refit the model but now with an increased \texttt{k} for age:
+<<mPen2>>=
+mPen2 <- gam( cbind(D,Y) ~ s(A, k=20) + s(P),  
+           family = poisreg(link=log), data = tdk)
+summary(mPen2)
+par(mfrow=c(2,2))
+gam.check(mPen2)					
+@ 
+With this choice of \texttt{k} the df value for age became about 11,
+which is well below $k-1 = 19$. Let us plot the fitted curves from
+this fitting, too
+<<mPen2-plot, fig=TRUE>>=
+par( mfrow=c(1,2) )
+plot( mPen2, seWithMean=TRUE )
+abline( v=1968, h=0, lty=3 )
+@ 
+There does not seem to have happened any essential changes from the
+previously fitted curves, so maybe 8 df could, after all, be quite
+enough for the age effect.
+
+\item Graphical presentation of the effects using \texttt{plot.gam()}
+ can be improved. For instance, we may present the
+  age effect to describe the ``mean'' incidence rates by age, averaged
+  over the whole time span of 54 years. This is obtained by adding 
+  the estimated intercept
+  to the estimated smooth curve for the age effect and showing
+  the antilogarithms of the ordinates of the curve.
+  For that purpose we need to extract the intercept and modify the
+  labels of the $y$-axis accordingly. The estimated period curve 
+  can also be expressed in terms of
+ relative indidence rates in relation to the fitted baseline rate, 
+ as determined  by the model intercept.
+<<mPen2-newplot>>=
+par( mfrow=c(1,2) )
+icpt <- coef(mPen2)[1]  #  estimated intecept
+plot( mPen2, seWithMean=TRUE, select=1, rug=FALSE,       
+      yaxt="n", ylim= c(log(1),log(20)) - icpt, 
+      xlab="Age (y)", ylab="Mean rate (/100000 y)" )
+axis(2, at = log( c(1, 2, 5, 10, 20)) - icpt, labels=c(1, 2, 5, 10, 20) )
+plot( mPen2, seWithMean=TRUE, select=2, rug=FALSE, 
+      yaxt="n", ylim=c( log(0.4), log(2) ), 
+      xlab="Calendat year", ylab="Relative rate")
+axis(2, at=log( c(0.5, 0.75, 1, 1.5, 2)), labels = c(0.5, 0.75, 1, 1.5, 2))
+abline( v=1968, h=0, lty=3 )
+@
+
+\end{enumerate}
+
+\textbf{\textit{Homework}}. 
+You could continue the analysis of these data by fitting an age-cohort
+model as an alternative to the age-period model, as well as an
+age-cohort-period model utilizing function \texttt{apc.fit()} in
+\texttt{Epi}. See \url{http://bendixcarstensen.com/APC/} for details.
+>>>>>>> 5791fd7f29f5ff10cf0a981642ba6fefd796a94c

@@ -6,32 +6,32 @@
 % \begin{document}
 % \SweaveOpts{concordance=TRUE}
 
-\SweaveOpts{results=hide, prefix.string=./graph/tab}
+\SweaveOpts{results=hide, prefix.string=./graph/tidyverse}
 
-\section{Data manipulation with dplyr}
+\section{Data manipulation with \textit{tidyverse}}
 
 \subsection{Introduction}
 
-In this chapter we will reproduce \textit{more or less} the same outputs as in chapter 1.3 using 
-\texttt{tidyverse} packages suit.
-
-The main goal is to familiarize you with some of the main \texttt{dplyr} and \texttt{tidyverse} features.
-This is an optional practical for participants that have already good basic R basis. 
-All the rest of the course can be done without knowing \texttt{dplyr}.
+In this chapter we will produce \textit{more or less} the same outputs than in chapter 1.2 and 1.4 using 
+\texttt{tidyverse} packages framework.\newline
+The main objective of this exercise is to get familiar you with some of the main \texttt{tidyverse} features.\newline
+This is an \textbf{optional practical} for participants having already good basic R skills. 
+\textbf{All the rest of the course can be done without knowledge of \texttt{tidyverse}.}
 
 
 \subsection{The \texttt{births} data}
 
-A quick description of the \texttt{births} data-set (from \texttt{Epi} package) can be found in 
-chapter  1.3.2.\newline
-First of all, load the \texttt{Epi} and \texttt{dplyr} packages. Then we should (re)load the 
-births data-set.
+We will work with \texttt{births} data-set from \texttt{Epi} package. \newline
+First of all, load the \texttt{Epi} and \texttt{tidyverse} packages. 
+Then load the births data-set.
 
 << >>=
 library(Epi)
 suppressPackageStartupMessages(library(tidyverse))
 data(births) 
 @
+You can type \texttt{?birth} in the \texttt{R} console to get a description of the \texttt{birth} data-set. (Alternatively, you can refer to chapter  1.3.2)
+
 
 \subsection{\texttt{tibble} vs \texttt{data.frame}}
 
@@ -43,7 +43,7 @@ Inspect the class and characteristics of the \texttt{births} object.
 class(births)
 head(births)
 @
-\textbf{Note:} This can be summarized using \texttt{str} function
+\textbf{Note:} As any \texttt{R} object this can be summarized using \texttt{str} function.
 
 << >>=
 str(births)
@@ -60,18 +60,18 @@ births_tbl
 ## another way to visualize data set is to use glimpse function
 glimpse(births_tbl)
 @
-As you can see \texttt{tibble} inherits from \texttt{data.frame} which implies that all functions 
-working with \texttt{data.frame} objects will work with \texttt{tibble} objects. The opposite is 
+You can see that \texttt{tibble} objects inherits from \texttt{data.frame} which implies that all functions 
+working with \texttt{data.frame} objects will work with \texttt{tibble}. The opposite is 
 not necessary true. \texttt{tibble} has a couple of extra features compared to classical 
 \texttt{data.frame}. One of them is a slightly more user-friendly console print. The main 
-differences being that \texttt{tibble} objects supports grouping/nesting features. 
+difference is probably that \texttt{tibble} objects supports grouping/nesting features. 
 Some examples we be done will see latter on.
 
 \subsection{Piping functions}
 
 This is one of the most popular features of \texttt{tidyverse} grammar. It enables function chaining in 
-\texttt{R}. Function outputs are passed as input to the following function and so on. 
-It can help to make the code more readable.
+\texttt{R}. Function output is transparently passed as input to the next function and so on. 
+It can help to make the code more comprehensive and readable.
 Here is an example of classic vs piped functions.
 
 << >>=
@@ -81,14 +81,14 @@ births %>% head(4)
 \textbf{Note:} By default the chained object is given as the first argument to the following 
 function.
 You can use \texttt{$.$} if this is not the case.\newline  
-Here is a dummy example where we do not give the first argument to a function but the second one.
+Here is a dummy example where we do not give the first argument to \texttt{head} function but the second one.
 << >>=
 4 %>% head(births, .)
 @
 
 \subsection{\texttt{mutate} columns}
 
-\texttt{mutate} will allow you to add and or modify columns in a \texttt{data.frame}.\newline
+\texttt{mutate} will allow you to add and or modify columns in a \texttt{tibble}.\newline
 Let's create 2 new variables :
 \begin{itemize}
   \item \texttt{agegrp} (5 years mother's age group) 
@@ -117,30 +117,27 @@ births_tbl <-
         gestwks < 25 ~ 'less than 25 weeks',
         gestwks >= 25 & gestwks < 30  ~ '25-30 weeks',
         gestwks >= 30 & gestwks < 35  ~ '30-35 weeks',
-        gestwks >= 35 & gestwks < 40  ~ '35-40 weeks',
-        gestwks >= 40  ~ 'more than 40 weeks'
+        gestwks >= 35   ~ 'more than 35 weeks'
       ) 
   )
 
 births_tbl
 @
-
-You can see in the table columns header the type of data contained in each column. 
+You can see as header the type of data contained in each column. 
 For instance \texttt{<dbl>} stands for double (i.e. numeric value) and \texttt{fct}
-stands for factor. In \texttt{R} \texttt{data.frame} (/ \texttt{tibble}) data type
-have to be the same within a column (e.g. numeric only) but can be of different type across 
-columns.
+stands for factor.\newline 
+In \texttt{R} \texttt{data.frame} (/ \texttt{tibble}) data type
+must be the same within a column (e.g. numeric only) but can be of different type across  columns. (note: \texttt{matrix} object supports only one type of data) \newline
 
-Notes than \texttt{case\_when} function do not return a \texttt{factor} but a \texttt{character} variable in this case.
-You will have to force the conversion to \texttt{factor} if needed.
-
+Note that \texttt{case\_when} function do not return a \texttt{factor} but a \texttt{character} variable in this case.
+You will have to force the conversion from \texttt{character} to \texttt{factor} if needed.
 
 \subsection{\texttt{select} columns, \texttt{filter} and \texttt{arrange} rows}
 
 \texttt{select} is used for column sub-setting while filter is for row sub-setting. 
 They are equivalent to the \texttt{[]} in \texttt{R} base language.\newline
 Let's display a table where only babies' \texttt{id}, \texttt{sex}, \texttt{bweight} and mothers' 
-\texttt{agegrp} are kept for babies with a \texttt{bweight} grater than 4000g.
+\texttt{agegrp} are kept for babies with a \texttt{bweight} above 4000g.
 
 << >>=
 births_tbl %>%
@@ -151,9 +148,7 @@ births_tbl %>%
 @
 \texttt{select} can also be useful to reorder and rename columns.\newline
 \texttt{arrange} is a nice feature to reorder observations according to chosen attributes.\newline
-Let's rename \texttt{agegrp}, \texttt{sex} and \texttt{bweight} with more explicit labels and reorder 
-the table according to babies' decreasing birth weight.
-
+Let's rename \texttt{agegrp}, \texttt{sex} and \texttt{bweight} with better looking labels (e.g. \texttt{Age group}, \texttt{Sex}, \texttt{Birth weight}) and reorder the table according to babies' decreasing birth weight.
 
 << >>=
 births_tbl %>%
@@ -170,7 +165,7 @@ births_tbl %>%
 \textbf{Note:} \texttt{tibble} supports blank spaces in the column names which can be handy for final table 
 rendering. When you want to work with columns with blank spaces, do not forget to use the \texttt{$``$}
 (back-quote).\newline
-Let's do the same but arranging the table by decreasing birth weights within each sex.
+Try to produce the same table but arranging the rows by decreasing birth weights within each sex.
 
 << >>=
 births_tbl %>%
@@ -184,14 +179,13 @@ births_tbl %>%
   ## rearrange rows to put the heaviest newborn on top
   arrange(Sex, desc(`Birth weight`))
 @
+You can arrange the \texttt{tibble} according to more than one column.
 
 \subsection{\texttt{group\_by} and \texttt{summarise} data}
 
-One of the most valuable features of \texttt{dplyr} is the ability to aggregate data sharing a common
-attribute to process by group operations.\newline
+One greatest features of \texttt{dplyr} is the ability to aggregate data sharing a common attribute to process per group operations.\newline
 Here we want to compute the number of boys and girls in the data-set.\newline
-The idea here is to split the \texttt{births} table in 2. One for boys, the other for girls and to 
-count the number of rows of each sub-table.\newline
+The idea here is to split the \texttt{births} table in two groups. One with the boys, the other with the girls and to count the number of rows in each group.\newline
 
 << >>=
 births.01 <-
@@ -205,8 +199,7 @@ births.01 <-
 births.01
 @
 \textbf{Note:} \texttt{n} function is equivalent to \texttt{nrow}\newline 
-Now we have the number of boys and girls, we can compute the percentage of newborns in each sex 
-group.
+Now we have the number of boys and girls, we can compute the distribution (in percentage) of newborns per sex.
 
 << >>= 
 births.02 <-
@@ -215,10 +208,9 @@ births.02 <-
     percent = count / sum(count) * 100
   )
 @
-\textbf{Trick:} most of \texttt{dplyr} functions can be applied with an embedded condition using
+\textbf{Trick:} most of \texttt{dplyr} functions can be combined with a column selection execution statement using
 \texttt{across} function. This can be very handy in some cases.\newline 
-As an illustration if you want to calculate the \texttt{sum} of every \texttt{birth.02} numerical 
-columns
+As an example below a code to compute the \texttt{sum} of every \texttt{birth.02} numerical columns (numerical columns only)
 
 << >>=
 births.03 <-
@@ -234,19 +226,17 @@ births.03 <-
   )
 births.03
 @
-
 \texttt{across} function supports the purrr-style lambda format, e.g. \texttt{~ mean(.x, na.rm = TRUE)}
-where \texttt{.x} refers to the values from the data set to be passed to the function.
+where \texttt{.x} refers to the values from the data set to be passed to the function. This is a common notation you will find across several \texttt{tidyverse} functions. \newline
 
 Some other functions ending by \texttt{\_with} can be used conditionally within \texttt{dplyr}.
-As an example we can rename only columns which are not numeric at once (here we want to make all column names using upper characters) using
+As an example we can rename only columns which are not numeric at once (here we want to code all column names using upper characters) using
 the combination of \texttt{rename\_with} and \texttt{where}.
 
 << >>=
 births.03 %>%
   rename_with(toupper, where(~ !is.numeric(.x)))
 @
-
 Let's now compute the number of births and the mean birth weight according to newborn gender.
 
 << >>=
@@ -259,9 +249,8 @@ births.05 <-
   )
 births.05
 @
-With \texttt{births.05} table, compute the global mean new birth weight.\newline
-\textbf{Note:} with such a table the mean baby's birth weight have to be weighted by number of boys 
-and girls. 
+With \texttt{births.05} table, compute the global mean birth weight.\newline
+\textbf{Note:} with such a table the mean baby's birth weight have to be weighted by number of boys and girls (see. \texttt{?weighted.mean}). 
 
 << >>=
 births.05 %>%
@@ -281,9 +270,8 @@ births_tbl %>%
 
 \subsection{Multiple grouping}
 
-In some cases, we can be interested in looking at more than a single strata. This can be achieved 
-using multiple grouping.\newline
-Let's count the number of people per gender and birth weight class (low vs not low)
+In some cases, we can be interested in looking at more than a single strata. This can be achieved using multiple grouping.\newline
+Let's count the number of births per gender and birth weight class (low vs not low)
 
 << >>=
 births.06 <-
@@ -294,7 +282,7 @@ births.06 <-
   )
 births.06
 @
-Try then to compute the percentage of people in each group.\newline
+Try then to compute the percentage of babies in each group.\newline
 Look at the difference between the 2 following command lines:
 
 << >>=
@@ -309,14 +297,13 @@ births.06 %>%
     percent = count / sum(count) * 100
   )
 @
-\textbf{Note:} summarizing a data-set will remove the latest level of grouping but not the deeper ones 
-if multiple grouping has been done. In some cases you might have to explicitly ungroup your
-\texttt{data.frame} before doing calculations. In the previous examples, if you do not ungroup
-the data-set, percentages are computed per gender. Ungrouping will let you compute the overall 
+Are the results the same? \newline
+
+\textbf{Note:} summarizing a data-set will remove the last level of grouping but not the other ones if multiple grouping has been performed. In some cases you might have to explicitly ungroup your \texttt{data.frame} before doing further  calculations.\newline 
+In the previous examples, if you do not ungroup the data-set, percentages are computed per gender. Ungrouping will let you compute the overall 
 percentages.\newline 
 
-\textbf{Trick:} a good practice is to ungroup all the summarized dataset in order to prevent form 
-confusion. You can do it using the \texttt{.group = 'drop'} option in \texttt{summarize()}. 
+\textbf{Trick:} a good practice is to always ungroup the summarized dataset in order to prevent form confusion. You can do it using the \texttt{.group = 'drop'} option in \texttt{summarize()}. 
 
 << >>=
 ## this tibble will still be grouped by sex
@@ -333,13 +320,9 @@ births_tbl %>%
     count = n(),
     .groups = 'drop'
   )
-
-
 @
-
-
 The same exercise can be done using gestation time group (\texttt{gest4}) as stratifying variable.\newline
-Lets compute number and mean birth weights according to gestation time category
+Lets compute number of births and mean birth weights according to gestation time category.
 
 << >>=
 births_tbl %>%
@@ -349,9 +332,10 @@ births_tbl %>%
     bweight.mean = mean(bweight)
   )
 @
-Birth weight increases with gestation time.\newline
+Any trend?\newline
+It seems that birth weight increases with gestation time.\newline
 We can also spot that in our data-set the gestation time is missing for 10 newborns. 
-We will remove this observation for the rest of the practical session. \newline 
+We will do not consider this observation for the rest of the exercise. \newline 
 Lets cross-tabulate the birth weight category and the gestation time groups.
 
 << >>=
@@ -392,14 +376,13 @@ births_tbl %>%
 
 \subsection{Bind and join tables}
 
-Another nice feature of \texttt{dplyr} is tables binding and joining functions. To practice we
-will create 2 fake \texttt{tibble}:
+Another nice feature of \texttt{dplyr} is tables binding and joining. To practice we will create two \texttt{tibble}s:
 
 \begin{itemize}
   \item \texttt{age} an individual database which contains \texttt{pid} (unique individuals id) 
-  and \texttt{age} in year
+  and their \texttt{age} in year
   \item \texttt{center} an study center database which contains \texttt{pid} (unique individuals id)
-  and \texttt{center} (the center where an individual is registered)
+  and \texttt{center} (the center where an individual is registered coded as a letter)
 \end{itemize}
 
 << >>=
@@ -426,10 +409,10 @@ First of all let's have a look to \texttt{bind\_rows} function.
 bind_rows(age, center)
 @
 Is it useful?\newline
-Here not really but that can be in other situations (e.g. several individuals data base to merge..).\newline
+Here not really because we do not want to \textit{bind} the data-set (but \textit{join} them instead) but that can be in other situations (e.g. several individuals data base to merge..).\newline
 \textbf{Note:} in \texttt{bind\_rows}, if columns names do not match, they are fill with \texttt{NA}.  
 
-Here we want to join the 2 \texttt{tibble} according to the common attribute \texttt{pid}. Depending
+Here we want to join the 2 \texttt{tibble} according to their common attribute \texttt{pid}. Depending
 on the context you can be interested in joining tables differently. Have a look at the differences
 between \texttt{left\_join}, \texttt{full\_join} and \texttt{inner\_join}.
 
@@ -451,19 +434,17 @@ inner_join(age, center, by = c('pid')) %>%
     mean_age = mean(age)
   )
 @
-
-\textbf{Note:} the \texttt{by} argument indicates which column should be use to make the join. In some 
+\textbf{Note:} the \texttt{by} argument indicates which column should be use to make the \textit{join}. In some 
 cases, you might have to uses several columns to match (e.g. per sex and age group), this
-can be easily done specifying a vector of column names.
+can be easily done specifying a vector of column names.\newline
+From now on, we will consider other packages than \texttt{dplyr} from the \texttt{tidyverse} suits.
 
 \subsection{Data Visualization with ggplot2}
 
 One of the package that have contributed to \texttt{tidyverse} success is for sure \texttt{ggplot2}.
-We will go more into the details on how to produce graphs with \texttt{ggplot2} in another practical.
-Just a quick example of graphic using \texttt{ggplot2}.
-
-Let's Create a bar plot to visualize the number of births by women age group.
-
+We will go more into the details on how to produce advanced graphs with \texttt{ggplot2} in another practical.\newline
+Let's just have a quick example of graphic creation using \texttt{ggplot2}.\newline
+Let's draw a bar plot to visualize the number of births by women age group.\newline
 First you have to create a table with the number of birth per age group.
 
 << >>=
@@ -475,7 +456,6 @@ birth_per_ageg <- births_tbl %>% group_by(agegrp) %>% summarise(total_births = n
    ggplot(birth_per_ageg, aes(x = agegrp, y = total_births)) + 
    geom_bar(stat = "identity"))
 @
-
 This graph can be customize adding labels and title to the plot:
 << >>=
 (gg.02 <- 
@@ -484,18 +464,105 @@ This graph can be customize adding labels and title to the plot:
    ylab("Total Births") + 
    ggtitle("Number of Births per Women Age Group"))
 @
+As you can see, plots from \texttt{ggplot} family are built incrementally using the \texttt{+} operator for each additional element.
 
-As you can see, plots from \texttt{ggplot} family are built sequentially using the \texttt{+} operator for each additional element.
+\subsection{pivoting data with tidyr}
+
+\texttt{dplyr} often comes with its good friend \texttt{tidyr} when we are performing data manipulation. \texttt{tidyr} main features is to reshape tables from long to wide format and vis-versa. Let's have an example.\newline
+Let's transform in wide format the previously created \texttt{birth\_per\_ageg} table.
+We want to have a table with one column per age group containing the \texttt{total\_births} numbers.
+
+<<>>=
+birth_per_ageg
+
+birth_per_ageg_wide <- 
+  birth_per_ageg %>%
+  pivot_wider(names_from = 'agegrp', values_from = 'total_births')
+
+birth_per_ageg_wide
+@
+This table can easily be formatted back in long format using \texttt{pivot\_longer} function:
+
+<<>>=
+birth_per_ageg_long <- 
+  birth_per_ageg_wide %>%
+  pivot_longer(cols = 1:5, names_to = 'agegrp', values_to = 'total_births')
+
+birth_per_ageg_long
+@
+Are the tables \texttt{birth\_per\_ageg} and \texttt{birth\_per\_ageg\_long} identical?
+
+<<>>=
+identical(birth_per_ageg, birth_per_ageg_long)
+@
+Not really because the factor type of \texttt{agegrp} column has been lost during the transformation.\newline
+Let's convert \texttt{agegrp} column into a factor. Is the new table identical to \texttt{birth\_per\_ageg} ?
+
+<<>>=
+birth_per_ageg_long_02 <-
+  birth_per_ageg_long %>%
+  mutate(agegrp = as.factor(agegrp))
+
+identical(birth_per_ageg, birth_per_ageg_long_02)
+@
+Here we have seen the simplest example you can have of table reshaping with \texttt{tidyr}. If you are interested check the dedicated vignette (\texttt{vignette("pivot")}) to learn how to perform more advanced tables reshaping.
+
+\subsection{reading files with readr}
+
+Another package from \texttt{tidyverse} that can be introduced here is \texttt{readr} that contains a set of functions equivalent to the core \texttt{R} data.frame reading functions (e.g. \texttt{read.table()}, \texttt{read.csv()}, \texttt{read.delim()}, ...). The main change is that data are loaded in \texttt{R} as \texttt{tibble} instead of \texttt{data.frame}, type of variables (columns) are \textit{guessed} if possible, and some extra data checking tests are performed.
+
+Let's explore this differences with \texttt{fem} dataset available in \texttt{data} directory.
+
+<<>>=
+## read a csv using core R
+fem.csv.core <- read.csv('data/fem.csv')
+## read a csv using tidyverse
+fem.csv.tidy <- read_csv('data/fem.csv')
+## compare
+fem.csv.core
+fem.csv.tidy
+## table dimensions
+dim(fem.csv.core)
+dim(fem.csv.tidy)
+## compare column types
+map(fem.csv.core, class)
+map(fem.csv.tidy, class)
+@
+\textbf{note:} in case you do not fully get the last lines and the \texttt{map()} call, it will be explained in the next section on \texttt{purrr} package. 
+
+Here we see that the only difference is the type of object loaded \texttt{data.frame} vs \texttt{tibble} and the default type chosen to cast numeric values (\texttt{integer} vs \texttt{numeric}).
+
+What about loading \texttt{occoh.txt} you will be using in some other practical in the coming days.
+
+<<>>=
+## read a csv using core R
+occoh.txt.core <- read.table('data/occoh.txt')
+## read a csv using tidyverse
+occoh.txt.tidy <- read_table('data/occoh.txt')
+occoh.txt.tidy <- read_table('data/occoh.txt')
+## compare
+occoh.txt.core
+occoh.txt.tidy
+## table dimensions
+dim(occoh.txt.core)
+dim(occoh.txt.tidy)
+## compare column types
+map(occoh.txt.core, class)
+map(occoh.txt.tidy, class)
+@
+As you can see, in addition to inferring the type of columns in the input data (here some dates), using \texttt{readr} to load you data-set can help you to detect inconsistencies in input data formatting (there are no true problem here).
+
+If you are interested, you can explore the other functions of \texttt{readr} and see how you can tune it.
 
 \subsection{String manipulation with stringr}
 
-Another popular \texttt{tidyverse} popular package is \texttt{stringr} package. This package is 
-specialized in the string manipulation. Here are couple of examples.
+Another popular \texttt{tidyverse} popular package is \texttt{stringr} package. This package is specialized in the string manipulation. Here are couple of examples.
 
-Let's create a character vector with the following elements representing country names: "Estonia", "Finland", "Denmark", "United Kingdom".
+Let's create a character vector with the following elements representing country names: "Estonia", "Finland", "Denmark", "United Kingdom", "France".
 <<>>=
-countries <- c("Estonia", "Finland", "Denmark", "United Kingdom")
+countries <- c("Estonia", "Finland", "Denmark", "United Kingdom", "France")
 @
+With \texttt{stringr} functions perform the following actions.\newline
 
 Extract the first three characters from each country name:
 <<>>=
@@ -511,48 +578,38 @@ Replace "United" with "Utd" in each country name:
 <<>>=
 countries_modified <- str_replace(countries, "United", "Utd")
 @
-
 Find the positions of the letter "n" in each country name:
 <<>>=
 a_positions <- str_locate_all(countries, "n")
 @
-
-As you can see, the output of \texttt{str\_locate\_all} is a list (one element per character string) containing
-a 2 column table with one line for each match. The first column (start) being the position of the beginning
-of the match and the second one (end) being the end of the match. In our case, since we are searching for
-a single character match, this 2 indexes are always the same.
-
+As you can see, the output of \texttt{str\_locate\_all} is a list (one element per character string) containing a 2 column table with one line for each match. The first column (start) being the position of the beginning of the match and the second one (end) being the end of the match. In our case, since we are searching for a single character match, this 2 indexes are always the same.
 
 Count the number of characters in each country name:
 <<>>=
 character_counts <- str_length(countries)
 @
-
 These examples demonstrate various string manipulation operations using the \texttt{stringr} package. You can modify the exercises, combine several operations or explore other string manipulation functions provided by \texttt{stringr} to further practice and enhance your skills in manipulating and analyzing text data.
 
-\subsection{purrrr package to apply functions to list}
+
+\subsection{purrr package to apply functions to list}
 
 Among my favorite \texttt{tidyverse} packages, you will find \texttt{purrr}. This package contains
 several functions that are very similar to \texttt{lapply} function.
 
-The simplest example could be to apply the same function to a list of elements.
-As an example let's add "country: " in front of all our 
-
-Apply a function to each element of the vector using map(). Here producing the mean of some grades per 
-class:
+Apply a function to each element of the vector using map(). Here producing the mean of some grades per class:
 
 <<>>=
+## define the grade dataset
 grades <- 
   list(
     c1 = c(80, 85, 90), 
     c2 = c(75, 70, 85, 88), 
     c3 = c(90, 85, 95)
   )
+## compute grades
 mean_grades <- map(grades, mean)
 @
-
-By default \texttt{map()} return a list. One of the nice feature of \texttt{purrr} functions is to be
-able to specify the type of output you want (e.g. \texttt{\_dbl} for numeric, \texttt{\_chr} for characters, ...).
+By default \texttt{map()} return a list. One of the nice feature of \texttt{purrr} functions is to be able to specify the type of output you want (e.g. \texttt{\_dbl} for numeric, \texttt{\_chr} for characters, ...).
 Check and try to explain the differences between the following command lines:
 
 <<>>=
@@ -561,32 +618,22 @@ map_dbl(grades, mean)
 map_chr(grades, mean)
 map_df(grades, mean)
 @
-
 Other nice features of \texttt{map} like functions is he availability to support more than one argument.
 \texttt{map2()} for 2 arguments and \texttt{pmap()} for more than 2. This can be very handy in some conditions.
 If you are interested you can have a look to this function help file and play with the examples.
 
-\texttt{purrr} package has also a set of functions that can be used to apply iteratively a function using
-\texttt{reduce} and/or \texttt{accumulate}. The 2 function behave he same way, it takes the 2 first element of
-a list, apply a function. The results of the first operation is combine with the third element of the list in the 
-same function and so on.. The only difference is that accumulate return intermediate results while reduce return only the final results.
+\texttt{purrr} package has also a set of functions that can be used to apply iteratively a function using \texttt{reduce} and/or \texttt{accumulate}. The 2 functions behave the same way, it takes the 2 first element of a list, apply a function taking 2 arguments. The results is combined with the third element of the list and given as input to the same function and so on.. The only difference is that accumulate return intermediate results while reduce return only the final results.
 
 Here an example of the cumulative product of the 10 first numbers.
 <<>>=
 1:10 %>% reduce(`*`)
 1:10 %>% accumulate(`*`)
 @
-
-% \subsection{reading files with readr}
-% 
-% \subsection{pivoting data with tidyr}
-
+\texttt{purrr} have many of others useful features. Please check the dedicated documentation if you want to go further with this package.
 
 \subsection{Bonus: Rendering tables}
 
-Once you have produced a nice data-set we can be interested in rendering it in a nice format that can
-meet presentation/publication expectations. The \texttt{kableExtra} table can be useful to achieve 
-this goal.
+Once you have produced a nice data-set we can be interested in rendering it in a nice format that can meet presentation/publication expectations. The \texttt{kableExtra} table can be useful to achieve this goal.
 
 << >>=
 # if(!require(kableExtra)) install.packages('kableExtra')
@@ -621,11 +668,12 @@ births.08 %>%
   ) %>%
   save_kable(file = 'births.08.html', self_contained = TRUE)
 @
+\textbf{note:} One other very cool package to produce advance formatted Excel spreadsheet I am using more and more is \texttt{openxlsx}. Check it out if you are interested.
 
 <<echo=FALSE, eval=FALSE>>=
 ## trick to create dplyr-s.rnw file.
 ## this part have to be lauch manually
-dplyr_e.path <- '~/OneDrive - IARC/PROJECT/_SPE/SPE/pracs/dplyr-e.rnw'
+dplyr_e.path <- '~/OneDrive - IARC/PROJECT/_SPE/SPE/pracs/tidyverse-e.rnw'
 dplyr_e <- readLines(dplyr_e.path)
 dplyr_s <- purrr::map_chr(dplyr_e, ~ sub('results=hide', 'results=verbatim', .x))
 writeLines(dplyr_s, sub('-e.rnw$', '-s.rnw', dplyr_e.path))

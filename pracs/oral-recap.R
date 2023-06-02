@@ -4,6 +4,7 @@ library(survival)
 sessionInfo()
 options( width=87 )
 ###################################################
+setwd("C:/Users/janne/projects/SPE/pracs")
 orca <- read.table("./data/oralca2.txt", header=T)
 head(orca)
 str(orca)
@@ -95,130 +96,6 @@ summary( m1 )
 round( ci.exp( m1 ), 4 )
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ###################################################
 cox.zph( m1 )
 
@@ -256,14 +133,14 @@ round( ci.exp(m2haz2 ), 4)
 cox.zph(m2haz2)
 
 ###################################################
-library(cmprsk)
-attach(orca2)
-m2fg1 <- crr(time, event, cov1 = model.matrix(m2), failcode=1)
-summary(m2fg1, Exp=T)
+#library(cmprsk)
+#attach(orca2)
+#m2fg1 <- crr(time, event, cov1 = model.matrix(m2), failcode=1)
+#summary(m2fg1, Exp=T)
 
 ###################################################
-m2fg2 <- crr(time, event, cov1 = model.matrix(m2), failcode=2)
-summary(m2fg2, Exp=T)
+#m2fg2 <- crr(time, event, cov1 = model.matrix(m2), failcode=2)
+#summary(m2fg2, Exp=T)
 
 ###################################################
 orca.lex <- Lexis(exit = list(stime = time),
@@ -273,6 +150,7 @@ orca.lex <- Lexis(exit = list(stime = time),
 summary(orca.lex)
 
 ###################################################
+# Optional
 orca2.lex <- subset(orca.lex, stage != "unkn" )
 orca2.lex$st3 <- Relevel( orca2$stage, list(1:2, 3, 4:5) )
 levels(orca2.lex$st3) = c("I-II", "III", "IV")
@@ -311,3 +189,4 @@ blh95 <- cbind(blhaz$fit, blhaz$se.fit) %*% ci.mat()
 par(mfrow=c(1,1))
 matplot( news$stime, exp(blh95), type = "l", lty = c(1,1,1), lwd = c(2,1,1) ,
       col = rep("black", 3),  log = "xy", ylim = c(5,3000)  )
+
