@@ -14,7 +14,7 @@ MAIN = SPE-2023-lectures-3x1
 ## The rnw depencencies
 PDFINCLUDES = \
 	ecology/R-history-ecology.pdf \
-	tidyverse/tidyverse-booklet.pdf \
+	tidyverse/tidyverse-pres.pdf \
 	poisson-logistic/SPE-Poisson-Logistic-Regression.pdf \
 	splines/splines.pdf \
 	linmodels/lm.pdf \

@@ -1,6 +1,5 @@
 \SweaveOpts{results=verbatim, prefix.string=./graph/effects}
 
-
 \section{Estimation of effects: simple and more complex} %% 1.8
 
 This exercise deals with analysis of metric and binary 
@@ -85,20 +84,21 @@ data(births)
 str(births)
 @
 \item
-Because all variables are numeric we need first to do a little housekeeping. 
-Two of them are directly converted into factors.
-Categorical versions of two continuous variables are created by function {\tt cut()}.
+We perform similar housekeeping tasks as in the previous exercise. 
+%% Two of them are directly converted into factors.
+%% Categorical versions of two continuous variables are 
+%% created by function {\tt cut()}.
 %% Also, express birth weights in kilograms
 <<>>=
-births$hyp <- factor(births$hyp, labels = c("Normo", "Hyper"))
+births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
 births$sex <- factor(births$sex, labels = c("M", "F"))
-births$agegrp <- cut(births$matage, 
-    breaks = c(20, 25, 30, 35, 40, 45), right = FALSE)
+births$maged <- cut(births$matage, breaks=c(22,35,44), right=FALSE)
 births$gest4 <- cut(births$gestwks, 
     breaks = c(20, 35, 37, 39, 45), right = FALSE)
 @
 \item
-Have a look at univariate summaries of the different variables in the data; especially
+Have a look at univariate summaries of the different 
+variables in the data; especially
 the location and dispersion of the distribution of  \texttt{bweight}.
 <<summary>>=
 summary(births)
@@ -187,7 +187,7 @@ The command
 <<Table of mean bweight by gest4 >>=
 stat.table(gest4,mean(bweight),data=births)
 @
-confirms that the effect of \texttt{agegrp} (level~2 vs level~1) is $2590-1733=857$, etc.
+confirms that the effect of \texttt{gest4} (level~2 vs level~1) is $2590-1733=857$, etc.
 \item
 Compute these estimates by {\tt lm()} and find out how the coefficients are related to the group means
 <<lm of gest4 on bweight>>=
@@ -260,7 +260,7 @@ m3Ib <- lm(bweight ~ gest4b*hyp, data = births)
 round( ci.lin(m3Ib)[ , c(1,5,6)], 1) 
 @
 Notice now the coefficient $-91.6$ for {\tt hyp}. 
-It estimates the contrast \texttt{"Hyper"} vs. \texttt{"Normo"} on
+It estimates the contrast \texttt{"hyper"} vs. \texttt{"normal"} on
 {\tt bweight} among those with $\geq 39$ weeks of gestation.
 The estimate $-88.5$ g = $-180.1 -(-91.6)$ g describes the additional
 effect of {\tt hyp} in the category 37 to 38 weeks of gestation upon
@@ -325,8 +325,10 @@ The same is done with {\tt lm()} as follows:
 m4 <- lm(bweight ~ sex + hyp, data = births)
 ci.lin(m4)[ , c(1,5,6)]  
 @
-The estimated effect of \texttt{hyp} on \texttt{bweight} controlled for \texttt{sex} is thus $-448$ g.
-There can be more than one control variable, e.g \texttt{control=list(sex,agegrp)}.
+The estimated effect of \texttt{hyp} on \texttt{bweight} 
+controlled for \texttt{sex} is thus $-448$ g.
+ There can be more than one control variable, e.g 
+ \texttt{control=list(sex,maged)}.
 
 Many people go straight ahead and control for variables which are likely to confound the effect of exposure without bothering to stratify first, but usually it is useful to stratify first.
 \end{enumerate}
@@ -363,9 +365,10 @@ The linear effect of \texttt{gestwks} on the log-odds of \texttt{lowbw} is manif
 \item
 You cannot stratify by a numeric variable, 
 but you can study the effects of a 
-numeric exposure stratified by (say) \texttt{agegrp} with
-<<Linear effect of gestwks on bweight stratified by agegrp >>=
-effx(bweight, type="metric", exposure=gestwks, strata=agegrp, data=births)
+numeric exposure stratified by (say) \texttt{maged} with
+<<Linear effect of gestwks on bweight stratified by maged >>=
+effx(bweight, type="metric", exposure=gestwks, strata=maged, 
+     data=births)
 @
 You can control/adjust for a numeric variable by putting it in the control list.
 \end{enumerate}
@@ -477,11 +480,14 @@ Are you happy with the end result?
 \subsection{Analysis of binary outcomes}
 
 Instead of investigating the distribution and determinants
-of birth weight as such, it is common in perinatal epidemiology to consider
+of birth weight as such, it is common in perinatal 
+epidemiology to consider
 occurrence of low birth weight; whether birth weight is 
 $< 2.5$ kg or not. Variable \texttt{lowbw} with values 1 and 0
 in the \texttt{births} data represents that dichotomy.
-Let's perform some analyses on that outcome to illustrate effect estimation
+Some analyses on \texttt{lowbw} were already conducted 
+in the previous exercise. Here we illustrate further
+aspects of effect estimation
 and modelling binary outcome.
 \begin{enumerate}
 \item
@@ -492,12 +498,12 @@ stat.table( index=list(hyp, lowbw),
             contents=list(count(), percent(lowbw)),
             margins=TRUE, data=births)
 @
-It seems that 
-the prevalence for hypertensive mothers
+It seems that the prevalence for hypertensive mothers
 is about 18 percent points higher,
 or about three times as high as that for normotensive mothers, 
 \item
-The three comparative measures of prevalences can be obtained by \texttt{glm()}, whereas
+The three comparative measures of prevalences can be 
+estimated by \texttt{glm()} with different link functions, whereas
 \texttt{effx()} gives only odds ratio:
 <<lowbw-hyp-comp>>=
 binRD <- glm(lowbw ~ hyp, family=binomial(link="identity"), data=births)
@@ -567,9 +573,9 @@ the two groups. Function \texttt{qlogis()} returns the
 value of the logit transformation of the given argument. 
 <<lowbw-gestwks-hyp-pred, fig=TRUE>>=
 predm3hyp <- predict(binm3, 
-   newdata=data.frame(hyp="Hyper", nd), type="response")
+   newdata=data.frame(hyp="hyper", nd), type="response")
 predm3nor <- predict(binm3, 
-   newdata=data.frame(hyp="Normo", nd), type="response")
+   newdata=data.frame(hyp="normal", nd), type="response")
 par(mfrow=c(1,2))
 plot( nd$gestwks, qlogis(predm3hyp), type="l")
 lines( nd$gestwks, qlogis(predm3nor), lty=2)
