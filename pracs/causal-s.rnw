@@ -27,37 +27,15 @@ conclude the true association structure.
 \begin{itemize}
 %\item People who drink beer weigh on average $2kg$ more than those who don't.
 \item The probability of beer-drinking is 0.2 for females and 0.7 for males
-\item Men weigh on average $10kg$ more than women
+\item Men weigh on average $10kg$ more than women.
 \item One kg difference in body weight corresponds in
-average to $0.5mmHg$ difference in (systolic) blood pressures
+average to $0.5mmHg$ difference in (systolic) blood pressures.
 \item Beer-drinking increases blood pressure by $10mmHg$ in average.
-\item Beer-drinking has \textbf{no} effect on body weight
+\item Beer-drinking has \textbf{no} effect on body weight.
 \end{itemize}
-
-If you do want to draw the graph in \R\:
-<<causgraph1, echo=TRUE>>=
-library(Epi)
-par( mar=c(0,0,0,0), cex=2)
-plot( NA, bty="n",xlim= c(40,100), ylim=c(0,80), xaxt="n", yaxt="n",
- xlab="", ylab="" ) # create an empty plot with coordinates
-b<-0; w=12
-bb  <- tbox( "beer", 44, 40, w,w, col.txt="red" ,col.border=b)
-ww  <- tbox( "weight", 90, 40, w,w, col.txt="red" ,col.border=b)
-ss  <- tbox( "sex", 67, 70, w,w, col.txt="blue" ,col.border=b)
-bp  <- tbox( "BP", 67, 10, w,w, col.txt="blue" ,col.border=b)
-text( boxarr( bb, ww , col="red", lwd=3 ,gap= 4), "?", col="red", adj=c(0,-0.5) )
-boxarr( bb, bp , col="blue", lwd=3 )
-boxarr( ww, bp , col="blue", lwd=3 )
-boxarr( ss, bb , col="blue", lwd=3 )
-boxarr( ss, ww , col="blue", lwd=3 )
-@
-
-\textit{Following the algorithm from the lecture: remove BP and the corresponding arrows -- it is not an ancestor of the exposure or outcome. Beer and weight are separated if sex is removed -- thus one needs to adjust the analysis for sex}
-
 
 The \R\ commands to generate the data are:
 <<beerdata_1, echo=TRUE>>=
-set.seed(02062017)
 bdat= data.frame(sex = c(rep(0,500),rep(1,500))  )
                    # a data frame with 500 females, 500 males
 bdat$beer <- rbinom(1000,1,0.2+0.5*bdat$sex)
@@ -72,7 +50,7 @@ bdat$bp <- 110 + 0.5*bdat$weight + 10*bdat$beer + rnorm(1000,0,10)
 \item Adjusted for sex
 \item Adjusted for sex and blood pressure
 \end{enumerate}
-<<beermodels_1, echo=T>>=
+<<beermodels_1, echo=TRUE>>=
 library( Epi )
 m1a<-lm(weight~beer, data=bdat)
 m2a<-lm(weight~beer+sex, data=bdat)
@@ -85,7 +63,7 @@ ci.lin(m3a)
 \item What would be the conclusions on the effect of beer on weight, based on the three models? Do they agree? 
 Which (if any) of the models gives an unbiased estimate of the
   actual causal effect of interest?
-  
+
 \item How can the answer be seen from the graph?
 
 \item Now change the data-generation algorithm so, that in fact beer-drinking
@@ -96,7 +74,7 @@ Thus the data is generated as before, but the weight variable is computed as:
 bdat$weight <- 60 + 10*bdat$sex + 2*bdat$beer + rnorm(1000,0,7)
 @
 
-<<beermodels_2b, echo=T>>=
+<<beermodels_2b, echo=TRUE>>=
 bdat$bp <- 110 +0.5*bdat$weight  + 10*bdat$beer+ rnorm(1000,0,10)  #
 m1b<-lm(weight~beer,data=bdat)
 m2b<-lm(weight~beer+sex,data=bdat)
@@ -106,28 +84,90 @@ ci.lin(m2b)    # the correct model
 ci.lin(m3b)
 @
 
-\item Suppose one is interested in the effect of beer-drinking on blood pressure instead, and is fitting a) an unadjusted model  for blood pressure, with beer as an only covariate; b) a model with beer, weight and sex as covariates. Would either a) or b) give an unbiased estimate for the effect? (You may double-check whether the simulated data is consistent with your answer).
+\item Suppose one is interested in the effect of beer-drinking on blood pressure instead, and is fitting a) an unadjusted model  for blood pressure, with beer as an only covariate; b) a model with beer and sex as covariates. Would either a) or b) give an unbiased estimate for the effect? (You may double-check whether the simulated data is consistent with your answer).
 
-<<bpmodel, echo=T>>=
+<<bpmodel, echo=TRUE>>=
 m1bp<-lm(bp~beer,data=bdat)
-m2bp<-lm(bp~beer+weight,data=bdat)
-m3bp<-lm(bp~beer+weight+sex,data=bdat)
+m2bp<-lm(bp~beer+weight+sex,data=bdat)
 ci.lin(m1bp)
 ci.lin(m2bp)    # the correct model
-ci.lin(m3bp)    # also correct!
 @
+
 
 \end{enumerate}
 
+\subsection{DAG tools in the package \textit{dagitty}.}
+There is a software \textit{DAGitty} (\href{http://www.dagitty.net/}{http://www.dagitty.net/}) and also an R package \textit{dagitty} that can be helpful in dealing with DAGs. Let's try to get the answer to the previous exercise using this package. 
+<<dagitty1, echo=TRUE>>=
+install.packages("dagitty")
+library(dagitty)
+@
 
-\subsection{Instrumental variables estimation, Mendelian randomization and assumptions}
-In the lecture slides it was shown that in a model for blood glucose level (associated with the risk of diabetes), both BMI and FTO genotype were significant. Seeing such result in 
-a real dataset may misleadingly be interpreted as an evidence of a direct effect of FTO genotype on glucose.
- Conduct a simulation study to verify that one may see a significant genotype effect on outcome in such model 
- if in fact the assumptions for Instrumental Variables estimation (Mendelian Randomization) are valid -- genotype 
- has a direct effect on the exposure only, whereas exposure-outcome association is confounded.  
+
+Let's recreate the graph on the lecture slide 23 (but omitting the direct causal effect of interest, $C \rightarrow D$):
+<<dagitty2, echo=TRUE>>=
+g <- dagitty("dag {
+    C <- S -> Y -> U -> D 
+    C -> Z <- Y 
+    Z -> D 
+    C <- X -> D 
+    C -> Q
+    W -> D
+  }")
+plot(g)
+@
+
+To get a more similar look as on the slide, we must supply the coordinates (x increases from left to right, y from top to bottom):
+
+<<dagitty3, echo=TRUE>>=
+coordinates(g) <- list(x=c(S=1,C=1, Q=1,Y=2,Z=2,X=2,U=3,D=3,W=3), 
+                       y=c(U=1, Y=1, S=1, Z=2,  C=3, D=3, X=4, W=4, Q=4) )
+plot(g)
+@
+
+Let's look at all possible paths from $C$ to $D$:
+<<dagitty4, echo=TRUE>>=
+paths( g, "C", "D" )$paths
+@
+As you see, one path contains a collider and is therefore a \textit{closed} path and the others are \textit{open}.   
+
+Let's identify the minimal sets of variables needed to adjust the model for $D$ for, to obtain an unbiased estimate of the effect of $C$. You can specify, whether you want to estimate direct or total effect of $C$:
+
+<<dagitty5, echo=TRUE>>=
+adjustmentSets(g, exposure="C", outcome="D",effect="direct")
+adjustmentSets(g, exposure="C", outcome="D",effect="total")
+@
+
+Thus, for total effect estimation one should adjust for $X$ and either $Y$ or $S$, whereas for direct effect estimation, one would also need to adjust for $Z$.
+
+You can verify that, these are the variables that will block all open paths from $C$ to $D$. 
+
+\textbf{Now try to do the ``beer-weight'' exercise using \textit{dagitty}: }
 \begin{enumerate}
-\item Start by generating the genotype variable as \textit{Binomial(2,p)}, with $p=0.2$:
+\item Create the DAG and plot it
+<<dagitty6, echo=TRUE>>=
+bg <- dagitty("dag {
+  SEX -> BEER -> BP 
+  SEX -> WEIGHT -> BP
+  }")
+coordinates(bg) <- list(x=c(BEER=1, SEX=2, BP=2, WEIGHT=3), y=c(SEX=1, BEER=2, WEIGHT=2, BP=3))
+plot(bg)
+@
+\item What are the paths from WEIGHT to BEER?
+<<dagitty7, echo=TRUE>>=
+paths(bg, "BEER", "WEIGHT")
+@
+\item Will you get the same recommendation for the adjustment variable selection as you found before?
+<<dagitty8, echo=TRUE>>=
+adjustmentSets(bg, exposure="BEER", outcome="WEIGHT")
+@
+\end{enumerate}
+
+\subsection{Instrumental variables estimation: Mendelian randomization}
+Suppose you want to estimate the effect of Body Mass Index (BMI) on blood glucose level (associated with the risk of diabetes).
+ Let's conduct a simulation study to verify that when the exposure-outcome association is confounded, but there is a valid instrument (genotype), one obtains an unbiased estimate of the causal effect. 
+\begin{enumerate}
+\item Start by generating the genotype variable as \textit{Binomial(2,p)}, with $p=0.2$ (and look at the resulting genotype frequencies):
 <<mrdat1, echo=TRUE>>=
  n <- 10000
  mrdat <- data.frame(G = rbinom(n,2,0.2))
@@ -150,7 +190,7 @@ mrdat$Y <- with(mrdat, 3 + 0.1*BMI - 1.5*U + rnorm(n,0,0.5) )
 @
 \item Verify, that simple regression model for $Y$, with $BMI$ as a covariate, results in a biased 
 estimate of the causal effect (parameter estimate is different from what was generated) 
-<<mrmod1, echo=T>>=
+<<mrmod1, echo=F>>=
 mxy<-lm(Y ~ BMI, data=mrdat)
 ci.lin(mxy)
 @
@@ -158,7 +198,7 @@ How different is the estimate from 0.1?
 
 \item  Estimate a regression model for $Y$ with two covariates, $G$ and $BMI$. Do you see a significant effect of $G$?
 Could you explain analytically, why one may see a significant parameter estimate for $G$ there?
-<<mrmod2, echo=T>>=
+<<mrmod2, echo=F>>=
 mxyg<-lm(Y ~ G + BMI, data=mrdat)
 ci.lin(mxyg)
 @
@@ -203,19 +243,25 @@ Now look at the distribution of the parameter estimate:
 <<mrsim2, echo=T>>=
 summary(mr)    
 @
+
 \item (\textit{optional}) Change the code of simulations so that the assumptions are violated: add a weak direct effect of the genotype G to the equation that generates $Y$:
 <<mrsim3, echo=TRUE>>=
 mrdat$Y <- with(mrdat, 3 + 0.1*BMI - 1.5*U + 0.05*G + rnorm(n,0,0.5) )
 @
 Repeat the simulation study to see, what is the bias in the average estimated causal effect of $BMI$ on $Y$.
 
-\item (\textit{optional}) Using library \texttt{sem}  and function \texttt{tsls}, obtain a two-stage least squares estimate for the 
-causal effect. Do you get the same estimate as before? 
+\item (\textit{optional}) Using library \texttt{sem}  and function \texttt{tsls}, one can obtain a two-stage least squares estimate for the  
+causal effect and also the proper standard error. Do you get the same estimate as before? 
 <<tsls, echo=TRUE>>=
+install.packages("sem")
 library(sem)
 summary(tsls(Y ~ BMI, ~G, data=mrdat))
 @
+(There are also several other R packages for IV estimation and Mendelian Randomization (\textit{MendelianRandomization} for instance))
+
 \end{enumerate}
+
+
 \subsection*{Why are simulation exercises useful for causal inference?}
 If we simulate the data, we know the data-generating mechanism and the ``true'' causal effects. So this is a way to check, whether 
 an analysis approach will lead to estimates that correspond to what is generated. One could expect to see similar phenomena in real
