@@ -26,6 +26,8 @@
 \usepackage[T1]{fontenc}
 \usepackage{moreverb}
 \newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\sini}[1]{\textcolor{Blue}{#1}}
+
 \newcommand{\E}{\mathrm{E}}
 \let\overbatim\verbatim
 \let\endoverbatim\endverbatim
@@ -33,22 +35,13 @@
 {\bgroup\baselineskip=0.8\baselineskip\overbatim}%
 {\endoverbatim\egroup}
 
-%
-%  TO THINK BEFORE 2019 LECTURE
-%  
-%  Bradford Hill criteria???
-%  More on mediation analysis?
-%  Show solution of the algorithm in the mediation case
-%  Show a plot of the Egger approach?
-%  (Still, the lecture should not be longer)
-%  Check that all graphs are correct!
-% 
+\newcommand{\indep}{\perp\!\!\!\!\perp}
 
 
 \newcounter{demo}
 \newcommand{\Demo}{\stepcounter{demo}\frametitle{Demo \arabic{demo}}}
 
-\title{Some topics on causal inference} 
+\title{Introduction to causal inference} 
 
 \author{Krista~Fischer}
 
@@ -237,7 +230,7 @@ where $Y^1=Y(X=1)$ and $Y^0=Y(X=0)$ are defined as individual's \alert<2>{potent
 	Also called as \alert{backdoor path} between $X$ and $Y$. \\
 	
 \noindent {\small Implied statistical associations ($Y$ is not independent of $X$ in general, but it is independent of $X$, conditional on $Z$):}
-$$X \not\perp Y \; \;  X \perp Y|Z$$
+$$X \not\indep Y \; \hspace{0.5cm}  X \indep Y|Z$$
 \noindent {\small 
 	$X$ and $Y$ are independent, conditional on $Z$, but marginally dependent.}
 	
@@ -350,8 +343,8 @@ $Z = \beta_0 +  \beta_{xz} X + \beta_{yz} Y + \varepsilon,$ with $\beta_{xz}\ne 
 hence, there exist parameters 
 $\beta_{xy}\ne 0$ and $\beta_{zy}\ne 0$, so that: \\
 $Y = \beta^*_0 +  \beta_{xy} X + \beta_{zy} Z + \varepsilon^*. $\\[0.2cm]
-$$X \perp Y \; \hspace{0.5cm} 
-X \not\perp Y|Z$$
+$$X \indep Y \; \hspace{0.5cm} 
+X \not\indep Y|Z$$
 
  
 \pause
@@ -407,20 +400,29 @@ personality, \ldots)}
 
 \begin{enumerate}
 \item Sketch a causal graph
-\item Remove colliders
-\item Identify all pathways between the exposure and outcome 
-\item You need to select adjustment variables that block all paths except the one you are looking for
+\item Identify all paths between the exposure and outcome (ways to go from $X$ to $Y$ regardless of the direction of the arrows).
+\item Identify the \sini{closed} paths that include colliders and \sini{open} paths that don't.  
+\item You need to select adjustment variables that block all \sini{open} paths.
+\item \alert{Don't} adjust for colliders (as they would open the closed paths)!
+ \item If you are looking for the total effects, you don't need to block the \sini{directed} paths (that follow the directions of the arrows). 
 \item \alert{Often, there are unobserved confounders!} 
 \end{enumerate}
+\mbox{}\\[0.5cm]
+R package \textit{dagitty} is useful for such tasks.
 \end{frame}
 
 
 \begin{frame}
 \frametitle{Example: mediation with confounding}
 \includegraphics[width=6cm]{mediation_conf}\\[-0.3cm]
-
- If $W$ is an unobserved confounder, no valid causal inference is possible in general. However, the total effect of $X$ on $Y$ is estimable.
-
+Paths:
+$X \rightarrow Z \rightarrow Y$ (open) and $X \rightarrow Z \leftarrow W \rightarrow Y$ (closed). \\[0.3cm]
+\begin{itemize}
+	\item The total effect of $X$ on $Y$ is estimable without any adjustment.
+	\item For direct effect you need to adjust for $Z$, but that would open the closed path -- to block that, you also need to adjust for $W$. 
+	\item If $W$ is an unobserved confounder, direct effect of $X$ on $Y$ cannot be estimated. 
+\end{itemize} 
+ 
 \end{frame}
 
 \section{Causal models for observational data}
