@@ -18,7 +18,7 @@ mreg <- glm( cbind(D, Y) ~ 1, family=poisreg(link=log) )
 ci.exp( mreg ) 
 
 ###################################################
-### code chunk number 2: log(Rate) and it's 95% CI. ci.lin NO exp
+### code chunk number 2: log(Rate) and it's 95% CI. ci.lin NO exp=T
 ###################################################
 mreg <- glm( cbind(D, Y) ~ 1, family=poisreg(link=log) )
 ci.lin( mreg )[,c(1,5,6)] 
