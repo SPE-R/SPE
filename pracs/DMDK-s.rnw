@@ -208,240 +208,6 @@ more detailed analyses.
 %% \end{enumerate}
 \end{enumerate}
 
-%% \subsection*{SMR}
-\subsection*{SMR}
-
-%% The SMR is the \textbf{S}tandardized \textbf{M}ortality
-%% \textbf{R}atio, which is the mortality rate-ratio between the diabetes
-%% patients and the general population.  In real studies we would
-%% subtract the deaths and the person-years among the diabetes patients
-%% from those of the general population, but since we do not have access
-%% to these, we make the comparison to the general population at large,
-%% \textit{i.e.} also including the diabetes patients.
-
-%% So we now want to include the population mortality rates as a fixed
-%% variable in the split dataset; for each record in the split dataset we
-%% attach the value of the population mortality for the relevant sex, and
-%% and calendar time.
-
-%% This can be achieved in two ways: Either we just use the current split
-%% of follow-up time and allocate the population mortality rates for some
-%% suitably chosen (mid-)point of the follow-up in each, or we make a
-%% second split by date, so that follow-up in the diabetes patients is in
-%% the same classification of age and data as the population mortality
-%% table.
-
-The SMR is the \textbf{S}tandardized \textbf{M}ortality
-\textbf{R}atio, which is the mortality rate-ratio between the diabetes
-patients and the general population.  In real studies we would
-subtract the deaths and the person-years among the diabetes patients
-from those of the general population, but since we do not have access
-to these, we make the comparison to the general population at large,
-\textit{i.e.} also including the diabetes patients.
-
-We now want to include the population mortality rates as a fixed
-variable in the split dataset; for each record in the split dataset we
-attach the value of the population mortality for the relevant sex, and
-and calendar time.
-
-This can be achieved in two ways: Either we just use the current split
-of follow-up time and allocate the population mortality rates for some
-suitably chosen (mid-)point of the follow-up in each, or we make a
-second split by date, so that follow-up in the diabetes patients is in
-the same classification of age and data as the population mortality
-table.
-
-%% \begin{enumerate}[resume]
-\begin{enumerate}[resume]
-
-%% \item We will use the former approach, using the dataset split in
-%%   6 month intervals, and then include as an extra variable the
-%%   population mortality as available from the data set
-%%   \texttt{M.dk}.
-
-%%   First create the variables in the diabetes dataset that we need
-%%   for matching with the population mortality data, that is sex and
-%%   age and date at the midpoint of each of the intervals (or rater at a
-%%   point 3 months after the left endpoint of the interval --- recall
-%%   we split the follow-up in 6 month intervals).
-
-%%   We need to have variables of the same type when we merge, so we must
-%%   transform the sex variable in \texttt{M.dk} to a factor, and must
-%%   for each follow-up interval in the \texttt{SL} data have an age and
-%%   a period variable that can be used in merging with the population data.
-%% <<eval = FALSE>>=
-%% str(SL)
-%% SL$Am <- floor(SL$A + 0.25)
-%% SL$Pm <- floor(SL$P + 0.25)
-%% data(M.dk)
-%% str(M.dk)
-%% M.dk <- transform(M.dk, Am = A,
-%%                         Pm = P,
-%%                        sex = factor(sex, labels = c("M","F")))
-%% str(M.dk)
-%% @ %
-%% Then match the rates from \texttt{M.dk} into \texttt{SL} ---
-%% \texttt{sex}, \texttt{Am} and \texttt{Pm} are the common variables,
-%% and therefore the match is on these variables:
-%% <<eval = FALSE>>=
-%% SLr <- merge(SL, M.dk[,c("sex", "Am", "Pm", "rate")])
-%% dim(SL)
-%% dim(SLr)
-%% @ %
-%% This merge (remember to \texttt{?merge}!) only takes rows that have
-%% information from both datasets, hence the slightly fewer rows in
-%% \texttt{SLr} than in \texttt{SL}.
-
-\item Using the former approach we shall include as an extra variable
-  the population mortality as available from the data set
-  \texttt{M.dk}.
-
-  First create the variables in the diabetes dataset that we need for
-  matching with the age and period classification of the population
-  mortality data, that is age, date (and sex) at the midpoint of each of
-  the intervals (or rater at a point 3 months after the left endpoint
-  of the interval --- recall we split the follow-up in 6 month
-  intervals).
-
-  We need to have variables of the same type when we merge, so we must
-  transform the sex variable in \texttt{M.dk} to a factor, and must
-  for each follow-up interval in the \texttt{SL} data have an age
-  (\texttt{Am}) and a period (\texttt{Pm}) variable that can be used
-  in merging with the population data. We match on the age and perido
-  of the midpoint of the follow-up interval:
-<<>>=
-SL$Am <- floor(SL$A + 0.25)
-SL$Pm <- floor(SL$P + 0.25)
-@
-Then we can load the dataset with the rates and construct the matching
-variables:
-<<>>=
-data(M.dk)
-str(M.dk)
-M.dk <- transform(M.dk, Am = A,
-                        Pm = P,
-                       sex = factor(sex, labels = c("M","F")))
-head(M.dk)
-str(SL)
-str(M.dk)
-@ %
-We then match the rates from \texttt{M.dk} into \texttt{SL} ---
-\texttt{sex}, \texttt{Am} and \texttt{Pm} are the common variables,
-and therefore the match is on these variables:
-<<>>=
-SLr <- merge(SL, M.dk[,c("sex", "Am", "Pm", "rate")])
-dim(SL)
-dim(SLr)
-@
-This merge only takes rows that have information from both data sets,
-hence the slightly fewer rows in \texttt{SLr} than in \texttt{SL} ---
-there are a few record in \texttt{SL} with age and period values that
-do not exist in the population mortality data, these will be excluded.
-
-This could also have been done as an \code{inner\_join} using the
-\texttt{tidyverse} machinery:
-<<>>=
-SLi <- inner_join(SL, M.dk[,c("sex","Am","Pm","rate")])
-dim(SL)
-dim(SLi)
-@ %
-
-%% \item Compute the expected number of deaths as the person-time
-%%    multiplied by the corresponding population rate, and put it in a
-%%    new variable, \texttt{E}, say (\texttt{E}xpected). Use \texttt{stat.table}
-%%    to make a table of observed, expected and the ratio (SMR) by age
-%%    (suitably grouped, look for \texttt{cut}) and sex.
-
-\item We compute the expected number of deaths as the person-time
-   multiplied by the corresponding population rate recalling that the
-   rate is given in units of deaths per 1000 PY, whereas
-   \texttt{lex.dur} is in units of 1 PY:
-<<>>=
-SLr$E <- SLr$lex.dur * SLr$rate / 1000
-stat.table(sex,
-           list(D = sum(lex.Xst == "Dead"),
-                Y = sum(lex.dur),
-                E = sum(E),
-              SMR = ratio(lex.Xst == "Dead",E)),
-           data = SLr,
-           margin = TRUE)
-stat.table(list(sex,
-                Age = cut(A,
-                          breaks = c(0, 4:9*10, 100),
-                          right = FALSE)),
-           list(D = sum(lex.Xst == "Dead"),
-                Y = sum(lex.dur),
-                E = sum(E),
-              SMR = ratio(lex.Xst == "Dead", E)),
-           margin = TRUE,
-             data = SLr)
-@ %
-  We see that the SMR is pretty much the same for women and men, but
-  also that there is quite a steep decrease in SMR by age.
-
-%% \item Fit a poisson model with sex as the explanatory varable and
-%%   log-expected as offset to derive the SMR (and c.i.).
-%%   Some of the population mortality rates are 0, so you need to exclude
-%%   those records from the analysis.
-%% <<>>=
-%% msmr <- glm((lex.Xst == "Dead") ~ sex - 1 + offset(log(E)),
-%%              family = poisson,
-%%              data = subset(SLr,E>0))
-%% ci.exp(msmr)
-%% @ %
-%%   Recogninze the numbers?
-
-\item We can fit a poisson model with sex as the explanatory variable and
-  log-expected as offset to derive the SMR (and c.i.).
-
-  Some of the population mortality rates are 0, so we must exclude
-  those records from the analysis.
-<<>>=
-msmr <- glm((lex.Xst == "Dead") ~ sex - 1 + offset(log(E)),
-            family = poisson,
-              data = subset(SLr, E > 0))
-ci.exp(msmr)
-@ %
-  These are the same SMRs as just coomputed by \texttt{stat.table},
-  but now with confidence intervals.
-
-%% \item The same model can be fitted a bit simpler by the
-%% \code{poisreg} family, try:
-%% <<>>=
-%% msmr <- glm(cbind(lex.Xst == "Dead", E) ~ sex - 1,
-%%             family = poisreg,
-%%               data = subset(SLr, E > 0))
-%% ci.exp(msmr)
-%% @ %
-%%   We can assess the ratios of SMRs between men and women by using the
-%%   \texttt{ctr.mat} argument which should be a matrix:
-%% <<>>=
-%% (CM <- rbind(M = c(1,0),
-%%              W = c(0,1),
-%%          'M/F' = c(1,-1)))
-%% round(ci.exp(msmr, ctr.mat = CM), 2)
-%% @ %
-%% What do you conclude?
-
-\item The same model can be fitted a bit simpler by the \code{poisreg} family:
-<<>>=
-msmr <- glm(cbind(lex.Xst == "Dead", E) ~ sex - 1,
-            family = poisreg,
-              data = subset(SLr, E > 0))
-ci.exp(msmr)
-@ %
-  We can assess the ratio of SMRs between men and women by using the
-  \texttt{ctr.mat} argument which should be a matrix:
-<<>>=
-(CM <- rbind(M = c(1,0),
-             W = c(0,1),
-         'M/F' = c(1,-1)))
-round(ci.exp(msmr, ctr.mat = CM), 2)
-@ %
-
-%% \end{enumerate}
-\end{enumerate}
-
 %% \subsection*{Age-specific mortality}
 \subsection*{Age-specific mortality}
 
@@ -820,6 +586,240 @@ constant across age and duration.
 %% \end{enumerate}
 \end{enumerate}
 
+%% \subsection*{SMR}
+\subsection*{SMR}
+
+%% The SMR is the \textbf{S}tandardized \textbf{M}ortality
+%% \textbf{R}atio, which is the mortality rate-ratio between the diabetes
+%% patients and the general population.  In real studies we would
+%% subtract the deaths and the person-years among the diabetes patients
+%% from those of the general population, but since we do not have access
+%% to these, we make the comparison to the general population at large,
+%% \textit{i.e.} also including the diabetes patients.
+
+%% So we now want to include the population mortality rates as a fixed
+%% variable in the split dataset; for each record in the split dataset we
+%% attach the value of the population mortality for the relevant sex, and
+%% and calendar time.
+
+%% This can be achieved in two ways: Either we just use the current split
+%% of follow-up time and allocate the population mortality rates for some
+%% suitably chosen (mid-)point of the follow-up in each, or we make a
+%% second split by date, so that follow-up in the diabetes patients is in
+%% the same classification of age and data as the population mortality
+%% table.
+
+The SMR is the \textbf{S}tandardized \textbf{M}ortality
+\textbf{R}atio, which is the mortality rate-ratio between the diabetes
+patients and the general population.  In real studies we would
+subtract the deaths and the person-years among the diabetes patients
+from those of the general population, but since we do not have access
+to these, we make the comparison to the general population at large,
+\textit{i.e.} also including the diabetes patients.
+
+We now want to include the population mortality rates as a fixed
+variable in the split dataset; for each record in the split dataset we
+attach the value of the population mortality for the relevant sex, and
+and calendar time.
+
+This can be achieved in two ways: Either we just use the current split
+of follow-up time and allocate the population mortality rates for some
+suitably chosen (mid-)point of the follow-up in each, or we make a
+second split by date, so that follow-up in the diabetes patients is in
+the same classification of age and data as the population mortality
+table.
+
+%% \begin{enumerate}[resume]
+\begin{enumerate}[resume]
+
+%% \item We will use the former approach, using the dataset split in
+%%   6 month intervals, and then include as an extra variable the
+%%   population mortality as available from the data set
+%%   \texttt{M.dk}.
+
+%%   First create the variables in the diabetes dataset that we need
+%%   for matching with the population mortality data, that is sex and
+%%   age and date at the midpoint of each of the intervals (or rater at a
+%%   point 3 months after the left endpoint of the interval --- recall
+%%   we split the follow-up in 6 month intervals).
+
+%%   We need to have variables of the same type when we merge, so we must
+%%   transform the sex variable in \texttt{M.dk} to a factor, and must
+%%   for each follow-up interval in the \texttt{SL} data have an age and
+%%   a period variable that can be used in merging with the population data.
+%% <<eval = FALSE>>=
+%% str(SL)
+%% SL$Am <- floor(SL$A + 0.25)
+%% SL$Pm <- floor(SL$P + 0.25)
+%% data(M.dk)
+%% str(M.dk)
+%% M.dk <- transform(M.dk, Am = A,
+%%                         Pm = P,
+%%                        sex = factor(sex, labels = c("M","F")))
+%% str(M.dk)
+%% @ %
+%% Then match the rates from \texttt{M.dk} into \texttt{SL} ---
+%% \texttt{sex}, \texttt{Am} and \texttt{Pm} are the common variables,
+%% and therefore the match is on these variables:
+%% <<eval = FALSE>>=
+%% SLr <- merge(SL, M.dk[,c("sex", "Am", "Pm", "rate")])
+%% dim(SL)
+%% dim(SLr)
+%% @ %
+%% This merge (remember to \texttt{?merge}!) only takes rows that have
+%% information from both datasets, hence the slightly fewer rows in
+%% \texttt{SLr} than in \texttt{SL}.
+
+\item Using the former approach we shall include as an extra variable
+  the population mortality as available from the data set
+  \texttt{M.dk}.
+
+  First create the variables in the diabetes dataset that we need for
+  matching with the age and period classification of the population
+  mortality data, that is age, date (and sex) at the midpoint of each of
+  the intervals (or rater at a point 3 months after the left endpoint
+  of the interval --- recall we split the follow-up in 6 month
+  intervals).
+
+  We need to have variables of the same type when we merge, so we must
+  transform the sex variable in \texttt{M.dk} to a factor, and must
+  for each follow-up interval in the \texttt{SL} data have an age
+  (\texttt{Am}) and a period (\texttt{Pm}) variable that can be used
+  in merging with the population data. We match on the age and perido
+  of the midpoint of the follow-up interval:
+<<>>=
+SL$Am <- floor(SL$A + 0.25)
+SL$Pm <- floor(SL$P + 0.25)
+@
+Then we can load the dataset with the rates and construct the matching
+variables:
+<<>>=
+data(M.dk)
+str(M.dk)
+M.dk <- transform(M.dk, Am = A,
+                        Pm = P,
+                       sex = factor(sex, labels = c("M","F")))
+head(M.dk)
+str(SL)
+str(M.dk)
+@ %
+We then match the rates from \texttt{M.dk} into \texttt{SL} ---
+\texttt{sex}, \texttt{Am} and \texttt{Pm} are the common variables,
+and therefore the match is on these variables:
+<<>>=
+SLr <- merge(SL, M.dk[,c("sex", "Am", "Pm", "rate")])
+dim(SL)
+dim(SLr)
+@
+This merge only takes rows that have information from both data sets,
+hence the slightly fewer rows in \texttt{SLr} than in \texttt{SL} ---
+there are a few record in \texttt{SL} with age and period values that
+do not exist in the population mortality data, these will be excluded.
+
+This could also have been done as an \code{inner\_join} using the
+\texttt{tidyverse} machinery:
+<<>>=
+SLi <- inner_join(SL, M.dk[,c("sex","Am","Pm","rate")])
+dim(SL)
+dim(SLi)
+@ %
+
+%% \item Compute the expected number of deaths as the person-time
+%%    multiplied by the corresponding population rate, and put it in a
+%%    new variable, \texttt{E}, say (\texttt{E}xpected). Use \texttt{stat.table}
+%%    to make a table of observed, expected and the ratio (SMR) by age
+%%    (suitably grouped, look for \texttt{cut}) and sex.
+
+\item We compute the expected number of deaths as the person-time
+   multiplied by the corresponding population rate recalling that the
+   rate is given in units of deaths per 1000 PY, whereas
+   \texttt{lex.dur} is in units of 1 PY:
+<<>>=
+SLr$E <- SLr$lex.dur * SLr$rate / 1000
+stat.table(sex,
+           list(D = sum(lex.Xst == "Dead"),
+                Y = sum(lex.dur),
+                E = sum(E),
+              SMR = ratio(lex.Xst == "Dead",E)),
+           data = SLr,
+           margin = TRUE)
+stat.table(list(sex,
+                Age = cut(A,
+                          breaks = c(0, 4:9*10, 100),
+                          right = FALSE)),
+           list(D = sum(lex.Xst == "Dead"),
+                Y = sum(lex.dur),
+                E = sum(E),
+              SMR = ratio(lex.Xst == "Dead", E)),
+           margin = TRUE,
+             data = SLr)
+@ %
+  We see that the SMR is pretty much the same for women and men, but
+  also that there is quite a steep decrease in SMR by age.
+
+%% \item Fit a poisson model with sex as the explanatory varable and
+%%   log-expected as offset to derive the SMR (and c.i.).
+%%   Some of the population mortality rates are 0, so you need to exclude
+%%   those records from the analysis.
+%% <<>>=
+%% msmr <- glm((lex.Xst == "Dead") ~ sex - 1 + offset(log(E)),
+%%              family = poisson,
+%%              data = subset(SLr,E>0))
+%% ci.exp(msmr)
+%% @ %
+%%   Recogninze the numbers?
+
+\item We can fit a poisson model with sex as the explanatory variable and
+  log-expected as offset to derive the SMR (and c.i.).
+
+  Some of the population mortality rates are 0, so we must exclude
+  those records from the analysis.
+<<>>=
+msmr <- glm((lex.Xst == "Dead") ~ sex - 1 + offset(log(E)),
+            family = poisson,
+              data = subset(SLr, E > 0))
+ci.exp(msmr)
+@ %
+  These are the same SMRs as just coomputed by \texttt{stat.table},
+  but now with confidence intervals.
+
+%% \item The same model can be fitted a bit simpler by the
+%% \code{poisreg} family, try:
+%% <<>>=
+%% msmr <- glm(cbind(lex.Xst == "Dead", E) ~ sex - 1,
+%%             family = poisreg,
+%%               data = subset(SLr, E > 0))
+%% ci.exp(msmr)
+%% @ %
+%%   We can assess the ratios of SMRs between men and women by using the
+%%   \texttt{ctr.mat} argument which should be a matrix:
+%% <<>>=
+%% (CM <- rbind(M = c(1,0),
+%%              W = c(0,1),
+%%          'M/F' = c(1,-1)))
+%% round(ci.exp(msmr, ctr.mat = CM), 2)
+%% @ %
+%% What do you conclude?
+
+\item The same model can be fitted a bit simpler by the \code{poisreg} family:
+<<>>=
+msmr <- glm(cbind(lex.Xst == "Dead", E) ~ sex - 1,
+            family = poisreg,
+              data = subset(SLr, E > 0))
+ci.exp(msmr)
+@ %
+  We can assess the ratio of SMRs between men and women by using the
+  \texttt{ctr.mat} argument which should be a matrix:
+<<>>=
+(CM <- rbind(M = c(1,0),
+             W = c(0,1),
+         'M/F' = c(1,-1)))
+round(ci.exp(msmr, ctr.mat = CM), 2)
+@ %
+
+%% \end{enumerate}
+\end{enumerate}
+
 %% \subsection{SMR modeling}
 \subsection{SMR modeling}
 
@@ -956,5 +956,5 @@ We see that there is absolutely no indication of difference between
 men and women, but also that the estimated effect of duraion is not
 exactly credible.
 
-%% \end{enumerate}
+%% \end{enumerate
 \end{enumerate}

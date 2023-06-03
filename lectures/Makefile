@@ -14,27 +14,17 @@ MAIN = SPE-2023-lectures-3x1
 ## The rnw depencencies
 PDFINCLUDES = \
 	ecology/R-history-ecology.pdf \
-	language-index/spe2019-lang_index.pdf \
-	dplyr/dplyr-pres.pdf \
+	tidyverse/tidyverse-pres.pdf \
 	poisson-logistic/SPE-Poisson-Logistic-Regression.pdf \
-	linmodels/lm.pdf \
 	splines/splines.pdf \
+	linmodels/lm.pdf \
+	causal/spe2023-CIlect-kf.pdf \
 	graphics_advanced/Graphics.pdf \
 	Survival_competing_risk/Survival_competing_risk.pdf \
 	time-rep/time-rep.pdf \
 	casecontrol/NCC-CC-studies.pdf \
-	causal/spe2019-CIlect-kf.pdf \
+	causal-two/causal-two.pdf \
 	multistate/multistate.pdf
-
-	
-## PDFINCLUDES = \
-	linmodels/lm.pdf \
-	graphics_advanced/Graphics.pdf \
-	time-rep/time-rep.pdf \
-	casecontrol/NCC-CC-studies.pdf \
-	causal/spe2017-CIlect-kf.pdf \
-	multistate/multistate.pdf
-
 
 ##inpdf = $(FILEINCLUDES:.=.pdf)
 scaledpdf = $(PDFINCLUDES:.pdf=-scaled.pdf)

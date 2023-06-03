@@ -1,25 +1,25 @@
-### R code from vignette source '/home/plummerm/Projects/SPE/SPE2017/pracs/basic-e.rnw'
+### R code from vignette source '/home/martyn/Projects/SPE/SPE/pracs/basic-e.rnw'
 
 ###################################################
-### code chunk number 1: basic-e.rnw:90-91
+### code chunk number 1: basic-e.rnw:108-109
 ###################################################
 (12+16)*5
 
 
 ###################################################
-### code chunk number 2: basic-e.rnw:95-96
+### code chunk number 2: basic-e.rnw:113-114
 ###################################################
 12+16*5
 
 
 ###################################################
-### code chunk number 3: basic-e.rnw:147-148
+### code chunk number 3: basic-e.rnw:161-162
 ###################################################
 v <- c(4, 6, 1, 2.2)
 
 
 ###################################################
-### code chunk number 4: basic-e.rnw:156-159
+### code chunk number 4: basic-e.rnw:170-173
 ###################################################
 v
 3+v
@@ -27,7 +27,7 @@ v
 
 
 ###################################################
-### code chunk number 5: basic-e.rnw:168-171
+### code chunk number 5: basic-e.rnw:182-185
 ###################################################
 v <- c(4, 6, NA)
 3 + v
@@ -35,37 +35,37 @@ v <- c(4, 6, NA)
 
 
 ###################################################
-### code chunk number 6: basic-e.rnw:175-176
+### code chunk number 6: basic-e.rnw:189-190
 ###################################################
 mean(v)
 
 
 ###################################################
-### code chunk number 7: basic-e.rnw:182-183
+### code chunk number 7: basic-e.rnw:196-197
 ###################################################
 mean(v, na.rm=TRUE)
 
 
 ###################################################
-### code chunk number 8: basic-e.rnw:193-194
+### code chunk number 8: basic-e.rnw:208-209
 ###################################################
 length(v)
 
 
 ###################################################
-### code chunk number 9: basic-e.rnw:202-203
+### code chunk number 9: basic-e.rnw:217-218
 ###################################################
 1:10
 
 
 ###################################################
-### code chunk number 10: basic-e.rnw:208-209
+### code chunk number 10: basic-e.rnw:223-224
 ###################################################
 seq(from=15, to=85, by=5)
 
 
 ###################################################
-### code chunk number 11: basic-e.rnw:214-215
+### code chunk number 11: basic-e.rnw:229-230
 ###################################################
 c(5, seq(from=20, to=85, by=5))
 
@@ -115,65 +115,63 @@ length(v)
 
 
 ###################################################
-### code chunk number 19: basic-e.rnw:266-272
+### code chunk number 19: basic-e.rnw:281-285
 ###################################################
 x <- c(2, 7, 0, 9, 10, 23, 11, 4, 7, 8, 6, 0)
 x[4]
 x[3:5]
 x[c(1,5,8)]
-x[(1:6)*2]
-x[-1]
 
 
 ###################################################
-### code chunk number 20: basic-e.rnw:279-281
+### code chunk number 20: basic-e.rnw:290-292
 ###################################################
 N <- length(x)
 x[N + 1]
 
 
 ###################################################
-### code chunk number 21: basic-e.rnw:286-288
+### code chunk number 21: basic-e.rnw:297-299
 ###################################################
 x > 10
 x[x > 10]
 
 
 ###################################################
-### code chunk number 22: basic-e.rnw:301-302
+### code chunk number 22: basic-e.rnw:312-313
 ###################################################
 x[x >= 10 & x <= 20]
 
 
 ###################################################
-### code chunk number 23: basic-e.rnw:306-307
+### code chunk number 23: basic-e.rnw:317-318
 ###################################################
 x[x < 10 | x > 20]
 
 
 ###################################################
-### code chunk number 24: basic-e.rnw:311-313
+### code chunk number 24: basic-e.rnw:322-324
 ###################################################
 x[1] <- 1000
 x
 
 
 ###################################################
-### code chunk number 25: basic-e.rnw:318-320
+### code chunk number 25: basic-e.rnw:329-331
 ###################################################
 x[x==0] <- 1
 x
 
 
 ###################################################
-### code chunk number 26: basic-e.rnw:327-329
+### code chunk number 26: basic-e.rnw:338-340
 ###################################################
 x[2:4] <- c(0, 8, 1)
 x
 
 
 ###################################################
-### code chunk number 27: basic-e.rnw:337-341
+### code chunk number 27: basic-e.rnw:348-352
 ###################################################
 y <- x[x < 3]
 y <- y + 3
@@ -182,40 +180,40 @@ x
 
 
 ###################################################
-### code chunk number 28: basic-e.rnw:346-347
+### code chunk number 28: basic-e.rnw:357-358
 ###################################################
 x[x < 3] <- x[x < 3] + 3
 
 
 ###################################################
-### code chunk number 29: basic-e.rnw:361-363
+### code chunk number 29: basic-e.rnw:372-374
 ###################################################
 x %% 2
 ifelse(x %% 2 == 0,"even","odd")
 
 
 ###################################################
-### code chunk number 30: basic-e.rnw:377-379
+### code chunk number 30: basic-e.rnw:388-390
 ###################################################
 m <- list(4, TRUE, "name of company")
 m
 
 
 ###################################################
-### code chunk number 31: basic-e.rnw:390-392
+### code chunk number 31: basic-e.rnw:401-403
 ###################################################
 m[1:2] #A list containing first two elements of m
 m[3]   #A list containing the third element of m 
 
 
 ###################################################
-### code chunk number 32: basic-e.rnw:396-397
+### code chunk number 32: basic-e.rnw:407-408
 ###################################################
 m[[3]] #Extract third element
 
 
 ###################################################
-### code chunk number 33: basic-e.rnw:402-405
+### code chunk number 33: basic-e.rnw:413-416
 ###################################################
 mylist <- list(name=c("Joe","Ann","Jack","Tom"),
                age=c(34,50,27,42))
@@ -223,14 +221,14 @@ mylist
 
 
 ###################################################
-### code chunk number 34: basic-e.rnw:410-412
+### code chunk number 34: basic-e.rnw:421-423
 ###################################################
 mylist$name
 mylist$age
 
 
 ###################################################
-### code chunk number 35: basic-e.rnw:421-424
+### code chunk number 35: basic-e.rnw:432-435
 ###################################################
 mydata <- data.frame(name=c("Joe","Ann","Jack","Tom"),
                      age=c(34,50,27,42),sex=c(1,2,1,1),
@@ -238,20 +236,19 @@ mydata <- data.frame(name=c("Joe","Ann","Jack","Tom"),
 
 
 ###################################################
-### code chunk number 36: basic-e.rnw:431-433
+### code chunk number 36: basic-e.rnw:441-442
 ###################################################
 mydata$height
-mydata[[4]]
 
 
 ###################################################
-### code chunk number 37: basic-e.rnw:436-437
+### code chunk number 37: basic-e.rnw:445-446
 ###################################################
 mydata
 
 
 ###################################################
-### code chunk number 38: basic-e.rnw:442-445
+### code chunk number 38: basic-e.rnw:451-454
 ###################################################
 mydata[1,] 
 mydata[,c("age", "height")] 
@@ -259,21 +256,21 @@ mydata[2,4]
 
 
 ###################################################
-### code chunk number 39: basic-e.rnw:451-453
+### code chunk number 39: basic-e.rnw:460-462
 ###################################################
 yourdata <- data.frame(name=c("Ann","Peter","Sue","Jack","Tom","Joe","Jane"),
                        weight=c(67,81,56,90,72,79,69))
 
 
 ###################################################
-### code chunk number 40: basic-e.rnw:457-459
+### code chunk number 40: basic-e.rnw:466-468
 ###################################################
 newdata <- merge(mydata, yourdata)
 newdata
 
 
 ###################################################
-### code chunk number 41: basic-e.rnw:468-470
+### code chunk number 41: basic-e.rnw:477-479
 ###################################################
 newdata <- merge(mydata, yourdata, all=TRUE)
 newdata
@@ -288,259 +285,149 @@ objects()
 
 
 ###################################################
-### code chunk number 43: basic-e.rnw:498-499
+### code chunk number 43: basic-e.rnw:507-508
 ###################################################
 data(diet)
 
 
 ###################################################
-### code chunk number 44: basic-e.rnw:506-507
+### code chunk number 44: basic-e.rnw:515-516
 ###################################################
 remove(diet)
 
 
 ###################################################
-### code chunk number 45: basic-e.rnw:518-519
+### code chunk number 45: basic-e.rnw:527-528
 ###################################################
 head(births)
 
 
 ###################################################
-### code chunk number 46: basic-e.rnw:522-523
-###################################################
-births[1,"bweight"]
-
-
-###################################################
-### code chunk number 47: basic-e.rnw:527-528
-###################################################
-births[1,2]
-
-
-###################################################
-### code chunk number 48: basic-e.rnw:532-533
-###################################################
-births[2,"bweight"]
-
-
-###################################################
-### code chunk number 49: basic-e.rnw:537-538
-###################################################
-births[1:10, "bweight"]
-
-
-###################################################
-### code chunk number 50: basic-e.rnw:541-542
-###################################################
-births[, "bweight"]
-
-
-###################################################
-### code chunk number 51: basic-e.rnw:545-546
+### code chunk number 46: basic-e.rnw:531-532
 ###################################################
 births[1, ]
 
 
 ###################################################
-### code chunk number 52: Display row 7 of gestwks
+### code chunk number 47: basic-e.rnw:535-536
 ###################################################
-births[7, "gestwks"]
+births[2, ]
 
 
 ###################################################
-### code chunk number 53: Display all the data in row 7
+### code chunk number 48: basic-e.rnw:540-541
 ###################################################
-births[7,]
+births[1:10, ]
 
 
 ###################################################
-### code chunk number 54: Display first 10 rows of gestwks
-###################################################
-births[1:10, "gestwks"]
-
-
-###################################################
-### code chunk number 55: basic-e.rnw:572-573
+### code chunk number 49: basic-e.rnw:547-548
 ###################################################
 subset(mydata, height < 180)
 
 
 ###################################################
-### code chunk number 56: basic-e.rnw:577-578
-###################################################
-mydata[mydata$height < 180, ]
-
-
-###################################################
-### code chunk number 57: basic-e.rnw:582-584
-###################################################
-newdata[newdata$height < 180, ]
-subset(newdata, height < 180)
-
-
-###################################################
-### code chunk number 58: basic-e.rnw:594-595
+### code chunk number 50: basic-e.rnw:555-556
 ###################################################
 summary(births)
 
 
 ###################################################
-### code chunk number 59: basic-e.rnw:602-603
+### code chunk number 51: basic-e.rnw:563-564
 ###################################################
 names(births)
 
 
 ###################################################
-### code chunk number 60: basic-e.rnw:610-611
+### code chunk number 52: basic-e.rnw:571-572
 ###################################################
 summary(births$hyp)
 
 
 ###################################################
-### code chunk number 61: basic-e.rnw:615-616
+### code chunk number 53: basic-e.rnw:576-577
 ###################################################
 with(births, summary(hyp))
 
 
 ###################################################
-### code chunk number 62: Create a new variable in the workspace
+### code chunk number 54: Create a new variable in the workspace
 ###################################################
 logbw <- log(births$bweight)
 
 
 ###################################################
-### code chunk number 63: Create a new variable in the data frame
+### code chunk number 55: Create a new variable in the data frame
 ###################################################
 births$logbw <- log(births$bweight)
 
 
 ###################################################
-### code chunk number 64: basic-e.rnw:635-636
+### code chunk number 56: basic-e.rnw:596-597
 ###################################################
 births$bweight <- births$bweight/1000
 
 
 ###################################################
-### code chunk number 65: Convert hyp to be a factor
+### code chunk number 57: Convert hyp to be a factor
 ###################################################
 births$hyp <- factor(births$hyp, labels=c("normal", "hyper"))
 
 
 ###################################################
-### code chunk number 66: :abel levels of sex
+### code chunk number 58: :abel levels of sex
 ###################################################
 births$sex<-factor(births$sex, labels = c("M", "F"))
 
 
 ###################################################
-### code chunk number 67: Distribution of hyp
+### code chunk number 59: Distribution of hyp
 ###################################################
 with(births, table(hyp))
 
 
 ###################################################
-### code chunk number 68: Distribution of hyp
+### code chunk number 60: Distribution of hyp
 ###################################################
 table(births$hyp)
 
 
 ###################################################
-### code chunk number 69: Distribution of sex
+### code chunk number 61: Distribution of sex
 ###################################################
 table(births$sex)
 with(births, table(sex))
 
 
 ###################################################
-### code chunk number 70: Joint distribution of sex and hyp
+### code chunk number 62: Joint distribution of sex and hyp
 ###################################################
 with(births, table(sex, hyp))
 
 
 ###################################################
-### code chunk number 71: Create logical variable early
+### code chunk number 63: Create logical variable early
 ###################################################
 early<-births$gestwks<30
 table(early)
 
 
 ###################################################
-### code chunk number 72: Cut matage into four groups
+### code chunk number 64: Cut matage into four groups
 ###################################################
 births$agegrp  <- cut(births$matage, breaks=c(20,30,35,40,45), right=FALSE)
 with(births, table(agegrp))
 
 
 ###################################################
-### code chunk number 73: Summarize gestwks
+### code chunk number 65: Summarize gestwks
 ###################################################
 with(births, summary(gestwks))
 
 
 ###################################################
-### code chunk number 74: Cut gestwks
+### code chunk number 66: Cut gestwks
 ###################################################
 births$gest4 <- cut(births$gestwks, breaks=c(20,35,37,39,45))
-
-
-###################################################
-### code chunk number 75: Saving births
-###################################################
-save(births, file="births.RData")
-
-
-###################################################
-### code chunk number 76: Loading births2
-###################################################
-load("births.RData")
-
-
-###################################################
-### code chunk number 77: basic-e.rnw:781-782
-###################################################
-search()
-
-
-###################################################
-### code chunk number 78: basic-e.rnw:789-790
-###################################################
-objects()
-
-
-###################################################
-### code chunk number 79: basic-e.rnw:794-795
-###################################################
-objects(2)
-
-
-###################################################
-### code chunk number 80: basic-e.rnw:798-799
-###################################################
-objects("package:Epi")
-
-
-###################################################
-### code chunk number 81: basic-e.rnw:809-810
-###################################################
-attach(births)
-
-
-###################################################
-### code chunk number 82: basic-e.rnw:814-816
-###################################################
-search()
-objects(2)
-
-
-###################################################
-### code chunk number 83: basic-e.rnw:823-824
-###################################################
-hyp
-
-
-###################################################
-### code chunk number 84: basic-e.rnw:829-830
-###################################################
-detach()
 
 

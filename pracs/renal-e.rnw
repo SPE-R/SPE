@@ -7,7 +7,6 @@ options( width=90,
 @ %
 \renewcommand{\rwpre}{./graph/renal}
 \section{Time-dependent variables and multiple states}
-
 The following practical exercise is based on the data from paper:
 \begin{description}
 \item
@@ -18,9 +17,7 @@ Improved survival in patients obtaining remission of nephrotic range
 \end{description}
 You can find a \texttt{.pdf}-version of the paper here:
 \url{http://BendixCarstensen.com/~bxc/AdvCoh/papers/Hovind.2004.pdf}
-
 \subsection{The renal failure dataset}
-
 The dataset \texttt{renal.dta} contains data on follow up of 125
 patients from Steno Diabetes Center. They enter the study when they
 are diagnosed with nephrotic range albuminuria (NRA). This is a
@@ -47,9 +44,7 @@ the study at death or kidney failure (dialysis or transplant).
   \label{tab:fincol}
 \renewcommand{\arraystretch}{1.0}
 \end{table}
-
 \begin{enumerate}
-
 \item The dataset is in Stata-format, so you must read the dataset
   using \texttt{read.dta} from the \texttt{foreign} package (which is
   part of the standard \R-distribution). At the same time, convert
@@ -57,13 +52,13 @@ the study at death or kidney failure (dialysis or transplant).
 <<>>=
 library( Epi ) ; clear()
 library( foreign )
-renal <- read.dta("https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/renal.dta" )
+renal <- read.dta(
+         "https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/renal.dta")
 # renal <- read.dta( "http://BendixCarstensen.com/SPE/data/renal.dta" )
 # renal <- read.dta( "./data/renal.dta" )
 renal$sex <- factor( renal$sex, labels=c("M","F") )
 head( renal )
 @ %
-
 \item Use the \texttt{Lexis} function to declare the data as
   survival data with age, calendar time and time since entry into
   the study as timescales. Label any event $>0$ as ``ESRD'',
@@ -84,7 +79,6 @@ str( Lr )
 summary( Lr )
 @ %
 Make sure you know what the variables in \texttt{Lr} stand for.
-
 \item Visualize the follow-up in a Lexis-diagram, by using the
   \texttt{plot} method for \texttt{Lexis} objects.
 <<Lexis-ups, fig=TRUE>>=
@@ -92,7 +86,6 @@ plot( Lr, col="black", lwd=3 )
 subset( Lr, age<0 )
 @ %
 What is wrong here? List the data for the person with negative entry age.
-
 \item Correct the data and make a new plot, for example by:
 <<Lexis-def,fig=TRUE>>=
 Lr <- transform( Lr, dob = ifelse( dob>2000, dob-100, dob ),
@@ -100,23 +93,20 @@ Lr <- transform( Lr, dob = ifelse( dob>2000, dob-100, dob ),
 subset( Lr, id==586 )
 plot( Lr, col="black", lwd=3 )
 @ %
-
-\item (\emph{Optional, esoteric}) We can produce a slightly more fancy
-  Lexis diagram. Note that we have a $x$-axis of 40 years, and a
-  $y$-axis of 80 years, so when specifying the output file adjust the
-  \emph{total} width of the plot so that the use of \texttt{mai} (look
-  up the help page for \texttt{par}) to specify the margins of the
-  plot so that it leaves a plotting area twice as high as wide. The
+\item (\emph{Optional, esoteric}) We can produce a slightly more
+  fancy Lexis diagram. Note that we have a $x$-axis of 40 years, and
+  a $y$-axis of 80 years, so when specifying the output file adjust
+  the \emph{total} width of the plot so that the use of \texttt{mai}
+  (look up the help page for \texttt{par}) to specify the margins of
+  the plot so that it leaves a plotting area twice as high as wide. The
   \texttt{mai} argument to \texttt{par} gives the margins in inches,
-  so the total size of the horizontal and vertical margins is 1 inch
-  each if we specify \texttt{mai=c(3,3,1,1)/4}, to which we add 80/9
-  in the height, and 40/9 in the horizontal direction, each giving
-  exactly 9 years per inch in physical size.
-  
-\item Now make a Cox-regression analysis of the endpoint ESRD with the
-  variables sex and age at entry into the study, using time since
-  entry to the study as time scale (and therefore \texttt{lex.dur} the
-  time of exit).
+  so the total size of the horizontal and vertical margins is 1
+  inch each, to which we add 80/5 in the height, and 40/5 in the
+  horizontal direction, each giving exactly 5 years per inch in
+  physical size.
+\item Now make a Cox-regression analysis of the enpoint ESRD with
+  the variables sex and age at entry into the study, using time
+  since entry to the study as time scale.
 <<>>=
 library( survival )
 mc <- coxph( Surv( lex.dur, lex.Xst=="ESRD" ) ~
@@ -125,15 +115,6 @@ summary( mc )
 @ %
 What is the The hazard ratio between males and females?
 Between two persons who differ 10 years in age at entry?
-
-You may want to explore the \texttt{coxph.Lexis} function which is
-just a wrapper for \texttt{coxph} using the special structures in a
-\texttt{Lexis} object:
-<<>>=
-ml <- coxph.Lexis( Lr, formula = tfi ~ I(age/10) + sex )
-ci.exp(ml)
-@ %
-
 \item The main focus of the paper was to assess whether the occurrence of
   remission (return to a lower level of albumin excretion, an
   indication of kidney recovery) influences mortality.
@@ -149,14 +130,13 @@ ci.exp(ml)
     or 1 according to whether the person had an event at \texttt{dox}.
   \end{itemize}
   This is accomplished using the \texttt{cutLexis} function on the
-  \texttt{Lexis} object, where we introduce a remission state
-  \texttt{Rem}.  You must declare the \texttt{NRA} state as a
-  precursor state, i.e. a state that is \emph{less} severe than
-  \texttt{Rem} in the sense that a person who see a remission will
-  stay in the \texttt{Rem} state unless he goes to the \texttt{ESRD}
-  state. Also use \texttt{split.state=TRUE} to have different ESRD
-  states according to whether a person had had remission or not prioer
-  to ESRD. The statement to do this is:
+  \texttt{Lexis} object, where we introduce a remission state ``Rem''.
+  You must declare the ``NRA'' state as a precursor state, i.e. a
+  state that is \emph{less} severe than ``Rem'' in the sense that a
+  person who see a remission will stay in the ``Rem'' state unless he
+  goes to the ``ESRD'' state. Also use \texttt{split.state=TRUE} to
+  have different ESRD states according to whether a person had had
+  remission or not prioer to ESRD. The statement to do this is:
 <<>>=
 Lc <- cutLexis( Lr, cut = Lr$dor, # where to cut follow up
               timescale = "per",  # what timescale are we referring to
@@ -167,8 +147,7 @@ summary( Lc )
 @ %
 List the records from a few select persons (choose values for
 \texttt{lex.id}, using for example \texttt{subset( Lc, lex.id \%in\%
-c(5,7,9) )}, or other numbers). Explain what each record represents.
-
+c(5,7,9) )}, or other numbers).
 \item Now show how the states are connected and the number of transitions
   between them by using \texttt{boxes}. This is an interactive command
   that requires you to click in the graph window:
@@ -177,13 +156,12 @@ boxes( Lc )
 @ % $
 It has a couple of fancy arguments, try:
 <<Lc-boxes,fig=TRUE>>=
-boxes( Lc, boxpos=TRUE, scale.R=100, show.BE=TRUE )
+boxes( Lc, boxpos=TRUE, scale.R=100, show.BE=TRUE, hm=1.5, wm=1.5 )
 @ % $
 You may even be tempted to read the help page for
 \texttt{boxes.Lexis} \ldots
-
-\item (\emph{Optional, esoteric}) Plot a Lexis diagram where different
-  coloring is used for different segments of the follow-up. The
+\item Plot a Lexis diagram where different coloring is
+  used for different segments of the follow-up. The
   \texttt{plot.Lexis} function draws a line for each record in the
   dataset, so you can index the coloring by \texttt{lex.Cst} and
   \texttt{lex.Xst} as appropriate --- indexing by a factor corresponds
@@ -199,7 +177,6 @@ points( Lc, pch=c(NA,NA,16)[Lc$lex.Xst],
 points( Lc, pch=c(NA,NA,1)[Lc$lex.Xst],
             col="black", lwd=2 )
 @ %
-
 \item Make Cox-regression of mortality (i.e. endpoint ``ESRD'' or
   ``ESRD(Rem)'') with sex, age at entry and remission as
   explanatory variables, using time since entry as timescale, and
@@ -213,31 +190,13 @@ m1 <- coxph( Surv( tfi,                  # from
                    tfi+lex.dur,          # to
                    lex.Xst %in% EP ) ~   # event
              sex + I((doe-dob-50)/10) +  # fixed covariates
-             (lex.Cst=="Rem"),           # time-dependent variable 
+             (lex.Cst=="Rem"),           # time-dependent variable
              data = Lc )
 summary( m1 )
 @ %
-What is the effect of of remission on the rate of ESRD? 
-
-\item Try to use \texttt{coxph.Lexis} to fit this model --- read the
-  documentation for the function.
-<<>>=
-mt <- coxph.Lexis( Lc, formula = 
-                       tfi ~ sex + I((doe-dob-50)/10) + (lex.Cst=="Rem") )
-@ %
-What happens if you use current age as the baseline timescale instead?
-
-\item The assumption in this model about the two rates of remission is
-  that they are proportional as functions of time since
-  remission. This can tested with the \texttt{cox.zph} function:
-<<>>=
-cox.zph( m1 )
-@ %
- Is there indication of non-proportionality between the rates of ESRD?
+What is the effect of of remission on the rate of ESRD?
 \end{enumerate}
-
 \subsection{Splitting the follow-up time}
-
 In order to explore the effect of remission on the rate of ESRD, we
 shall split the data further into small pieces of follow-up. To this
 end we use the function \texttt{splitLexis}. The rates can then be
@@ -245,9 +204,7 @@ modeled using a Poisson-model, and the shape of the underlying
 \emph{rates} be explored. Furthermore, we can allow effects of both
 time since NRA and current age. To this end we will use splines, so we
 need the \texttt{splines} and also the \texttt{mgcv} packages.
-
 \begin{enumerate}[resume]
-
 \item Now split the follow-up time every month after entry, and verify
   that the number of events and risk time is the same as before and
   after the split:
@@ -256,58 +213,30 @@ sLc <- splitLexis( Lc, "tfi", breaks=seq(0,30,1/12) )
 summary( Lc, scale=100 )
 summary(sLc, scale=100 )
 @ %
-In the \texttt{popEpi} package there is a function \texttt{splitMulti}
-that does the same, but with a simpler syntax (and much faster for
-lareg datasets):
-<<>>=
-library(popEpi)
-sLc <- splitMulti( Lc, tfi=seq(0,30,1/12) )
-@ %
-Read the help page for \texttt{splitMulti} to see the features.
- 
 \item Try to fit the Poisson-model corresponding to the Cox-model
-  we fitted previously. The function \texttt{ns()} produces a model
+  we fitted previously. The function \texttt{Ns()} produces a model
   matrix corresponding to a piece-wise cubic function, modeling the
-  baseline hazard explicitly (think of the \texttt{Ns} terms as the
-  baseline hazard that is not visible in the Cox-model)
+  baseline hazard explicitly (think of the \texttt{ns} terms as the
+  baseline hazard that is not visible in the Cox-model). Use teh
+  wrapper function \code{glm.Lexis}
 <<>>=
-library( splines )
-mp <- glm( cbind(lex.Xst %in% EP,lex.dur) ~ Ns( tfi, knots=c(0,2,5,9,14) ) +
-           sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem"),
-           family = poisreg, 
-             data = sLc )
-ci.exp( mp )
-@ %
-As for the \texttt{coxph} there is also a wrapper for \texttt{glm} in
-multistate model. Per default it will model all transition \emph{to}
-any absorbing state (which is what we want in this case):
-<<>>=
-mp <- glm.Lexis( sLc, formula= ~ Ns( tfi, knots=c(0,2,5,9,14) ) +
-                      sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem") )
+mp <- glm.Lexis(sLc, ~ Ns(tfi, knots = c(0,2,5,10)) +
+                       sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem"))
 ci.exp( mp )
 @ %
 How does the effects of sex change from the Cox-model?
-
 \item Try instead using the \texttt{gam} function from the
-  \texttt{mgcv} package --- a function that allows the smoother
-  \texttt{s}, that optimizes the number as well as the location of the
-  knots:
+  \texttt{mgcv} package. There is convenience wrapper for this for
+  \texttt{Lexis} objects as well:
 <<>>=
 library( mgcv )
-mx <- gam( cbind(lex.Xst %in% EP,lex.dur) ~ s( tfi, k=10 ) +
-           sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem"),
-           family = poisreg, 
-             data = sLc )
+mx <- gam.Lexis(sLc,
+                ~ s(tfi, k=10) + sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem"))
 ci.exp( mp, subset=c("Cst","doe","sex") )
 ci.exp( mx, subset=c("Cst","doe","sex") )
 @ %
-There is also a wrapper for \texttt{gam} fitted to \texttt{Lexis} objects:
-<<>>=
-mx <- gam.Lexis( sLc, formula= ~ s( tfi, k=10 ) +
-                      sex + I((doe-dob-40)/10) + I(lex.Cst=="Rem") )
-ci.exp( mx )
-@ 
-
+We see that there is virtually no difference between the two
+approaches in terms of the regression parameters.
 \item Extract the regression parameters from the models using
   \texttt{ci.exp} and compare with the estimates from the Cox-model:
 <<>>=
@@ -315,111 +244,69 @@ ci.exp( mx, subset=c("sex","dob","Cst"), pval=TRUE )
 ci.exp( m1 )
 round( ci.exp( mp, subset=c("sex","dob","Cst") ) / ci.exp( m1 ), 2 )
 @ %
-How large is the difference in estimated regression parameters?
-
+How lare is the difference in estimated regression parameters?
 \item The model has the same assumptions as the Cox-model about
   proportionality of rates, but there is an additional assumption that
   the hazard is a smooth function of time since entry. It seems to be
   a sensible assumption (well, restriction) to put on the rates that
   they vary smoothly by time. No such restriction is made in the Cox
   model. The \texttt{gam} model optimizes the shape of the smoother by
-  general cross-validation. Try to look at the shape of the estimated
-  effect of \texttt{tfi}:
+  general cross-validation. Try to look at the shape of the
+  estimated effect of \texttt{tfi}:
 <<>>=
 plot( mx )
 @ %
 Is this a useful plot?
-
-\item However, \texttt{plot.gam} does not give you the \emph{absolute}
+\item However, \texttt{plot} does not give you the \emph{absolute}
   level of the underlying rates because it bypasses the intercept. So
   try to predict the rates as a function of \texttt{tfi} and the
-  covariates, by setting up a prediction data frame. Note that age in
-  the model specification is entered as \texttt{doe-dob}, hence the
-  prediction data frame must have these two variables and not the age,
-  but it is only the difference that matters for the prediction:
+  covariates, by setting up a prediction data frame. Note that age
+  in the model specification is entered as \texttt{doe-dob}, hence
+  the prediction data frame must have these two variables and not
+  the age, but it is onlythe difference that matters for the prediction:
 <<pred,fig=TRUE>>=
-nd <- data.frame( tfi = seq(0,20,0.1),
-                  sex = "M",
-                  doe = 1990,
-                  dob = 1940,
-              lex.Cst = "NRA",
-              lex.dur = 1 )
-str( nd )
-matshade( nd$tfi, ci.pred( mx, newdata=nd )*100, plot=TRUE,
-          type="l", lty=1, lwd=c(3,1,1), col="black",
-          log="y", xlab="Time since entry (years)",
-                   ylab="ESRD rate (per 100 PY) for 50 year man" )
-@ % $
+nd <- data.frame(tfi = seq(0,20,0.1),
+                 sex = "M",
+                 doe = 1990,
+                 dob = 1940,
+             lex.Cst = "NRA")
+str(nd)
+matshade(nd$tfi, cbind(ci.pred(mp, newdata = nd),
+                       ci.pred(mx, newdata = nd)) * 100, plot = TRUE,
+         type="l", lwd = 3:4, col = c("black", "forestgreen"),
+         log = "y", xlab = "Time since entry (years)",
+         ylab = "ESRD rate (per 100 PY) for 50 year man")
+@ %
 Try to overlay with the corresponding prediction from the
-\texttt{glm} model using \texttt{ns}. 
-
-\item Apart from the baseline timescale, time since NRA, the time
-  since remission might be of interest in describing the mortality
-  rate.  However this is only relevant for persons who actually have a
-  remission, but there is only 28 persons in this group and 8 events
-  --- this can be read of the plot with the boxes. With this rather
-  limited number of events we can certainly not expect to be able to
-  model anything more complicated than a linear trend with time since
-  remission.  The variable we want to have in the model is current
-  date (\texttt{per}) minus date of remission (\texttt{dor}):
-  \texttt{per-dor}, but \emph{only} positive values of it. This can be
-  fixed by using \texttt{pmax()}, but we must also deal with all those
-  who have missing values of \texttt{dor}, so construct a variable
-  which is 0 for persons in \texttt{NRA} and time since remission for
-  persons in \texttt{Rem}:
-<<>>=
-sLc <- transform( sLc, tfr = pmax( (per-dor)/10, 0, na.rm=TRUE ) )
-@ %
-
-\item Now expand the model with this variable:
-<<time-since-rem>>=
-mPx <- gam( cbind(lex.Xst %in% EP,lex.dur) ~ s( tfi, k=10 ) +
-            factor(sex) + I((doe-dob-40)/10) + I(lex.Cst=="Rem") + tfr,
-            family = poisreg, 
-              data = sLc )
-round( ci.exp( mPx ), 3 )
-@ %
-What can you say about the effect of time since remisssion on the rate
-of ESRD?
+\texttt{glm} model using \texttt{Ns}.
 \end{enumerate}
-
-\subsection{Prediction in a multistate model}
-
+\subsection{Prediction from the multistate model}
 If we want to make proper statements about the survival and disease
 probabilities we must know not only how the occurrence of remission
 influences the rate of death/ESRD, but we must also model the
 occurrence rate of remission itself.
-
-\begin{enumerate}[resume] 
+\begin{enumerate}[resume]
 \item The rates of ESRD were modelled by a Poisson model with
   effects of age and time since NRA --- in the models \texttt{mp}
   and \texttt{mx}.  But if we want to model whole process we must
-  also model the remission rates transition from \texttt{NRA} to
-  \texttt{Rem}, but the number of events is rather small so we restrict
+  also model the remission rates transition from ``NRA'' to
+  ``Rem'', but the number of events is rather small so we restrict
   covariates in this model to only time since NRA and sex. Note
-  that only the records that relate to the \texttt{NRA} state can be
-  used:
+  that only the records that represent follow-up in the ``NRA''
+  state should be used; this is most easily done using the
+  \texttt{gam.Lexis} function
 <<rem-inc-mgcv>>=
-mr <- gam( cbind(lex.Xst=="Rem",lex.dur) ~ s( tfi, k=10 ) + sex,
-           family = poisreg,
-             data = subset( sLc, lex.Cst=="NRA" ) )
-ci.exp( mr, pval=TRUE )
-@ %
-However it would be more convenient to use \texttt{gam.Lexis} with the
-\texttt{to} argument, whic will model all transitions \texttt{into}
-the states named in the argument \texttt{to} (in this case only one): 
-<<>>=
-mr <- gam.Lexis( sLc, to="Rem", formula= ~ s( tfi, k=10 ) + sex +
-                                I((doe-dob-40)/10) + I(lex.Cst=="Rem") )
-@ %
-What is the remission rate-ratio between men and women?
-
+mr <- gam.Lexis(sLc, ~ s( tfi, k=10 ) + sex,
+                     from = "NRA",
+                       to = "Rem")
+ci.exp(mr, pval = TRUE)
+@
+What is the remission rate-ration between men and women?
 \item If we want to predict the probability of being in each of the
   three states using these estimated rates, we may resort to
   analytical calculations of the probabilities from the estimated
-  rates, which is doable in this case, but which will be largely
-  intractable for more complicated models. 
-
+  rates, which is actually doable in this case, but which will be largely
+  intractable for more complicated models.
   Alternatively we can \emph{simulate} the life course for a large
   group of (identical) individuals through a model using the estimated
   rates. That will give a simulated cohort (in the form of a
@@ -429,116 +316,100 @@ What is the remission rate-ratio between men and women?
   to this is the initial status of the persons whose life-course we
   shall simulate, and the transition rates in suitable form:
 \begin{itemize}
-  
 \item Suppose we want predictions for men aged 50 at
   NRA. The input is in the form of a \texttt{Lexis} object (where
-  \texttt{lex.dur} and \texttt{lex.Xst} will be ignored --- these two
-  variables are the response variables to be simulated).
- 
-  Note that in order to carry over the necessary attributes from the
-  \texttt{Lexis} object \texttt{sLc} to our initiation data set we
-  construct the initiation data as a one-line subset of \texttt{sLc},
-  and just overwrite all values:
+  \texttt{lex.dur} and \texttt{lex.Xst} will be ignored). Note that in
+  order to carry over the \texttt{time.scales} and the
+  \texttt{time.since} attributes, we construct the input object using
+  \texttt{subset} to select columns, and \texttt{NULL} to select rows
+  (see the example in the help file for \texttt{simLexis}):
 <<>>=
-inL <- sLc[1,1:11]
-timeSince(inL)
+inL <- subset( sLc, select=1:11 )[NULL,]
+str( inL )
+timeScales(inL)
 inL[1,"lex.id"] <- 1
 inL[1,"per"] <- 2000
 inL[1,"age"] <- 50
 inL[1,"tfi"] <- 0
-inL[1,"lex.dur"] <- NA
 inL[1,"lex.Cst"] <- "NRA"
 inL[1,"lex.Xst"] <- NA
+inL[1,"lex.dur"] <- NA
 inL[1,"sex"] <- "M"
 inL[1,"doe"] <- 2000
 inL[1,"dob"] <- 1950
-inL <- inL[c(1,1),]
+inL <- rbind( inL, inL )
 inL[2,"sex"] <- "F"
 inL
 str( inL )
 @ %
-
 \item The other input for the simulation is the transitions, which is
   a list with an element for each transient state (that is ``NRA'' and
   ``Rem''), each of which is again a list with names equal to the
   states that can be reached from the transient state. The content of
-  the list will be model objects (\texttt{glm}, \texttt{gam} or
-  \texttt{coxph}), in this case the models we just fitted, describing
-  the transition rates:
+  the list will be \texttt{glm} objects, in this case the models we
+  just fitted, describing the transition rates:
 <<>>=
 Tr <- list( "NRA" = list( "Rem"  = mr,
                           "ESRD" = mx ),
             "Rem" = list( "ESRD(Rem)" = mx ) )
 @ %
 \end{itemize}
-With this as input we can now generate a cohort, using \texttt{N=10}
+With this as input we can now generate a cohort, using \texttt{N=5}
 to simulate life course of 10 persons (5 for each set of starting values
 in \texttt{inL}):
 <<first-sim>>=
-( iL <- simLexis( Tr, inL, N=5 ) )
-str(iL)
-summary( iL )
+( iL <- simLexis( Tr, inL, N=10 ) )
+summary( iL, by="sex" )
 @ %
-What type of object have you got as \texttt{iL}?
-
+What type of object have you got as \texttt{iL}.
+Simulate a couple of thousand persons.
 \item Now generate the life course of 5,000 persons, and look at the summary.
   The \texttt{system.time} command is just to tell you how long it
   took, you may want to start with 1000 just to see how long that takes.
 <<5000-sim>>=
-system.time( sM <- simLexis( Tr, inL, N=5000 ) )
+system.time(
+sM <- simLexis( Tr, inL, N = 5000, t.range = 12 ) )
 summary( sM, by="sex" )
 @ %
 Why are there so many ESRD-events in the resulting data set?
-
 \item Now count how many persons are present in each state
-  at each time for the first 10 years after entry (at age 50). This
+  at each time for the first 10 years after entry (which is at age 50). This
   can be done by using \texttt{nState}. Try:
 <<nState>>=
-nStm <- nState( subset(sM,sex=="M"), 
-                at=seq(0,10,0.1), from=50, time.scale="age" )
-nStf <- nState( subset(sM,sex=="F"), 
-                at=seq(0,10,0.1), from=50, time.scale="age" )
+nStm <- nState( subset(sM,sex=="M"), at=seq(0,10,0.1), from=50, time.scale="age" )
+nStf <- nState( subset(sM,sex=="F"), at=seq(0,10,0.1), from=50, time.scale="age" )
 head( nStf )
 @ %
-What is in the object \texttt{nStf}?
-
-\item With the counts of persons in each state at the designated time
-  points (in \texttt{nStm}), compute the cumulative fraction over the
-  states, arranged in order given by the permutation \texttt{pm}. W
-  just check that the states apper in the right order with the
-  permuation \texttt{prm}:
+What is tn the object \texttt{nStf}?
+\item With the counts of persons in each state at the
+  designated time points (in \texttt{nStm}), compute the cumulative fraction over the
+  states, arranged in order given by \texttt{perm}:
 <<pState>>=
-prm <- c(2,1,3,4)
-colnames( nStm )[prm]
-ppm <- pState( nStm, perm=prm )
-ppf <- pState( nStf, perm=prm )
+ppm <- pState( nStm, perm=c(2,1,3,4) )
+ppf <- pState( nStf, perm=c(2,1,3,4) )
 head( ppf )
 tail( ppf )
 @ %
 What do the entries in \texttt{ppf} represent?
-
 \item Try to plot the cumulative probabilities using the \texttt{plot}
   method for \texttt{pState} objects:
 <<plot-pp,fig=TRUE>>=
 plot( ppf )
 @ %
-What does the plot show? Is this useful?
-
+Is this useful?
 \item Now try to improve the plot so that it is easier to read, and
-  easier to compare men and women. Before you run each line, read it
-  carefully and explain what the command does. We could do:
+  easier to comapre men and women:
 <<new-nState,fig=TRUE>>=
-par( mfrow=c(1,2), las=1 )
+par( mfrow=c(1,2) )
 plot( ppm, col=c("limegreen","red","#991111","forestgreen") )
 lines( as.numeric(rownames(ppm)), ppm[,"Rem"], lwd=4 )
-text( 59.5, 0.75, "Men", adj=1, col="white", font=2, cex=1.2 )
+text( 59.5, 0.95, "Men", adj=1, col="white", font=2, cex=1.2 )
 axis( side=4, at=0:10/10 )
 axis( side=4, at=1:99/100, labels=NA, tck=-0.01 )
-plot( ppf, col=c("limegreen","red","#991111","forestgreen"), 
-      xlim=c(60,50), yaxt="n", ylab="" )
+plot( ppf, col=c("limegreen","red","#991111","forestgreen"), xlim=c(60,50) )
 lines( as.numeric(rownames(ppf)), ppf[,"Rem"], lwd=4 )
-text( 59.5, 0.75, "Women", adj=0, col="white", font=2, cex=1.2 )
-axis( side=2, at=0:10/10, label=NA )
+text( 59.5, 0.95, "Women", adj=0, col="white", font=2, cex=1.2 )
+axis( side=2, at=0:10/10 )
 axis( side=2, at=1:99/100, labels=NA, tck=-0.01 )
 @ %
 What is the 10-year risk of remission for men and women respectively?

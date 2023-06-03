@@ -1,9 +1,9 @@
-\documentclass[handout,12pt,dvipsnames,t]{beamer}
+\documentclass[12pt,dvipsnames,t,aspectratio=169]{beamer}
 \setbeamertemplate{footline}[frame number]
-\title{Poisson and Logistic Regression \newline }
-\author{Janne Pitk\"aniemi (initial slides EL) \newline \newline }
-\institute{Finnish Cancer Registry \newline \newline
-\normalsize Statistical Practice in Epidemiology (2019, Tartu) }
+\title{Poisson and Binary Regression \newline}
+\author{Janne Pitk\"aniemi }
+\institute{Finnish Cancer Registry \newline Tampere university \newline \newline
+\normalsize Statistical Practice in Epidemiology (2023, Tartu) }
 \date{}
 
 \usepackage{listings}
@@ -47,8 +47,8 @@ keywords={}
 \begin{itemize}
 \item Incidence rates, rate ratios and rate differences from\\ {\it follow-up studies}
  can be computed by fitting {\it Poisson regression models}.
-\item Odds ratios can be computed from binary data by fitting \\ {\it Logistic regression models}.
-\item Odds-ratios can be estimated from case-control studies.
+\item Risk ratios and differences can be computed from binary data by fitting \\ {\it Logistic regression models}.
+%\item Odds-ratios can be estimated from case-control studies.
 \item Both models are special instances of \\
 {\it Generalized linear models}.
 \item There are various ways to do these tasks in R.
@@ -59,15 +59,15 @@ keywords={}
 %----------------------------------------------------------------------
 \begin{frame}
 \frametitle{The Estonian Biobank cohort: survival among the elderly}
-Follow-up of 60 random individuals aged 75-103 at recruitment, until death ($\bullet$) or censoring (o) in April 2014 (linkage with the Estonian Causes of Death Registry). \\[-0.5cm]
-\includegraphics[height=6.5cm]{over75lines}
+Follow-up of 60 random individuals aged 75-103 at recruitment, until death ($\bullet$) or censoring (o) in April 2014 (linkage with the Estonian Causes of Death Registry). (time-scale: calendar time). \\[-0.5cm]
+\includegraphics[height=6.0cm]{over75lines}
 \end{frame}
 
 %----------------------------------------------------------------------
 \begin{frame}
 \frametitle{The Estonian Biobank cohort: survival among the elderly}
 Follow-up time for 60 random individuals aged 75-103 at recruitment (time-scale: time in study). \\[-0.5cm]
-\includegraphics[height=6.5cm]{over75fulines}
+\includegraphics[height=6.0cm]{over75fulines}
 \end{frame}
 
 \begin{frame}
@@ -103,7 +103,7 @@ Total no. cases, person-years \& rate (/1000 y):
    D      Y         R 
   884.00 11678.24    75.70 
 \end{lstlisting}
-Two R-implementations of the rate estimation with Poisson regression:\vspace*{-0.5cm}
+R-implementation of the rate estimation with Poisson regression:\vspace*{-0.5cm}
 \begin{columns}
 \setlength{\partopsep}{0pt}
 \begin{column}[t]{0.5\textwidth}
@@ -114,14 +114,15 @@ A model with offset term
 > m1 <- glm( D ~ 1, family=poisson, offset=log(Y))
 
 > coef(m1)
-(Intercept) 
-  -2.581
+(Intercept)
+ -2.581
 \end{lstlisting}
 \end{column}
 \begin{column}[t]{0.5\textwidth}
 \small
 \begin{lstlisting}
-A model with poisreg-family
+A model with poisreg-family (Epi package)
+
 > glm(cbind(D, Y) ~1, family=poisreg)
 
 Coefficients:
@@ -130,7 +131,8 @@ Coefficients:
 \end{lstlisting}
 \end{column}
 \end{columns}
-\emph{Why do we get the same results?}
+
+From the coefficient we get estimate of the rate $exp(-2.581)*1000=75.70$
 \end{frame}
 
 %----------------------------------------------------------------------
@@ -139,13 +141,11 @@ Coefficients:
 
 Let $Y\sim exp(\lambda)$, then $f(y;\lambda)=\lambda e^{-\lambda y} I(y > 0 )$
 
-Constant rate: $\lambda(y)=\frac{f(y;\lambda)}{S(y;\lambda)}=\lambda$
+Constant rate model: $\lambda(y)=\frac{f(y;\lambda)}{S(y;\lambda)}=\lambda$ and observed data $ \left\{ (y_i,\delta_i); i=1,...,n \right\}$. \newline
 
-Observed data $ \left\{ (y_i,\delta_i); i=1,...,n \right\}$.
+The likelihood \vspace*{0.2in} $L(\lambda)=\prod_{i=1}^{n} \lambda^{\delta_i} e^{-\lambda y_i}$ and \\[-0.5cm] $log(L)= \sum\limits_{i=1}^{n} \left[  \delta_i log(\lambda)-\lambda y_i \right]$
 
-The likelihood \vspace*{0.2in} $L(\lambda)=\prod_{i=1}^{n} \lambda^{\delta_i} e^{-\lambda y_i}$ and $log(L)= \sum\limits_{i=1}^{n} \left[  \delta_i log(\lambda)-\lambda y_i \right]$
-
-Solving the {\it score equations}: \ $\frac{\partial \log L(\lambda)}{\partial \lambda} = \sum \left[  \frac{\delta_i}{\lambda} -y_i \right] $ \\ %\vspace*{0.2in}
+Solving the {\it score equations}: \newline \newline $\frac{\partial \log L(\lambda)}{\partial \lambda} = \sum \left[  \frac{\delta_i}{\lambda} -y_i \right] $  %\vspace*{0.2in}
  $=  \frac{D}{\lambda} - Y = 0 $ and $  D-\lambda Y   =  0   $ \vspace*{0.5cm}
 
 $\rightarrow$
@@ -167,9 +167,12 @@ $$
 
 \item We should use an offset if we suspect that the
 underlying \textbf{population sizes (person-years) differ }
-for each of the observed counts -- For example varying person-years by tratment group, sex,age,... 
+for each of the observed counts -- For example varying person-years by sex,age,treatment group,... 
 
 \item We need a term in the model that "scales" the likelihood, but does not depend on model parameters ( include a \textbf{term with reg. coef. fixed to 1}) -- offset term is log(y)
+\item This is all taken care of by family=poisreg -- recommend to use
+
+
 \end{itemize}
 
 \begin{center}
@@ -204,7 +207,7 @@ Outcome of interest: death
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile]
-\frametitle{Comparing rates: thorotrast vs. control}
+\frametitle{Tabulating rates: thorotrast vs. control}
 Tabulating cases, person-years \& rates by group
 
 \lstset{basicstyle=\footnotesize}
@@ -221,13 +224,13 @@ Tabulating cases, person-years \& rates by group
   thor          807  748.00 19243.85   38.87
  --------------------------------------------
 \end{lstlisting}
-\normalsize
-Rate ratio, RR = $38.89/26.12 = 1.49$, \\
-Std. error of log-RR, SE  = $\sqrt{1/748 + 1/797} = 0.051$, \\
-Error factor, EF = $\exp(1.96 \times 0.051) = 1.105$, \\
-95\% confidence interval for RR:\\
-$(1.49/1.105, 1.49\times 1.105) =
- (1.35, 1.64)$.
+\footnotesize
+%Rate ratio, RR = $38.89/26.12 = 1.49$, 
+%Std. error of log-RR, SE  = $\sqrt{1/748 + 1/797} = 0.051$, \\
+%Error factor, EF = $\exp(1.96 \times 0.051) = 1.105$, \\
+%95\% confidence interval for RR:
+%$(1.49/1.105, 1.49\times 1.105) =
+% (1.35, 1.64)$.
 \end{frame}
 
 
@@ -238,8 +241,7 @@ $(1.49/1.105, 1.49\times 1.105) =
 \item Insert person years in units that you want rates in
 \lstset{basicstyle=\footnotesize}
 \begin{lstlisting}
-> m2 <- glm( d ~ contrast, offset=log(y/1000),
-+                family = poisson )
+> m2 <- glm( cbind(d,y/1000) ~ contrast,family = poisreg(link="log") )
 > round( summary(m2)$coef, 4)[, 1:2]
 
               Estimate Std. Error
@@ -252,7 +254,6 @@ Call function {\tt ci.exp()} in {\tt Epi}
 \lstset{basicstyle=\ttfamily\footnotesize}
 \begin{lstlisting}
 > round( ci.exp( m2 ), 3 )
-
               exp(Est.)   2.5%  97.5%
 (Intercept)      26.116 24.364 27.994
 contrast thor     1.488  1.347  1.644
@@ -270,9 +271,7 @@ contrast thor     1.488  1.347  1.644
 \item Insert person-years in units that you want rates in
 \lstset{basicstyle=\ttfamily\footnotesize}
 \begin{lstlisting}
-> m3 <- glm( d ~ contrast - 1, 
-                 offset=log(y/1000),
-+                family = poisson )
+> m3 <- glm( cbind(d,y/1000) ~ factor(contrast)-1,family = poisreg)
 > round( summary(m3)$coef, 4)[, 1:2]
 
               Estimate Std. Error
@@ -290,57 +289,57 @@ contrast thor    38.870 36.181 41.757
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]
-\frametitle{Rates in groups with Poisson regression}
-\begin{itemize}[<+->]
-\item You can have it all in one go:
-\lstset{basicstyle=\ttfamily\footnotesize}
-\begin{lstlisting}
-> CM <- rbind( c(1,0), c(0,1), c(-1,1) )
-> rownames(CM) <- c("Ctrl","Thoro","Th vs.Ct")
-> colnames(CM) <- names( coef(m3) )
-> CM
-          contrast ctrl contrast thor
-Ctrl                  1             0
-Thoro                 0             1
-Th vs. Ct            -1             1
-\end{lstlisting}
-
-\begin{lstlisting}
-> round( ci.exp( m3, ctr.mat=CM ),3 )
-\end{lstlisting}
-\begin{lstlisting}
-          exp(Est.)   2.5%  97.5%
-Ctrl         26.116 24.364 27.994
-Thoro        38.870 36.181 41.757
-Th vs. Ct     1.488  1.347  1.644
-\end{lstlisting}
-\normalsize
-\end{itemize}
-\end{frame}
+% \begin{frame}[fragile]
+% \frametitle{Rates in groups with Poisson regression}
+% \begin{itemize}[<+->]
+% \item You can have it all in one go:
+% \lstset{basicstyle=\ttfamily\footnotesize}
+% \begin{lstlisting}
+% > CM <- rbind( c(1,0), c(0,1), c(-1,1) )
+% > rownames(CM) <- c("Ctrl","Thoro","Th vs.Ct")
+% > colnames(CM) <- names( coef(m3) )
+% > CM
+%           contrast ctrl contrast thor
+% Ctrl                  1             0
+% Thoro                 0             1
+% Th vs. Ct            -1             1
+% \end{lstlisting}
+% 
+% \begin{lstlisting}
+% > round( ci.exp( m3, ctr.mat=CM ),3 )
+% \end{lstlisting}
+% \begin{lstlisting}
+%           exp(Est.)   2.5%  97.5%
+% Ctrl         26.116 24.364 27.994
+% Thoro        38.870 36.181 41.757
+% Th vs. Ct     1.488  1.347  1.644
+% \end{lstlisting}
+% \normalsize
+% \end{itemize}
+% \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]
-\frametitle{Rate ratio estimation with Poisson regression}
-
-\begin{itemize}
-\item Response may also be specified as individual {\it rates}:\\
-{\tt d/y} \\
-{\tt weights=} instead of {\tt offset=} are needed.
-\lstset{basicstyle=\ttfamily\footnotesize}
-\begin{lstlisting}
-> m4<-glm( d/(y/1000)~contrast, weights=y/1000,
-+            family=poisson)
-> round( ci.exp(m4), 3 )
-\end{lstlisting}
-\begin{lstlisting}
-              exp(Est.)   2.5%  97.5%
-(Intercept)      26.116 24.365 27.994
-contrast thor     1.488  1.347  1.644
-\end{lstlisting}
-\normalsize
-\end{itemize}
-\end{frame}
+% \begin{frame}[fragile]
+% \frametitle{Rate ratio estimation with Poisson regression}
+% 
+% \begin{itemize}
+% \item Response may also be specified as individual {\it rates}:\\
+% {\tt d/y} \\
+% {\tt weights=} instead of {\tt offset=} are needed.
+% \lstset{basicstyle=\ttfamily\footnotesize}
+% \begin{lstlisting}
+% > m4<-glm( d/(y/1000)~contrast, weights=y/1000,
+% +            family=poisson)
+% > round( ci.exp(m4), 3 )
+% \end{lstlisting}
+% \begin{lstlisting}
+%               exp(Est.)   2.5%  97.5%
+% (Intercept)      26.116 24.365 27.994
+% contrast thor     1.488  1.347  1.644
+% \end{lstlisting}
+% \normalsize
+% \end{itemize}
+% \end{frame}
 
 
 %----------------------------------------------------------------------
@@ -351,8 +350,9 @@ contrast thor     1.488  1.347  1.644
 \item The approach with \texttt{d/y} enables additive rate models too:
 \lstset{basicstyle=\ttfamily\footnotesize}
 \begin{lstlisting}
-> m5 <-glm(d/(y/1000) ~contrast,weights=y/1000,
-+            family=poisson(link="identity") )
+> contrast<-c(0,1)
+> m5 <-glm(cbind(d,y/1000) ~contrast,
+           family=poisreg(link="identity") )
 > round( ci.exp(m5,Exp=F), 3 )
 \end{lstlisting}
 \begin{lstlisting}
@@ -364,35 +364,35 @@ contrast thor   12.753  9.430 16.077
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]
-\frametitle{Rates difference}
-\begin{itemize}
-\item As before you can have it all:
-\lstset{basicstyle=\ttfamily\footnotesize}
-\begin{lstlisting}
-> m6 <- glm( d/(y/1000) ~ contrast -1,
-+  family = poisson(link="identity"), 
-+  weights = y/1000)
-> round(ci.exp(m6, ctr.mat=CM, Exp=F ), 3)
-\end{lstlisting}
-\begin{lstlisting}
-          Estimate   2.5%  97.5%
-Ctrl        26.116 24.303 27.929
-Thoro       38.870 36.084 41.655
-Th vs. Ct   12.753  9.430 16.077
-\end{lstlisting}
-\begin{lstlisting}
-> round( ci.exp( m3, ctr.mat=CM), 3 )
-\end{lstlisting}
-\begin{lstlisting}
-          exp(Est.)   2.5%  97.5%
-Ctrl         26.116 24.364 27.994
-Thoro        38.870 36.181 41.757
-Th vs. Ct     1.488  1.347  1.644
-\end{lstlisting}
-\normalsize
-\end{itemize}
-\end{frame}
+% \begin{frame}[fragile]
+% \frametitle{Rates difference}
+% \begin{itemize}
+% \item As before you can have it all:
+% \lstset{basicstyle=\ttfamily\footnotesize}
+% \begin{lstlisting}
+% > m6 <- glm( d/(y/1000) ~ contrast -1,
+% +  family = poisson(link="identity"), 
+% +  weights = y/1000)
+% > round(ci.exp(m6, ctr.mat=CM, Exp=F ), 3)
+% \end{lstlisting}
+% \begin{lstlisting}
+%           Estimate   2.5%  97.5%
+% Ctrl        26.116 24.303 27.929
+% Thoro       38.870 36.084 41.655
+% Th vs. Ct   12.753  9.430 16.077
+% \end{lstlisting}
+% \begin{lstlisting}
+% > round( ci.exp( m3, ctr.mat=CM), 3 )
+% \end{lstlisting}
+% \begin{lstlisting}
+%           exp(Est.)   2.5%  97.5%
+% Ctrl         26.116 24.364 27.994
+% Thoro        38.870 36.181 41.757
+% Th vs. Ct     1.488  1.347  1.644
+% \end{lstlisting}
+% \normalsize
+% \end{itemize}
+% \end{frame}
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile]
@@ -452,21 +452,9 @@ add_header_above(c(" ", "Treatment group" = 2))
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile]
-The difference between the probabilities is the fraction of the
-patients that benefit from the treatment: $ p_\text{Dal}- p_\text{Pl}$
-% \begin{eqnarray*}
-% \hat p_\text{Dal} -
-% \hat p_\text{Pl} & = & 20\% \\ \\
-% \se(\hat p_\text{Dal} - \hat p_\text{Pl}) & = &
-%  \sqrt{
-%  \frac{p_\text{Dal}(1-p_\text{Dal})}
-%       {n_\text{Dal}} +
-%  \frac{p_\text{Pl}(1-p_\text{Pl})}
-%       {n_\text{Pl}} } \\ & = & 0.11 \\ \\
-% 95\% \text{c.i.} & : & 20\% \pm 1.96 \times 11\% = ( 0\%;  40\% )
-% \end{eqnarray*}
+\frametitle{Binary data: Crosstabulation analysis of 2x2 table}
 
-%\lstset{basicstyle=\ttfamily\scriptsize}
+\lstset{basicstyle=\ttfamily\scriptsize}
 
 \begin{footnotesize}
 <<test, echo=TRUE,eval=FALSE,results=tex>>=
@@ -479,60 +467,43 @@ kable(twoby2( dlt ),"latex")
 \end{footnotesize}
 
 
-\begin{footnotesize}
+\begin{scriptsize}
 \begin{lstlisting}
 2 by 2 table analysis:
     Better Worse    P(Better) 95% conf. interval
 Dal     29    14       0.6744    0.5226   0.7967
 Pl      20    22       0.4762    0.3316   0.6249
-
                                    95% conf. interval
              Relative Risk: 1.4163    0.9694   2.0692
          Sample Odds Ratio: 2.2786    0.9456   5.4907
 Conditional MLE Odds Ratio: 2.2560    0.8675   6.0405
     Probability difference: 0.1982   -0.0110   0.3850
-             
+
              Exact P-value: 0.0808
         Asymptotic P-value: 0.0665
 \end{lstlisting}
-\end{footnotesize}
+\end{scriptsize}
 \normalsize
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Logistic regression for binary data}
+  \frametitle{Binary regression -- estimation of odds ratio}
   For grouped binary data, the response is a two-column matrix with
   columns (successes,failures).
+  \begin{scriptsize}
+<<PR, echo=TRUE,eval=TRUE,results=tex,>>=
+library(Epi)
+library(xtable)
+dlt <- data.frame(rbind( c(29,14),c(20,22) ))
+colnames( dlt ) <- c("Better","Worse")
+dlt$trt <- c(1,0)
+b2<-glm(cbind(Better,Worse)~trt,
+          family=binomial(link="logit"),
+          data=dlt)
 
-% \begin{lstlisting}
-% > trt <- factor(c("Dal","Pl"))
-% > b1 <- glm( dlt ~ trt, family=binomial )
-% > ci.exp( b1 )
-% \end{lstlisting}
-% \begin{lstlisting}
-%             exp(Est.)      2.5%    97.5%
-% (Intercept) 2.0714286 1.0945983 3.919992
-% trtPl       0.4388715 0.1821255 1.057557
-% \end{lstlisting}
-% Oops! Dalterapin has become the reference group; we want Placebo to be
-% the reference\ldots
-% \end{frame}
-
-%----------------------------------------------------------------------
-%\begin{frame}[fragile]
-%  \frametitle{Logistic regression for binary data}
-
-\begin{lstlisting}
-trt <- factor(c("Dal","Pl"))
-trt <- relevel( trt, 2 )
-b1 <- glm( dlt ~ trt, family=binomial )
-round( ci.exp( b1 ), 4 )
-\end{lstlisting}
-\begin{lstlisting}
-            exp(Est.)   2.5%  97.5%
-(Intercept)    0.9091 0.4962 1.6657
-trtDal         2.2786 0.9456 5.4907
-\end{lstlisting}
+xtable(round( ci.exp( b2 ), digits=6 ))
+@
+\end{scriptsize}
 \begin{itemize}
 \item The default parameters in logistic regression are \textbf{odds} (the
 intercept: $20/22=0.9090$) and the \textbf{odds-ratio}
@@ -545,42 +516,64 @@ intercept: $20/22=0.9090$) and the \textbf{odds-ratio}
 \end{frame}
 
 
-\begin{frame}[fragile]
-\frametitle{Logistic regression for binary data - Risk ratio (Relative risk)}
+% \begin{frame}[fragile]
+% \frametitle{Binary regression - Estimation of risk ratio (Relative risk)}
+% 
+% \footnotesize{
+% <<PR, echo=TRUE,eval=TRUE,results=tex,>>=
+% library(Epi)
+% library(xtable)
+% 
+% dlt <- rbind( c(29,14), c(20,22) )
+% diab<-expand.grid(dlt)
+% colnames(diab)[1]<-"d"
+% diab$out <- c("Better","Better","Worse","Worse")
+% diab$trt <- as.factor(c("Dal","Pl","Dal","Pl"))
+% diab$totals<-rep(rowSums(dlt),2)
+% diab$trt<-relevel( diab$trt, 2 )
+% print(xtable(diab,digits=c(0,0,0,0,0)),include.rownames = F)
+% @
+% }
+% 
+% \end{frame}
 
-\footnotesize{
+\begin{frame}[fragile]
+\frametitle{Binary regression - Estimation of risk ratio (Relative risk)}
 <<PR, echo=TRUE,eval=TRUE,results=tex,>>=
 library(Epi)
 library(xtable)
 
-dlt <- rbind( c(29,14), c(20,22) )
-diab<-expand.grid(dlt)
-colnames(diab)[1]<-"d"
-diab$out <- c("Better","Better","Worse","Worse")
-diab$trt <- as.factor(c("Dal","Pl","Dal","Pl"))
-diab$totals<-rep(rowSums(dlt),2)
-diab$trt<-relevel( diab$trt, 2 )
-print(xtable(diab,digits=c(0,0,0,0,0)),include.rownames = F)
-@
-}
-
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Logistic regression for binary data - risk ratio}
-
-<<PR, echo=TRUE,eval=TRUE,results=tex,>>=
-library(Epi)
-library(xtable)
-
-b2 <- glm(d/totals~trt, 
-          weights=totals,
+dlt <- data.frame(rbind( c(29,14),c(20,22) ))
+colnames( dlt ) <- c("Better","Worse")
+dlt$trt <- c(1,0)
+b2<-glm(cbind(Better,Worse)~trt,
           family=binomial(link="log"),
-          data=diab[c(1,2),])
+          data=dlt)
+
 xtable(round( ci.exp( b2 ), digits=6 ))
 @
 
 Diabetics with Dalterapin treatment are 1.4 times likely to get better than those treated with placebo
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Binary regression - Estimation of risk difference}
+<<PR, echo=TRUE,eval=TRUE,results=tex,>>=
+library(Epi)
+library(xtable)
+
+dlt <- data.frame(rbind( c(29,14),c(20,22) ))
+colnames( dlt ) <- c("Better","Worse")
+dlt$trt <- c(1,0)
+b2<-glm(cbind(Better,Worse)~trt,
+          family=binomial(link="identity"),
+          data=dlt)
+
+xtable(round( ci.exp( b2,Exp=F ), digits=6 ))
+@
+
+Twenty percent more of the Diabetics with Dalterapin treatment are getting better compared to Diabetics treated with placebo
 
 \end{frame}
 
@@ -601,182 +594,177 @@ Diabetics with Dalterapin treatment are 1.4 times likely to get better than thos
 % \end{itemize}
 
 
-
-\begin{frame}[fragile]
-\frametitle{Case-control study: Food-poisoning outbreak}
-
-\begin{itemize} %[<+->]
-\item An outbreak of acute gastrointestinal illness (AGI) occurred in
-  a psychiatric hospital in Dublin in 1996.
-\item Out of all 423 patients and staff members, 65 were
-  affected during 27 to 31 August, 1996.
-\item 65 cases and 62 randomly selected control subjects were
-  interviewed.
-\item Exposure of interest: chocolate mousse cake.
-\item 47 cases and 5 controls reported having eaten the cake.
-\end{itemize}
-
-{\small Ref: \verb|http://www.eurosurveillance.org/ViewArticle.aspx?|}
-{\small \verb|ArticleId=188|} -- here original numbers somewhat modified.
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Outbreak: crude summary of data}
-
-\begin{itemize}
-\item Target population information
- \begin{itemize}
-  \item N = 423, size of the whole study population
-  \item D = 65, no. of cases of AGI
-  \item B = 358, no. of non-cases
- \end{itemize}
-\item Case-control data
-\begin{itemize}
-\item  C = 62, no. of controls, random sample from 358 non-cases
-\item  f = 62/358 = 0.173, sampling fraction of non-cases
-\item  D1 = 47 cases exposed to chocolate mousse
-\item  D0 = 18 unexposed cases
-\item  C1 = 5 controls exposed to chocolate mousse
-\item  C0 = 57 unexposed controls
-\end{itemize}
-\end{itemize}
-
-%{\small Ref: \verb|http://www.eurosurveillance.org/ViewArticle.aspx?|}
-%{\small \verb|ArticleId=188|} -- here original numbers somewhat modified.
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Outbreak: results of analysis}
-
-Overall incidence proportion (IP) of AGI in the population
-
-\scriptsize{
-<<cc1 ,echo=TRUE,eval=TRUE>>=
-D <- 65; N <- 423; IP <- D/N 
-round(IP, 3)
-@
-}
-
-\normalsize
-Analysis of case-control data
-\scriptsize{
-<<cc2, echo=TRUE,eval=TRUE>>=
-D1 <- 47; D0 <- D - D1; 
-C <- 62 ; C1 <- 5; C0 <- C - C1
-@
-}
-
-\normalsize
-Case-control ratios by exposure (not as useful as the following!)
-\scriptsize{
-<<cc3, echo=TRUE,eval=TRUE>>=
-round( c( D1/C1, D0/C0 ), 2)
-@
-}
-\normalsize
-Exposure odds in cases and controls
-
-\scriptsize{
-<<cc4, echo=TRUE,eval=TRUE>>=
-round( c( D1/D0, C1/C0 ), 2)
-@
-}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Outbreak: results of analysis}
-
-Estimation of the incidence odds ratio (IOR) = exposure odds ratio 
-
-\scriptsize{
-<<cc5, echo=TRUE,eval=TRUE>>=
-IOR <- (D1/D0)/(C1/C0)
-SE.logIOR <- sqrt(1/D1 + 1/D0 + 1/C1 + 1/C0 )
-CI.IOR <- IOR * exp( c(-1,1)*1.96*SE.logIOR )
-round( c(IOR, SE.logIOR, CI.IOR ), 2)
-@
-}
-
-\normalsize
-Same with glm model
-
-\scriptsize{
-<<cc6, echo=TRUE,eval=TRUE>>=
-count<-c(D1,D0,C1,C0)
-cc<-c(1,1,0,0)
-exposed<-c(1,0,1,0)
-mousse<-data.frame(cbind(cc,exposed,count))
-ci.exp(glm(cc~exposed,weights=count,family="binomial",data=mousse))
-@
-}
-\end{frame}
-
-%----------------------------------
-\begin{frame}[fragile]
-\frametitle{Logistic regression in case-control studies}
-
-\begin{itemize}
-
-\item Model for disease occurrence in the target population:
-\begin{center}
-$ \ln\left[\frac{p}{1-p}\right] = \beta_0 + \beta_1 x_1 + \beta_2 x_2 $
-\end{center}
-
-\item Sampling fractions:
-  P(inclusion in study $\mid$ control)  =  $s_\text{ctr}$ 
-  P(inclusion in study  $\mid$ case)  =  $s_\text{case}$ 
-
-\item  Model for observed case-control data:
-  \begin{align*}
- \ln[\mbox{odds ( case | incl.) }]
-  & = \ln\left[\frac{p}{1-p}\right] +
-      \ln\left[\frac{s_\text{cas}}{s_\text{ctr}}\right] \\ \\
-  & =  \left( \ln\left[\frac{s_\text{cas}}{s_\text{ctr}}\right] + \beta_0 \right)
-         + \beta_1 x_1 + \beta_2 x_2
-  \end{align*}
-\end{itemize}
-\end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{Logistic regression in case-control studies}
-  
-  Analysis of $P(case | inclusion)$ --- \textit{i.e.} binary
-observations:
-$$
-Y=\left\{ \begin{array}{ll}
-          1 \quad \sim & \mbox{case}\\
-          0 \quad \sim & \mbox{control}
-                    \end{array} \right.
-$$
-$\ln[\mbox{odds ( case | incl.) }] =
- \left( \ln\left[\frac{s_\text{cas}}{s_\text{ctr}}\right] + \beta_0 \right)
-         + \beta_1 x_1 + \beta_2 x_2$
-\vspace*{1cm}
-\begin{itemize}
-\item Effect of covariates is estimated correctly.
-\item Intercept is meaningless \newline
-\hspace*{0.5cm} depends on $s_\text{cas}$ and $s_\text{ctr}$
-  that are often unknown.
-
-\end{itemize}
-\end{frame}
+% \begin{frame}[fragile]
+% \frametitle{Case-control study: Food-poisoning outbreak}
+% 
+% \begin{itemize} %[<+->]
+% \item An outbreak of acute gastrointestinal illness (AGI) occurred in
+%   a psychiatric hospital in Dublin in 1996.
+% \item Out of all 423 patients and staff members, 65 were
+%   affected during 27 to 31 August, 1996.
+% \item 65 cases and 62 randomly selected control subjects were
+%   interviewed.
+% \item Exposure of interest: chocolate mousse cake.
+% \item 47 cases and 5 controls reported having eaten the cake.
+% \end{itemize}
+% 
+% {\small Ref: \verb|http://www.eurosurveillance.org/ViewArticle.aspx?|}
+% {\small \verb|ArticleId=188|} -- here original numbers somewhat modified.
+% \end{frame}
+% 
+% \begin{frame}[fragile]
+% \frametitle{Outbreak: crude summary of data}
+% 
+% \begin{itemize}
+% \item Target population information
+%  \begin{itemize}
+%   \item N = 423, size of the whole study population
+%   \item D = 65, no. of cases of AGI
+%   \item B = 358, no. of non-cases
+%  \end{itemize}
+% \item Case-control data
+% \begin{itemize}
+% \item  C = 62, no. of controls, random sample from 358 non-cases
+% \item  f = 62/358 = 0.173, sampling fraction of non-cases
+% \item  D1 = 47 cases exposed to chocolate mousse
+% \item  D0 = 18 unexposed cases
+% \item  C1 = 5 controls exposed to chocolate mousse
+% \item  C0 = 57 unexposed controls
+% \end{itemize}
+% \end{itemize}
+% 
+% %{\small Ref: \verb|http://www.eurosurveillance.org/ViewArticle.aspx?|}
+% %{\small \verb|ArticleId=188|} -- here original numbers somewhat modified.
+% \end{frame}
+% 
+% \begin{frame}[fragile]
+% \frametitle{Outbreak: results of analysis}
+% 
+% Overall incidence proportion (IP) of AGI in the population
+% 
+% \scriptsize{
+% <<cc1 ,echo=TRUE,eval=TRUE>>=
+% D <- 65; N <- 423; IP <- D/N 
+% round(IP, 3)
+% @
+% }
+% 
+% \normalsize
+% Analysis of case-control data
+% \scriptsize{
+% <<cc2, echo=TRUE,eval=TRUE>>=
+% D1 <- 47; D0 <- D - D1; 
+% C <- 62 ; C1 <- 5; C0 <- C - C1
+% @
+% }
+% 
+% \normalsize
+% Case-control ratios by exposure (not as useful as the following!)
+% \scriptsize{
+% <<cc3, echo=TRUE,eval=TRUE>>=
+% round( c( D1/C1, D0/C0 ), 2)
+% @
+% }
+% \normalsize
+% Exposure odds in cases and controls
+% 
+% \scriptsize{
+% <<cc4, echo=TRUE,eval=TRUE>>=
+% round( c( D1/D0, C1/C0 ), 2)
+% @
+% }
+% \end{frame}
+% 
+% \begin{frame}[fragile]
+% \frametitle{Outbreak: results of analysis}
+% 
+% Estimation of the incidence odds ratio (IOR) = exposure odds ratio 
+% 
+% \scriptsize{
+% <<cc5, echo=TRUE,eval=TRUE>>=
+% IOR <- (D1/D0)/(C1/C0)
+% SE.logIOR <- sqrt(1/D1 + 1/D0 + 1/C1 + 1/C0 )
+% CI.IOR <- IOR * exp( c(-1,1)*1.96*SE.logIOR )
+% round( c(IOR, SE.logIOR, CI.IOR ), 2)
+% @
+% }
+% 
+% \normalsize
+% Same with glm model
+% 
+% \scriptsize{
+% <<cc6, echo=TRUE,eval=TRUE>>=
+% count<-c(D1,D0,C1,C0)
+% cc<-c(1,1,0,0)
+% exposed<-c(1,0,1,0)
+% mousse<-data.frame(cbind(cc,exposed,count))
+% ci.exp(glm(cc~exposed,weights=count,family="binomial",data=mousse))
+% @
+% }
+% \end{frame}
+% 
+% %----------------------------------
+% \begin{frame}[fragile]
+% \frametitle{Logistic regression in case-control studies}
+% 
+% \begin{itemize}
+% 
+% \item Model for disease occurrence in the target population:
+% \begin{center}
+% $ \ln\left[\frac{p}{1-p}\right] = \beta_0 + \beta_1 x_1 + \beta_2 x_2 $
+% \end{center}
+% 
+% \item Sampling fractions:
+%   P(inclusion in study $\mid$ control)  =  $s_\text{ctr}$ 
+%   P(inclusion in study  $\mid$ case)  =  $s_\text{case}$ 
+% 
+% \item  Model for observed case-control data:
+%   \begin{align*}
+%  \ln[\mbox{odds ( case | incl.) }]
+%   & = \ln\left[\frac{p}{1-p}\right] +
+%       \ln\left[\frac{s_\text{cas}}{s_\text{ctr}}\right] \\ \\
+%   & =  \left( \ln\left[\frac{s_\text{cas}}{s_\text{ctr}}\right] + \beta_0 \right)
+%          + \beta_1 x_1 + \beta_2 x_2
+%   \end{align*}
+% \end{itemize}
+% \end{frame}
+% 
+% \begin{frame}[fragile]
+%   \frametitle{Logistic regression in case-control studies}
+%   
+%   Analysis of $P(case | inclusion)$ --- \textit{i.e.} binary
+% observations:
+% $$
+% Y=\left\{ \begin{array}{ll}
+%           1 \quad \sim & \mbox{case}\\
+%           0 \quad \sim & \mbox{control}
+%                     \end{array} \right.
+% $$
+% $\ln[\mbox{odds ( case | incl.) }] =
+%  \left( \ln\left[\frac{s_\text{cas}}{s_\text{ctr}}\right] + \beta_0 \right)
+%          + \beta_1 x_1 + \beta_2 x_2$
+% \vspace*{1cm}
+% \begin{itemize}
+% \item Effect of covariates is estimated correctly.
+% \item Intercept is meaningless \newline
+% \hspace*{0.5cm} depends on $s_\text{cas}$ and $s_\text{ctr}$
+%   that are often unknown.
+% 
+% \end{itemize}
+% \end{frame}
 
 \begin{frame}
 \frametitle{Conclusion: What did we learn?}
 \begin{itemize} %[<+->]
-\item Poisson regression models.
+\item Rates, their ratio and difference can be analysed by Poisson regression
 \item In Poisson models the response can be either:
   \begin{itemize}
     \item case indicator {\tt d} with {\tt offset = log(y)}, or
-    \item rate {\tt d/y} with {\tt weights = y} or
-    \item case and person-years {\tt c(d,y)} as response in glm with poisreg-family (Epi-package)
+    \item case and person-years {\tt cbind(d,y)} with poisreg-family (Epi-package)
   \end{itemize}
 \item Both may be fitted on either grouped data, or individual
   records.
-\item Binary outcome can be modeled with odds.
-\item Case-control studies:\\
-  Odds-ratios can be computed by logistic
-  regression models, but \textbf{Intercept} from model is \textbf{meaningless}.
+\item Binary outcome can be modeled with binary regression.
 \end{itemize}
 \end{frame}
 \end{document}

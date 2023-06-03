@@ -36,45 +36,63 @@ and data. When you open a project in the RStudio GUI, your working
 directory is automatically changed to the directory associated with
 the project.
 
+You can display the current working directory with the {\tt getwd()}
+(``get working directory'') function and set it with the {\tt setwd()}
+(``set working directory'') function. The function {\tt dir()} can be
+used to see what files you have in the working directory.
+
+\subsection{The workspace}
+\label{subsection:workspace}
 
 You can quit \textsf{R} by typing
 \begin{verbatim}
 q()
 \end{verbatim}
 at the \textsf{R} command prompt. You will be asked if you want to
-save your workspace. We recommend that you answer ``no'' to this
+save your workspace. We strongly recommend that you answer ``no'' to this
 question. If you answer ``yes'' then R will write a file named
 \texttt{.RData} into the working directory containing all the objects
-you created during your session so that they will be available next
-time you start \textsf{R}. This may seem convenient but you will soon
-find that your workspace becomes cluttered with old objects.
+you created during your session. This file will be automatically loaded
+the next time you start \textsf{R} and this will restore all the objects
+in your workspace. 
 
-You can display the current working directory with the {\tt getwd()}
-function and set it with the {\tt setwd()} function. The function {\tt
-  dir()} can be used to see what files you have in the working
-directory.
+It may seem convenient to keep your R objects from one session to another.
+But this has many disadvantages.
+\begin{itemize}
+\item You may not remember how an object was created. This becomes a
+  problem if you need to redo your analysis after the data has been
+  changed or updated, or if you accidentally delete the object.
+\item An object might be modified or overwritten. In this case your 
+  analysis will give you a different answer but you will not know why.
+  You may not even notice that the answer has changed.
+\item It becomes impossible to clean your workspace if you cannot
+  rememeber which objects are required by which analyses. As a result,
+  your workspace will become cluttered with old objects.
+\end{itemize}
 
-\subsection{Read-evaluate-print}
-
-The simplest use of \textsf{R} is interactively. \textsf{R} will read
-in the command you type, evaluate them, then print out the
-answer. This is called the {\em read-eval-print loop}, or REPL for
-people who don't like words. In this exercise, we recommend that you
-work interactively. As the course evolves you will find that you need
-to switch to {\em script files}. We come back to this issue at the end
-of the exercise.
-
-It is important to remember that R is case sensitive, so that
-\texttt{A} is different from \texttt{a}. Commands in R are generally
-separated by a newline, although a semi-colon can also be used.
+We strongly recommend that you follow some basic principles of
+reproducible research.
+\begin{itemize}
+\item Always start with a clean (empty) workspace.
+\item Read in the data you need from a pristine source.
+\item Put your R commands in a script file so that they can be run
+  again in a future session.
+\item All modifications to the data that you need to make should be
+  done in R using a script and not by editing the data source. This
+  way, if the original data is modified or updated then you can run
+  the script again on the updated data.
+\end{itemize}
 
 \subsection{Using R as a calculator}
 
-Try using R as a calculator by typing different arithmetic expressions
-on the command line.  Note that R allows you to recall previous
-commands using the vertical arrow key. You can edit a recalled command
-and then resubmit it by pressing the return key. Keeping that in
-mind, try the following:
+Try using R as an interactive calculator by typing different
+arithmetic expressions on the command line.  Pressing the return key
+on the command line finishes the expression. R will then evaluate the
+expression and print out the result.
+
+Note that R allows you to recall previous commands using the vertical
+arrow key. You can edit a recalled command and then resubmit it by
+pressing the return key. Keeping that in mind, try the following:
 \begin{verbatim}
  12+16
  (12+16)*5
@@ -106,13 +124,13 @@ of nested braces.  To keep track of these, it helps to use a
 syntax-highlighting editor. For example, in RStudio, when you type an
 opening bracket ``('', RStudio will automatically add a closing
 bracket ``)'', and when the cursor moves past a closing bracket,
-RStudio will automatically highlight the corresponding opening bracket
-(in grey). Features like this can make it much easier to write R
-code free from syntax errors.
+RStudio will automatically highlight the corresponding opening
+bracket.  Features like this can make it much easier to write R code
+free from syntax errors.
 
-Instead of printing the result you can store it in an object, say
+Instead of printing the result to the screen, you can store it in an object, say
 \begin{verbatim}
- a <-  round(sqrt((12+16)*5),2)
+a <-  round(sqrt((12+16)*5),2)
 \end{verbatim}
 In this case \textsf{R} does not print anything to the screen. You can
 see the results of the calculation, stored in the object \texttt{a},
@@ -126,20 +144,16 @@ log10(a)   # log to the base 10
 The left arrow expression {\verb+ <-+}, pronounced ``gets'', is called
 the assignment operator, and is obtained by typing \verb+<+ followed
 by \verb+-+ (with no space in between).  It is also possible to use
-the equals sign \verb+=+ for assignment. Note that some \textsf{R}
-experts do not like this and recommend to use only ``gets'' for
-assignment, reserving \verb+=+ for function arguments,
+the equals sign \verb+=+ for assignment.
 
-You can also use a right arrow, as in
-\begin{verbatim}
- round(sqrt((12+16)*5),2) -> a
-\end{verbatim}
+Note that object names in R are case sensitive. So you can assign
+different values to objects named \texttt{A} and \texttt{a}.
 
 \subsection{Vectors}
 
 All commands in R are {\em functions} which act on {\em objects}.  One
 important kind of object is a {\em vector}, which is an ordered
-collection of numbers, or character strings (e.g. ``Charles Darwin'') ,
+collection of numbers, or character strings (e.g. ``Charles Darwin''),
 or logical values ({\tt TRUE} or {\tt FALSE}). The components of a
 vector must be of the same type (numeric, character, or logical).  The
 combine function {\tt c()}, together with the assignment operator, is
@@ -161,7 +175,7 @@ v
 and you will see that R understands what to do in each case. 
 
 R extends ordinary arithmetic with the concept of a {\em missing
-  value} represented by the symbol {\tt NA} (Not Available). Any
+  value} represented by the symbol {\tt NA} (``Not Available''). Any
 operation on a missing value creates another missing value. You can
 see this by repeating the same operations on a vector containing a
 missing value:
@@ -183,8 +197,9 @@ optional argument called {\tt na.rm} which can be used for this.
 mean(v, na.rm=TRUE)
 @
 Many functions in R have optional arguments that can be omitted, in which
-case they take their default value (in this case {\tt na.rm=FALSE}), or can be
-explicitly given in the function call to override the default behaviour.
+case they take their default value (For example, the {\tt mean} function has
+default {\tt na.rm=FALSE}). You can explicitly values to optional arguments
+in the function call to override the default behaviour.
 
 You can get a description of the structure of any object using the
 function {\tt str()}. For example, \texttt{str(v)} shows that {\tt v}
@@ -268,11 +283,7 @@ x <- c(2, 7, 0, 9, 10, 23, 11, 4, 7, 8, 6, 0)
 x[4]
 x[3:5]
 x[c(1,5,8)]
-x[(1:6)*2]
-x[-1]
 @
-Negative subscripts mean ``drop this element''. So \verb+x[-1]+
-returns every element of \texttt{x} except the first.
 
 Trying to extract an element that is beyond the end of the vector is,
 surprisingly, not an error. Instead, this returns a missing value
@@ -425,12 +436,10 @@ mydata <- data.frame(name=c("Joe","Ann","Jack","Tom"),
 @ 
 The construction of a data frame is just like a named list (except
 that we use the constructor function {\tt data.frame} instead of {\tt
-  list}). In fact data frames are lists so, for example, you can
-extract vectors using the dollar sign or other extraction methods for
-lists:
+  list}). In fact data frames are also lists so, for example, you can
+extract vectors using the dollar sign:
 <<>>=
 mydata$height
-mydata[[4]]
 @ 
 On the other hand, data frames are also two dimensional objects:
 <<results=verbatim>>=
@@ -511,84 +520,36 @@ Check that the object {\tt diet} is no longer in your workspace.
 %\end{exercise}
 
 \subsection{Referencing parts of the data frame (indexing)}
-Typing
-\texttt{births}
-will list the entire data frame -- not usually very helpful. You can
-use the {\tt head} function to see just the first few rows of a data frame
+
+Typing \texttt{births} will list the entire data frame -- not usually
+very helpful. You can use the {\tt head} function to see just the
+first few rows of a data frame
 <<>>=
 head(births)
 @ 
 Now try
 <<>>=
-births[1,"bweight"]
-@
-This will list the value taken by the first subject for the {\tt bweight}
-variable. Alternatively
-<<>>=
-births[1,2]
-@
-will list the value taken by the first subject for the second
-variable (which is {\tt bweight}). Similarly
-<<>>=
-births[2,"bweight"]
-@
-will list the value taken by the second subject for {\tt bweight}, and so on.
-To list the data for the first 10 subject for the {\tt bweight} variable, try
-<<>>=
-births[1:10, "bweight"]
-@
-and to list all the data for this variable, try
-<<>>=
-births[, "bweight"]
-@
-To list the data for the first subject try
-<<>>=
 births[1, ]
 @
-An empty index before the comma means ``all rows'' and an empty index after
-the comma means ``all columns''.
+This will list all the values for the first row. Similarly,
+<<>>=
+births[2, ]
+@
+will list the value taken by the second row, and so on.
+To list the data for the first 10 subjects, try
+<<>>=
+births[1:10, ]
+@
 
-%\begin{exercise}
-\begin{enumerate}[resume]
-\item Display the data on the variable {\tt gestwks} for row 7 in the {\tt births}
-  data frame.
-<<Display row 7 of gestwks,echo=F>>=
-births[7, "gestwks"]
-@
-\item Display all the data in row 7.
-<<Display all the data in row 7,echo=F>>=
-births[7,]
-@
-\item Display the first 10 rows for the variable {\tt gestwks}.
-<<Display first 10 rows of gestwks,echo=F>>=
-births[1:10, "gestwks"]
-@
-\end{enumerate}
-%\end{exercise}
-
-The \textsf{subset} function is another way of getting subsets from a
-data frame.To select all subjects with height less than 180 cm from the
-data frame {\tt mydata} we use
+Often we want to extract rows of a data frame based on a condition.
+To select all subjects with height less than 180 cm from the
+data frame {\tt mydata} we can use the \texttt{subset()} function.
 <<>>=
 subset(mydata, height < 180)
-@
-The subset function is usually clearer than the equivalent code using
-\textsf{[]}:
-<<>>=
-mydata[mydata$height < 180, ]
-@
-Another advantage of subset is that it will drop observations with
-missing values.  Compare the following
-<<>>=
-newdata[newdata$height < 180, ]
-subset(newdata, height < 180)
 @ 
-If \texttt{height} is missing then \texttt{subset} will drop that
-row. But \texttt{[]} will do something you might not expect. It will
-include the rows with missing \texttt{height}, but will replace every
-element in those rows with the missing value \texttt{NA}.
 
 \subsection{Summaries}
+
 A good way to start an analysis is to ask for a
 summary of the data by typing
 <<>>=
@@ -751,131 +712,3 @@ births$gest4 <- cut(births$gestwks, breaks=c(20,35,37,39,45))
 \end{enumerate}
 %\end{exercise}
 
-
-\subsection{Saving and loading data}
-
-As noted in section \ref{subsection:workingdir}, at the end of the
-session, R will offer to save your workspace and, if you accept, it
-will create a file {\tt .RData} in your working directory. In fact you
-can save any R object to disc. For example, to save the data frame
-{\tt births} try
-<< Saving births>>=
-save(births, file="births.RData")
-@
-which will save the births data frame in the file \textsf{births.RData}. 
-If you send this file to a colleague then they can read the data back
-into R with
-<<Loading births2 >>=
-load("births.RData")
-@
-The commands {\tt save()} and {\tt load()} can be used with any R
-objects, but they are particularly useful when dealing with large data
-frames. The binary format created by the {\tt save()} functions is the
-same across all platforms and between R versions.
-
-\subsection{The search path}
-
-When you load a package with the {\tt library()} function, the
-functions in that package become available for you to use via a
-mechanism called the {\em search path}.  The command
-<<>>=
-search()
-@ 
-shows the positions on the search path. The first position is
-``.GlobalEnv''. This is the global environment, which is another name
-for your workspace.  The second entry on the search path is the Epi
-package, the third is a package of commands called methods, the fourth
-is a package called stats, and so on.  To see what is in the workspace try
-<<>>=
-objects()
-@ 
-You should see the objects that you have created in this session.  To see what
-is in the Epi package, try
-<<>>=
-objects(2)
-@
-You can also refer to a package by name, not position
-<<>>=
-objects("package:Epi")
-@ 
-When you type the name of an object R looks for it in the order of the
-search path and will return the first object with this name that it
-finds. 
-
-\subsection{Attaching a data frame}
-
-The search path can also be modified by attaching a data frame. For
-example:
-<<>>=
-attach(births)
-@
-This places a copy of the variables in the {\tt births} data frame in
-position 2 of the search path. You can verify this with
-<<>>=
-search()
-objects(2)
-@
-which shows the objects in this position are the variables from the
-{\tt births} data frame.
-
-Attaching a data frame makes the variables in it directly accessible.
-For example, when you type the command:
-<<>>=
-hyp
-@ 
-you should get the variable {\tt hyp} from the {\tt births} data set
-without having to use the dollar sign. The {\tt detach()} function
-removes the data frame from the search path.
-<<>>=
-detach()
-@ 
-when no arguments are given, the {\tt detach()} function removes the
-second entry on the search path (after the global environment).
-
-This seems like an attractive feature, especially for people who are
-used to other statistical software (e.g. SAS, Stata) in which the
-variables in the ``current working dataset'' are directly accessible in
-this way. However, attaching data frames causes more problems than it
-solves and should be avoided. In particular:
-
-\begin{itemize}
-\item Since the attached data frame appears second in the search path,
-  it comes after the global environment. If you have an object {\tt
-    hyp} in the global environment then you will get this, instead of
-  the variable from the {\tt births} data frame. This is called {\em
-    masking}. R will warn you about masking, but only once for each
-  variable.
-\item Attaching a data frame creates a copy of all the variables in it.
-  Subsequent changes to the data frame (e.g. selecting rows or recoding
-  variables) are not reflected in the attached copy, which is a 
-  snapshot of the data frame when it was attached.
-\item If you forget to {\tt detach()} the data frame when you are
-  finished with it, then you may create multiple attached copies on your
-  search path, especially when using a script.
-\end{itemize}
-
-It is best to stick to using the dollar sign to select variables in a
-data frame, or to use the {\tt with()} function. Many R functions (but
-not all of them) have a {\tt data} argument which can be used to
-specify a data frame that should be searched before the search path.
-
-\subsection{Interactive use vs scripting}
-
-You can work with R simply by typing function calls at the command
-prompt and reading the results as they are printed.  This is OK for
-simple use but rapidly becomes cumbersome.  If the results of one
-calculation are used to feed into the next calculation, it can be
-difficult to go back if you find you have made a mistake, or if you
-want to repeat the same commands with different data. 
-
-When working with R it is best to use a text editor to prepare a batch
-file (or script) which contains R commands and then to run them from
-the script. If you are using a GUI then you can use the built-in
-script editor, or you can use your favourite text editor instead if
-you prefer.
-
-One major advantage of running all your R commands from a script is
-that you end up with a record of exactly what you did which can be
-repeated at any time. This will also help you redo the analysis in the
-(highly likely) event that your data changes before you have finished
-all analyses.

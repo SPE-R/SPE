@@ -1,4 +1,3 @@
-
 library( Epi )
 options(digits=4)  #  to cut down decimal points in the output
 
