@@ -327,7 +327,7 @@ summary(km1)     #  detailed KM-estimate
 
 <<km,echo=FALSE,eval=TRUE,fig=TRUE,height=4>>=
 par(mfcol=c(1,1))
-plot(survfit(orca$suob~orca$sex), ylab="Proporton",xlab="Time (years)",lwd=c(2,1.5,1.5,2,1.5,1.5),lty=c(1,3,3,1,3,3),conf.int = T,col=c("red","blue"),main="Estimated survival (95% CI) and CDF")
+plot(survfit(orca$suob~orca$sex), ylab="Proportion",xlab="Time since diagnosis (years)",lwd=c(2,1.5,1.5,2,1.5,1.5),lty=c(1,3,3,1,3,3),conf.int = T,col=c("red","blue"),main="Estimated survival (95% CI)")
 text(3,0.9,"KM for S(t)")
 legend(x=10, y=1,
             c("Female","Male"),
@@ -397,8 +397,7 @@ occur before the target event and remove the person from
 \item \textit{target event}: occurrence of endometrial cancer,
  \textit{competing events}: hysterectomy or death.
 \medskip
-\item \textit{target event}: relapse of a disease \\
-(ending the state of remission), \\
+\item \textit{target event}: relapse of a disease (ending the state of remission), \\
  \textit{competing event}: death while still in remission.
  
 % \medskip
@@ -687,16 +686,22 @@ legend(x=10, y=1,
 plotCIF(cif1, 2, main= "CIF for other deaths")
 lines(km2$time,1-km2$surv,main = "Cancer death",lty=c(2),type="s")
 
-plotCIF(cif1, 1, main = "CIF for cancer death")
-lines(km1$time,1-km1$surv,lty=c(2),type="s")
-lines(cif1$time,1-cif1$pstate[,2],lty=c(1),type="s")
-lines(km2$time,km2$surv,lty=c(2),type="s")
 
-index15<-which(floor(cif1$time)==15)[1]-1
-text(15,0.1,paste("P(death cancer)= \n",round(cif1$pstate[index15,1],4.4)))
-text(15,0.8,paste("P(death other)= \n",round(cif1$pstate[index15,2],4.4)))
-text(5,0.5,paste("P(alive)=",round(cif1$pstate[index15,3],4.4)))
+oral_cif<-data.frame(cbind(cif1$time,cif1$pstate))
+colnames(oral_cif)<-c("time","alive","can_death","other")
+plot(oral_cif$time, oral_cif$alive,type="l",xlab = "time",ylab="CIF")
+lines(oral_cif$time, 1-oral_cif$can_death,type="l")
+
+
+index15<-which(floor(oral_cif$time)==15)[1]-1
+text(5,0.1,paste("P(alive)"))
+text(12,0.5,paste("P(other)"))
+text(10,0.8,paste("P(oral)"))
 abline(v=15,lty=3)
+text(20,0.05,paste(round(oral_cif[index15,2],3.2)),cex=2)
+text(20,0.75,paste(round(oral_cif[index15,3],3.2)),cex=2)
+text(20,0.4,paste(round(oral_cif[index15,4],3.2)),cex=2)
+
 
 @
 
@@ -761,12 +766,11 @@ Often a parameter-free form $\lambda_0(t)$ is assumed. Then
   \lambda_i(t) = \lambda_0(t) \exp(\eta_1),
 \]
 specifies the \textbf{Cox model} or the \textbf{semiparametric proportional hazards model}.
-
-\bigskip
+bigskip
 $\eta_i = \beta_1 x_{i1} + \dots + \beta_p x_{ip}$ not depending on time.  
 
 \bigskip
-Generalizations: \textbf{time-dependent} \\ covariates $x_{ij}(t)$
+Generalizations: \textbf{time-dependent} covariates $x_{ij}(t)$
 
 % For exponential model, $\lambda_0(t) = \lambda_0$.
 
@@ -806,22 +810,23 @@ Thus $e^{\beta_j} = \text{HR}_j$ = \textbf{hazard ratio} or relative rate
 
 Fitting Cox models with sex and sex + age.
 \small
-\begin{verbatim}
-> cm0 <- coxph( suob ~ sex, data = orca)
-> summary( cm0)
-        coef exp(coef) se(coef)    z Pr(>|z|)
-sexMale 0.126     1.134    0.134 0.94     0.35
-        exp(coef) exp(-coef) lower .95 upper .95
-sexMale      1.13      0.882     0.872      1.47
 
-> cm1 <- coxph( suob ~ sex + age, data = orca)
-> summary(cm1)
-        exp(coef) exp(-coef) lower .95 upper .95
-sexMale      1.49      0.669      1.14      1.96
-age          1.04      0.960      1.03      1.05
-\end{verbatim}
+<<>>=
+cm0 <- coxph( suob ~ sex, data = orca)
+ci.exp(cm0)
+@
+
+Total mortality in males is 13\% higher in male than females, but not significant.
+
+<<>>=
+cm0 <- coxph( suob ~ age+sex, data = orca)
+ci.exp(cm0)
+@
+
+
+The M/F contrast visible only after age-adjustment.(43\% higher in males).
 \normalsize
-The M/F contrast visible only after age-adjustment.
+
 \end{frame}
 
 \begin{frame}[fragile]
