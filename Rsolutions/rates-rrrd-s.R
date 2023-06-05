@@ -1,5 +1,4 @@
-### R code from vignette source 'rates-rrrd-s.rnw'
-### Encoding: ISO8859-1
+### R code from vignette source '/home/runner/work/SPE/SPE/build/rates-rrrd-s.rnw'
 
 ###################################################
 ### code chunk number 1: rates-rrrd-s.rnw:47-49
