@@ -1,8 +1,8 @@
 \SweaveOpts{results=verbatim,keep.source=TRUE,include=FALSE,eps=FALSE}
 %% ,prefix.string=./graph/crv}
 
-%%  LaTeX script for the lecture "Linea and generalized linear models"
-%%  in SPE, Saturday 24 August, 2019 -- Esa Läärä
+%%  LaTeX script for the lecture "Linear and generalized linear models"
+%%  in SPE, Saturday 3 June, 2023 -- Esa Läärä
 
 %% \documentclass[12pt,t,dvipsnames,handout% Uncomment ",handout" when doing handouts
 %% ]{beamer}
@@ -76,8 +76,8 @@
  \large \sf #2\\
  \large \bf #3}
 \vfill
-Statistical Practice in Epidemiology with \textbf{R}\\
-23 to 28 August, 2019\\
+Statistical Practice in Epidemiology using \textbf{R}\\
+2 to 7 June, 2023\\
 University of Tartu, Estonia
 %% International Agency for Research on Cancer, Lyon, France
 \end{frame}
@@ -142,8 +142,8 @@ University of Tartu, Estonia
 % \end{frame}
 
 \banner{Linear and generalized linear models}
-       {Saturday 24 August, 2019}
-       {Esa L??r?}
+       {Saturday 3 June, 2023}
+       {Esa L{\"a}{\"a}r{\"a}}
       %% {lin-mod}
       
 
@@ -154,7 +154,7 @@ University of Tartu, Estonia
 \bi
 \item Simple linear regression. 
 \medskip 
-\item Fitting a model and extracting results.
+\item Fitting a regression model and extracting results.
 \medskip
 \item Predictions and diagnostics.
 \medskip
@@ -162,16 +162,17 @@ University of Tartu, Estonia
 \medskip
 \item Main effects and interactions.
 \medskip
+\item Modelling curved effects.
+\medskip
 \item Generalized linear models.
 \medskip
-\item Modelling curved effects.
-% \medskip
-% \item Generalized additive models 
+\item Binary regression and Poisson regression. 
 \ei
 
 \end{frame}
 
-\begin{frame}[fragile]\frametitle{Variables in generalized linear models}
+\begin{frame}[fragile]
+\frametitle{Variables in generalized linear models}
 
 \bi
 \item
@@ -181,23 +182,25 @@ The {\bf outcome} or {\bf response} variable must be numeric.
 Main types of response variables are
 \begin{itemize}
 {\normalsize
-\item[--] Metric or continuous (a measurement with units)
+\item[--] Metric or continuous (a measurement with units).
 \medskip
-\item[--] Binary (two values coded 0/1)
+\item[--] Binary (``yes'' vs. ''no'', coded 1/0), or proportion.
 \medskip
-\item[--] Failure (does the subject fail at end of follow-up)
-\medskip
-\item[--] Count (aggregated failure data, number of cases)
+\item[--] Failure in person-time, or incidence rate. 
+% \medskip
+% \item[--] Count (aggregated failure data, number of cases)
 \end{itemize}
 
 \medskip
 \item
 {\bf Explanatory} variables or {\bf regressors} can be
 \begin{itemize}
+{\normalsize
 \item[--] Numeric or quantitative variables
 \medskip
 \item[--] Categorical factors, represented by class indicators or contrast
   matrices.
+}
 \end{itemize}
 \ei
 \vfill
@@ -240,7 +243,7 @@ births <- subset(births, !is.na(gestwks))
 
 \begin{frame}[fragile]
 
-<<par, echo=F, results=hide>>=
+<<par, echo=FALSE, results=hide>>=
 par(mar= c(5,5,1,1)+0.1)
 @
 \frametitle{Birth weight and gestational age}
@@ -275,7 +278,7 @@ $\to$
 \end{semiverbatim}
 \begin{itemize}
 \item \texttt{lm()} is the function that fits linear regression models,
-assuming {\bf Gaussian} distribution for {\bf error} terms.
+assuming \\ {\bf Gaussian} distribution or \textbf{family} for {\bf error} terms.
 \medskip
 \item \verb+bweight ~ gestwks+ is the {\bf model formula}
 \medskip
@@ -301,7 +304,7 @@ Interpretation of {\bf intercept} and {\bf slope}?
 \begin{frame}[fragile]\frametitle{Model object and extractor functions}
 
 Model object = {\bf list} of different elements, each being
-separately accessible. -- See \texttt{str(m)} for the full list.
+separately accessible. \\ -- See \texttt{str(m)} for the full list.
 
 \medskip
 Functions that extract results from the fitted model object
@@ -328,7 +331,7 @@ Functions that extract results from the fitted model object
 gestwks        197.0   179.7   214.2
 \end{verbatim}
 }
-This function is in {\tt Epi} package
+Function \texttt{ci.lin()} is found in {\tt Epi} package.
 \medskip
 \item
 \verb|anova(m)| -- Analysis of Variance Table
@@ -357,7 +360,7 @@ for {\it individual} responses \\ are returned.
 \ei
 % \medskip
 \item \texttt{plot(m)} -- produces various diagnostic plots based
-on residuals (raw or standardized)
+on residuals \\ (raw, standardized or studentized residuals).
 \ei
 
 Many of these are special {\bf methods} for certain {\bf generic functions},  
@@ -438,8 +441,9 @@ hypH          -430.7 -585.4 -275.9
 
 \medskip
 \item
-Interpretation: {\tt -430.7 = 2768.2 - 3198.9}  
-= difference between level 2 {\it vs.} reference level 1 of {\tt hyp}
+Interpretation: {\tt -430.7 = 2768.2 - 3198.9} \\ 
+= difference between level 2 (``\texttt{H}'') {\it vs.} 
+reference level 1 (``\texttt{N}'') of factor {\tt hyp}.
 \ei
 \vfill
 \end{frame}
@@ -497,8 +501,8 @@ same. The effect of {\tt hyp} is the constant vertical distance between the line
 \bi
 \item
 Joint effect of
- \texttt{hyp} and \texttt{gestwks} under additivity
- is modelled e.g. by updating a simpler model:
+ \texttt{hyp} and \texttt{gestwks} % under additivity
+ is modelled e.g. by updating: % a simpler model:
 
 \medskip
 \verb|> mhg <- update(mh, . ~ . + gestwks)|
@@ -510,16 +514,29 @@ hypH          -143.7  -259.0   -28.4
 gestwks        192.2   174.7   209.8
 \end{semiverbatim}
 }
-
 \medskip
 \item
-The effect of {\tt hyp}: {\tt H} {\it vs.} {\tt N}
- is attenuated  \\ (from $-430.7$ to $-143.7$). 
+The coefficient for {\tt hyp}: {\tt H} {\it vs.} {\tt N}
+ is attenuated (from $-430.7$ to $-143.7$). 
+\medskip
+\item 
+Does $-143.7$ estimate the \textbf{causal effect} of \texttt{hyp}
+\textbf{adjusted} for \texttt{gestwks}?
 \medskip
 \item
-This suggests
-that much of the effect of hypertension on birth weight is mediated through
-a shorter gestation period among hypertensive mothers.
+No, as \texttt{gestwks} is most likely a \textbf{mediator}. --  
+Much of the effect of \texttt{hyp} on 
+\texttt{bweight} is mediated via
+shorter \texttt{gestwks} in hypertensive mothers.
+\medskip
+\item
+Instead, for \textbf{total causal effect} of \texttt{hyp}, 
+adjustment for at least age is needed, but adjusting for \texttt{gestwks}
+is \textbf{overadjustment}. 
+\medskip
+\item
+Yet, for \textbf{predictive
+modelling} it is OK to keep \texttt{gestwks}. 
 \ei
 
 % \vfill
@@ -577,8 +594,7 @@ The effect of {\tt hyp} increases
 \item
 % A model including an interaction upon the main effects: \\
 %\begin{verbatim}
-{\small \verb|mhgi <- lm(bweight ~ hyp + gestwks + | \\
-        \verb|              hyp:gestwks, data = births)|
+{\small \verb|mhgi <- lm(bweight ~ hyp + gestwks + hyp:gestwks, ...)|
 \medskip
 \item
 Or with shorter formula: {\small \verb| bweight ~ hyp * gestwks |}
@@ -593,7 +609,7 @@ hypH:gestwks      31.4    -8.3    71.1
 }
 \medskip
 \item
-Estimated slope: 183.9 g/wk in reference group {\tt N} and \\
+Estimated slope: 183.9 g/wk in reference group {\tt N} of normotensive mothers and \\
  183.9 + 31.4 = \ 215.3 g/wk in hypertensive mothers.
 \medskip
 \item[$\Leftrightarrow$]
@@ -633,13 +649,13 @@ hypH:I(gestwks - 40)     31.4   -8.3   71.1
 }
 \medskip
 \item
-Main effect of {\tt hyp} = $-77.3$ is the % effect of {\tt hyp} 
+The ``main effect'' of {\tt hyp} = $-77.3$ is the % effect of {\tt hyp} 
 difference between
-{\tt H} and {\tt N} at % the reference value 
+{\tt H} and {\tt N} \\ at the reference value 
 {\tt gestwks} = 40.
 \medskip
 \item
-{\tt Intercept} = 3395.6 is the estimated mean {\tt bweight} at 
+{\tt Intercept} = 3395.6 is the estimated mean {\tt bweight} \\ at 
 the reference value 40 of {\tt gestwks} in {\tt group N}.
 
 \ei
@@ -655,7 +671,7 @@ the reference value 40 of {\tt gestwks} in {\tt group N}.
 \item
 A categorical explanatory variable or {\bf factor}  
 with $L$ {\bf levels} will be represented by $L-1$ linearly independent
-columns in the {\bf model matrix} of a linear model. 
+columns in the \\ {\bf model matrix} of a linear model. 
 \medskip
 \item
 These columns can be defined in various ways implying
@@ -966,7 +982,7 @@ In model formula factor name {\tt faktori} can be replaced by expression
 like \verb+C(faktori, contr.cum)+.
 \medskip
 \item 
-Function \texttt{ci.lin()} has an option for calculating CI's for
+Function \texttt{ci.lin()} can calculate CI's for
 linear functions of the parameters of a fitted
 model {\tt mall} when supplied by a relevant contrast matrix \\
 \verb|> ci.lin(mall, ctr.mat = CM)[ , c(1,5,6)]|
@@ -1034,50 +1050,7 @@ Estimate     2.5\%    97.5\%
 
 \end{comment}
 
-\begin{frame}[fragile]
-\frametitle{From linear to generalized linear models}
 
-\bi
-\item An alternative way of fitting our 1st Gaussian model:
-\medskip
-{\small
-\begin{semiverbatim}
-> m <- glm(bweight ~ gestwks, family=gaussian, data=births)
-\end{semiverbatim}
-}
-\medskip
-\item
-Function \texttt{glm()} fits {\bf generalized linear models} (GLM).
-\medskip
-\item
-Requires specification of the  
-\bi
-{\normalsize
-\item[--] {\bf family} 
--- i.e. the assumed ``error'' distribution for $Y_i$s, %% and the
-\item[--]
-{\bf link} function -- a transformation of the expected $Y_i$.
-}
-\ei
-% \medskip
-\item
-Covers common models for other types
-of response variables and distributions, too, e.g.
-{\bf logistic} regression for binary responses and {\bf Poisson} regression
-for counts.
-\medskip
-\item
-Fitting: method of {\bf maximum likelihood}.  
-% \medskip
-\item
-Many extractor functions
-for a {\tt glm} object similar to those 
- % share the name and key features of those % corresponding functions
- for an {\tt lm} object.
-
-\ei
-
-\end{frame}
 
 
 \begin{frame}[fragile]\frametitle{More about numeric regressors}
@@ -1088,29 +1061,29 @@ What if dependence of $Y$ on $X$ is non-linear?
 \item {\bf Categorize} the values of $X$ into a factor.
 
 \bi
-{%% \normalsize
+{\normalsize
 \item[--] Continuous effects violently discretized 
-  by often arbitrary cutpoints. -- Inefficient.
+  by often arbitrary cutpoints. This is inefficient.
 }
 \ei
-%% \medskip
+\medskip
 \item Fit a low-degree (e.g. 2 to 4) {\bf polynomial} of $X$.
 \bi
-{%% \normalsize
+{\normalsize
 \item[--] Tail behaviour may be problematic. 
 }
 \ei
-%% \medskip
+ \medskip
 \item Use {\bf fractional polynomials}.
 \bi
-{%% \normalsize
+{\normalsize
 \item[--] Invariance problems. Only useful if $X = 0$ is well-defined.
 }
 \ei
-%% \medskip
+\medskip
 \item Use a {\bf spline} model: smooth function $s(X;\beta)$. -- See Martyn's lecture
 \bi
-{%% \normalsize
+{\normalsize
 \item[--] More flexible models that act locally.
 \item[--] Effect of $X$ reported by graphing $\widehat s(X;\beta)$ \& its CI
 }
@@ -1207,7 +1180,7 @@ library(mgcv)
 mpen <- gam( bweight ~ s(gestwks), data = births)
 @
 }
-<<mPen-plot, echo=F, fig=T, results=hide>>=				
+<<mPen-plot, echo=FALSE, fig=TRUE, results=hide>>=				
 pr.pen <- predict( mpen, newdata=nd, se.fit=TRUE)
 with( births, plot( bweight ~ gestwks, xlim = c(24, 45), cex.axis= 1.5, cex.lab = 1.5 )  )
 matlines( nd$gestwks, cbind(pr.pen$fit, pr.pen$fit - 2*pr.pen$se.fit, pr.pen$fit + 2*pr.pen$se.fit),  
@@ -1448,6 +1421,173 @@ I(matage^2)   -0.002
   
 \end{comment}
 
+\begin{frame}[fragile]
+\frametitle{From linear to generalized linear models}
+
+\bi
+\item An alternative way of fitting our 1st Gaussian model:
+\medskip
+{\small
+\begin{semiverbatim}
+> m <- glm(bweight ~ gestwks, family=gaussian, data=births)
+\end{semiverbatim}
+}
+\medskip
+\item
+Function \texttt{glm()} fits {\bf generalized linear models} (GLM).
+\medskip
+\item
+Requires specification of the  
+\bi
+{\normalsize
+\item[--] {\bf family} 
+-- i.e. the assumed ``error'' distribution for $Y_i$s, %% and the
+\item[--]
+{\bf link} function -- a transformation of the expected $Y_i$.
+}
+\ei
+% \medskip
+\item
+Covers common models for other types
+of response variables and distributions, too, e.g.
+{\bf logistic} regression for \textbf{binary} responses and \\ {\bf Poisson} regression
+for counts.
+\medskip
+\item
+Fitting: method of {\bf maximum likelihood}.  
+% \medskip
+\item
+Many extractor functions
+for a {\tt glm} object similar to those 
+ % share the name and key features of those % corresponding functions
+ for an {\tt lm} object.
+
+\ei
+
+\end{frame}
+
+\begin{frame}
+\frametitle{\large Generalized linear models}
+
+Modelling how expected values, risks, rates, etc. depend on 
+% , and prevalences 
+% exposure $X$ and covariates $Z$ (modifiers, and/or confounders). -- 
+explanatory variables or regressors $X=(X_1, \dots, X_p)$. --
+Common elements:
+ \begin{itemize} 
+ \item
+Each subject $i$ $(i=1, \dots, N)$ has an own {\bf regressor profile}, 
+i.e. 
+vector $x_{i}^{\small\text{T}} = (x_{i1}, \dots, x_{ip})$ 
+of values of $X$.   
+% continuous and/or dichotomous explanatory terms, including possible product 
+% or ``interaction'' terms.
+\pause
+\medskip
+\item
+%% In the spirit of \textbf{generalized linear models}, 
+ Let vector  
+  $\beta^{\small\text{T}} = (\beta_0, \beta_1, \dots, \beta_p)$ 
+  contain regression coefficients. \\ The \textbf{linear predictor} is
+  a linear combination of $\beta_j$s and $x_{ij}$s:
+%%	-- assuming so far no {\bf interactions}, nor {\bf effect 
+%% modifications} 
+ $$ \eta_i = \beta_0 + %% \beta x_i + \gamma^{\small\text{T}}z_i$$
+    \beta_1 x_{i1} + \dots + \beta_p x_{ip} $$ 
+\item
+Some $X_j$s can be {\bf product terms} for interactions and
+modifications if needed, and 
+{\bf splines} may be used for continuous covariates.
+\medskip
+\item
+Further model specification depends on the type of outcome variable,
+assumed error distribution or family,
+desired interpretation of coefficients, 
+and importance and choice of time scale(s).  
+\end{itemize} 
+\end{frame}
+
+\begin{frame}
+
+\frametitle{\large Binary regression and interpretations of coefficients}
+
+\bi
+\item
+Basic model for risks $\pi(x_i) = P\{Y_i=1| X=x_i\} = E(Y_i|X=x_i)$ 
+with fixed risk period, complete follow-up
+(no censoring, nor competing events): 
+% (analogously for prevalences $\Pi$): 
+$$ g\{\pi(x_i)\} = \beta_0 + \beta_1 x_{i1} + \dots \beta_p x_{ip}, \quad i = 1, \dots, N.$$
+\item
+\textbf{Link} $g(\cdot)$ and interpretation of $\beta_j$s, assuming the
+validity of model (including homogeneity or non-modification of the
+coefficent in question):
+\bi
+{\normalsize 
+\item[--]  id $\Rightarrow$ $\beta_j$ = 
+adjusted \textbf{risk difference} (RD)  for $X_j=1$ vs. $X_j=0$,
+\item[--] log $\Rightarrow$ $\beta_j=$ 
+adjusted log of \textbf{risk ratio} (RR) \ \ \ \ -- " --
+\item[--] logit $\Rightarrow$ $\beta_j =$ 
+adjusted log of %% \underline{conditional}
+\textbf{odds ratio} (OR),   \ \ \ -- " -- \\
+%% {\bf NB.} This is different from \underline{marginal} OR 
+%% due to \textbf{non-collapsibility}.
+}
+\ei
+\medskip
+\item
+ Fitting: \texttt{glm(..., family=binomial(link=...), ...)}
+ \medskip
+\item
+Issues with id \& log links in keeping predicted $\widehat\pi(\cdot)$ between $0$ and $1$. \\
+-- A solution for RR: Doubling the cases \& logit-link!
+ {\small (\href{https://doi.org/10.1186/s12874-022-01636-3}{\color{blue}Ning et al. 2022})}. \\
+-- A solution for RD exists, too  {\small (\href{https://doi.org/10.1098/rsos.190067}{\color{blue}Battey et al. 2019})}. 
+\ei
+\end{frame}
+
+\begin{frame}
+\frametitle{Poisson regression -- model for rates}
+\bi
+\item
+A common outcome variable is
+a pair $(D, Y)$ = (no. of cases, person-time), from
+which the \textbf{incidence rate} = $D/Y$ 
+(see Janne's lecture on Friday).
+\medskip
+\item
+\textbf{Poisson regression model} specifies, how theoretical rates
+or \textbf{hazards} $\lambda(x_i)$ are assumed 
+to depend on values of $X$.
+\medskip
+\item
+Some components of $X$ represent the relevant \textbf{time scales} \\
+(as in the exercise of today; 
+more details in Bendix's lecture on Monday).
+\medskip
+\item
+Linear predictor as above -- 
+\textbf{Link} $g(\cdot)$ and interpretation of $\beta_j$s:
+\bi
+{\normalsize 
+\item[--]  id $\Rightarrow$ $\beta_j$ = 
+adjusted \textbf{rate difference} (RD)  for $X_j=1$ vs. $X_j=0$,
+\item[--] log $\Rightarrow$ $\beta_j=$ 
+adjusted log of \textbf{rate ratio} (RR) \ \ \ \ -- " --
+}
+\ei
+\medskip
+\item
+Fitting -- our recommended approach using \texttt{Epi}:
+\begin{center}
+\texttt{glm(cbind(d,y) \~\ ..., family=poisreg(link=...),...)}
+\end{center}
+
+\ei
+
+\end{frame}
+
 
 % \input{testis-gam}
 \begin{frame}
@@ -1457,16 +1597,24 @@ I(matage^2)   -0.002
 \item A wide range of models from simple linear regression to splines.
 \medskip
 \item
-R functions fitting linear and generalized models: \\ \texttt{lm()} and \texttt{glm()}.
+Gaussian family for continuous outcomes, binomial for binary outcomes,
+and Poisson family for rates.
+\medskip
+\item
+Various link functions for different parametrizations. 
+\medskip
+\item
+R functions fitting linear and generalized models: 
+\texttt{lm()} and \texttt{glm()}.
 \medskip
 \item
 Parametrization of categorical explanatory factors; contrast matrices.
 \medskip
 \item
-Extracting results and predictions: \\ \texttt{ci.lin(), fitted(), predict(), ...} . 
+Extracting results and predictions: \texttt{ci.lin(), fitted(), predict()}. 
 \medskip
 \item
-Model diagnostics: \\ \texttt{resid()}, \texttt{plot.lm(), ...} .
+Model diagnostics:  \texttt{resid()}, \texttt{plot.lm(), ...} .
 % \medskip
 % \item
 % Penalized splines and generalized additive models: package \texttt{mgcv}, functions \\

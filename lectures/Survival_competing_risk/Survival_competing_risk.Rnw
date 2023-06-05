@@ -2,12 +2,12 @@
 \setbeamertemplate{footline}[frame number]
 %\usepackage{pgfpages}
 %\pgfpagesuselayout{4 on 1}[a4paper,border shrink=5mm,landscape]
-\SweaveOpts{out.width = "\\textwidth"}
+%\SweaveOpts{out.width = "\\textwidth"}
 
 \title{Survival analysis with competing risks \newline }
 \author{Janne Pitk\"aniemi \newline \newline }
 \institute{Finnish Cancer Registry \newline Tampere University \newline
-\normalsize Statistical Practice in Epidemiology (2019, Tartu) }
+\normalsize Statistical Practice in Epidemiology (2023, Tartu) }
 \date{}
 
 
@@ -32,7 +32,7 @@
  Regression modelling of hazards: Cox model.
  \medskip
  \item[5.]
- Packages \texttt{survival, mstate, (cmprisk)}.
+ Packages \texttt{survival, mstate, Epi,(cmprisk)}.
 \medskip
 \item[6.] 
  Functions \texttt{Surv(), survfit(), plot.survfit(), coxph()}.
@@ -249,8 +249,7 @@ Tools for analysis with one outcome event.
 \begin{itemize}
 \item 
 \texttt{Surv(time, event) -> sobj} \\ 
-creates a \textbf{survival object} \texttt{sobj} assuming that all start at 0, 
-containing pairs $(y_i, \delta_i)$,
+creates a \textbf{survival object} \texttt{sobj} assuming that all start at 0, containing pairs $(y_i, \delta_i)$,
  \medskip
  \item
 \texttt{Surv(entry, exit, event) -> sobj2} \\
@@ -266,7 +265,7 @@ containing KM or other non-parametric estimates
 (also from a fitted Cox model), 
  \medskip
 \item 
-\texttt{plot(sfo)} \\
+\texttt{plot(sfo), plotCIF(sobj)} \\
 % applied to \texttt{survfit} object \texttt{sfo}
  plot method for survival curves and related graphs, 
   \medskip
@@ -296,6 +295,7 @@ with covariates \texttt{x1} and \texttt{x2}.
 
 orca <-  read.table(file = 'https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/oralca2.txt', header = TRUE, sep = " ",row.names = 1 )
 library(survival)
+library(Epi)
 @
 
 {\scriptsize
@@ -327,7 +327,7 @@ summary(km1)     #  detailed KM-estimate
 
 <<km,echo=FALSE,eval=TRUE,fig=TRUE,height=4>>=
 par(mfcol=c(1,1))
-plot(survfit(orca$suob~orca$sex), ylab="Proporton",xlab="Time (years)",lwd=c(2,1.5,1.5,2,1.5,1.5),lty=c(1,3,3,1,3,3),conf.int = T,col=c("red","blue"),main="Estimated survival (95% CI) and CDF")
+plot(survfit(orca$suob~orca$sex), ylab="Proportion",xlab="Time since diagnosis (years)",lwd=c(2,1.5,1.5,2,1.5,1.5),lty=c(1,3,3,1,3,3),conf.int = T,col=c("red","blue"),main="Estimated survival (95% CI)")
 text(3,0.9,"KM for S(t)")
 legend(x=10, y=1,
             c("Female","Male"),
@@ -397,8 +397,7 @@ occur before the target event and remove the person from
 \item \textit{target event}: occurrence of endometrial cancer,
  \textit{competing events}: hysterectomy or death.
 \medskip
-\item \textit{target event}: relapse of a disease \\
-(ending the state of remission), \\
+\item \textit{target event}: relapse of a disease (ending the state of remission), \\
  \textit{competing event}: death while still in remission.
  
 % \medskip
@@ -677,7 +676,7 @@ CIF curves may also be stacked (right).
 km1 <- survfit( Surv(orca$time, orca$event==1)~1,data=orca)
 km2 <- survfit( Surv(orca$time, orca$event==2)~1,data=orca)
 cif1 <- survfit( Surv(orca$time, orca$event, type="mstate")~1,data=orca)
-par(mfrow=c(1,3),lwd=1.6)
+par(mfrow=c(1,3),lwd=1.6,xaxs="i", yaxs="i")
 plotCIF(cif1, 1, main = "CIF for cancer death")
 lines(km1$time,1-km1$surv,lty=c(2),type="s")
 legend(x=10, y=1,
@@ -687,16 +686,19 @@ legend(x=10, y=1,
 plotCIF(cif1, 2, main= "CIF for other deaths")
 lines(km2$time,1-km2$surv,main = "Cancer death",lty=c(2),type="s")
 
-plotCIF(cif1, 1, main = "CIF for cancer death")
-lines(km1$time,1-km1$surv,lty=c(2),type="s")
-lines(cif1$time,1-cif1$pstate[,2],lty=c(1),type="s")
-lines(km2$time,km2$surv,lty=c(2),type="s")
+stackedCIF(cif1,xlim=c(0,20),main="Stacked CIF",
+           col = c("black"),
+           fill=c("blue","green","red"))
+text( 5, 0.10, "Oral ca death ", pos = 4)
+text( 4, 0.45, " Other death ", pos = 4)
+text( 1, 0.80, " Alive ", pos = 4)
 
 index15<-which(floor(cif1$time)==15)[1]-1
-text(15,0.1,paste("P(death cancer)= \n",round(cif1$pstate[index15,1],4.4)))
-text(15,0.8,paste("P(death other)= \n",round(cif1$pstate[index15,2],4.4)))
-text(5,0.5,paste("P(alive)=",round(cif1$pstate[index15,3],4.4)))
-abline(v=15,lty=3)
+ abline(v=15,lty=3)
+text(17.5,0.9,paste(round(cif1$pstate[index15,1],2.2)),cex=1.2)
+text(17.5,0.1,paste(round(cif1$pstate[index15,2],2.2)),cex=1.2)
+text(17.5,0.6,paste(round(cif1$pstate[index15,3],2.2)),cex=1.2)
+# 
 
 @
 
@@ -761,12 +763,11 @@ Often a parameter-free form $\lambda_0(t)$ is assumed. Then
   \lambda_i(t) = \lambda_0(t) \exp(\eta_1),
 \]
 specifies the \textbf{Cox model} or the \textbf{semiparametric proportional hazards model}.
-
-\bigskip
+bigskip
 $\eta_i = \beta_1 x_{i1} + \dots + \beta_p x_{ip}$ not depending on time.  
 
 \bigskip
-Generalizations: \textbf{time-dependent} \\ covariates $x_{ij}(t)$
+Generalizations: \textbf{time-dependent} covariates $x_{ij}(t)$
 
 % For exponential model, $\lambda_0(t) = \lambda_0$.
 
@@ -806,22 +807,23 @@ Thus $e^{\beta_j} = \text{HR}_j$ = \textbf{hazard ratio} or relative rate
 
 Fitting Cox models with sex and sex + age.
 \small
-\begin{verbatim}
-> cm0 <- coxph( suob ~ sex, data = orca)
-> summary( cm0)
-        coef exp(coef) se(coef)    z Pr(>|z|)
-sexMale 0.126     1.134    0.134 0.94     0.35
-        exp(coef) exp(-coef) lower .95 upper .95
-sexMale      1.13      0.882     0.872      1.47
 
-> cm1 <- coxph( suob ~ sex + age, data = orca)
-> summary(cm1)
-        exp(coef) exp(-coef) lower .95 upper .95
-sexMale      1.49      0.669      1.14      1.96
-age          1.04      0.960      1.03      1.05
-\end{verbatim}
+<<>>=
+cm0 <- coxph( suob ~ sex, data = orca)
+ci.exp(cm0)
+@
+
+Total mortality in males is 13\% higher in male than females, but not significant.
+
+<<>>=
+cm0 <- coxph( suob ~ age+sex, data = orca)
+ci.exp(cm0)
+@
+
+
+The M/F contrast visible only after age-adjustment.(43\% higher in males).
 \normalsize
-The M/F contrast visible only after age-adjustment.
+
 \end{frame}
 
 \begin{frame}[fragile]
@@ -873,156 +875,26 @@ Main options, providing answers to different questions.
 \end{frame}
 
 \begin{frame}[fragile]
-   \frametitle{Competing risks model: excess hazard of death}
+\frametitle{SMR}
 
+Relate population mortality to the mortality of your "exposed" cohort \newline
 
-\begin{center}
-\setlength{\unitlength}{0.65pt}
-\begin{picture}(400,140)
-  \thicklines
-  \put(  0, 110){\framebox(120,50){Alive}}
-  \put(115,0){\framebox(120,50){Dead}}
-%  \put(170, 97){(Cause-specific hazards)}
-  \put(230, 110){\framebox(120,50){Diseased}}
-    \put(230, 110){\makebox(120,40)[b]{\scriptsize{($u = u_\text{D}$)}}}
-  \put(125,105){\vector(1, -1){45}}
-  \put(225,105){\vector(-1, -1){45}}
-  \put(125, 135){\vector(1,0){100}}
-  \put(170,137){\makebox(0,0)[b]{$\alpha(u)$}}
-  \put(110, 95){\makebox(0,0)[t]{$\lambda_\text{P}(u)$}}
-  \put(230, 90){\makebox(0,0)[t]{$\lambda(t)$}}
-  %\put(315, 95){\makebox(0,0)[t]{$\lambda(t)=\lambda_1(t)+\lambda_2(t)$}}
-  \put(350, 75){\makebox(0,0)[t]{$\lambda(t)=\lambda_\text{E}(t)+\lambda_\text{P}(u_\text{D}+t)$}}
-  \put(300, 45){(excess mortality)}
-  \put(350, 40){\makebox(0,0)[t]{$\lambda(t)= SMR \times \lambda_\text{P}(u_\text{D}+t)$}}
-  \put(250, 10){(standardized mortality ratio)}
-\end{picture}
-\end{center}
-where
+Let
 \begin{itemize}
-\item
- $\lambda_\text{P}(u)$ is the hazard of dying from any cause among disease-free members
- \item
-   $\lambda_\text{E}(t)$ is the excess hazard of dying from the disease among diseased cohort members
- \end{itemize}
+\item $\lambda_\text(a)$ be the mortality in the cohort
+\item $\lambda_\text{P}(a)$ be the population mortality 
+\item $\lambda_\text{E}(a)$ be the excess hazard of dying from the disease among cohort members
+\item SMR is the relative mortality in the cohort \newline
+
+$\lambda(a)=\lambda_\text{E}(a)+\lambda_\text{P}(a)$
+(excess mortality) \newline 
+
+$\lambda(a)= SMR \times \lambda_\text{P}(a)$
+(standardized mortality ratio)
+
+\end{itemize}
 
 \end{frame}
 
-% \begin{frame}[fragile]
-%    \frametitle{Rectal cancer}
-% 
-% Ex. rectal cancers in females in Finland 2008-2012. Calculate observed mortality,
-% excess mortality and relative mortality.
-% {\footnotesize
-% <<em,echo=TRUE>>=
-% library(popEpi) # R-package for population-based cancer analysis- CRAN
-% library(Epi)
-% library(survival)
-% 
-% data("sire")
-% head(sire)
-% @
-% }
-% \end{frame}
-% 
-% \begin{frame}[fragile]
-%    \frametitle{Rectal cancer}
-% 
-% {\footnotesize
-% <<em2,echo=TRUE,eval=TRUE>>=
-% data(sire)
-%  ## split data
-%  fotcut <- c(0,3/12,6/12,1,2,3,4,5)
-%  lex.split <- lexpand(sire, birth = bi_date, entry = dg_date,
-%                       exit = ex_date, 
-%                       status=status %in% 1:2, 
-%                       breaks = list(fot=fotcut), 
-%                       pophaz=popmort,# population mortality
-%                       pp=F, # weights for survival estimation
-%                       aggre = list(fot) )
-% head(lex.split)
-% @
-% }
-% 
-% \end{frame}
-% 
-% 
-% \begin{frame}[fragile]
-%    \frametitle{Rectal cancer -- mortality models}
-% 
-% Modeling mortality by splitted follow-up time since cancer diagnosis (fot)
-% 
-% Estimate excess mortality $\lambda_E(t)$ (link function d.exp)
-% 
-% {\scriptsize
-% <<excess,echo=TRUE,eval=TRUE>>=
-% excess.mort <- relpois_ag(formula = from0to1 ~ -1 + fot,  
-% data = lex.split, 
-% d.exp = d.exp, 
-% offset = log(pyrs))
-% @
-% }
-% 
-% Estimate relative mortality (offset=log(d.exp))
-% {\scriptsize
-% <<relative,echo=TRUE,eval=TRUE>>=
-% relative.mort <- glm(formula = from0to1 ~ -1 + as.factor(fot),
-% family=poisson(link="log"),
-% data=lex.split,
-% offset=log(d.exp))
-% @
-% }
-% Estimate observed mortality (offset=log(pyrs))
-% {\scriptsize
-% <<obs.mort,echo=TRUE,eval=TRUE>>=
-% obs.mort <- glm(formula = from0to1 ~ -1 + as.factor(fot),
-% family=poisson(link="log"),
-% data=lex.split,
-% offset=log(pyrs))
-% @ 
-% }
-% 
-% 
-% \end{frame}
-% 
-% \begin{frame}[fragile]
-%    \frametitle{Rectal cancer mortality}
-% 
-% Observed, expected, excess and relative mortality
-% 
-% {\footnotesize
-% <<em3,echo=FALSE,eval=TRUE,fig=TRUE,height=11,width=14>>=
-% 
-% par(mfrow=c(1,3),lwd=2,cex=1.4)
-% 
-% x <- fotcut
-% y <- ci.exp(obs.mort)[,1]*100
-% plot(x,c(y[1],y),type="n",xlim=c(0,5),ylim=c(0,37),ylab="Observed mortality /100 py",xlab="")
-% segments(x[-length(x)],y[-length(x)],x[-1],y[-length(x)],lwd=4) 
-% abline(h=0)
-% 
-% y <- ci.exp(obs.mort)[,1]*100-ci.exp(excess.mort)[,1]*100
-% segments(x[-length(x)],y[-length(x)],x[-1],y[-length(x)],col="violet",lwd=4) 
-% mtext("Observed and population",side=3,cex=1.5)
-% #legend("topright",c("Total mortality","Population mortality"),col=c("black","gray"),lty=1,lwd=2,y.intersp = 2,seg.len = 3,text.width=3.3)
-% 
-% y <- ci.exp(excess.mort)[,1]*100
-% plot(x,c(y[1],y),type="n",xlim=c(0,5),ylim=c(0,37),ylab="Excess mortality /100 py",xlab="Time since diagnoses (years)")
-% #,ylab="Excess mortality per 100 person-years",xlab="Time since diagnoses (years)")
-% segments(x[-length(x)],y[-length(x)],x[-1],y[-length(x)],lwd=4) 
-% abline(h=0)
-% mtext("Excess",side=3,cex=1.5)
-% 
-% y <- ci.exp(relative.mort)[,1]
-% plot(x,c(y[1],y),type="n",xlim=c(0,5),ylim=c(0,11),ylab="Relative mortality",xlab="")
-% #,ylab="Relative mortality",xlab="Time since diagnoses (years)")Excess mortality per 100 person-years
-% segments(x[-length(x)],y[-length(x)],x[-1],y[-length(x)],lwd=4) 
-% abline(h=1)
-% mtext("Relative",side=3,cex=1.5)
-% 
-% @
-% }
-% 
-% \end{frame}
 
 \end{document}

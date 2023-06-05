@@ -1,9 +1,8 @@
 \SweaveOpts{results=hide,keep.source=TRUE,include=FALSE,eps=FALSE,prefix.string=./graph/causInf2}
 \section{Causal inference 2: Model-based estimation of causal estimands}
 
-
 Sources of inspiration: \href{https://doi.org/10.1002/sim.7628}{\color{blue}Luque Fernandez, M.A. et al. (2018)}
-{\it Stat Med} 2018;37(16):2530-2546  and \\ 
+{\it Stat Med} 2018;37(16):2530-2546  and  
   \href{https://doi.org/10.1002/sim.9234}{\color{blue}Smith et al. (2022)} {\it Stat Med} 2022;41(2):407-432.
 
 We shall illustrate with simulated data the estimation of causal effects
@@ -84,13 +83,17 @@ appears weaker  for the outcome model.
 
 \begin{enumerate} % [resume]
 \item
-Based on inspection of the causal diagram, can you identify a proper subset 
-from the four covariates, 
-which would be sufficient to block all backdoor paths between $X$ and $Y$ 
+Based on inspection of the causal diagram, can you 
+provide justification for the claim that 
+variables $Z_2, Z_3, and Z_4$ form a proper subset 
+of the four covariates, which is sufficient to block 
+all backdoor paths between $X$ and $Y$ 
 and thus remove confounding?
 \item
-Even if such a minimal sufficient set is found in item (a), why could it still
-be worth while to include all covariates when modelling the outcome?
+Even though we have such a minimal sufficient set as 
+indicated in item (a), why could it still
+be worth while to include covariate $Z_1$, too,
+when modelling the outcome?
 
 \end{enumerate}
 
@@ -109,7 +112,9 @@ library(SuperLearner)
 library(tmle) 
 @
 \item
-Define the R-functions for the true outcome model and the true exposure model.
+Define the R-functions which computes expected values
+for the exposure and outcome based on the assumed 
+true outcome model and the true exposure model.
 <<true models>>=
 EX <- function( z2, z3, z4) {
            plogis(-5 + 0.05*z2 + 0.25*z3 + 0.5*z4 + 0.4*z2*z4) } 
@@ -118,7 +123,9 @@ EY <- function(x, z1, z2, z3, z4) {
                  0.20*z4 + 0.15*z2*z4) }
 @
 \item
-Define the function for the generation of data based on the given assumptions 
+Define the function for the generation of data
+by simulating random values from pertinent probability distributions 
+based  on the given assumptions.  
 <<data generation function>>=
 genData <- function(N) {
   z1 <- rbinom(N, size=1, prob=0.5)             # Bern(0.5)
@@ -162,45 +169,44 @@ Ey1 <- with(dd, sum(y==1 & x==1)/sum(x==1) )
 Ey0 <- with(dd, sum(y==1 & x==0)/sum(x==0) )
 round(Contr(Ey1, Ey0), 4)
 @
-How much bigger is the risk of death of those exposed
+How much bigger is the risk of death of those factually exposed
 to radiotherapy only as compared with those receiving chemotherapy, too?
 \item
-Compute the counterfactual risks of death 
+Compute now first the counterfactual risks of death 
 $E(Y_i^{X_i=x}) = P(Y_i^{X_i=x}=1) = \pi_i^{X_i=x}$
  for each individual 
 under the alternative treatments or exposure values $x=0,1$ 
-with given covariate values, 
+with given covariate values, then 
 the average or overall counterfactual risks $E(Y^{X=1}) = \pi^1$ 
 and $E(Y^{X=0}) = \pi^0$ in the population, 
-and the true marginal causal contrasts for the effect of $X$:
+and finally the true marginal causal contrasts for the effect of $X$:
 \begin{align*}
  \text{RD} & = E(Y^{X=1})-E(Y^{X=0}), \qquad  \text{RR} = E(Y^{X=1})/E(Y^{X=0}), \\
  \text{OR} & = \frac{E(Y^{X=1})/[1 -  E(Y^{X=1})]}{E(Y^{X=0})/[1 -  E(Y^{X=0})] }
 \end{align*}
 <<true contrasts>>=
-dd <- transform(dd, EY1.ind = EY(1, z1, z2, z3, z4),
-                    EY0.ind = EY(0, z1, z2, z3, z4) )
+dd <- transform(dd, EY1.ind = EY(x=1, z1, z2, z3, z4),
+                    EY0.ind = EY(x=0, z1, z2, z3, z4) )
 EY1 <- mean(dd$EY1.ind)
 EY0 <- mean(dd$EY0.ind)
 round(Contr(EY1, EY0), 4)
 @
 \item
-Compare the associational contrasts in item (a) with the 
-causal contrasts in item (b). 
-What do you conclude about confoundedness of the associational contrasts?
+Compare the associational contrasts computed in in item (a) with the 
+causal contrasts in item (b). What do you conclude about confoundedness of the associational contrasts?
 \end{enumerate}
 
 \subsection{Outcome modelling and estimation of causal contrasts by g-formula}
 
-As the first approach for estimating causal contrast of interest
-we apply the method of standardization or g-formula. Is
+As the first approach for estimating causal contrasts of interest
+we apply the method of standardization or g-formula. It is
 based on a hopefully realistic enough model for
 $E(Y|X=x, Z=z)$, i.e. 
-how the probability of outcome is 
+how the risk of outcome is 
 expected to depend on the exposure variable $X$ and 
 on a sufficient set $Z$ of confounders. The counterfactual
-risks are marginal expectations of the above quantities, 
-standardized over the joint 
+risks $E(Y^{X=x}), x=0,1$, are marginal expectations 
+of the above quantities, standardized over the joint 
 distribution of the confounders $Z$ in the target population. 
 $$ E(Y^{X=x}) = E_Z[E(Y|X=x,Z)] 
        = \int E(Y|X=x, Z=z)dF_Z(z), \quad x=0,1. $$
@@ -213,15 +219,16 @@ for the outcome,
 $$ \pi_i = E(Y_i|X_i=x_i, Z_{i1}=z_{i1}, \dots, Z_{i4}=z_{i4}) = 
   \text{expit}\left(\beta_0 + \delta x_i + 
   \sum_{j=1}^4 \beta_j z_{ij} \right) $$
-Fit this model for the whole population in order to have an accurate
-estimate of the possible bias due to misspecification of the outcome
-model
+Fit this model on the target population using function \texttt{glm()}
+% in order to have an accurate
+% estimate of the possible bias due to misspecification of the outcome
+% model
 <<outcome model>>=
 mY  <- glm(y ~ x + z1 + z2 + z3 + z4, family = binomial, data = dd)
 round(ci.lin(mY, Exp=TRUE)[, c(1,5)], 3)
 @
 There is not much idea in looking at the 
-standard errors or confidence intervals in such a big target population.
+standard errors or confidence intervals in such a big  population.
 \item
 For each subject $i$, compute the fitted 
 individual risk $\widehat{Y_i}$ as well as 
@@ -230,15 +237,15 @@ risks  $\widetilde{Y_i}^{X_i=x}$ for both exposure levels
 $x=0,1$ separately,
 keeping the individual values of the $Z$-variables as they are.
 <<predict>>=
-dd$yh <- predict(mY, type = "response")
-dd$yp1 <- predict(mY, newdata=data.frame( x=rep(1,N), 
+dd$yh <- predict(mY, type = "response")    #  fitted values
+dd$yp1 <- predict(mY, newdata=data.frame( x=rep(1,N),       # x=1
           dd[,c("z1","z2","z3","z4")]), type = "response")
-dd$yp0 <- predict(mY, newdata=data.frame( x=rep(0,N), 
+dd$yp0 <- predict(mY, newdata=data.frame( x=rep(0,N),       # x=0
           dd[,c("z1","z2","z3","z4")]), type = "response")
 @
 \item
 Applying the method of standardization or g-formula 
-compute the point estimates 
+compute now the point estimates 
 $$ \widehat{E}_g(Y^{X=x}) = 
     \frac{1}{n} \sum_{i=1}^n \widetilde{Y}_i^{X_i=x}, \quad x=0,1. $$
 of the two  counterfactual risks $E(Y^{X=1}) = \pi^1$ and 
@@ -256,14 +263,15 @@ arithmetic means of the individually
 predicted values $\widetilde{Y_i}^{X_i=x}$
 of the outcome for the two exposure levels.
 
-Compare the estimated contrast with the true ones in item 3(b) above. 
-How big was the bias due to 
+Compare the estimated contrasts with the true ones in item 3(b) above. 
+How big is the bias due to 
 slight misspecification of the outcome model?
 Compare in particular the estimate of the marginal OR here with
 the conditional OR obtained in item (a) from the pertinent 
 coefficient in the logistic model. Which one is closer to 1?
 \item
-Perform the same calculations using the tools in package \texttt{stdReg} 
+Perform the same calculations using the tools in package 
+\texttt{stdReg} 
 (see \href{https://doi.org/10.1007/s10654-016-0157-3}{\color{blue}Sj{\"o}lander 2016})
 <<stdReg>>=
 mY.std <- stdGlm(fit=mY, data=dd, X="x")
@@ -276,7 +284,7 @@ round(summary(mY.std, transform="odds",
 Check that you got the same point estimates as in the previous item.
 Again, the confidence intervals are not very meaningful when 
 analysing the data covering the whole
-big target population. Of course, when applied to sample data they are 
+big target population. Of course, when applied to real sample data they are 
 relevant. In \texttt{stdReg} package, the standard errors are 
 obtained by the multivariate delta method
 built upon M-estimation and robust sandwich estimator of the 
@@ -331,7 +339,8 @@ The next method is based on weighting each individual observation
 \begin{enumerate} % [resume] 
 
 \item 
-Fit first a model for the exposure including main effects of the $Z$-variables only.
+Fit first a model for the exposure including main effects 
+of the $Z$-variables only.
 $$ p_i = \E(X_i| Z_{1i} = z_{1i}, \dots, Z_{4i} = z_{4i}) 
    = \text{expit}(\gamma_0 + \gamma_1 z_{1i} + \gamma_2 z_{2i} + 
       \gamma_3 z_{i3} + \gamma_4 z_{4i} ), \quad i=1, \dots N $$
@@ -344,7 +353,7 @@ round(ci.lin(mX, Exp=TRUE)[, c(1, 5)], 4)
 Extract the propensity scores, i.e. fitted
 probabilities of belonging to exposure group 1:
 $ \text{PS}_i = \widehat{p}_i$, 
-and compare their distribution between the exposure groups.
+and compare their distribution between the two groups.
 <<propScore, fig=FALSE>>=
 dd$PS = predict(mX, type = "response")
 summary(dd$PS)
@@ -380,9 +389,9 @@ EY1.w <- sum( dd$x * dd$w * dd$y ) / sum( dd$x *  dd$w)
 EY0.w <- sum( (1-dd$x) * dd$w * dd$y ) / sum( (1-dd$x) * dd$w)
 round(Contr(EY1.w, EY0.w), 4)
 @
-The estimate seems to be downward biased. Could this be so, 
-because of ignoring
-the relatively strong product term effect of $Z_2$ and $Z_4$?
+These estimates seem to be somewhat downward biased when comparing
+to true values. Could this be because of omitting the
+ relatively strong product term effect of $Z_2$ and $Z_4$?
 \item
 Let us attempt to correct the estimates by a double robust
 approach called augmented IPW estimation (AIPW), 
@@ -431,13 +440,13 @@ mX2 <- glm(x ~ (z2 + z3 + z4)^2, family=binomial, data=dd)
 round(ci.lin(mX2, Exp=TRUE)[, c(1,5)], 3)
 psw <- SumStat(ps.formula=mX2$formula, data=dd, 
       weight=c("IPW", "treated", "overlap"))
-dd$PS2 <- psw$propensity[, 2]  # propensity scores extracted
+dd$PS2 <- psw$propensity[, 2]          # propensity scores extracted
 plot(density(dd$PS2[dd$x==0]), lty=2  )
 lines(density(dd$PS2[dd$x==1]), lty=1)  
 @
 Note that apart from ordinary IPW, 
 other types of weights can also also obtained. These
-are relevant when estimating other causal contrasts,
+are relevant when estimating other kinds of causal contrasts,
 like ``average treatment effect among the treated'' (ATT) and ``average 
 treatment effect in the overlap (or equipoise) population'' (ATO). 
 \item
@@ -496,6 +505,9 @@ We now consider now another double robust approach,
 known as targeted maximum likelihood estimation (TMLE).
 It also corrects the estimator obtained from the outcome model
 by elements that are derived from the exposure model.
+See \href{https://doi.org/10.1093/aje/kww165}{\color{blue}Schuler and Rose (2017)}
+for more details
+
 \begin{enumerate} % [resume]
 
 \item
@@ -506,11 +518,13 @@ dd$H1 <- dd$x / dd$PS2
 dd$H0 <- (1-dd$x) / (1 - dd$PS2) 
 @
 \item
-Then, a working model is fitted for the outcome, in which the clever covariates
+Then, a working model is fitted for the outcome, 
+in which the clever covariates
 are explanatory variables, but the model also includes
-the previously fitted linear predictor $\widehat{\eta}_i = \text{logit}(\widehat Y_i)$
+the previously fitted linear predictor 
+$\widehat{\eta}_i = \text{logit}(\widehat Y_i)$
 from the original outcome model \texttt{mY}
-as an offset term.  
+as an offset term. Moreover, the intercept is removed.  
 <<model with clever covariates>>=
 epsmod <- glm( y ~ -1 + H0 + H1 + offset(qlogis(yh)), 
    family = binomial(link=logit), data=dd ) 
@@ -518,8 +532,9 @@ eps <- coef(epsmod)
 eps
 @
 \item
-The logit-transformed  predicted values $\widetilde{Y}_i^{X_i=1}$ and $\widetilde{Y}_i^{X_i=0}$
-of counterfactual individual risks  from the original outcome model  are
+The logit-transformed  predicted values $\widetilde{Y}_i^{X_i=1}$ and
+$\widetilde{Y}_i^{X_i=0}$
+of counterfactual individual risks from the original outcome model  are
 now corrected by the estimated coefficients of the clever covariates,
 and the corrected predictions are returned to the original scale.
 <<tmle estimates>>=       
