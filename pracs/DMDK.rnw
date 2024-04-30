@@ -20,8 +20,11 @@
 <<echo = FALSE>>=
 options(width = 90,
         prompt = " ", continue = " ",
-        SweaveHooks = list( fig = function()
-        par(mar = c(3,3,1,1),mgp = c(3,1,0)/1.6,las = 1,bty = "n")))
+        SweaveHooks = list(fig = function()
+               par(mar = c(3,3,1,1),
+                   mgp = c(3,1,0)/1.6,
+                   las = 1,
+                   bty = "n")))
 @ %
 \renewcommand{\rwpre}{./graph/DMDK}
 
@@ -64,7 +67,6 @@ Then we load the dataset and inspect it:
 data(DMlate)
 str(DMlate)
 head(DMlate)
-summary(DMlate)
 @ %
 
 %% \item Set up the dataset as a \texttt{Lexis} object with age, calendar
@@ -130,7 +132,7 @@ We can get an overview of the data by using the \texttt{summary}
 function on the object:
 <<>>=
 summary(LL)
-head(LL)
+print(head(LL), nd = 2)
 @ %
 
 %% \item Get an overview of the mortality by using \texttt{stat.table}
@@ -177,7 +179,7 @@ here apparently only some 10\%.
 %%   Compare to the original \texttt{Lexis}-dataset.
 
 \item When we want to assess how mortality depends on age, calendar
-  time and duration or to comapre with population mortality, we would
+  time and duration or to compare with population mortality, we would
   in principle split the follow-up along all three time scales, but in
   practice it is sufficient to split it along one of the time-scales
   and then use the value of each of the time-scales at the left
@@ -193,9 +195,11 @@ here apparently only some 10\%.
   faster (particularly for large datasets) and has a somewhat smarter
   syntax --- it returns a \texttt{data.table}:
 <<>>=
-system.time(SL <- splitLexis(LL, breaks = seq(0,125,1/2), time.scale = "A"))
+system.time(SL <- splitLexis(LL, 
+                             breaks = seq(0, 125, 1/2), 
+                             time.scale = "A"))
 summary(SL) ; class(SL)
-system.time(SL <- splitMulti(LL, A = seq(0,125,1/2)))
+system.time(SL <- splitMulti(LL, A = seq(0, 125, 1/2)))
 summary(SL) ; class(SL)
 summary(LL)
 @ %
@@ -204,6 +208,384 @@ persons, events and person-years is still the same as in
 \texttt{LL}. Thus, the amount of follow-up information is still the
 same; it is just distributed over more records, and hence allowing
 more detailed analyses.
+
+%% \end{enumerate}
+\end{enumerate}
+
+%% \subsection*{Age-specific mortality}
+\subsection*{Age-specific mortality}
+
+%% \begin{enumerate}[resume]
+\begin{enumerate}[resume]
+
+%% \item Now estimate age-specific mortality curves for men and
+%%   women separately, using splines as implemented in \texttt{gam}.
+%%   We use \texttt{k = 20} to be sure to catch any irregularities by age.
+%% <<>>=
+%% r.m <- gam(cbind(lex.Xst == "Dead", lex.dur) ~ s(A, k = 20),
+%%             family = poisreg,
+%%             data = subset(SL, sex == "M"))
+%% gam.check(r.m)
+%% @
+%% Make sure you understand all the components on this modeling statement.
+
+%% Fit the same model for women.
+
+%% There is a convenient wrapper for this, exploiting the \code{Lexis}
+%% structure of data, but which does not have an update
+%% <<>>=
+%% r.m <- gam.Lexis(subset(SL, sex == "M"), ~ s(A, k = 20))
+%% r.f <- gam.Lexis(subset(SL, sex == "F"), ~ s(A, k = 20))
+%% gam.check(r.m)
+%% gam.check(r.f)
+%% @
+
+\item We now use this dataset to estimate models with age-specific
+  mortality curves for men and women separately, using splines (the
+  function \texttt{gam}, using \texttt{s} from the \texttt{mgcv}
+  package).
+<<>>=
+r.m <- gam(cbind(lex.Xst == "Dead", lex.dur) ~ s(A, k = 20),
+            family = poisreg,
+              data = subset(SL, sex == "M"))
+r.f <- update(r.m, data = subset(SL, sex == "F"))
+@ %
+Here we are modeling the rates based on the follow-up (events
+(\texttt{(lex.Xst == "Dead")}) and person-years (\texttt{lex.dur})) as
+a non-linear function of age --- represented by the penalized spline
+function \texttt{s}.
+
+There is a convenient wrapper for this, exploiting the \code{Lexis}
+structure of data, which however does not have an \code{update} method
+to it.
+<<>>=
+r.m <- gam.Lexis(subset(SL, sex == "M"), ~ s(A, k = 20))
+r.f <- gam.Lexis(subset(SL, sex == "F"), ~ s(A, k = 20))
+@
+
+%% \item Now, extract the estimated rates by using the wrapper function
+%%   \texttt{ci.pred} that computes predicted rates and confidence
+%%   limits for these.
+%%
+%%   However, when using the \code{glm.Lexis} or \code{gam.Lexis} we
+%%   aviod this; they rely on the \code{poisreg} family that will return
+%%   the rates in the (inverse) units in which the person-years were
+%%   given; that is the units of \code{lex.dur}.
+%% <<>>=
+%% nd <-  data.frame(A = seq(20,90,0.5))
+%% p.m <- ci.pred(r.m, newdata = nd)
+%% p.f <- ci.pred(r.f, newdata = nd)
+%% str(p.m)
+%% @ %
+
+\item From these objects we could get the estimated log-rates by using
+  \texttt{predict}, by supplying a data frame of values for the
+  variables used as predictors in the model. These will be values of
+  age --- the ages where we want to see the predicted rates \emph{and}
+  \texttt{lex.dur}.
+
+  The default \texttt{predict.gam} function is a bit clunky as it
+  gives the prediction and the standard errors of these in two different
+  elements of a list, so in \texttt{Epi} there is a wrapper function
+  \texttt{ci.pred} that uses this and computes predicted rates and
+  confidence limits for these, which is usually what is needed.
+
+  Note that in terms of predictions from a model fitted with the
+  family \texttt{pois\textcolor{red}{son}}, \texttt{lex.dur} is a covariate too;
+  by setting this to 1000 throughout the data frame \texttt{nd} we get
+  the rates in units of deaths per 1000 PY\footnote{Note however this is only
+  the case if the offset is specified in the model formula. If the offset is
+  specified as an argument (\texttt{offset = log(lex.dur)}), then the
+  value of \texttt{lex.dur} in the prediction dataframe will be ignored
+  (equivaent of setting \texttt{lex.dur} to 1 in the \texttt{newdata}
+  argument to \texttt{ci.pred}.)}
+
+However, when using the \code{glm.Lexis} or \code{gam.Lexis} we aviod
+this; they rely on the \code{pois\textcolor{red}{reg}} family that
+will return the rates in the (inverse) units in which the person-years
+were given; that is the units of \code{lex.dur}, in this case, events
+per 1 person-year:
+<<>>=
+nd <-  data.frame(A = seq(20, 80, 0.5))
+p.m <- ci.pred(r.m, newdata = nd)
+p.f <- ci.pred(r.f, newdata = nd)
+head(p.m)
+@ %
+
+%% \item Plot the predicted rates for men and women together - using for
+%%   example \texttt{matplot} or \texttt{matshade}.
+%% <<>>=
+%% p.f <- ci.pred(r.f, newdata = nd)
+%% matplot(nd$A, cbind(p.m,p.f) * 1000,
+%%         type = "l", col = rep(c("blue","red"),each = 3), lwd = c(3,1,1), lty = 1,
+%%         log = "y", xlab = "Age", ylab = "Mortality of DM ptt per 1000 PY")
+%% @ %
+
+\item We can then plot the predicted rates for men and women together
+  using \texttt{matplot}:
+<<a-rates,fig = TRUE>>=
+matplot(nd$A, cbind(p.m, p.f) * 1000,
+        type = "l", col = rep(c("blue","red"),each = 3), lwd = c(3,1,1), lty = 1,
+        log = "y", xlab = "Age", ylab = "Mortality of DM ptt per 1000 PY")
+@ % $
+An alternative is to use \texttt{matshade} that gives confidence
+limist as shaded areas
+<<A-rates,fig = TRUE>>=
+matshade(nd$A, cbind(p.m,p.f) * 1000, plot = TRUE,
+         col = c("blue","red"), lty = 1, lwd = 3,
+         log = "y", xlab = "Age", ylab = "Mortality among DM ptt per 1000 PY")
+@ %
+\insfig{A-rates}{0.7}{Age-specific mortality rates for Danish diabetes
+  patients as estimated from a \textrm{\tt gam} model with only
+  age. Blue: men, red: women.}
+
+   Not surprisingly, the uncertainty on the rates is largest among the
+   youngest where the no. of deaths is smallest.
+
+%% \end{enumerate}
+\end{enumerate}
+
+%% \subsection*{Further time scales: period and duration}
+\subsection*{Further time scales: period and duration}
+
+%% \begin{enumerate}[resume]
+\begin{enumerate}[resume]
+
+%% \item We now want to model the mortality rates among diabetes patients
+%%   also including current date and duration of diabetes, using penalized
+%%   splines.  Use the argument \texttt{bs = "cr"} to \texttt{s()} to get
+%%   cubic splines indstead of thin plate (\texttt{"tp"}) splines which is
+%%   the default. Check if you have a reasonable fit using \code{gam.check}.
+%% <<>>=
+%% Mtp <- gam((lex.Xst == "Dead") ~ s(  A, bs = "cr", k = 10) +
+%%                                  s(  P, bs = "cr", k = 10) +
+%%                                  s(dur, bs = "cr", k = 10),
+%%             offset = log(lex.dur),
+%%             family = poisson,
+%%               data = subset(SL, sex == "M"))
+%% @
+%% An easier specification of the model exploits the \code{Lexis} class
+%% of the dataset, try:
+%% <<>>=
+%% Mcr <- gam.Lexis(subset(SL, sex == "M"),
+%%                  ~ s(  A, bs = "cr", k = 10) +
+%%                    s(  P, bs = "cr", k = 10) +
+%%                    s(dur, bs = "cr", k = 10))
+%% summary(Mcr)
+%% gam.check(Mcr)
+%% @ %
+%% Fit the same model for women as well. Are the models reasonably fitting?
+
+\item We model the mortality rates among diabetes patients also
+  including current date and duration of diabetes. Note that we for
+  later prediction purposes put the offset in the model formula.
+<<>>=
+Mcr <- gam.Lexis(subset(SL, sex == "M"),
+                 ~ s(  A, bs = "cr", k = 10) +
+                   s(  P, bs = "cr", k = 10) +
+                   s(dur, bs = "cr", k = 10))
+summary(Mcr)
+Fcr <- gam.Lexis(subset(SL, sex == "F"),
+                 ~ s(  A, bs = "cr", k = 10) +
+                   s(  P, bs = "cr", k = 10) +
+                   s(dur, bs = "cr", k = 10))
+summary(Fcr)
+@ %
+For the male rates the \texttt{edf} (effective degrees of freedom) is
+quite close to the \texttt{k}, but as wee shall see there is no need
+for more detailed modeling.
+
+%% \item Plot the estimated effects, using the default plot method for
+%%   \texttt{gam} objects. Remember that there are three effects
+%%   estimated, so it is useful set up a multi-panel display, and for
+%%   the sake of comparability to set ylim to the same for men and women:
+%% <<>>=
+%% par(mfrow = c(2,3))
+%% plot(Mcr, ylim = c(-3,3))
+%% plot(Fcr, ylim = c(-3,3))
+%% @
+%% What is the absolute scale for these effects?
+
+\item We can now plot the estimated effects for men and women ---
+  compare the different plotting options between men and women:
+<<plgam-default,fig = TRUE,height = 9,width = 9>>=
+par(mfcol = c(3,2))
+plot(Fcr, ylim = c(-3,3), col = "red")
+plot(Mcr, ylim = c(-3,3), col = "blue",
+          lwd = 2, shade = TRUE, shade.col = adjustcolor("blue", alpha = 0.15))
+@ %
+\insfig{plgam-default}{1.0}{Plot of the estimated smooth terms for women
+(left) and men (right). It seems that the duration effects
+are somewhat over-modeled.}
+
+%% \item Compare the fit of the naive model with just age and the
+%%   three-factor models, using \texttt{anova}, e.g.:
+%% <<>>=
+%% anova(Mcr, r.m, test = "Chisq")
+%% @ %
+%% What do you conclude?
+
+\item Not surprisingly, these models fit substantially better than the
+  model with only age as we can see from this comparison:
+<<>>=g
+anova(Mcr, r.m, test = "Chisq")
+anova(Fcr, r.f, test = "Chisq")
+@ %
+
+%% \item The model we fitted has three time-scales: current age, current
+%%   date and current duration of diabetes, so the effects that we report
+%%   are not immediately interpretable, as they are (as in any kind of
+%%   multiple regressions) to be interpreted as ``all else equal'' which
+%%   they are not, as the three time scales advance simultaneously at the
+%%   same pace.
+
+%%   The reporting would therefore more naturally be on the
+%%   mortality scale as a function of age, but showing the mortality
+%%   for persons diagnosed in different ages, using separate displays
+%%   for separate years of diagnosis.
+
+%%   This is most easily done using the \texttt{ci.pred} function with
+%%   the \texttt{newdata = } argument. So a person diagnosed in age 50 in
+%%   1995 will have a mortality measured in cases per 1000 PY as:
+%% <<>>=
+%% pts <- seq(0, 12, 1/4)
+%% nd <- data.frame(A =   50 + pts,
+%%                  P = 1995 + pts,
+%%                dur =        pts)
+%% m.pr <- ci.pred(Mcr, newdata = nd)
+%% @ %
+%%   Note that because we used \code{gam.Lexis} which uses
+%%   the\code{poisreg} family we need not specify \code{lex.dur} as a
+%%   variable in the prediction data frame \code{nd}. Predictions will
+%%   be rates in the same units as \code{lex.dur}.
+%%
+%%   Now take a look at the result from the \texttt{ci.pred} statement and
+%%   construct prediction of mortality for men and women diagnosed in a
+%%   range of ages, say 50, 60, 70, and plot these together in the same
+%%   graph:
+%% <<eval = FALSE,results = hide>>=
+%% cbind(nd, ci.pred(Mcr, newdata = nd))
+%% @
+
+\item Since the fitted model has three time-scales: current age,
+  current date and current duration of diabetes, the effects that
+  we see from the \texttt{plot.gam} are not really interpretable; they
+  are (as in any kind of multiple regressions) to be interpreted as
+  ``all else equal'' which they are not; the three time scales
+  advance simultaneously at the same pace.
+
+  The reporting would therefore more naturally be \emph{only} on one
+  time scale, showing the mortality for persons diagnosed in
+  different ages in a given year.
+
+  This is most easily done using the \texttt{ci.pred} function with
+  the \texttt{newdata=} argument. So a person diagnosed in age 50 in
+  1995 will have a mortality measured in cases per 1000 PY as:
+<<>>=
+pts <- seq(0, 12, 1/4)
+nd <- data.frame(A =   50 + pts,
+                 P = 1995 + pts,
+               dur =        pts)
+head(cbind(nd$A, ci.pred(Mcr, newdata = nd) * 1000))
+@ % $
+  Note that because we used \code{gam.Lexis} which uses
+  the\code{poisreg} family, we need not specify \code{lex.dur} as a
+  variable in the prediction data frame \code{nd}. Predictions will
+  be rates in the same (well, inverse) units as \code{lex.dur}.
+
+Since there is no duration beyond 18 years in the dataset we only make
+predictions for 12 years of duration, and do it for persons diagnosed
+in 1995 and 2005 --- the latter is quite dubious too because we are
+extrapolating calendar time trends quite a bit beyond data.
+
+We form matrices of predictions with confidence intervals, that we
+will plot in the same frame (using nested loops):
+<<rates,fig = TRUE>>=
+plot(NA, xlim = c(50, 85), ylim = c(5, 400), log = "y",
+         xlab = "Age", ylab = "Mortality rate for DM patients")
+for(ip in c(1995, 2005))
+for(ia in c(50, 60, 70))
+   {
+nd <- data.frame(A = ia + pts,
+                 P = ip + pts,
+               dur =      pts)
+matshade(nd$A, ci.pred(Mcr, nd) * 1000, col = "blue", lty = 1 + (ip == 1995))
+matshade(nd$A, ci.pred(Fcr, nd) * 1000, col = "red" , lty = 1 + (ip == 1995))
+   }
+@ %
+\insfig{rates}{1.0}{Mortality rates for diabetes patients diagnosed
+  1995 and 2005 in ages 50, 60 and 70; as estimated by penalized
+  splines. Men blue, women red; broken lines persons diagnosed 1995,
+  full lines persons diagnosed 2005.}
+
+%% \item From figure it seems that the duration effect is
+%% over-modeled, so refit constraining the d.f. to 5:
+%% <<rates5,fig = TRUE, width = 10, eval = FALSE>>=
+%% Mcr <- gam.Lexis(subset(SL, sex == "M"),
+%%                  ~ s(  A, bs = "cr", k = 10) +
+%%                    s(  P, bs = "cr", k = 10) +
+%%                    s(dur, bs = "cr", k = 5))
+%% summary(Mcr)
+%% Fcr <- gam.Lexis(subset(SL, sex == "F"),
+%%                  ~ s(  A, bs = "cr", k = 10) +
+%%                    s(  P, bs = "cr", k = 10) +
+%%                    s(dur, bs = "cr", k = 5))
+%% @ %
+%% How does \texttt{gam.check()} look for these models?
+%% Plot the estimated rates from the revised models.
+%% What do you conclude from the plots?
+
+\item From figure \ref{fig:rates} it seems that the duration effect is
+dramatically over-modeled, so we refit constraining the d.f. to 5 (note
+that this choice is essentially an arbitray choice) and redo the whole
+thing again:
+<<rates5,fig = TRUE,width = 10>>=
+Mcr <- gam.Lexis(subset(SL, sex == "M"),
+                 ~ s(  A, bs = "cr", k = 10) +
+                   s(  P, bs = "cr", k = 10) +
+                   s(dur, bs = "cr", k = 5))
+summary(Mcr)
+Fcr <- gam.Lexis(subset(SL, sex == "F"),
+                 ~ s(  A, bs = "cr", k = 10) +
+                   s(  P, bs = "cr", k = 10) +
+                   s(dur, bs = "cr", k = 5))
+summary(Fcr)
+gam.check(Mcr)
+gam.check(Fcr)
+@ %
+From the summaries it seems that \texttt{k = 5} is a bit \emph{under}-modeling the
+duration effect.
+
+We can also add the rate-ratio between men and women using the
+\texttt{ci.ratio} function:
+<<rates-5,fig = TRUE>>=
+plot(NA, xlim = c(50,80), ylim = c(0.9,100), log = "y",
+         xlab = "Age", ylab = "Mortality rate for DM patients")
+abline(v = c(50,55,60,65,70), col = gray(0.8))
+# for(ip in c(1995,2005))
+ip <- 2005
+for(ia in seq(50, 70, 5))
+   {
+nd <- data.frame(A = ia + pts,
+                 P = ip + pts,
+               dur =      pts)
+matshade(nd$A, rm <- ci.pred(Mcr, nd) * 1000, col = "blue", lwd = 2)
+matshade(nd$A, rf <- ci.pred(Fcr, nd) * 1000, col = "red" , lwd = 2)
+matshade(nd$A, ci.ratio(rm, rf), lwd = 2)
+   }
+abline(h = 1, lty = "55")
+@ %
+\insfig{rates-5}{1.0}{Mortality rates for diabetes patients diagnosed
+  1995 and 2005 in ages 50, 55, 60, 65 and 70; as estimated by penalized
+  splines. Note that we did this for year of diagnosis 2005 alone, but
+  for a longer duration period. Men blue, women red, M/W rate ratio gray.}
+From figure \ref{fig:rates-dur} we see that there is an incraesed
+mortality in the first few years afer diagnosis (this is a clinical
+artifact) and little indication that age \emph{at} diagnosis has any effect.
+(This can of course be tried explicitly).
+
+Moreover it is pretty clear that the M/W mortality rate ratio is
+constant across age and duration.
 
 %% \end{enumerate}
 \end{enumerate}
@@ -442,384 +824,6 @@ round(ci.exp(msmr, ctr.mat = CM), 2)
 %% \end{enumerate}
 \end{enumerate}
 
-%% \subsection*{Age-specific mortality}
-\subsection*{Age-specific mortality}
-
-%% \begin{enumerate}[resume]
-\begin{enumerate}[resume]
-
-%% \item Now estimate age-specific mortality curves for men and
-%%   women separately, using splines as implemented in \texttt{gam}.
-%%   We use \texttt{k = 20} to be sure to catch any irregularities by age.
-%% <<>>=
-%% r.m <- gam(cbind(lex.Xst == "Dead", lex.dur) ~ s(A, k = 20),
-%%             family = poisreg,
-%%             data = subset(SL, sex == "M"))
-%% gam.check(r.m)
-%% @
-%% Make sure you understand all the components on this modeling statement.
-
-%% Fit the same model for women.
-
-%% There is a convenient wrapper for this, exploiting the \code{Lexis}
-%% structure of data, but which does not have an update
-%% <<>>=
-%% r.m <- gam.Lexis(subset(SL, sex == "M"), ~ s(A, k = 20))
-%% r.f <- gam.Lexis(subset(SL, sex == "F"), ~ s(A, k = 20))
-%% gam.check(r.m)
-%% gam.check(r.f)
-%% @
-
-\item We now use this dataset to estimate models with age-specific
-  mortality curves for men and women separately, using splines (the
-  function \texttt{gam}, using \texttt{s} from the \texttt{mgcv}
-  package).
-<<>>=
-r.m <- gam(cbind(lex.Xst == "Dead", lex.dur) ~ s(A, k = 20),
-            family = poisreg,
-              data = subset(SL, sex == "M"))
-r.f <- update(r.m, data = subset(SL, sex == "F"))
-@ %
-Here we are modeling the rates based on the follow-up (events
-(\texttt{(lex.Xst == "Dead")}) and person-years (\texttt{lex.dur})) as
-a non-linear function of age --- represented by the penalized spline
-function \texttt{s}.
-
-There is a convenient wrapper for this, exploiting the \code{Lexis}
-structure of data, which however does not have an \code{update} method
-to it.
-<<>>=
-r.m <- gam.Lexis(subset(SL, sex == "M"), ~ s(A, k = 20))
-r.f <- gam.Lexis(subset(SL, sex == "F"), ~ s(A, k = 20))
-@
-
-%% \item Now, extract the estimated rates by using the wrapper function
-%%   \texttt{ci.pred} that computes predicted rates and confidence
-%%   limits for these.
-%%
-%%   However, when using the \code{glm.Lexis} or \code{gam.Lexis} we
-%%   aviod this; they rely on the \code{poisreg} family that will return
-%%   the rates in the (inverse) units in which the person-years were
-%%   given; that is the units of \code{lex.dur}.
-%% <<>>=
-%% nd <-  data.frame(A = seq(20,90,0.5))
-%% p.m <- ci.pred(r.m, newdata = nd)
-%% p.f <- ci.pred(r.f, newdata = nd)
-%% str(p.m)
-%% @ %
-
-\item From these objects we could get the estimated log-rates by using
-  \texttt{predict}, by supplying a data frame of values for the
-  variables used as predictors in the model. These will be values of
-  age --- the ages where we want to see the predicted rates \emph{and}
-  \texttt{lex.dur}.
-
-  The default \texttt{predict.gam} function is a bit clunky as it
-  gives the prediction and the standard errors of these in two different
-  elements of a list, so in \texttt{Epi} there is a wrapper function
-  \texttt{ci.pred} that uses this and computes predicted rates and
-  confidence limits for these, which is usually what is needed.
-
-  Note that in terms of predictions from a model fitted with teh
-  family \texttt{pois\textcolor{red}{son}}, \texttt{lex.dur} is a covariate too;
-  by setting this to 1000 throughout the data frame \texttt{nd} we get
-  the rates in units of deaths per 1000 PY\footnote{Note however this is only
-  the case if the offset is specified in the model formula. If the offset is
-  specified as an argument (\texttt{offset = log(lex.dur)}), then the
-  value of \texttt{lex.dur} in the dataframe will be ignored
-  (equivaent of setting \texttt{lex.dur} to 1 in the \texttt{newdata}
-  argument to \texttt{ci.pred}.)}
-
-However, when using the \code{glm.Lexis} or \code{gam.Lexis} we aviod
-this; they rely on the \code{pois\textcolor{red}{reg}} family that
-will return the rates in the (inverse) units in which the person-years
-were given; that is the units of \code{lex.dur}, in this case, events
-per 1 person-year:
-<<>>=
-nd <-  data.frame(A = seq(20, 80, 0.5))
-p.m <- ci.pred(r.m, newdata = nd)
-p.f <- ci.pred(r.f, newdata = nd)
-head(p.m)
-@ %
-
-%% \item Plot the predicted rates for men and women together - using for
-%%   example \texttt{matplot} or \texttt{matshade}.
-%% <<>>=
-%% p.f <- ci.pred(r.f, newdata = nd)
-%% matplot(nd$A, cbind(p.m,p.f) * 1000,
-%%         type = "l", col = rep(c("blue","red"),each = 3), lwd = c(3,1,1), lty = 1,
-%%         log = "y", xlab = "Age", ylab = "Mortality of DM ptt per 1000 PY")
-%% @ %
-
-\item We can then plot the predicted rates for men and women together
-  using \texttt{matplot}:
-<<a-rates,fig = TRUE>>=
-matplot(nd$A, cbind(p.m, p.f) * 1000,
-        type = "l", col = rep(c("blue","red"),each = 3), lwd = c(3,1,1), lty = 1,
-        log = "y", xlab = "Age", ylab = "Mortality of DM ptt per 1000 PY")
-@ % $
-An alternative is to use \texttt{matshade} that gives confidence
-limist as shaded areas
-<<A-rates,fig = TRUE>>=
-matshade(nd$A, cbind(p.m,p.f) * 1000, plot = TRUE,
-         col = c("blue","red"), lty = 1, lwd = 3,
-         log = "y", xlab = "Age", ylab = "Mortality among DM ptt per 1000 PY")
-@ %
-\insfig{A-rates}{0.7}{Age-specific mortality rates for Danish diabetes
-  patients as estimated from a \textrm{\tt gam} model with only
-  age. Blue: men, red: women.}
-
-   Not surprisingly, the uncertainty on the rates is largest among the
-   youngest where the no. of deaths is smallest.
-
-%% \end{enumerate}
-\end{enumerate}
-
-%% \subsection*{Further time scales: period and duration}
-\subsection*{Further time scales: period and duration}
-
-%% \begin{enumerate}[resume]
-\begin{enumerate}[resume]
-
-%% \item We now want to model the mortality rates among diabetes patients
-%%   also including current date and duration of diabetes, using penalized
-%%   splines.  Use the argument \texttt{bs = "cr"} to \texttt{s()} to get
-%%   cubic splines indstead of thin plate (\texttt{"tp"}) splines which is
-%%   the default. Check if you have a reasonable fit using \code{gam.check}.
-%% <<>>=
-%% Mtp <- gam((lex.Xst == "Dead") ~ s(  A, bs = "cr", k = 10) +
-%%                                  s(  P, bs = "cr", k = 10) +
-%%                                  s(dur, bs = "cr", k = 10),
-%%             offset = log(lex.dur),
-%%             family = poisson,
-%%               data = subset(SL, sex == "M"))
-%% @
-%% An easier specification of the model exploits the \code{Lexis} class
-%% of the dataset, try:
-%% <<>>=
-%% Mcr <- gam.Lexis(subset(SL, sex == "M"),
-%%                  ~ s(  A, bs = "cr", k = 10) +
-%%                    s(  P, bs = "cr", k = 10) +
-%%                    s(dur, bs = "cr", k = 10))
-%% summary(Mcr)
-%% gam.check(Mcr)
-%% @ %
-%% Fit the same model for women as well. Are the models reasonably fitting?
-
-\item We model the mortality rates among diabetes patients also
-  including current date and duration of diabetes. Note that we for
-  later prediction purposes put the offset in the model formula.
-<<>>=
-Mcr <- gam.Lexis(subset(SL, sex == "M"),
-                 ~ s(  A, bs = "cr", k = 10) +
-                   s(  P, bs = "cr", k = 10) +
-                   s(dur, bs = "cr", k = 10))
-summary(Mcr)
-Fcr <- gam.Lexis(subset(SL, sex == "F"),
-                 ~ s(  A, bs = "cr", k = 10) +
-                   s(  P, bs = "cr", k = 10) +
-                   s(dur, bs = "cr", k = 10))
-summary(Fcr)
-@ %
-For the male rates the \texttt{edf} (effective degrees of freedom) is
-quite close to the \texttt{k}, but as wee shall see there is no need
-for more detailed modeling.
-
-%% \item Plot the estimated effects, using the default plot method for
-%%   \texttt{gam} objects. Remember that there are three effects
-%%   estimated, so it is useful set up a multi-panel display, and for
-%%   the sake of comparability to set ylim to the same for men and women:
-%% <<>>=
-%% par(mfrow = c(2,3))
-%% plot(Mcr, ylim = c(-3,3))
-%% plot(Fcr, ylim = c(-3,3))
-%% @
-%% What is the absolute scale for these effects?
-
-\item We can now plot the estimated effects for men and women ---
-  compare the different plotting options between men and women:
-<<plgam-default,fig = TRUE,height = 9,width = 9>>=
-par(mfcol = c(3,2))
-plot(Fcr, ylim = c(-3,3), col = "red")
-plot(Mcr, ylim = c(-3,3), col = "blue",
-          lwd = 2, shade = TRUE, shade.col = adjustcolor("blue", alpha = 0.15))
-@ %
-\insfig{plgam-default}{1.0}{Plot of the estimated smooth terms for women
-(left) and men (right). It seems that the duration effects
-are somewhat over-modeled.}
-
-%% \item Compare the fit of the naive model with just age and the
-%%   three-factor models, using \texttt{anova}, e.g.:
-%% <<>>=
-%% anova(Mcr, r.m, test = "Chisq")
-%% @ %
-%% What do you conclude?
-
-\item Not surprisingly, these models fit substantially better than the
-  model with only age as we can see from this comparison:
-<<>>=g
-anova(Mcr, r.m, test = "Chisq")
-anova(Fcr, r.f, test = "Chisq")
-@ %
-
-%% \item The model we fitted has three time-scales: current age, current
-%%   date and current duration of diabetes, so the effects that we report
-%%   are not immediately interpretable, as they are (as in any kind of
-%%   multiple regressions) to be interpreted as ``all else equal'' which
-%%   they are not, as the three time scales advance simultaneously at the
-%%   same pace.
-
-%%   The reporting would therefore more naturally be on the
-%%   mortality scale as a function of age, but showing the mortality
-%%   for persons diagnosed in different ages, using separate displays
-%%   for separate years of diagnosis.
-
-%%   This is most easily done using the \texttt{ci.pred} function with
-%%   the \texttt{newdata = } argument. So a person diagnosed in age 50 in
-%%   1995 will have a mortality measured in cases per 1000 PY as:
-%% <<>>=
-%% pts <- seq(0, 12, 1/4)
-%% nd <- data.frame(A =   50 + pts,
-%%                  P = 1995 + pts,
-%%                dur =        pts)
-%% m.pr <- ci.pred(Mcr, newdata = nd)
-%% @ %
-%%   Note that because we used \code{gam.Lexis} which uses
-%%   the\code{poisreg} family we need not specify \code{lex.dur} as a
-%%   variable in the prediction data frame \code{nd}. Predictions will
-%%   be rates in the same units as \code{lex.dur}.
-%%
-%%   Now take a look at the result from the \texttt{ci.pred} statement and
-%%   construct prediction of mortality for men and women diagnosed in a
-%%   range of ages, say 50, 60, 70, and plot these together in the same
-%%   graph:
-%% <<eval = FALSE,results = hide>>=
-%% cbind(nd, ci.pred(Mcr, newdata = nd))
-%% @
-
-\item Since the fitted model has three time-scales: current age,
-  current date and current duration of diabetes, the effects that
-  we see from the \texttt{plot.gam} are not really interpretable; they
-  are (as in any kind of multiple regressions) to be interpreted as
-  ``all else equal'' which they are not; the three time scales
-  advance simultaneously at the same pace.
-
-  The reporting would therefore more naturally be \emph{only} on one
-  time scale, showing the mortality for persons diagnosed in
-  different ages in a given year.
-
-  This is most easily done using the \texttt{ci.pred} function with
-  the \texttt{newdata=} argument. So a person diagnosed in age 50 in
-  1995 will have a mortality measured in cases per 1000 PY as:
-<<>>=
-pts <- seq(0, 12, 1/4)
-nd <- data.frame(A =   50 + pts,
-                 P = 1995 + pts,
-               dur =        pts)
-head(cbind(nd$A, ci.pred(Mcr, newdata = nd) * 1000))
-@ % $
-  Note that because we used \code{gam.Lexis} which uses
-  the\code{poisreg} family, we need not specify \code{lex.dur} as a
-  variable in the prediction data frame \code{nd}. Predictions will
-  be rates in the same (well, inverse) units as \code{lex.dur}.
-
-Since there is no duration beyond 18 years in the dataset we only make
-predictions for 12 years of duration, and do it for persons diagnosed
-in 1995 and 2005 --- the latter is quite dubious too because we are
-extrapolating calendar time trends quite a bit beyond data.
-
-We form matrices of predictions with confidence intervals, that we
-will plot in the same frame (sing nested loops):
-<<rates,fig = TRUE>>=
-plot(NA, xlim = c(50, 85), ylim = c(5, 400), log = "y",
-         xlab = "Age", ylab = "Mortality rate for DM patients")
-for(ip in c(1995, 2005))
-for(ia in c(50, 60, 70))
-   {
-nd <- data.frame(A = ia + pts,
-                 P = ip + pts,
-               dur =      pts)
-matshade(nd$A, ci.pred(Mcr, nd) * 1000, col = "blue", lty = 1 + (ip == 1995))
-matshade(nd$A, ci.pred(Fcr, nd) * 1000, col = "red" , lty = 1 + (ip == 1995))
-   }
-@ %
-\insfig{rates}{1.0}{Mortality rates for diabetes patients diagnosed
-  1995 and 2005 in ages 50, 60 and 70; as estimated by penalized
-  splines. Men blue, women red; broken lines persons diagnosed 1995,
-  full lines persons diagnosed 2005.}
-
-%% \item From figure it seems that the duration effect is
-%% over-modeled, so refit constraining the d.f. to 5:
-%% <<rates5,fig = TRUE, width = 10, eval = FALSE>>=
-%% Mcr <- gam.Lexis(subset(SL, sex == "M"),
-%%                  ~ s(  A, bs = "cr", k = 10) +
-%%                    s(  P, bs = "cr", k = 10) +
-%%                    s(dur, bs = "cr", k = 5))
-%% summary(Mcr)
-%% Fcr <- gam.Lexis(subset(SL, sex == "F"),
-%%                  ~ s(  A, bs = "cr", k = 10) +
-%%                    s(  P, bs = "cr", k = 10) +
-%%                    s(dur, bs = "cr", k = 5))
-%% @ %
-%% How does \texttt{gam.check()} look for these models?
-%% Plot the estimated rates from the revised models.
-%% What do you conclude from the plots?
-
-\item From figure \ref{fig:rates} it seems that the duration effect is
-dramatically over-modeled, so we refit constraining the d.f. to 5 (note
-that this choice is essentially an arbitray choice) and redo the whole
-thing again:
-<<rates5,fig = TRUE,width = 10>>=
-Mcr <- gam.Lexis(subset(SL, sex == "M"),
-                 ~ s(  A, bs = "cr", k = 10) +
-                   s(  P, bs = "cr", k = 10) +
-                   s(dur, bs = "cr", k = 5))
-summary(Mcr)
-Fcr <- gam.Lexis(subset(SL, sex == "F"),
-                 ~ s(  A, bs = "cr", k = 10) +
-                   s(  P, bs = "cr", k = 10) +
-                   s(dur, bs = "cr", k = 5))
-summary(Fcr)
-gam.check(Mcr)
-gam.check(Fcr)
-@ %
-From the summaries it seems that \texttt{k = 5} is a bit \emph{under}-modeling the
-duration effect.
-
-We can also add the rate-ratio between men and women using the
-\texttt{ci.ratio} function:
-<<rates-5,fig = TRUE>>=
-plot(NA, xlim = c(50,80), ylim = c(0.9,100), log = "y",
-         xlab = "Age", ylab = "Mortality rate for DM patients")
-abline(v = c(50,55,60,65,70), col = gray(0.8))
-# for(ip in c(1995,2005))
-ip <- 2005
-for(ia in seq(50, 70, 5))
-   {
-nd <- data.frame(A = ia + pts,
-                 P = ip + pts,
-               dur =      pts)
-matshade(nd$A, rm <- ci.pred(Mcr, nd) * 1000, col = "blue", lwd = 2)
-matshade(nd$A, rf <- ci.pred(Fcr, nd) * 1000, col = "red" , lwd = 2)
-matshade(nd$A, ci.ratio(rm, rf), lwd = 2)
-   }
-abline(h = 1, lty = "55")
-@ %
-\insfig{rates-5}{1.0}{Mortality rates for diabetes patients diagnosed
-  1995 and 2005 in ages 50, 55, 60, 65 and 70; as estimated by penalized
-  splines. Note that we did this for year of diagnosis 2005 alone, but
-  for a longer duration period. Men blue, women red, M/W rate ratio gray.}
-From figure \ref{fig:rates-dur} we see that there is an incraesed
-mortality in the first few years afer diagnosis (this is a clinical
-artifact) and little indication that age \emph{at} diagnosis has any effect.
-(This can of course be tried explicitly).
-
-Moreover it is pretty clear that the M/W mortality rate ratio is
-constant across age and duration.
-
-%% \end{enumerate}
-\end{enumerate}
-
 %% \subsection{SMR modeling}
 \subsection{SMR modeling}
 
@@ -956,5 +960,5 @@ We see that there is absolutely no indication of difference between
 men and women, but also that the estimated effect of duraion is not
 exactly credible.
 
-%% \end{enumerate
+%% \end{enumerate}
 \end{enumerate}
