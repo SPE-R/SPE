@@ -1,3 +1,4 @@
+
 library( Epi )
 options(digits=4)  #  to cut down decimal points in the output
 
@@ -18,7 +19,7 @@ mreg <- glm( cbind(D, Y) ~ 1, family=poisreg(link=log) )
 ci.exp( mreg ) 
 
 ###################################################
-### code chunk number 2: log(Rate) and it's 95% CI. ci.lin NO exp=T
+### code chunk number 2: log(Rate) and it's 95% CI. ci.lin NO exp
 ###################################################
 mreg <- glm( cbind(D, Y) ~ 1, family=poisreg(link=log) )
 ci.lin( mreg )[,c(1,5,6)] 
@@ -115,7 +116,7 @@ births %>%
 ### code chunk for Binary regression
 ###################################################
 
-m<-glm(lowbw~hyp,family=binomial(link=log),data=births)
+m <- glm(lowbw~hyp-1,family=binomial(link=log),data=births)
 ci.exp(m)
 
 ###################################################
