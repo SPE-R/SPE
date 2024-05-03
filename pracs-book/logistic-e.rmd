@@ -1,0 +1,350 @@
+```{r, include=FALSE}
+knitr::opts_chunk$set(results='hide', prefix.string='./graph/logistic')
+```
+
+# Logistic regression (GLM)
+
+## Malignant melanoma in Denmark
+
+In the mid-80s a case-control study on
+risk factors for malignant melanoma was conducted in Denmark
+({\O}sterlind et al. The Danish case-control study of cutaneous
+malignant melanoma I: Importance of host factors.
+ *Int J Cancer* 1988; 42: 200-206).
+
+
+The cases were patients with skin melanoma
+(excluding lentigo melanoma),
+newly diagnosed from 1 Oct, 1982 to 31 March, 1985, aged 20-79, from 
+East Denmark, and they were identified from the Danish Cancer Registry.
+
+The controls (twice as many as cases) 
+were drawn from the residents of East Denmark
+in April, 1984, as a random sample stratified by
+sex and age (within the same 5 year age group) to reflect the 
+sex and age distribution of the cases. This is called group matching,
+and in such a study, it is necessary to control for age and sex in the statistical analysis. 
+(Yes indeed: In spite of the fact that
+stratified sampling by sex and age removed the statistical association of these
+variables with melanoma from the final case-control data set,
+ the analysis must control for
+variables which determine the probability of selecting 
+ subjects from the base population to the study sample.)
+ 
+The population of East Denmark is a dynamic one. Sampling the
+controls only at one time point is a rough approximation of
+{\it incidence density sampling}, which ideally would spread out over the whole study period. Hence
+the exposure odds ratios calculable from the data are estimates
+of the corresponding hazard rate ratios between the exposure groups. 
+
+After exclusions, refusals etc., 
+474 cases (92% of eligible cases) 
+and 926 controls (82%) were interviewed. This was done face-to-face
+with a structured questionnaire
+by trained interviewers, who were not 
+informed about the subject's case-control status.
+
+For this  exercise we have selected a few host variables from the
+study in an ascii-file, `melanoma.dat`. The variables are listed
+in table \@ref(tab:meldat).
+
+\begin{table}[h]
+\begin{center}
+\caption{{#tab:meldat}
+  \it Variables in the melanoma dataset.} 
+\begin{tabular}{@{\extracolsep{1em}}llll}\\
+{\bf Variable} & {\bf Units or Coding} & {\bf Type} & {\bf Name}\\
+\\ \hline \\
+ Case-control status &  1=case, 0=control & numeric & `cc` \\
+ Sex & 1=male, 2=female & numeric & `sex` \\
+ Age at interview & age in years & numeric & `age` \\
+ Skin complexion & 0=dark, 1=medium, 2=light & numeric & `skin` \\
+ Hair colour & 0=dark brown/black, 1=light brown, \\
+             & 2=blonde, 3=red & numeric & `hair` \\
+ eye colour & 0=brown, 1=grey, green, 2=blue & numeric & `eyes` \\
+ Freckles & 1=many, 2=some, 3=none & numeric & `freckles` \\
+ Naevi, small & no. naevi $<5$mm & numeric & `nvsmall` \\
+ Naevi, largs & no. naevi $\ge 5$mm & numeric & `nvlarge` \\ \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+## Reading the data
+Start R and
+load the `Epi` package using the function `library()`. 
+Read the data set from the file `melanoma.dat` found in the course website
+%% (this should be in the subdirectory data of your working directory) 
+to a data frame with name `mel` using the `read.table()` function.
+Remember to specify that missing values are coded ''`.`'', and 
+that variable names are in the first line of the file.
+View the overall structure of the data frame, and list the first 20 rows of `mel`.
+
+```{r Reading the data, echo=T}
+library(Epi)
+mel <- read.table("http://bendixcarstensen.com/SPE/data/melanoma.dat", header=TRUE, na.strings=".")
+str(mel)
+head(mel, n=20)
+```
+
+## House keeping
+The structure of the data frame `mel` tells us that all the variables are numeric (integer), so first you need to do a bit of house keeping. For example the variables `sex, skin, hair, eye` need to be converted to factors, with labels, and `freckles` which is coded 4 for none down to 1 for many (not very intuitive) needs to be recoded, and relabelled.
+
+To avoid too much typing and to leave plenty of time to think about the analysis, these house keeping commands are in a script file called `melanoma-house.r`. You should study this script carefully before running it.
+The coding of `freckles` can be reversed by subtracting the current codes from 4. Once recoded the variable needs to be converted to a factor with labels "none", etc. Age is currently a numeric variable recording age to the nearest year, and it will be convenient to group these values into (say) 10 year age groups, using `cut`. In this case we choose to create a new variable, rather than change the original.
+
+```{r Run the house keeping script}
+source("http://bendixcarstensen.com/SPE/data/melanoma-house.r")
+```
+
+Look again at the structure of the data frame `mel` and note the changes. Use the command `summary(mel)` to look at the univariate distributions.
+
+```{r Structure and summary, echo=F}
+str(mel)
+summary(mel)
+```
+
+This is enough housekeeping for now - let's turn to something a bit more interesting.
+
+## One variable at a time
+As a first step it is a good idea to start by looking at the numbers of cases and controls by each variable separately, ignoring age and sex. Try
+```{r cases and controls by each variable separately}
+with(mel, table(cc,skin))
+stat.table(skin, contents=ratio(cc,1-cc), data=mel)
+```
+to see the numbers of cases and controls, as well as the 
+odds of being a case by skin colour
+
+Now use `effx()` to get crude estimates of the hazard ratios for the effect of skin colour. 
+```{r Effect of skin}
+effx(cc, type="binary", exposure=skin, data=mel)
+```
+
+
+\medskip
+$\bullet$ Look at the crude effect estimates of `hair`, `eyes` and 
+`freckles` in the same way.
+
+```{r Effects of hair eyes and freckles, echo=F}
+with(mel, table(cc,hair))
+stat.table(hair, contents=ratio(cc,1-cc), data=mel)
+effx(cc,type="binary",exposure=hair,data=mel)
+
+with(mel, table(cc,eyes))
+stat.table(eyes, contents=ratio(cc,1-cc), data=mel)
+effx(cc, type="binary", exposure=eyes, data=mel)
+
+with(mel, table(cc,freckles))
+stat.table(freckles, contents=ratio(cc,1-cc),data=mel)
+effx(cc, type="binary", exposure=freckles, data=mel)
+```
+## Generalized linear models with binomial family and logit link
+
+
+The function `effx()` is just a wrapper for the `glm()` function, and you can show this by fitting the glm directly with
+```{r Fitting the glm}
+mf <- glm(cc ~ freckles, family="binomial", data=mel)
+round(ci.exp( mf ),2)
+
+```
+Comparison with the output from `effx()` shows the results to be the same. 
+
+Note that in `effx()` the type of response is *binary'' whereas in `glm()` the family of probability distributions used to fit the model is ``binomial*. There is a 1-1 relationship between type of response and family:
+
+\begin{tabular}{ll}
+metric & gaussian \\
+binary & binomial\\
+failure/count & poisson
+\end{tabular}
+## Controlling for age and sex
+Because the probability that a control is selected into the study depends on age and sex it is necessary to control for age and sex. For example, the effect of freckles controlled for age and sex is obtained with
+```{r controlling for age and sex}
+effx(cc, typ="binary", exposure=freckles, control=list(age.cat,sex),data=mel)
+```
+or
+```{r freckles controlling for age and sex using glm}
+mfas <- glm(cc ~ freckles + age.cat + sex, family="binomial", data=mel)
+round(ci.exp(mfas), 2)
+```
+Do the adjusted estimates differ from the crude ones
+ that you computed with `effx()`?
+
+## Likelihood ratio tests
+
+There are 2 effects estimated for the 3 levels of `freckles`, and `glm()` provides a test for each effect separately, but to test for no effect at all of `freckles` you need a likelihood ratio test. This involves fitting two models, one without `freckles` and one with, and recording the change in deviance. Because there are some missing values for freckles it is necessary to restrict the first model to those subjects who have values for freckles.
+```{r Likelihood ratio test for the effects of freckles }
+mas <- glm(cc ~ age.cat + sex, family="binomial", data=subset(mel, !is.na(freckles)) )
+anova(mas, mfas, test="Chisq")
+```
+The change in residual deviance is $1785.9-1737.1=48.8$ on $1389-1387=2$ degrees of freedom.
+The $P$-value corresponding to this change is obtained from the upper tail of the
+cumulative distribution of the $\chi^2$-distribution with 2 df:
+```{r P-value}
+1 - pchisq(48.786, 2)
+```
+
+\medskip
+$\bullet$
+There are 3 effects for the 4 levels of hair colour (`hair`). 
+To obtain adjusted estimates for the effect of hair colour and to test the pertinent null hypothesis fit the relevant models, print the and use `anova` to test for no effects of hair colour.
+```{r hair colour controlling for age and sex, echo = F}
+mas2 <- glm(cc ~ age.cat + sex, family="binomial", 
+               data=subset(mel, !is.na(hair)) )
+mhas <- glm(cc ~ hair + age.cat + sex, family="binomial", 
+               data=subset(mel, !is.na(hair)) )
+round(ci.exp(mhas), 2)
+anova(mas2, mhas, test="Chisq")
+```
+Compare the estimates with the crude ones and assess the evidence against the null hypothesis. 
+
+## Relevelling
+
+From the above you can see that subjects at each of the 3 levels light-brown, blonde, and red, are at greater risk than subjects with dark hair, with similar odds ratios. This suggests creating a new variable `hair2` which has just two levels, dark and the other three. The `Relevel()` function in `Epi` has been used for this in the house keeping script.
+
+\medskip
+$\bullet$ Use `effx()` to compute the odds-ratio of melanoma
+  between persons with red, blonde or light brown hair versus those with dark  hair.
+```{r Effect of hair2, echo=F}
+effx(cc, type="binary", exposure=hair2, control=list(age.cat,sex), data=mel)
+```
+Reproduce these results by fitting an appropriate glm.
+```{r Effect of hair2 using glm, echo=F}
+mh2 <- glm(cc ~ hair2 + age.cat + sex, family="binomial", 
+             data = subset(mel, !is.na(hair2)) )
+ci.exp(mh2 )
+```
+Use also a likelihood ratio test to test for the effect of `hair2`.
+```{r LR test, echo=FALSE}
+m1 <- glm(cc ~ age.cat + sex, data = subset(mel, !is.na(hair2)) )
+anova(m1, mh2,test="Chisq")
+```
+
+## Controlling for other variables
+
+When you control the effect of an exposure for some variable you are asking a question about what would the effect be if the variable is kept constant. For example, consider the effect of `freckles` controlled for `hair2`. We first stratify by `hair2` with
+```{r Effect of freckles controlled for age.cat and sex and stratified by hair2 }
+effx(cc, type="binary", exposure=freckles, 
+                  control=list(age.cat,sex), strata=hair2, data=mel)
+```
+The effect of freckles is still apparent in each of the two strata for hair colour. Use `effx()` to control for `hair2`, too, in addition to `age.cat` and `sex`.
+```{r Effect of freckles controlled for age.cat sex and hair2 }
+effx(cc, type="binary", exposure=freckles, 
+                  control=list(age.cat,sex,hair2), data=mel)
+```
+It is tempting to control for variables without thinking about the question you are thereby asking. This can lead to nonsense.
+
+\subsection{Stratification using `glm()` }
+We shall reproduce the output from 
+```{r Effect of freckles controlled for age.cat and sex and stratified by hair2 bis}
+effx(cc, type="binary", exposure=freckles, 
+           control=list(age.cat,sex), strata=hair2,data=mel)
+```
+using `glm()`. To do this requires a nested model formula:
+```{r Nested effects using glm}
+mfas.h <- glm(cc ~ hair2/freckles + age.cat + sex, family="binomial", data=mel)
+ci.exp(mfas.h )
+```
+In amongst all the other effects you can see the two effects of freckles for dark hair (1.61 and 2.84) and the two effects of freckles for other hair (1.42 and 3.15). 
+
+## Naevi
+The distributions of `nvsmall` and `nvlarge` are very skew to the right. You can see this with
+```{r Distribution of naevi }
+with(mel, stem(nvsmall))
+with(mel, stem(nvlarge))
+```
+Because of this it is wise to categorize them into a few classes 
+ 
+- [--] small naevi into four: 0, 1, 2-4, and 5+; 
+- [--] large naevi into three: 0, 1, and 2+. 
+ 
+This has been done in
+the house keeping script.
+
+\medskip
+$\bullet$
+Look at the joint frequency distribution of these new variables
+using `with(mel, table( ))`. Are they strongly associated?
+```{r Joint frequency of nvsma4 and nvlar3,echo=F}
+stat.table(list(nvsma4,nvlar3),contents=percent(nvlar3),data=mel)
+#   High frequencies on the diagonal shows a strong association
+```
+
+\medskip
+$\bullet$ 
+Compute the sex- and age-adjusted OR estimates (with 95% CIs) associated with
+the number of small naevi first by using `effx()`, and 
+then by fitting separate glms including `sex`, `age.cat` and `nvsma4` in the model formula.
+```{r Effects of naevi on melanoma, echo=F}
+effx(cc,type="binary",exposure=nvsma4,control=list(age.cat,sex),data=mel)
+mns <- glm(cc ~ nvsma4 + age.cat + sex, family="binomial",data=mel)
+round(ci.exp(mns), 2)
+```
+
+\medskip
+$\bullet$
+Do the same with large naevi `nvlar3`.
+```{r echo=F}
+effx(cc, type="binary", exposure=nvlar3, control=list(age.cat,sex), data=mel)
+mnl <- glm(cc ~ nvlar3 + age.cat + sex, family="binomial", data=mel)
+round(ci.exp(mnl), 2)
+```
+
+\medskip
+$\bullet$
+Now fit a glm containing
+`age.cat, sex, nvsma4` and `nvlar3`. 
+What is the interpretation of the coefficients for `nvsma4` and `nvlar3`?
+```{r echo=F}
+mnls <- glm(cc ~ nvsma4 + nvlar3 + age.cat + sex, family="binomial", data=mel)
+# Coeffs for nvsma4 are the effects of nvsma4 controlled for age.cat, sex, and nvlar3. 
+# Similarly for the coefficients for nvlar3.
+```
+
+## Treating freckles as a numeric exposure  
+
+ The evidence for the effect of `freckles` is already convincing. However,
+ to demonstrate how it is done, we shall perform a linear trend test by treating freckles as a numeric exposure. 
+```{r Linear effect of freckles}
+mel$fscore<-as.numeric(mel$freckles)
+effx(cc, type="binary", exposure=fscore, control=list(age.cat,sex), data=mel)
+```
+
+You can check for linearity of the log odds of being a case with `fscore` by comparing the model containing `freckles` as a factor with the model containing `freckles` as numeric.
+```{r  }
+m1 <- glm(cc ~ freckles + age.cat + sex, family="binomial", data=mel)
+m2 <- glm(cc ~ fscore + age.cat + sex, family="binomial", data=mel)
+anova(m2, m1, test="Chisq")
+```
+There is no evidence against linearity ($p=0.22$).
+
+It is sometimes helpful to look at the linearity in more detail with
+```{r Using cumulative contrasts to study linearity }
+m1 <- glm(cc ~ C(freckles, contr.cum) + age.cat + sex, family="binomial",data=mel)
+round(ci.exp(m1 ), 2)
+m2 <- glm(cc ~ fscore + age.cat + sex, family="binomial",data=mel)
+round(ci.exp(m2), 2)
+```
+The use of `C(freckles, contr.cum)` makes each odds ratio to compare the odds at that
+ level versus the previous level; not against the baseline (except for the 2nd level). 
+If the log-odds are linear then these odds ratios should be the same
+ (and the same as the odds ratio for `fscore` in m2.
+
+## Graphical displays
+   
+  The odds ratios (with CIs) can be graphically displayed using
+  function `plotEst()` in `Epi`. It uses the value
+ of `ci.lin()` evaluated on the  fitted model object.
+ As the intercept and the effects of age and sex are of
+ no interest, we shall drop the corresponding rows (the 7 first ones)
+ from the matrix produced by `ci.lin()`, and
+  the plot is based just on the 1st, 5th and the 6th column
+ of this matrix:
+
+```{r Plots}
+m <- glm(cc ~ nvsma4 + nvlar3 + age.cat + sex, family="binomial",data=mel)
+plotEst( exp( ci.lin(m)[ 2:5, -(2:4)] ), xlog=T, vref=1 )
+```
+The `xlog` argument makes the OR axis logarithmic.
+
+
+

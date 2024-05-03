@@ -1,0 +1,493 @@
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(keep.source=TRUE,eps=FALSE, results='hide',  prefix.string='./graph/occoh-caco')
+```
+
+# Nested case-control study and case-cohort study: Risk factors of coronary heart disease
+
+In this exercise we shall apply both the nested case-control (NCC) 
+design and the case-cohort (CC)  design in sampling
+control subjects from a defined cohort or closed study population. 
+The case group comprises those cohort members who die from coronary heart disease (CHD) during a $> 20$ years follow-up of the cohort.  
+The risk factors of interest are cigarette smoking, systolic blood pressure,  and total cholesterol level.
+
+Our study population is an occupational cohort comprising 1501 men
+working in blue-collar jobs in one Nordic country. 
+Eligible subjects had no history of coronary heart disease
+when recruited to the study in the early 1990s. 
+Smoking habits and many other items were inquired at baseline
+by a questionnaire, and 
+blood pressure was measured by a research nurse, the values being
+ written down on the questionnaire. Serum samples were also taken from the cohort members at the same time and were stored in a freezer. For some reason,
+the data in the questionnaires were not entered to any computer file, but the questionnaires were kept in a safe storehouse for further purposes. 
+Also, no biochemical analyses were initially performed for the sera 
+collected from the participants.  However, dates of birth and dates of entry to the study were recorded
+in an electronic file.
+
+In 2010 the study was suddenly reactivated by those investigators of the original team who were still alive then.
+As the first step mortality follow-up of the cohort members was
+executed by record linkage to the national population register, from which
+the dates of death and emigration were obtained. Another linkage was performed with the national register of causes of death in order to get the
+deaths from coronary heard disease identified. As a result a data file
+`occoh.txt` was completed containing the following variables:
+
+| Variable  | Description                                 |
+| :-------  | :------------------------------------------ |
+| `id` | identification number |
+| `birth` | date of birth |
+| `entry` | date of recruitment and baseline measurements |
+| `exit` | date of exit from mortality follow-up |
+| `death` | indicator for vital status at the end of follow-up; 1, if dead from any cause, and = 0, if alive |
+|`chdeath` | indicator for death from coronary heart disease; 1, if *yes*, and 0, if *no*. |
+
+
+This exercise is divided into five main parts:
+
+1. Description of the study base or the follow-up experience of the
+  whole cohort, identification of the cases and illustrating the risk sets. 
+
+2. Nested case-control study within the cohort: 
+    (i) selection of controls by risk set or time-matched sampling
+    using function `ccwc()` in package `Epi`, 
+    (ii) collection of exposure data for cases and controls 
+    from the pertinent data base of the whole cohort to the
+    case-control data set using function `merge()`, and 
+    (iii) analysis of the case-control data set with stratified Cox 
+    model using function `clogit()` in package `survival()`,
+
+3. Case-cohort study within the cohort:
+    (i) selection of a subcohort by simple random sampling from the cohort,
+    (ii) collection of exposure data for subcohort members and cases, and
+    (iii) analysis of the case-cohort data set with Cox model by weighted partial
+    likelihood including appropriate weighting and correction of estimated
+    covariance matrix for the model coefficients using function `cch()` in package `survival()`.
+ 
+4. Comparison of results from all previous analyses, also with those from a full cohort design.
+
+5. Further tasks and homework.
+
+  
+## Reading the cohort data, illustrating the study base and risk sets
+
+- Load the packages `Epi` and `survival`. 
+Read in the cohort data file and name
+the resulting data frame as `oc`.
+See its structure and print the univariate summaries.
+```{r Read in occoh data, echo=TRUE}
+library(Epi)
+library(survival)
+url <- "https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data"
+oc <- read.table( paste(url, "occoh.txt", sep = "/"), header=TRUE)
+str(oc)
+summary(oc)
+```
+
+- It is convenient to change all the dates into fractional calendar years
+```{r cal.yr, echo=TRUE}
+oc$ybirth <- cal.yr(oc$birth) 
+oc$yentry <- cal.yr(oc$entry) 
+oc$yexit <- cal.yr(oc$exit)
+```
+
+We shall also compute the age at entry and at exit, respectively,
+as age will be the main time scale in our analyses.
+```{r age.yr, echo=TRUE}
+oc$agentry <- oc$yentry - oc$ybirth
+oc$agexit <- oc$yexit - oc$ybirth 
+```
+- As the next step we shall create a `lexis` object
+from the data frame along the calendar period and age axes,
+and as the outcome event we specify the coronary death.
+```{r oclexis, echo=TRUE}
+oc.lex <- Lexis( entry = list( per = yentry, 
+                               age = yentry - ybirth ), 
+                  exit = list( per = yexit),
+           exit.status = chdeath,
+                    id = id, data = oc)
+str(oc.lex)
+summary(oc.lex)
+```
+
+- At this stage it is informative to examine a graphical
+presentation of the follow-up lines and outcome cases in a conventional 
+Lexis diagram. Make use of the `plot` method for `Lexis` objects. 
+Gray lifelines are drawn and a bullet is put at the exit point of those lifelines
+that end with the outcome event.
+```{r plotlexis, echo=TRUE, fig = FALSE}
+par(mfrow=c(1,1))
+plot( oc.lex, xlim=c(1990, 2010),grid=TRUE )
+points( oc.lex, pch=c(NA, 16)[oc.lex$lex.Xst+1] )
+```
+-  As age is here the main time axis, 
+we shall graphically illustrate the **study base**, *i.e.* 
+the follow-up lines and outcome events, 
+only along the age scale, being ordered by age at exit.
+<!-- %% Function `plot2()` in the same source file does the work. -->
+Vertical lines at those ages when new coronary
+deaths occur are drawn to identify the pertinent
+**risk sets**. For that purpose it is useful first 
+ to sort the data frame and the `Lexis` object 
+ jointly by age at exit & age at entry, 
+ and to give a new ID number according to that order.
+```{r plotlexage, echo=TRUE, fig=FALSE}
+oc.ord <- cbind(ID = 1:1501, oc[ order( oc$agexit, oc$agentry), ] )  
+oc.lexord <- Lexis( entry = list( age = agentry ), 
+                     exit = list( age = agexit),
+              exit.status = chdeath,
+                       id = ID, data = oc.ord)
+plot(oc.lexord, "age")
+points(oc.lexord, pch=ifelse(oc.lexord$lex.Xst==1, 16, NA) )
+with( subset(oc.lexord, lex.Xst==1), 
+      abline( v=agexit, lty=3))
+```
+- For a closer look, we now
+ zoom the graphical illustration of the risk sets into
+event times occurring between 50 to 58 years. -- 
+Copy the last four lines from the previous item and add arguments `xlim` and `ylim`
+to the call of `plot()`.
+```{r plotlexage2, echo=TRUE, fig=FALSE}
+plot(oc.lexord, "age", xlim=c(50, 58), ylim=c(5, 65))
+points(oc.lexord, "age", pch=ifelse(oc.lexord$lex.Xst==1, 16, NA))
+with( subset(oc.lexord, lex.Xst==1), 
+      abline( v=agexit, lty=3))
+```
+
+## Nested case-control study
+
+We shall now employ the strategy of **risk-set sampling**
+or **time-matched** sampling of controls, *i.e.*
+we are conducting a *nested case-control study*
+within the cohort.
+
+
+- The risk sets are defined according to the age at diagnosis of the case. Further matching is applied for age at entry by 1-year agebands.
+For this purpose we first generate a categorical variable
+`agen2` for age at entry 
+```{r agentry2, echo=TRUE}
+oc.lex$agen2 <- cut(oc.lex$agentry, br = seq(40, 62, 1) )
+```
+
+Matched sampling from risk sets may be carried out using 
+function `ccwc()` found in the `Epi` package.
+Its main arguments are the times 
+of `entry` and `exit` which specify the time at risk along the
+main time scale (here age), and the outcome variable to be given 
+in the `fail` argument. The number of controls per case
+is set to be two, and the additional matching factor is given. 
+- After setting the RNG seed (with your own number), 
+make a call of this function and see
+the structure of the resulting data frame `cactrl` 
+containing the cases and the chosen individual controls. 
+```{r risksetsample, echo=TRUE}
+set.seed(98623)
+cactrl <- 
+   ccwc(entry=agentry, exit=agexit, fail=chdeath, 
+        controls = 2, match= agen2, 
+        include = list(id, agentry), 
+        data=oc.lex, silent=FALSE)
+str(cactrl)
+```
+Check the meaning of the four first columns of the case-control 
+data frame from the help page of function `ccwc()`.
+
+- Now we shall start  collecting data on the 
+risk factors for the cases and their
+matched controls, including determination of the total cholesterol levels from the frozen sera! The storehouse of the risk factor measurements for 
+the whole cohort is file `occoh-Xdata.txt`. It contains
+values of the following variables.
+
+| Variable  | Description                                 |
+| :-------  | :------------------------------------------ |
+| `id`      | identification number, the same as in `occoh.txt` |
+| `smok`.   | cigarette smoking with categories; 1: `never`, 2: `former`, 3: `1-14/d`, 4: `15+/d` |
+| `sbp`.    | systolic blood pressure (mmHg) |
+| `tchol`   | total cholesterol level (mmol/l) |
+
+```{r ocX, echo=TRUE}
+ocX <- read.table( paste(url, "occoh-Xdata.txt", sep = "/"), header=TRUE)
+str(ocX)
+```
+ 
+-  In the next step we collect the values of the risk factors
+for our cases and controls by merging the case-control data frame and 
+the storehouse file. 
+In this  operation we utilize function `merge()` to 
+select columns of two data frames: `cactrl` 
+(all columns) and `ocX` (four columns) and to merge
+these into a single file (see exercise 1.1, subsection 1.1.8, where 
+`merge()` was introduced).
+ The `id` variable in both files is used as the key to link each
+individual case or control with his own data on risk factors.
+```{r merge, echo=TRUE}
+oc.ncc <- merge(cactrl, ocX[, c("id", "smok", "tchol", "sbp")], 
+   by = "id")
+str(oc.ncc)
+```
+
+-  We shall treat smoking as categorical and
+ total cholesterol and systolic blood pressure 
+as quantitative risk factors, but the values of the
+latter will be divided by 10 to get more interpretable effect estimates.
+
+| Variable  | Description                                 |
+| :-------  | :------------------------------------------ |
+| `cholgrp` | cholesterol class; 1: `<5`, 2: `5-<6.5`, 3: `>=6.5` |
+| `sbpgrp`  | blood pressure class; 1: `<130`, 2: `130-<150`, 3: `150-<170`, 4: `>=170` |
+
+Convert the smoking variable into a factor.
+```{r factor smol, echo=TRUE}
+oc.ncc$smok <- factor(oc.ncc$smok, 
+    labels = c("never", "ex", "1-14/d", ">14/d"))          
+```
+
+-  It is useful to start the analysis of case-control data by 
+simple tabulations by the categorized risk factors. 
+Crude estimates of the rate ratios associated with them,
+in which matching is ignored, can be obtained as follows. 
+<!-- %% instructed in Janne's lecture -->
+<!-- %% on Poisson and logistic models on Saturday 23 May.  -->
+We shall focus on smoking
+```{r cccrude smok, echo=TRUE}
+stat.table( index = list( smok, Fail ), 
+          contents = list( count(), percent(smok) ),
+           margins = T, data = oc.ncc )
+smok.crncc <- glm( Fail ~ smok, family=binomial, data = oc.ncc)
+round(ci.exp(smok.crncc), 3) 
+```
+
+
+
+- A proper analysis takes into account matching that was employed 
+in the selection of controls for each case from the 
+pertinent risk set, further restricted to 
+subjects who were about the same age at entry as the case was.
+Also, adjustment for the other risk factors is desirable.
+In this analysis function `clogit()` in `survival` package is
+utilized. It is in fact a wrapper of function `coxph()`. 
+
+```{r clogit , echo=TRUE}
+m.clogit <- clogit( Fail ~ smok + I(sbp/10) + tchol + 
+       strata(Set), data = oc.ncc )
+summary(m.clogit)
+round(ci.exp(m.clogit), 3)
+```
+
+Compare these with the crude estimates obtained above.
+
+## Case-cohort study
+
+Now we start applying the second major outcome-selective 
+sampling strategy
+for collecting exposure data from a big study population
+
+
+
+-  The subcohort is selected as a  
+  simple random sample ($n=260$) from the whole cohort.
+The `id`-numbers of the individuals that are 
+selected will be stored in vector `subcids`, and
+`subcind` is an indicator for inclusion to the subcohort. 
+```{r subc sample, echo=TRUE} 
+N <- 1501; n <- 260
+set.seed(15792)
+subcids <- sample(N, n )
+oc.lexord$subcind <- 1*(oc.lexord$id %in% subcids)
+```
+
+-  We form the data frame `oc.cc`
+ to be used in the subsequent 
+analysis selecting the union of the subcohort members 
+and the case group from the data frame of the full cohort.
+After that we collect the data of the risk factors from the
+data storehouse for the  subjects in the case-cohort data 
+```{r casecoh data, echo=TRUE} 
+oc.cc <- subset( oc.lexord, subcind==1 | chdeath ==1)
+oc.cc <- merge( oc.cc, ocX[, c("id", "smok", "tchol", "sbp")], 
+   by ="id")
+str(oc.cc) 
+```
+
+-  We shall now create a graphical illustration of 
+ the lifelines contained in the case-cohort data.
+Lines for the subcohort non-cases are grey without bullet at exit,
+those for subcohort cases are blue with blue bullet at exit, and
+for cases outside the subcohort the lines are red and dotted with
+red bullets at exit. 
+```{r casecoh-lines, echo=TRUE, fig=FALSE} 
+plot( subset(oc.cc, chdeath==0), "age")    
+lines( subset(oc.cc, chdeath==1 & subcind==1), col="blue")  
+lines( subset(oc.cc, chdeath==1 & subcind==0), col="red")   
+points(subset(oc.cc, chdeath==1), pch=16, 
+       col=c("blue", "red")[oc.cc$subcind+1])
+```
+
+-  Define the categorical smoking variable again.
+```{r grouping , echo=TRUE}
+oc.cc$smok <- factor(oc.cc$smok, 
+    labels = c("never", "ex", "1-14/d", ">14/d"))
+```
+
+
+<!-- oc.cc$cholgrp <- cut( oc.cc$tchol, br = c(2.4, 5, 6.5, 13),  -->
+<!--           include.lowest = T, right = F ) -->
+<!-- oc.cc$sbpgrp <- cut( oc.cc$sbp, br = c(95, 130, 150, 170, 240),  -->
+<!--           include.lowest = T, right = F ) -->
+
+
+A crude estimate of the hazard ratio for the various smoking categories $k$
+vs. non-smokers ($k=1$) can be obtained by tabulating cases $(D_k)$ and person-years ($y_k$)
+ in the subcohort by smoking  and then computing the
+relevant exposure odds ratio for each category:
+$$ \text{HR}_k ^{\text{crude}} = \frac{D_k/D_1}{y_k/y_1} $$
+
+```{r cc-crude HR by smok}
+sm.cc <- stat.table( index = smok, 
+   contents = list( Cases = sum(lex.Xst), Pyrs = sum(lex.dur) ),
+	 margins = T, data = oc.cc)
+print(sm.cc, digits = c(sum=0, ratio=1))
+HRcc <- (sm.cc[ 1, -5]/sm.cc[ 1, 1])/(sm.cc[ 2, -5]/sm.cc[2, 1])		
+round(HRcc, 3)			
+```
+Do these estimates resemble those obtained from nested case-control data?
+- 
+To estimate the rate ratios associated with smoking and adjusted for the
+other risk factors we now fit the pertinent Cox model 
+applying the method of {\it weighted partial likelihood} as 
+presented by Ling \& Ying (1993) and Barlow (1994).
+This analysis can be done using function `cch()` 
+in package `survival` with `method = "LinYing"`
+
+```{r weighted cox LinYing, echo=TRUE} 
+oc.cc$survobj <- with(oc.cc, Surv(agentry, agexit, chdeath) )
+cch.LY <- cch( survobj ~  smok + I(sbp/10)  + tchol, stratum=NULL,
+   subcoh = ~subcind, id = ~id,  cohort.size = N, data = oc.cc, 
+    method ="LinYing" )
+summary(cch.LY)
+```
+
+## Full cohort analysis and comparisons
+
+Finally, suppose the investigators after all could afford to collect the
+data on risk factors from the storehouse for the whole cohort.
+
+
+- 
+Let us form the data frame corresponding to the full cohort design
+and convert again smoking to be categorical.
+```{r fullcoh, echo=TRUE}
+oc.full <- merge( oc.lex, ocX[, c("id", "smok", "tchol", "sbp")], 
+   by.x = "id", by.y = "id") 
+oc.full$smok <- factor(oc.full$smok, 
+    labels = c("never", "ex", "1-14/d", ">14/d"))
+```
+
+Juts for comparison with the corresponding analysis in case-cohort data
+perform a similar crude estimation of hazard ratios associated with smoking.
+```{r cox-crude HR by smok}
+sm.coh <- stat.table( index = smok, 
+   contents = list( Cases = sum(lex.Xst), Pyrs = sum(lex.dur) ),
+	 margins = T, data = oc.full)
+print(sm.coh, digits = c(sum=0, ratio=1))
+HRcoh <- (sm.coh[ 1, -5]/sm.coh[ 1, 1])/(sm.coh[ 2, -5]/sm.coh[2, 1])		
+round(HRcoh, 3)			
+```
+
+
+- 
+Fit now the ordinary Cox model to the full cohort. There is no need
+to employ extra tricks upon the ordinary `coxph()` fit.
+
+```{r cox full, echo=TRUE}
+cox.coh <- coxph( Surv(agentry, agexit, chdeath) ~ 
+        smok + I(sbp/10)  + tchol, data = oc.full)
+summary(cox.coh)        
+```
+
+- 
+Lastly, a comparison of the point estimates and standard errors between 
+the different designs, including variants of analysis for the case-cohort design, can be performed.
+
+```{r comparison, echo=TRUE}
+betas <- cbind( coef(cox.coh), coef(m.clogit), coef(cch.LY) )
+colnames(betas) <-  c("coh", "ncc", "cch.LY")
+round(betas, 3)
+
+SEs <- cbind( sqrt( diag( cox.coh$var ) ), 
+              sqrt( diag( m.clogit$var ) ),
+              sqrt( diag( cch.LY$var ) ) )
+colnames(SEs) <- colnames(betas) 
+round(SEs, 3)
+```
+
+You will notice that the point estimates of the coefficients
+obtained from the full cohort, nested case-control, and case-cohort analyses, 
+respectively, are somewhat variable.  However,  
+the standard errors from the NCC and CC
+ analyses should be quite similar when the numbers of cases and non-cases are similar.
+
+
+
+## Further exercises and homework
+
+
+
+- If you have time, you could run both the NCC study and CC study 
+again but now with a larger control group or subcohort;
+for example 4 controls per case in NCC and $n=520$ as the subcohort size in CC. 
+Remember resetting the seed first. 
+Pay attention in the results to how much closer 
+will be the point estimates and the proper SEs to those
+obtained from the full cohort design. 
+
+-  Instead of simple linear terms for `sbp` and `tchol` you could try to fit
+spline models to describe their effects.
+
+-  A popular alternative to weighted partial likelihood
+in the analysis of case-cohort data is the *pseudo-likelihood method*
+(Prentice 1986), which is based on *late entry* to follow-up 
+of the case subjects not belonging to 
+the subcohort. 
+The way to do this is provided by function `cch()` which
+you can apply directly to the case-cohort data `oc.cc` as before
+but now with `method = "Prentice"`. -- Try this and compare the results
+with those obtained by weighted partial likelihood in model
+`cch.LY`. 
+
+- Yet another computational solution for
+maximizing weighted partial likelihood is provided by 
+a combination of functions `twophase()` 
+ and `svycoxph()` of the `survey` package.
+<!-- \begin{comment} -->
+<!-- In this approach, the starting point is a data frame,  -->
+<!-- named e.g. `oc.lex2`, -->
+<!-- that contains the whole cohort but includes also  -->
+<!-- necessary columns for the interesting risk factors, such that -->
+<!-- their values are known for the cases and the subcohort members -->
+<!-- but are missing (`NA`) for non-cases outside the subcohort. -->
+<!-- The case-cohort design embedded in the cohort  -->
+<!-- is viewed as a special case of a {\it two-phase sampling design}. -->
+<!-- The pertinent design features are determined by -->
+<!-- the key indicator variables in `oc.lex2`:  -->
+<!-- subcohort membership (cf. variable `subcind` above) -->
+<!-- and case status (`chdeath`).  -->
+<!-- Based on these items,  -->
+<!-- a call of function `twophase()` with appropriate -->
+<!-- arguments creates an object -->
+<!--  of class `twophase`, named e.g. `oc.2ph`, that -->
+<!--  contains the original data frame and all the survey design information -->
+<!--   (like weights) needed to analyse it. -->
+<!-- After that, function `svycoxph()`, which is   -->
+<!-- a *survey design version* of `coxph()`,  -->
+<!-- is called with a similar model formula as before but in which, -->
+<!-- instead of the `data` argument, one would specify `design = oc.2ph`. -->
+<!-- % which takes care of the weights.  -->
+<!-- \end{comment} -->
+The approach is illustrated with an example
+ in a vignette *Two-phase designs in epidemiology* by Thomas Lumley
+(see <http://cran.r-project.org/web/packages/survey/vignettes/epi.pdf>).
+-- You can try this at home and check that you would obtain similar results as
+with model `cch.LY`. 
+
+
+
+
