@@ -1,12 +1,22 @@
 ###################################################
 library(Epi)
 library(survival)
+options(show.signif.stars = F)
 sessionInfo()
-options( width=87 )
-par()
+<<<<<<< HEAD
+options( width=90 )
+# par()
 ###################################################
 setwd("C:/Users/janne/projects/SPE/pracs")
-orca <- read.table("./data/oralca2.txt", header=T)
+# orca <- read.table("./data/oralca2.txt", header=T)
+orca <- read.table("https://bendixcarstensen.com/SPE/data/oralca2.txt", header=T)
+=======
+options( width=70 )
+
+###################################################
+orca <- read.table("https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/oralca2.txt", 
+                   header=T)
+>>>>>>> 7fcd5eebc4326d741c049af7edf9f009beb1fb3b
 head(orca)
 str(orca)
 summary(orca)
@@ -24,32 +34,40 @@ s.all
 str(s.all)
 
 ###################################################
-plot(s.all,main="KM estimate of the survival \n and cum. mortality proportions",
+plot(s.all,main="KM estimate of the survival
+     and cum. mortality proportions",
      xlab="years", ylab="Survival")
 lines(s.all, fun = "event", mark.time=T, conf.int=F)
-
+abline(h=0.5)
 ###################################################
-# Oral cancer patient suvival by stage 
+# Oral cancer patient suvival by stage
 ###################################################
 s.stg  <- survfit(suob ~ stage, data= orca)
+s.stg
 col5 <- c("green", "blue", "black", "red", "gray")
 plot(s.stg, col= col5, fun="event", mark.time=F ,
      main="KM estimate of the cum. mortality proportions by stage",
-     xlab="years", ylab="Cum. mortality")
+<<<<<<< HEAD
+     xlab="years", ylab="Cum. mortality", lwd=2)
 legend(10, 0.4, legend=levels(factor(orca$stage)),
+=======
+     xlab="years", ylab="Cum. mortality")
+legend(15, 0.5, legend=levels(factor(orca$stage)),
+>>>>>>> 7fcd5eebc4326d741c049af7edf9f009beb1fb3b
        col=col5, lty=1, cex=0.8,
        title="Stage", text.font=4, bg='white')
-s.stg
+text(rep(22,5), seq(0.22,0.05,,5), levels(factor(orca$stage)),
+     col = col5, font = 2, adj = 1)
 
 ###################################################
 # Cum haz and log-log of cum. haz by stage
 ###################################################
 
 par(mfrow=c(1,2))
-plot(s.stg, col= col5, fun="cumhaz", main="cum. hazards", 
+plot(s.stg, col= col5, fun="cumhaz", main="cum. hazards",
      xlab="years", ylab="Cum. hazard")
 legend(0,3.5, legend=levels(factor(orca$stage)),
-       col=col5, lty=1, cex=0.8,
+       col=col5, lty=1, cex=0.5,
        title="Stage", text.font=4, bg='white')
 plot(s.stg, col= col5, fun="cloglog", main = "cloglog: log cum.haz",
      xlab="years", ylab="clog-log")
@@ -70,14 +88,19 @@ stat.table( list( sex, agegr), list( count(), percent(agegr) ),
 s.agrx <- survfit(suob ~ agegr + sex, data=orca)
 par(mfrow=c(1,1))
 plot(s.agrx, fun="event", mark.time=T, xlim = c(0,15), lwd=2,
-             col=rep(c("red", "blue"),3), lty=c(2,2, 1,1, 5,5),
-     pch=c(1,1,2,2,4,4))
+             col=rep(c("red", "blue"),3), lty=c(2,2, 1,1, 5,5))
 legend(10,0.3, legend=c("(0,55] Female "," (0,55] Male",
                        "(55,75] Female "," (55,75] Male",
                        "(75,95] Female "," (75,95] Male" ),
-       col=rep(c("red", "blue"),3), lty=c(2,2, 1,1, 5,5), 
+<<<<<<< HEAD
+       col=rep(c("red", "blue"),3), lty=c(2,2, 1,1, 5,5),
        pch=c(1,1,2,2,4,4),cex=0.7)
+
+=======
+       col=rep(c("red", "blue"),3), lty=c(2,2, 1,1, 5,5), 
+       cex=0.7)
        
+>>>>>>> 7fcd5eebc4326d741c049af7edf9f009beb1fb3b
 
 
 ###################################################
@@ -108,7 +131,7 @@ plotCIF(cif2, 2, main= "Other deaths by stage",
         col=col5, ylim = c(0, 0.7) )
 
 ###################################################
-# Stacked plot 
+# Stacked plot
 ###################################################
 
 par(mfrow=c(1,1),xaxs="i", yaxs="i") # make plot start 0,0
@@ -122,10 +145,8 @@ text( 10, 0.80, " Alive ", pos = 4)
 ###################################################
 # Proportional hazards models for total mortality
 ############################
-
-options(show.signif.stars = F)
 # recall
-oral$stage<-factor(oral$stage)
+orca$stage<-factor(orca$stage)
 orca$suob <- Surv(orca$time, 1*(orca$event > 0) ) # total mortality
 m1 <- coxph(suob ~ sex + I(age/10) + stage, data= orca)
 summary( m1 )
@@ -135,7 +156,7 @@ round( ci.exp( m1 ), 4 )
 ###################################################
 # test proportionality
 ###################################################
-cox.zph( m1 )
+cox.zph( m1 ) # goofy!
 
 ###################################################
 orca2 <- subset(orca, stage != "unkn")
@@ -152,7 +173,7 @@ newd
 col3 <- c("green", "black", "red")
 par(mfrow=c(1,2))
 plot( survfit(m2, newdata= subset(newd, sex=="Male" & age==40)),
-     col=col3, fun="event", mark.time=F,main="Age 40")
+     col=col3, fun="event", mark.time=F,main="Age 40", ylim=0:1)
 lines( survfit(m2, newdata= subset(newd, sex=="Female" & age==40)),
       col= col3, fun="event", lty = 2, mark.time=F)
 
@@ -163,9 +184,10 @@ lines( survfit(m2, newdata= subset(newd, sex=="Female" & age==80)),
 
 ###################################################
 # models for event specific hazards, oral cancer death
-m2haz1 <- coxph( Surv( time, event==1)  ~ sex + I((age-65)/10) + st3 , data=orca2 )
+m2haz1 <- coxph( Surv( time, event==1)  ~ sex + I((age-65)/10) + st3 , 
+                 data=orca2 )
 round( ci.exp(m2haz1 ), 4)
-cox.zph(m2haz1)
+cox.zph(m2haz1) # goofy!
 
 ###################################################
 # other cause death
@@ -200,10 +222,10 @@ levels(orca2.lex$st3) = c("I-II", "III", "IV")
 cuts <- sort(orca2$time[orca2$event==1])
 orca2.spl <- splitLexis( orca2.lex, br = cuts, time.scale="stime" )
 orca2.spl$timeband <- as.factor(orca2.spl$stime)
-
+table(orca2.spl$timeband)
 ###################################################
 str(orca2.spl)
-orca2.spl[ 1:20, ]
+print.data.frame(orca2.spl)
 
 ###################################################
 m2pois1 <- glm( 1*(lex.Xst=="Oral ca. death")  ~
@@ -230,4 +252,12 @@ blh95 <- cbind(blhaz$fit, blhaz$se.fit) %*% ci.mat()
 par(mfrow=c(1,1))
 matplot( news$stime, exp(blh95), type = "l", lty = c(1,1,1), lwd = c(2,1,1) ,
       col = rep("black", 3),  log = "xy", ylim = c(5,3000)  )
+
+nam <- c("sex","age","st3")
+round(cbind(
+ci.exp(m2pois1, subset = nam),
+ci.exp(m2pspli, subset = nam)), 3)
+
+
+
 
