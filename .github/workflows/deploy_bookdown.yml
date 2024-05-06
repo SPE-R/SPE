@@ -33,10 +33,12 @@ jobs:
         run: Rscript -e 'install.packages(c("rmarkdown","bookdown"))'
       - name: Render Book
         run: Rscript -e 'bookdown::render_book("pracs-book/", "bookdown::gitbook")'
+      - name: Copy Book
+        run: cp -r pracs-book/_book _book
       - uses: actions/upload-artifact@v2
         with:
           name: _book
-          path: pracs-book/_book/
+          path: _book
   
   checkout-and-deploy:
    runs-on: ubuntu-20.04
@@ -50,7 +52,7 @@ jobs:
          # Artifact name
          name: _book # optional
          # Destination path
-         path: pracs-book/_book # optional
+         path: _book # optional
      - name: Deploy to GitHub Pages
        uses: Cecilapp/GitHub-Pages-deploy@v3
        env:
