@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 6 Analysis of hazard rates, their ratios and differences and binary regression | Statistical Practice in Epidemiology with R</title>
+  <meta name="description" content="This is the SPE-R 2024 exercises book" />
+  <meta name="generator" content="bookdown 0.39 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 6 Analysis of hazard rates, their ratios and differences and binary regression | Statistical Practice in Epidemiology with R" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This is the SPE-R 2024 exercises book" />
+  <meta name="github-repo" content="spe-r/spe" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 6 Analysis of hazard rates, their ratios and differences and binary regression | Statistical Practice in Epidemiology with R" />
+  
+  <meta name="twitter:description" content="This is the SPE-R 2024 exercises book" />
+  
+
+<meta name="author" content="Krista Fischer" />
+<meta name="author" content="Martyn Plummer" />
+<meta name="author" content="Janne Pitkäniemi" />
+<meta name="author" content="Bendix Carstensen" />
+<meta name="author" content="Damien Georges" />
+<meta name="author" content="Esa Läärä" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="graphics-in-r.html"/>
+<link rel="next" href="estimation-of-effects-simple-and-more-complex.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">SPE-R practicals</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>About</a></li>
+<li class="chapter" data-level="1" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html"><i class="fa fa-check"></i><b>1</b> Practice with basic R</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#the-working-directory"><i class="fa fa-check"></i><b>1.1</b> The working directory</a></li>
+<li class="chapter" data-level="1.2" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#the-workspace"><i class="fa fa-check"></i><b>1.2</b> The workspace</a></li>
+<li class="chapter" data-level="1.3" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#using-r-as-a-calculator"><i class="fa fa-check"></i><b>1.3</b> Using R as a calculator</a></li>
+<li class="chapter" data-level="1.4" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#vectors"><i class="fa fa-check"></i><b>1.4</b> Vectors</a></li>
+<li class="chapter" data-level="1.5" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#sequences"><i class="fa fa-check"></i><b>1.5</b> Sequences</a></li>
+<li class="chapter" data-level="1.6" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#displaying-and-changing-parts-of-a-vector-indexing"><i class="fa fa-check"></i><b>1.6</b> Displaying and changing parts of a vector (indexing)</a></li>
+<li class="chapter" data-level="1.7" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#lists"><i class="fa fa-check"></i><b>1.7</b> Lists</a></li>
+<li class="chapter" data-level="1.8" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#data-frames"><i class="fa fa-check"></i><b>1.8</b> Data frames</a></li>
+<li class="chapter" data-level="1.9" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#working-with-built-in-data-frames"><i class="fa fa-check"></i><b>1.9</b> Working with built-in data frames</a></li>
+<li class="chapter" data-level="1.10" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#referencing-parts-of-the-data-frame-indexing"><i class="fa fa-check"></i><b>1.10</b> Referencing parts of the data frame (indexing)</a></li>
+<li class="chapter" data-level="1.11" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#summaries"><i class="fa fa-check"></i><b>1.11</b> Summaries</a></li>
+<li class="chapter" data-level="1.12" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#generating-new-variables"><i class="fa fa-check"></i><b>1.12</b> Generating new variables</a></li>
+<li class="chapter" data-level="1.13" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#turning-a-variable-into-a-factor"><i class="fa fa-check"></i><b>1.13</b> Turning a variable into a factor</a></li>
+<li class="chapter" data-level="1.14" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#frequency-tables"><i class="fa fa-check"></i><b>1.14</b> Frequency tables</a></li>
+<li class="chapter" data-level="1.15" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#grouping-the-values-of-a-numeric-variable"><i class="fa fa-check"></i><b>1.15</b> Grouping the values of a numeric variable</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html"><i class="fa fa-check"></i><b>2</b> Reading data into <code>R</code></a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#introduction"><i class="fa fa-check"></i><b>2.1</b> Introduction</a></li>
+<li class="chapter" data-level="2.2" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#data-sources"><i class="fa fa-check"></i><b>2.2</b> Data sources</a></li>
+<li class="chapter" data-level="2.3" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#data-in-text-files"><i class="fa fa-check"></i><b>2.3</b> Data in text files</a></li>
+<li class="chapter" data-level="2.4" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#things-that-can-go-wrong"><i class="fa fa-check"></i><b>2.4</b> Things that can go wrong</a></li>
+<li class="chapter" data-level="2.5" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#forgetting-the-headers"><i class="fa fa-check"></i><b>2.5</b> Forgetting the headers</a></li>
+<li class="chapter" data-level="2.6" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#using-the-wrong-separator"><i class="fa fa-check"></i><b>2.6</b> Using the wrong separator</a></li>
+<li class="chapter" data-level="2.7" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#mis-specifying-the-representation-of-missing-values"><i class="fa fa-check"></i><b>2.7</b> Mis-specifying the representation of missing values</a></li>
+<li class="chapter" data-level="2.8" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#spreadsheet-data"><i class="fa fa-check"></i><b>2.8</b> Spreadsheet data</a></li>
+<li class="chapter" data-level="2.9" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#reading-data-from-the-internet"><i class="fa fa-check"></i><b>2.9</b> Reading data from the Internet</a></li>
+<li class="chapter" data-level="2.10" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#reading-from-the-clipboard"><i class="fa fa-check"></i><b>2.10</b> Reading from the clipboard</a></li>
+<li class="chapter" data-level="2.11" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#binary-data"><i class="fa fa-check"></i><b>2.11</b> Binary data</a></li>
+<li class="chapter" data-level="2.12" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#summary"><i class="fa fa-check"></i><b>2.12</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html"><i class="fa fa-check"></i><b>3</b> Data manipulation with <code>tidyverse</code></a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#introduction-1"><i class="fa fa-check"></i><b>3.1</b> Introduction</a></li>
+<li class="chapter" data-level="3.2" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#the-births-data"><i class="fa fa-check"></i><b>3.2</b> The <code>births</code> data</a></li>
+<li class="chapter" data-level="3.3" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#tibble-vs-data.frame"><i class="fa fa-check"></i><b>3.3</b> <code>tibble</code> vs <code>data.frame</code></a></li>
+<li class="chapter" data-level="3.4" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#piping-functions"><i class="fa fa-check"></i><b>3.4</b> Piping functions</a></li>
+<li class="chapter" data-level="3.5" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#mutate-columns"><i class="fa fa-check"></i><b>3.5</b> <code>mutate</code> columns</a></li>
+<li class="chapter" data-level="3.6" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#select-columns-filter-and-arrange-rows"><i class="fa fa-check"></i><b>3.6</b> <code>select</code> columns, <code>filter</code> and <code>arrange</code> rows</a></li>
+<li class="chapter" data-level="3.7" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#group_by-and-summarise-data"><i class="fa fa-check"></i><b>3.7</b> <code>group_by</code> and <code>summarise</code> data</a></li>
+<li class="chapter" data-level="3.8" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#multiple-grouping"><i class="fa fa-check"></i><b>3.8</b> Multiple grouping</a></li>
+<li class="chapter" data-level="3.9" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#bind-and-join-tables"><i class="fa fa-check"></i><b>3.9</b> Bind and join tables</a></li>
+<li class="chapter" data-level="3.10" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#data-visualization-with-ggplot2"><i class="fa fa-check"></i><b>3.10</b> Data Visualization with ggplot2</a></li>
+<li class="chapter" data-level="3.11" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#pivoting-data-with-tidyr"><i class="fa fa-check"></i><b>3.11</b> pivoting data with tidyr</a></li>
+<li class="chapter" data-level="3.12" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#reading-files-with-readr"><i class="fa fa-check"></i><b>3.12</b> reading files with readr</a></li>
+<li class="chapter" data-level="3.13" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#string-manipulation-with-stringr"><i class="fa fa-check"></i><b>3.13</b> String manipulation with stringr</a></li>
+<li class="chapter" data-level="3.14" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#purrr-package-to-apply-functions-to-list"><i class="fa fa-check"></i><b>3.14</b> purrr package to apply functions to list</a></li>
+<li class="chapter" data-level="3.15" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#bonus-rendering-tables"><i class="fa fa-check"></i><b>3.15</b> Bonus: Rendering tables</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="tabulation.html"><a href="tabulation.html"><i class="fa fa-check"></i><b>4</b> Tabulation</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="tabulation.html"><a href="tabulation.html#introduction-2"><i class="fa fa-check"></i><b>4.1</b> Introduction</a></li>
+<li class="chapter" data-level="4.2" data-path="tabulation.html"><a href="tabulation.html#the-births-data-1"><i class="fa fa-check"></i><b>4.2</b> The births data</a></li>
+<li class="chapter" data-level="4.3" data-path="tabulation.html"><a href="tabulation.html#one-way-tables"><i class="fa fa-check"></i><b>4.3</b> One-way tables</a></li>
+<li class="chapter" data-level="4.4" data-path="tabulation.html"><a href="tabulation.html#improving-the-presentation-of-tables"><i class="fa fa-check"></i><b>4.4</b> Improving the Presentation of Tables</a></li>
+<li class="chapter" data-level="4.5" data-path="tabulation.html"><a href="tabulation.html#two-way-tables"><i class="fa fa-check"></i><b>4.5</b> Two-way Tables</a></li>
+<li class="chapter" data-level="4.6" data-path="tabulation.html"><a href="tabulation.html#printing"><i class="fa fa-check"></i><b>4.6</b> Printing</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="graphics-in-r.html"><a href="graphics-in-r.html"><i class="fa fa-check"></i><b>5</b> Graphics in R</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="graphics-in-r.html"><a href="graphics-in-r.html#simple-plot-on-the-screen"><i class="fa fa-check"></i><b>5.1</b> Simple plot on the screen</a></li>
+<li class="chapter" data-level="5.2" data-path="graphics-in-r.html"><a href="graphics-in-r.html#colours"><i class="fa fa-check"></i><b>5.2</b> Colours</a></li>
+<li class="chapter" data-level="5.3" data-path="graphics-in-r.html"><a href="graphics-in-r.html#adding-to-a-plot"><i class="fa fa-check"></i><b>5.3</b> Adding to a plot</a></li>
+<li class="chapter" data-level="5.4" data-path="graphics-in-r.html"><a href="graphics-in-r.html#using-indexing-for-plot-elements"><i class="fa fa-check"></i><b>5.4</b> Using indexing for plot elements</a></li>
+<li class="chapter" data-level="5.5" data-path="graphics-in-r.html"><a href="graphics-in-r.html#generating-colours"><i class="fa fa-check"></i><b>5.5</b> Generating colours</a></li>
+<li class="chapter" data-level="5.6" data-path="graphics-in-r.html"><a href="graphics-in-r.html#saving-your-graphs-for-use-in-other-documents"><i class="fa fa-check"></i><b>5.6</b> Saving your graphs for use in other documents</a></li>
+<li class="chapter" data-level="5.7" data-path="graphics-in-r.html"><a href="graphics-in-r.html#interacting-with-a-plot"><i class="fa fa-check"></i><b>5.7</b> Interacting with a plot</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><i class="fa fa-check"></i><b>6</b> Analysis of hazard rates, their ratios and differences and binary regression</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#hand-calculations-for-a-single-rate"><i class="fa fa-check"></i><b>6.1</b> Hand calculations for a single rate</a></li>
+<li class="chapter" data-level="6.2" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-for-a-single-rate-with-logarithmic-link"><i class="fa fa-check"></i><b>6.2</b> Poisson model for a single rate with logarithmic link</a></li>
+<li class="chapter" data-level="6.3" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-for-a-single-rate-with-identity-link"><i class="fa fa-check"></i><b>6.3</b> Poisson model for a single rate with identity link</a></li>
+<li class="chapter" data-level="6.4" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-assuming-the-same-rate-for-several-periods"><i class="fa fa-check"></i><b>6.4</b> Poisson model assuming the same rate for several periods</a></li>
+<li class="chapter" data-level="6.5" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#analysis-of-rate-ratio"><i class="fa fa-check"></i><b>6.5</b> Analysis of rate ratio</a></li>
+<li class="chapter" data-level="6.6" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#analysis-of-rate-difference"><i class="fa fa-check"></i><b>6.6</b> Analysis of rate difference</a></li>
+<li class="chapter" data-level="6.7" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#binary-regression"><i class="fa fa-check"></i><b>6.7</b> Binary regression</a></li>
+<li class="chapter" data-level="6.8" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#optionalhomework-hand-calculations-and-calculations-using-matrix-tools"><i class="fa fa-check"></i><b>6.8</b> Optional/Homework: Hand calculations and calculations using matrix tools</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html"><i class="fa fa-check"></i><b>7</b> Estimation of effects: simple and more complex</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#response-and-explanatory-variables"><i class="fa fa-check"></i><b>7.1</b> Response and explanatory variables</a></li>
+<li class="chapter" data-level="7.2" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#data-set-births"><i class="fa fa-check"></i><b>7.2</b> Data set <code>births</code></a></li>
+<li class="chapter" data-level="7.3" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#simple-estimation-with-effx-lm-and-glm"><i class="fa fa-check"></i><b>7.3</b> Simple estimation with <code>effx()</code>, <code>lm()</code> and <code>glm()</code></a></li>
+<li class="chapter" data-level="7.4" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#confirms-this-3032.8-3229.9-197.1."><i class="fa fa-check"></i><b>7.4</b> confirms this (<span class="math inline">\(3032.8-3229.9=-197.1\)</span>).</a></li>
+<li class="chapter" data-level="7.5" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#factors-on-more-than-two-levels"><i class="fa fa-check"></i><b>7.5</b> Factors on more than two levels</a></li>
+<li class="chapter" data-level="7.6" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#stratified-effects-and-interaction-or-effect-measure-modification-1.8.5"><i class="fa fa-check"></i><b>7.6</b> Stratified effects, and interaction or effect-measure modification %% 1.8.5</a></li>
+<li class="chapter" data-level="7.7" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#controlling-or-adjusting-for-the-effect-of-hyp-for-sex"><i class="fa fa-check"></i><b>7.7</b> Controlling or adjusting for the effect of hyp for sex</a></li>
+<li class="chapter" data-level="7.8" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#numeric-exposures"><i class="fa fa-check"></i><b>7.8</b> Numeric exposures</a></li>
+<li class="chapter" data-level="7.9" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#checking-the-assumptions-of-the-linear-model"><i class="fa fa-check"></i><b>7.9</b> Checking the assumptions of the linear model</a></li>
+<li class="chapter" data-level="7.10" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#penalized-spline-model"><i class="fa fa-check"></i><b>7.10</b> Penalized spline model</a></li>
+<li class="chapter" data-level="7.11" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#analysis-of-binary-outcomes"><i class="fa fa-check"></i><b>7.11</b> Analysis of binary outcomes</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html"><i class="fa fa-check"></i><b>8</b> Poisson regression &amp; analysis of curved effects</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html#testis-cancer-data-input-and-housekeeping"><i class="fa fa-check"></i><b>8.1</b> Testis cancer: Data input and housekeeping</a></li>
+<li class="chapter" data-level="8.2" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html#some-descriptive-analysis"><i class="fa fa-check"></i><b>8.2</b> Some descriptive analysis</a></li>
+<li class="chapter" data-level="8.3" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html#age-and-period-as-categorical-factors"><i class="fa fa-check"></i><b>8.3</b> Age and period as categorical factors</a></li>
+<li class="chapter" data-level="8.4" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html#generalized-additive-model-with-penalized-splines"><i class="fa fa-check"></i><b>8.4</b> Generalized additive model with penalized splines</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="causal-inference.html"><a href="causal-inference.html"><i class="fa fa-check"></i><b>9</b> Causal inference</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="causal-inference.html"><a href="causal-inference.html#proper-adjustment-for-confounding-in-regression-models"><i class="fa fa-check"></i><b>9.1</b> Proper adjustment for confounding in regression models</a></li>
+<li class="chapter" data-level="9.2" data-path="causal-inference.html"><a href="causal-inference.html#dag-tools-in-the-package-dagitty"><i class="fa fa-check"></i><b>9.2</b> DAG tools in the package <code>dagitty</code></a></li>
+<li class="chapter" data-level="9.3" data-path="causal-inference.html"><a href="causal-inference.html#instrumental-variables-estimation-mendelian-randomization"><i class="fa fa-check"></i><b>9.3</b> Instrumental variables estimation: Mendelian randomization</a></li>
+<li class="chapter" data-level="9.4" data-path="causal-inference.html"><a href="causal-inference.html#why-are-simulation-exercises-useful-for-causal-inference"><i class="fa fa-check"></i><b>9.4</b> Why are simulation exercises useful for causal inference?</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="graphics-meccano.html"><a href="graphics-meccano.html"><i class="fa fa-check"></i><b>10</b> Graphics meccano</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="graphics-meccano.html"><a href="graphics-meccano.html#base-graphics"><i class="fa fa-check"></i><b>10.1</b> Base graphics</a></li>
+<li class="chapter" data-level="10.2" data-path="graphics-meccano.html"><a href="graphics-meccano.html#using-ggplot2"><i class="fa fa-check"></i><b>10.2</b> Using ggplot2</a></li>
+<li class="chapter" data-level="10.3" data-path="graphics-meccano.html"><a href="graphics-meccano.html#grid-graphics"><i class="fa fa-check"></i><b>10.3</b> Grid graphics</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html"><i class="fa fa-check"></i><b>11</b> Survival analysis with competing risks: Oral cancer patients</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#description-of-the-data"><i class="fa fa-check"></i><b>11.1</b> Description of the data</a></li>
+<li class="chapter" data-level="11.2" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#loading-the-packages-and-the-data"><i class="fa fa-check"></i><b>11.2</b> Loading the packages and the data</a></li>
+<li class="chapter" data-level="11.3" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#total-mortality-kaplanmeier-analyses"><i class="fa fa-check"></i><b>11.3</b> Total mortality: Kaplan–Meier analyses</a></li>
+<li class="chapter" data-level="11.4" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#total-mortality-by-stage"><i class="fa fa-check"></i><b>11.4</b> Total mortality by stage</a></li>
+<li class="chapter" data-level="11.5" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#event-specific-cumulative-mortality-curves"><i class="fa fa-check"></i><b>11.5</b> Event-specific cumulative mortality curves</a></li>
+<li class="chapter" data-level="11.6" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#regression-modelling-of-overall-mortality."><i class="fa fa-check"></i><b>11.6</b> Regression modelling of overall mortality.</a></li>
+<li class="chapter" data-level="11.7" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#modelling-event-specific-hazards"><i class="fa fa-check"></i><b>11.7</b> Modelling event-specific hazards</a></li>
+<li class="chapter" data-level="11.8" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#lexis-object-with-multi-state-set-up"><i class="fa fa-check"></i><b>11.8</b> Lexis object with multi-state set-up</a></li>
+<li class="chapter" data-level="11.9" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#optional-poisson-regression-as-an-alternative-to-cox-model"><i class="fa fa-check"></i><b>11.9</b> Optional: Poisson regression as an alternative to Cox model</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html"><i class="fa fa-check"></i><b>12</b> Time-splitting, time-scales and SMR</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#age-specific-mortality"><i class="fa fa-check"></i><b>12.1</b> Age-specific mortality</a></li>
+<li class="chapter" data-level="12.2" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#further-time-scales-period-and-duration"><i class="fa fa-check"></i><b>12.2</b> Further time scales: period and duration</a></li>
+<li class="chapter" data-level="12.3" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#smr"><i class="fa fa-check"></i><b>12.3</b> SMR</a></li>
+<li class="chapter" data-level="12.4" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#smr-modeling"><i class="fa fa-check"></i><b>12.4</b> SMR modeling</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><i class="fa fa-check"></i><b>13</b> Nested case-control study and case-cohort study: Risk factors of coronary heart disease</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#reading-the-cohort-data-illustrating-the-study-base-and-risk-sets"><i class="fa fa-check"></i><b>13.1</b> Reading the cohort data, illustrating the study base and risk sets</a></li>
+<li class="chapter" data-level="13.2" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#nested-case-control-study"><i class="fa fa-check"></i><b>13.2</b> Nested case-control study</a></li>
+<li class="chapter" data-level="13.3" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#case-cohort-study"><i class="fa fa-check"></i><b>13.3</b> Case-cohort study</a></li>
+<li class="chapter" data-level="13.4" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#do-these-estimates-resemble-those-obtained-from-nested-case-control-data"><i class="fa fa-check"></i><b>13.4</b> Do these estimates resemble those obtained from nested case-control data?</a></li>
+<li class="chapter" data-level="13.5" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#full-cohort-analysis-and-comparisons"><i class="fa fa-check"></i><b>13.5</b> Full cohort analysis and comparisons</a></li>
+<li class="chapter" data-level="13.6" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#further-exercises-and-homework"><i class="fa fa-check"></i><b>13.6</b> Further exercises and homework</a></li>
+</ul></li>
+<li class="chapter" data-level="14" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html"><i class="fa fa-check"></i><b>14</b> Causal inference 2: Model-based estimation of causal estimands</a>
+<ul>
+<li class="chapter" data-level="14.1" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#control-of-confounding"><i class="fa fa-check"></i><b>14.1</b> Control of confounding</a></li>
+<li class="chapter" data-level="14.2" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#generation-of-target-population-and-true-models"><i class="fa fa-check"></i><b>14.2</b> Generation of target population and true models</a></li>
+<li class="chapter" data-level="14.3" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#factual-and-counterfactual-risks---associational-and-causal-contrasts"><i class="fa fa-check"></i><b>14.3</b> Factual and counterfactual risks - associational and causal contrasts</a></li>
+<li class="chapter" data-level="14.4" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#outcome-modelling-and-estimation-of-causal-contrasts-by-g-formula"><i class="fa fa-check"></i><b>14.4</b> Outcome modelling and estimation of causal contrasts by g-formula</a></li>
+<li class="chapter" data-level="14.5" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#inverse-probability-weighting-ipw-by"><i class="fa fa-check"></i><b>14.5</b> Inverse probability weighting (IPW) by</a></li>
+<li class="chapter" data-level="14.6" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#improving-ipw-estimation-and-using-r-package-psweight"><i class="fa fa-check"></i><b>14.6</b> Improving IPW estimation and using R package <code>PSweight</code></a></li>
+<li class="chapter" data-level="14.7" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#targeted-maximum-likelihood-estimation-tmle"><i class="fa fa-check"></i><b>14.7</b> Targeted maximum likelihood estimation (TMLE)</a></li>
+<li class="chapter" data-level="14.8" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#tmle-with-superlearner"><i class="fa fa-check"></i><b>14.8</b> TMLE with SuperLearner</a></li>
+</ul></li>
+<li class="chapter" data-level="15" data-path="time-dependent-variables-and-multiple-states.html"><a href="time-dependent-variables-and-multiple-states.html"><i class="fa fa-check"></i><b>15</b> Time-dependent variables and multiple states</a>
+<ul>
+<li class="chapter" data-level="15.1" data-path="time-dependent-variables-and-multiple-states.html"><a href="time-dependent-variables-and-multiple-states.html#the-renal-failure-dataset"><i class="fa fa-check"></i><b>15.1</b> The renal failure dataset</a></li>
+<li class="chapter" data-level="15.2" data-path="time-dependent-variables-and-multiple-states.html"><a href="time-dependent-variables-and-multiple-states.html#splitting-the-follow-up-time"><i class="fa fa-check"></i><b>15.2</b> Splitting the follow-up time</a></li>
+<li class="chapter" data-level="15.3" data-path="time-dependent-variables-and-multiple-states.html"><a href="time-dependent-variables-and-multiple-states.html#prediction-from-the-multistate-model"><i class="fa fa-check"></i><b>15.3</b> Prediction from the multistate model</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/SPE-R/SPE" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Statistical Practice in Epidemiology with R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression" class="section level1 hasAnchor" number="6">
+<h1><span class="header-section-number">Chapter 6</span> Analysis of hazard rates, their ratios and differences and binary regression<a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>This exercise is <em>very</em> prescriptive, so you should make an
+effort to really understand everything you type into R. Consult the
+relevant slides of the lecture on <em>Poisson and Binary regression …</em></p>
+<div id="hand-calculations-for-a-single-rate" class="section level2 hasAnchor" number="6.1">
+<h2><span class="header-section-number">6.1</span> Hand calculations for a single rate<a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#hand-calculations-for-a-single-rate" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Let <span class="math inline">\(\lambda\)</span> be the true <strong>hazard rate</strong> or theoretical incidence rate of a given outcome event.
+Its estimator is the empirical <strong>incidence rate</strong>
+<span class="math inline">\(\widehat\lambda = D/Y\)</span> = no. cases/person-years. Recall that the
+standard error of the empirical rate is
+SE<span class="math inline">\((\widehat\lambda) = \widehat\lambda/\sqrt{D}\)</span>.</p>
+<p>The simplest approximate 95% confidence interval (CI) for <span class="math inline">\(\lambda\)</span>
+is given by
+<span class="math display">\[ \widehat\lambda \pm 1.96 \times SE(\widehat\lambda) \]</span></p>
+<ul>
+<li>Suppose <span class="math inline">\(15\)</span> outcome events are observed during <span class="math inline">\(5532\)</span> person-years in a given study cohort.
+Let’s use R as a simple desk calculator to estimate the underlying hazard rate <span class="math inline">\(\lambda\)</span> (in 1000
+person-years; therefore 5.532) and to get the first version of an approximate confidence
+interval:</li>
+</ul>
+</div>
+<div id="poisson-model-for-a-single-rate-with-logarithmic-link" class="section level2 hasAnchor" number="6.2">
+<h2><span class="header-section-number">6.2</span> Poisson model for a single rate with logarithmic link<a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-for-a-single-rate-with-logarithmic-link" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>You are able to estimate the hazard rate <span class="math inline">\(\lambda\)</span> and compute its CI with a <strong>Poisson regression model</strong>, as described in the relevant slides in the lecture handout.</p>
+<p>Poisson regression is a <strong>generalized linear model</strong> in which the <strong>family</strong>, <em>i.e.</em> the distribution of the response variable, is assumed to be the Poisson distribution. The most commonly applied <strong>link function</strong>
+in Poisson regression is the natural logarithm; log for short.</p>
+<ul>
+<li><p>A family object <code>poisreg</code>, a modified version of the original <code>poisson</code> family object, is available
+in package <code>Epi</code>. When using this, the response is defined as a <em>matrix</em> of two columns: numbers
+of cases <span class="math inline">\(D\)</span> and person-years <span class="math inline">\(Y\)</span>, these being combined into a matrix by <code>cbind(D,Y)</code>. No specification
+of <code>offset</code> is needed.</p></li>
+<li><p>If you want confidence interval for log rate</p></li>
+</ul>
+<p>In this course we endorse the use of family <code>poisreg</code> because of its advantages in more general settings.</p>
+</div>
+<div id="poisson-model-for-a-single-rate-with-identity-link" class="section level2 hasAnchor" number="6.3">
+<h2><span class="header-section-number">6.3</span> Poisson model for a single rate with identity link<a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-for-a-single-rate-with-identity-link" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The approach leaning on having the number of cases <span class="math inline">\(D\)</span> as the response and log<span class="math inline">\((Y)\)</span> as an offset,
+is limited only to models with log link. A major advantage of the <code>poisreg</code> family is that it allows
+a straighforward use of the <em>identity</em> link, too. With this link the response variable is the same, but
+the parameters to be directly estimated are now the rates itself and their differences, not the log-rates
+and their differences as with the log link.</p>
+<ul>
+<li>Fit a Poisson model with identity link to our simple data, and
+use <code>ci.lin()</code> to produce the estimate and the
+confidence interval for the hazard rate from this model:</li>
+</ul>
+<p>How is the coefficient of this model interpreted?
+Verify that you actually get the same rate estimate and CI as in section 1.6.1, item 1.</p>
+</div>
+<div id="poisson-model-assuming-the-same-rate-for-several-periods" class="section level2 hasAnchor" number="6.4">
+<h2><span class="header-section-number">6.4</span> Poisson model assuming the same rate for several periods<a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-assuming-the-same-rate-for-several-periods" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Now, suppose the events and person years are collected over three distinct periods.</p>
+<ul>
+<li><p>Read in the data and compute period-specific rates</p></li>
+<li><p>Using these data,
+fit the same model with log link as in section 1.6.2, assuming a common single hazard <span class="math inline">\(\lambda\)</span>
+for the separate periods. Compare the result from the previous ones</p></li>
+<li><p>Now test whether the rates are the same in the three periods:
+Try to fit a model with the period as a factor in the model:</p></li>
+</ul>
+<p>Compare the goodness-of-fit of the two models using <code>anova()</code> with the argument
+<code>test="Chisq"</code>:</p>
+<p>Compare the test statistic to the deviance of the model <code>mp</code>.
+– What is the deviance indicating?</p>
+</div>
+<div id="analysis-of-rate-ratio" class="section level2 hasAnchor" number="6.5">
+<h2><span class="header-section-number">6.5</span> Analysis of rate ratio<a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#analysis-of-rate-ratio" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We now switch to comparison of two rates <span class="math inline">\(\lambda_1\)</span> and <span class="math inline">\(\lambda_0\)</span>, i.e.
+the hazard in an exposed group vs. that in an unexposed one.</p>
+<p>Consider first estimation of the <strong>hazard ratio</strong> or the underlying <em>true</em> rate ratio
+<span class="math inline">\(\rho = \lambda_1/\lambda_0\)</span> between the groups. Suppose we have
+pertinent empirical data (cases and person-times) from both groups,
+<span class="math inline">\((D_1,Y_1)\)</span> and <span class="math inline">\((D_0,Y_0)\)</span>. The point estimate of <span class="math inline">\(\rho\)</span> is the
+empirical <strong>incidence rate ratio</strong>
+<span class="math display">\[
+\widehat{\rho} = RR = \frac{\widehat\lambda_1}{\widehat\lambda_0} = \frac{D_1/Y_1}{D_0/Y_0}
+\]</span></p>
+<!-- 
+The variance of $\log(\RR)$, that is, the difference
+of the log of the empirical rates,
+$\log(\widehat\lambda_1) - \log(\widehat\lambda_0)$, is commonly estimated as
+\begin{eqnarray*}
+   {\mbox{var}}(\log(\RR)) 
+    & = & {\mbox{var}}\{ \log( \widehat\lambda_1/\widehat\lambda_0 ) \} 
+     =  \mbox{var}\{ \log( \widehat\lambda_1 ) \} + \mbox{var}\{ \log( \widehat \lambda_0 ) \} \\
+    & = & 1/D_1 + 1/D_0
+\end{eqnarray*}
+Based on a similar argument as before, an approximate 95\CI for the
+true rate ratio $\lambda_1/\lambda_0$ is then: 
+\[
+  \RR \td \exp\left(1.96\sqrt{\frac{1}{D_1}+
+                              \frac{1}{D_0}}\,\right)
+\]
+ -->
+<p>Suppose you have <span class="math inline">\(15\)</span> events during <span class="math inline">\(5532\)</span> person-years in an
+unexposed group and <span class="math inline">\(28\)</span> events during <span class="math inline">\(4783\)</span> person-years in an
+exposed group:</p>
+<ul>
+<li><p>Calculate the incidence rates in the two groups, their ratio, and the CI of the true hazard ratio <span class="math inline">\(\rho\)</span> by direct application of the above formulae:</p></li>
+<li><p>Now achieve this using a Poisson model. For that we first combine
+the group-specific numbers into pertinent vectors and specify a factor to represent the contrast between the exposed and the unexposed group</p></li>
+</ul>
+<p>What do the parameters mean in this model?</p>
+<ul>
+<li>You can extract the estimation results for exponentiated parameters in two ways, as before:</li>
+</ul>
+</div>
+<div id="analysis-of-rate-difference" class="section level2 hasAnchor" number="6.6">
+<h2><span class="header-section-number">6.6</span> Analysis of rate difference<a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#analysis-of-rate-difference" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>For the <strong>hazard difference</strong> <span class="math inline">\(\delta = \lambda_1 - \lambda_0\)</span>,
+the natural estimator is the <strong>incidence rate difference</strong>
+<span class="math display">\[ \widehat\delta = \widehat\lambda_1  - \widehat\lambda_0 = D_1/Y_1 - D_0/Y_0 = \mbox{RD} . \]</span>
+Its variance is just the sum of the variances of the two rates
+<!-- (since the latter are  based on independent samples): -->
+<span class="math display">\[ var(RD) = var(\widehat\lambda_1 ) + var( \widehat\lambda_0 ) =  D_1/Y_1^2 + D_0/Y_0^2 \]</span></p>
+<ul>
+<li><p>Use this formula to compute the point estimate of the rate difference <span class="math inline">\(\lambda\)</span> and a 95% confidence interval for it:</p></li>
+<li><p>Verify that this is the confidence interval you get when you fit
+an additive model (obtained by identity link) with exposure as a factor:</p></li>
+</ul>
+</div>
+<div id="binary-regression" class="section level2 hasAnchor" number="6.7">
+<h2><span class="header-section-number">6.7</span> Binary regression<a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#binary-regression" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Explore the factors associated with risk of low birth weight
+in 500 singleton births in a London Hospital. Indicator (lowbw) for birth weight less than 2500 g. Data available from the Epi package. Factors of interest are
+maternal hypertension (hyp), mother’s age at birth over 35 years and sex of the baby.</p>
+<p>Load the <code>Epi</code> package and the data set and look at its content</p>
+<ul>
+<li><p>Because all variables are numeric we need first to do a little housekeeping.
+Two of them are directly converted into factors,
+and categorical versions are created of two continuous variables by function <code>cut()</code>.
+<!-- Also, express birth weights in kilograms --></p></li>
+<li><p>Cross tabulate (dplyr) counts of children by hypertension and low birth weight.
+calculate (mutate) proportions of low birth weigth children by hypertension.</p></li>
+<li><p>Estimate relative risk of low birth weight for mothers with hypertension compared to those without using binary regression.</p></li>
+<li><p>Adjust relative risk of low birth and hypertension with the sex of children</p></li>
+<li><p>Adjust relative risk of low birth and hypertension with the sex of children and mother beeing over 35 years.</p></li>
+</ul>
+</div>
+<div id="optionalhomework-hand-calculations-and-calculations-using-matrix-tools" class="section level2 hasAnchor" number="6.8">
+<h2><span class="header-section-number">6.8</span> Optional/Homework: Hand calculations and calculations using matrix tools<a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#optionalhomework-hand-calculations-and-calculations-using-matrix-tools" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<blockquote>
+<p>NB. This subsection requires some familiarity with matrix algebra. Do this only after you have done the other exercises of this session.</p>
+</blockquote>
+<p>First some basic hand calculations.</p>
+<ul>
+<li><p>Suppose <span class="math inline">\(15\)</span> outcome events are observed during <span class="math inline">\(5532\)</span> person-years in a given study cohort.
+Let’s use R as a simple desk calculator to estimate the underlying hazard rate <span class="math inline">\(\lambda\)</span> (in 1000
+person-years; therefore 5.532) and to get the first version of an approximate confidence
+interval:</p></li>
+<li><p>Compute now the approximate confidence interval using the method
+based on log-transformation and compare the result with that in the previous item.</p></li>
+<li><p>Calculate the incidence rates in the two groups, their ratio, and the<br />
+CI of the true hazard ratio <span class="math inline">\(\rho\)</span> by direct application of the above formulae:</p></li>
+<li><p>Explore the function <code>ci.mat()</code>, which lets you use
+matrix multiplication (operator <code>'%*%'</code>
+in R) to produce a confidence interval from an estimate and its
+standard error (or CIs from whole columns of estimates and SEs):</p></li>
+</ul>
+<p>As you see, this function returns a <span class="math inline">\(2\times 3\)</span> matrix (2 rows, 3 columns) containing familiar numbers.</p>
+<ul>
+<li>When you combine the single rate and its standard error into
+a row vector of length 2, i.e. a <span class="math inline">\(1\times 2\)</span> matrix, and multiply this
+by the <span class="math inline">\(2\times 3\)</span> matrix above, the computation returns
+a <span class="math inline">\(1\times 3\)</span> matrix containing the point estimate and the
+confidence limit.</li>
+</ul>
+<p>Apply this method to the single rate calculations in 1.6.1, first creating the <span class="math inline">\(1 \times 2\)</span> matrix and then performing the matrix multiplication.</p>
+<ul>
+<li><p>When the confidence interval is based on the log-rate and its
+standard error, the result is obtained by appropriate application of
+the exp-function on the pertinent matrix product</p></li>
+<li><p>For computing the rate ratio and its CI as in 1.6.5, matrix
+multiplication with <code>ci.mat()</code> should give the same result as
+there:</p></li>
+<li><p>The main argument in function <code>ci.mat()</code> is <code>alpha</code>,
+which sets the confidence level: <span class="math inline">\(1 - \alpha\)</span>. The default value is
+<code>alpha = 0.05</code>, corresponding to the level <span class="math inline">\(1 - 0.05\)</span> = 95%.
+If you wish to get the confidence interval for the rate ratio at
+the 90% level (= <span class="math inline">\(1-0.1\)</span>), for instance, you may proceed as
+follows:</p></li>
+<li><p>Now achieve this using a Poisson model. For that we first combine
+the group-specific numbers into pertinent vectors and specify a factor to represent the contrast between the exposed and the unexposed group</p></li>
+<li><p>Look again to the model used to analyse the rate ratio in. Often one would like to get simultaneously both
+the rates and the ratio between them. This can be achieved in one go
+using the <em>contrast matrix</em> argument <code>ctr.mat</code> to
+<code>ci.lin()</code> or <code>ci.exp()</code>. Try:</p></li>
+<li><p>Use the same machinery to the additive model to get the rates
+and the rate-difference in one go. Note that the annotation of the
+resulting estimates are via the column-names of the contrast matrix.</p></li>
+</ul>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="graphics-in-r.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="estimation-of-effects-simple-and-more-complex.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/SPE-R/SPE/edit/master/rates-rrrd-e.rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf", "_main.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

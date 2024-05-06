@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 2 Reading data into R | Statistical Practice in Epidemiology with R</title>
+  <meta name="description" content="This is the SPE-R 2024 exercises book" />
+  <meta name="generator" content="bookdown 0.39 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 2 Reading data into R | Statistical Practice in Epidemiology with R" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This is the SPE-R 2024 exercises book" />
+  <meta name="github-repo" content="spe-r/spe" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 2 Reading data into R | Statistical Practice in Epidemiology with R" />
+  
+  <meta name="twitter:description" content="This is the SPE-R 2024 exercises book" />
+  
+
+<meta name="author" content="Krista Fischer" />
+<meta name="author" content="Martyn Plummer" />
+<meta name="author" content="Janne Pitkäniemi" />
+<meta name="author" content="Bendix Carstensen" />
+<meta name="author" content="Damien Georges" />
+<meta name="author" content="Esa Läärä" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="practice-with-basic-r.html"/>
+<link rel="next" href="data-manipulation-with-tidyverse.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">SPE-R practicals</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>About</a></li>
+<li class="chapter" data-level="1" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html"><i class="fa fa-check"></i><b>1</b> Practice with basic R</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#the-working-directory"><i class="fa fa-check"></i><b>1.1</b> The working directory</a></li>
+<li class="chapter" data-level="1.2" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#the-workspace"><i class="fa fa-check"></i><b>1.2</b> The workspace</a></li>
+<li class="chapter" data-level="1.3" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#using-r-as-a-calculator"><i class="fa fa-check"></i><b>1.3</b> Using R as a calculator</a></li>
+<li class="chapter" data-level="1.4" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#vectors"><i class="fa fa-check"></i><b>1.4</b> Vectors</a></li>
+<li class="chapter" data-level="1.5" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#sequences"><i class="fa fa-check"></i><b>1.5</b> Sequences</a></li>
+<li class="chapter" data-level="1.6" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#displaying-and-changing-parts-of-a-vector-indexing"><i class="fa fa-check"></i><b>1.6</b> Displaying and changing parts of a vector (indexing)</a></li>
+<li class="chapter" data-level="1.7" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#lists"><i class="fa fa-check"></i><b>1.7</b> Lists</a></li>
+<li class="chapter" data-level="1.8" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#data-frames"><i class="fa fa-check"></i><b>1.8</b> Data frames</a></li>
+<li class="chapter" data-level="1.9" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#working-with-built-in-data-frames"><i class="fa fa-check"></i><b>1.9</b> Working with built-in data frames</a></li>
+<li class="chapter" data-level="1.10" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#referencing-parts-of-the-data-frame-indexing"><i class="fa fa-check"></i><b>1.10</b> Referencing parts of the data frame (indexing)</a></li>
+<li class="chapter" data-level="1.11" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#summaries"><i class="fa fa-check"></i><b>1.11</b> Summaries</a></li>
+<li class="chapter" data-level="1.12" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#generating-new-variables"><i class="fa fa-check"></i><b>1.12</b> Generating new variables</a></li>
+<li class="chapter" data-level="1.13" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#turning-a-variable-into-a-factor"><i class="fa fa-check"></i><b>1.13</b> Turning a variable into a factor</a></li>
+<li class="chapter" data-level="1.14" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#frequency-tables"><i class="fa fa-check"></i><b>1.14</b> Frequency tables</a></li>
+<li class="chapter" data-level="1.15" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#grouping-the-values-of-a-numeric-variable"><i class="fa fa-check"></i><b>1.15</b> Grouping the values of a numeric variable</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html"><i class="fa fa-check"></i><b>2</b> Reading data into <code>R</code></a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#introduction"><i class="fa fa-check"></i><b>2.1</b> Introduction</a></li>
+<li class="chapter" data-level="2.2" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#data-sources"><i class="fa fa-check"></i><b>2.2</b> Data sources</a></li>
+<li class="chapter" data-level="2.3" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#data-in-text-files"><i class="fa fa-check"></i><b>2.3</b> Data in text files</a></li>
+<li class="chapter" data-level="2.4" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#things-that-can-go-wrong"><i class="fa fa-check"></i><b>2.4</b> Things that can go wrong</a></li>
+<li class="chapter" data-level="2.5" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#forgetting-the-headers"><i class="fa fa-check"></i><b>2.5</b> Forgetting the headers</a></li>
+<li class="chapter" data-level="2.6" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#using-the-wrong-separator"><i class="fa fa-check"></i><b>2.6</b> Using the wrong separator</a></li>
+<li class="chapter" data-level="2.7" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#mis-specifying-the-representation-of-missing-values"><i class="fa fa-check"></i><b>2.7</b> Mis-specifying the representation of missing values</a></li>
+<li class="chapter" data-level="2.8" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#spreadsheet-data"><i class="fa fa-check"></i><b>2.8</b> Spreadsheet data</a></li>
+<li class="chapter" data-level="2.9" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#reading-data-from-the-internet"><i class="fa fa-check"></i><b>2.9</b> Reading data from the Internet</a></li>
+<li class="chapter" data-level="2.10" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#reading-from-the-clipboard"><i class="fa fa-check"></i><b>2.10</b> Reading from the clipboard</a></li>
+<li class="chapter" data-level="2.11" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#binary-data"><i class="fa fa-check"></i><b>2.11</b> Binary data</a></li>
+<li class="chapter" data-level="2.12" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#summary"><i class="fa fa-check"></i><b>2.12</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html"><i class="fa fa-check"></i><b>3</b> Data manipulation with <code>tidyverse</code></a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#introduction-1"><i class="fa fa-check"></i><b>3.1</b> Introduction</a></li>
+<li class="chapter" data-level="3.2" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#the-births-data"><i class="fa fa-check"></i><b>3.2</b> The <code>births</code> data</a></li>
+<li class="chapter" data-level="3.3" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#tibble-vs-data.frame"><i class="fa fa-check"></i><b>3.3</b> <code>tibble</code> vs <code>data.frame</code></a></li>
+<li class="chapter" data-level="3.4" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#piping-functions"><i class="fa fa-check"></i><b>3.4</b> Piping functions</a></li>
+<li class="chapter" data-level="3.5" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#mutate-columns"><i class="fa fa-check"></i><b>3.5</b> <code>mutate</code> columns</a></li>
+<li class="chapter" data-level="3.6" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#select-columns-filter-and-arrange-rows"><i class="fa fa-check"></i><b>3.6</b> <code>select</code> columns, <code>filter</code> and <code>arrange</code> rows</a></li>
+<li class="chapter" data-level="3.7" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#group_by-and-summarise-data"><i class="fa fa-check"></i><b>3.7</b> <code>group_by</code> and <code>summarise</code> data</a></li>
+<li class="chapter" data-level="3.8" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#multiple-grouping"><i class="fa fa-check"></i><b>3.8</b> Multiple grouping</a></li>
+<li class="chapter" data-level="3.9" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#bind-and-join-tables"><i class="fa fa-check"></i><b>3.9</b> Bind and join tables</a></li>
+<li class="chapter" data-level="3.10" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#data-visualization-with-ggplot2"><i class="fa fa-check"></i><b>3.10</b> Data Visualization with ggplot2</a></li>
+<li class="chapter" data-level="3.11" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#pivoting-data-with-tidyr"><i class="fa fa-check"></i><b>3.11</b> pivoting data with tidyr</a></li>
+<li class="chapter" data-level="3.12" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#reading-files-with-readr"><i class="fa fa-check"></i><b>3.12</b> reading files with readr</a></li>
+<li class="chapter" data-level="3.13" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#string-manipulation-with-stringr"><i class="fa fa-check"></i><b>3.13</b> String manipulation with stringr</a></li>
+<li class="chapter" data-level="3.14" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#purrr-package-to-apply-functions-to-list"><i class="fa fa-check"></i><b>3.14</b> purrr package to apply functions to list</a></li>
+<li class="chapter" data-level="3.15" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#bonus-rendering-tables"><i class="fa fa-check"></i><b>3.15</b> Bonus: Rendering tables</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="tabulation.html"><a href="tabulation.html"><i class="fa fa-check"></i><b>4</b> Tabulation</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="tabulation.html"><a href="tabulation.html#introduction-2"><i class="fa fa-check"></i><b>4.1</b> Introduction</a></li>
+<li class="chapter" data-level="4.2" data-path="tabulation.html"><a href="tabulation.html#the-births-data-1"><i class="fa fa-check"></i><b>4.2</b> The births data</a></li>
+<li class="chapter" data-level="4.3" data-path="tabulation.html"><a href="tabulation.html#one-way-tables"><i class="fa fa-check"></i><b>4.3</b> One-way tables</a></li>
+<li class="chapter" data-level="4.4" data-path="tabulation.html"><a href="tabulation.html#improving-the-presentation-of-tables"><i class="fa fa-check"></i><b>4.4</b> Improving the Presentation of Tables</a></li>
+<li class="chapter" data-level="4.5" data-path="tabulation.html"><a href="tabulation.html#two-way-tables"><i class="fa fa-check"></i><b>4.5</b> Two-way Tables</a></li>
+<li class="chapter" data-level="4.6" data-path="tabulation.html"><a href="tabulation.html#printing"><i class="fa fa-check"></i><b>4.6</b> Printing</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="graphics-in-r.html"><a href="graphics-in-r.html"><i class="fa fa-check"></i><b>5</b> Graphics in R</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="graphics-in-r.html"><a href="graphics-in-r.html#simple-plot-on-the-screen"><i class="fa fa-check"></i><b>5.1</b> Simple plot on the screen</a></li>
+<li class="chapter" data-level="5.2" data-path="graphics-in-r.html"><a href="graphics-in-r.html#colours"><i class="fa fa-check"></i><b>5.2</b> Colours</a></li>
+<li class="chapter" data-level="5.3" data-path="graphics-in-r.html"><a href="graphics-in-r.html#adding-to-a-plot"><i class="fa fa-check"></i><b>5.3</b> Adding to a plot</a></li>
+<li class="chapter" data-level="5.4" data-path="graphics-in-r.html"><a href="graphics-in-r.html#using-indexing-for-plot-elements"><i class="fa fa-check"></i><b>5.4</b> Using indexing for plot elements</a></li>
+<li class="chapter" data-level="5.5" data-path="graphics-in-r.html"><a href="graphics-in-r.html#generating-colours"><i class="fa fa-check"></i><b>5.5</b> Generating colours</a></li>
+<li class="chapter" data-level="5.6" data-path="graphics-in-r.html"><a href="graphics-in-r.html#saving-your-graphs-for-use-in-other-documents"><i class="fa fa-check"></i><b>5.6</b> Saving your graphs for use in other documents</a></li>
+<li class="chapter" data-level="5.7" data-path="graphics-in-r.html"><a href="graphics-in-r.html#interacting-with-a-plot"><i class="fa fa-check"></i><b>5.7</b> Interacting with a plot</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><i class="fa fa-check"></i><b>6</b> Analysis of hazard rates, their ratios and differences and binary regression</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#hand-calculations-for-a-single-rate"><i class="fa fa-check"></i><b>6.1</b> Hand calculations for a single rate</a></li>
+<li class="chapter" data-level="6.2" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-for-a-single-rate-with-logarithmic-link"><i class="fa fa-check"></i><b>6.2</b> Poisson model for a single rate with logarithmic link</a></li>
+<li class="chapter" data-level="6.3" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-for-a-single-rate-with-identity-link"><i class="fa fa-check"></i><b>6.3</b> Poisson model for a single rate with identity link</a></li>
+<li class="chapter" data-level="6.4" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-assuming-the-same-rate-for-several-periods"><i class="fa fa-check"></i><b>6.4</b> Poisson model assuming the same rate for several periods</a></li>
+<li class="chapter" data-level="6.5" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#analysis-of-rate-ratio"><i class="fa fa-check"></i><b>6.5</b> Analysis of rate ratio</a></li>
+<li class="chapter" data-level="6.6" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#analysis-of-rate-difference"><i class="fa fa-check"></i><b>6.6</b> Analysis of rate difference</a></li>
+<li class="chapter" data-level="6.7" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#binary-regression"><i class="fa fa-check"></i><b>6.7</b> Binary regression</a></li>
+<li class="chapter" data-level="6.8" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#optionalhomework-hand-calculations-and-calculations-using-matrix-tools"><i class="fa fa-check"></i><b>6.8</b> Optional/Homework: Hand calculations and calculations using matrix tools</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html"><i class="fa fa-check"></i><b>7</b> Estimation of effects: simple and more complex</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#response-and-explanatory-variables"><i class="fa fa-check"></i><b>7.1</b> Response and explanatory variables</a></li>
+<li class="chapter" data-level="7.2" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#data-set-births"><i class="fa fa-check"></i><b>7.2</b> Data set <code>births</code></a></li>
+<li class="chapter" data-level="7.3" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#simple-estimation-with-effx-lm-and-glm"><i class="fa fa-check"></i><b>7.3</b> Simple estimation with <code>effx()</code>, <code>lm()</code> and <code>glm()</code></a></li>
+<li class="chapter" data-level="7.4" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#confirms-this-3032.8-3229.9-197.1."><i class="fa fa-check"></i><b>7.4</b> confirms this (<span class="math inline">\(3032.8-3229.9=-197.1\)</span>).</a></li>
+<li class="chapter" data-level="7.5" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#factors-on-more-than-two-levels"><i class="fa fa-check"></i><b>7.5</b> Factors on more than two levels</a></li>
+<li class="chapter" data-level="7.6" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#stratified-effects-and-interaction-or-effect-measure-modification-1.8.5"><i class="fa fa-check"></i><b>7.6</b> Stratified effects, and interaction or effect-measure modification %% 1.8.5</a></li>
+<li class="chapter" data-level="7.7" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#controlling-or-adjusting-for-the-effect-of-hyp-for-sex"><i class="fa fa-check"></i><b>7.7</b> Controlling or adjusting for the effect of hyp for sex</a></li>
+<li class="chapter" data-level="7.8" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#numeric-exposures"><i class="fa fa-check"></i><b>7.8</b> Numeric exposures</a></li>
+<li class="chapter" data-level="7.9" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#checking-the-assumptions-of-the-linear-model"><i class="fa fa-check"></i><b>7.9</b> Checking the assumptions of the linear model</a></li>
+<li class="chapter" data-level="7.10" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#penalized-spline-model"><i class="fa fa-check"></i><b>7.10</b> Penalized spline model</a></li>
+<li class="chapter" data-level="7.11" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#analysis-of-binary-outcomes"><i class="fa fa-check"></i><b>7.11</b> Analysis of binary outcomes</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html"><i class="fa fa-check"></i><b>8</b> Poisson regression &amp; analysis of curved effects</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html#testis-cancer-data-input-and-housekeeping"><i class="fa fa-check"></i><b>8.1</b> Testis cancer: Data input and housekeeping</a></li>
+<li class="chapter" data-level="8.2" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html#some-descriptive-analysis"><i class="fa fa-check"></i><b>8.2</b> Some descriptive analysis</a></li>
+<li class="chapter" data-level="8.3" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html#age-and-period-as-categorical-factors"><i class="fa fa-check"></i><b>8.3</b> Age and period as categorical factors</a></li>
+<li class="chapter" data-level="8.4" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html#generalized-additive-model-with-penalized-splines"><i class="fa fa-check"></i><b>8.4</b> Generalized additive model with penalized splines</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="causal-inference.html"><a href="causal-inference.html"><i class="fa fa-check"></i><b>9</b> Causal inference</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="causal-inference.html"><a href="causal-inference.html#proper-adjustment-for-confounding-in-regression-models"><i class="fa fa-check"></i><b>9.1</b> Proper adjustment for confounding in regression models</a></li>
+<li class="chapter" data-level="9.2" data-path="causal-inference.html"><a href="causal-inference.html#dag-tools-in-the-package-dagitty"><i class="fa fa-check"></i><b>9.2</b> DAG tools in the package <code>dagitty</code></a></li>
+<li class="chapter" data-level="9.3" data-path="causal-inference.html"><a href="causal-inference.html#instrumental-variables-estimation-mendelian-randomization"><i class="fa fa-check"></i><b>9.3</b> Instrumental variables estimation: Mendelian randomization</a></li>
+<li class="chapter" data-level="9.4" data-path="causal-inference.html"><a href="causal-inference.html#why-are-simulation-exercises-useful-for-causal-inference"><i class="fa fa-check"></i><b>9.4</b> Why are simulation exercises useful for causal inference?</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="graphics-meccano.html"><a href="graphics-meccano.html"><i class="fa fa-check"></i><b>10</b> Graphics meccano</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="graphics-meccano.html"><a href="graphics-meccano.html#base-graphics"><i class="fa fa-check"></i><b>10.1</b> Base graphics</a></li>
+<li class="chapter" data-level="10.2" data-path="graphics-meccano.html"><a href="graphics-meccano.html#using-ggplot2"><i class="fa fa-check"></i><b>10.2</b> Using ggplot2</a></li>
+<li class="chapter" data-level="10.3" data-path="graphics-meccano.html"><a href="graphics-meccano.html#grid-graphics"><i class="fa fa-check"></i><b>10.3</b> Grid graphics</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html"><i class="fa fa-check"></i><b>11</b> Survival analysis with competing risks: Oral cancer patients</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#description-of-the-data"><i class="fa fa-check"></i><b>11.1</b> Description of the data</a></li>
+<li class="chapter" data-level="11.2" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#loading-the-packages-and-the-data"><i class="fa fa-check"></i><b>11.2</b> Loading the packages and the data</a></li>
+<li class="chapter" data-level="11.3" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#total-mortality-kaplanmeier-analyses"><i class="fa fa-check"></i><b>11.3</b> Total mortality: Kaplan–Meier analyses</a></li>
+<li class="chapter" data-level="11.4" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#total-mortality-by-stage"><i class="fa fa-check"></i><b>11.4</b> Total mortality by stage</a></li>
+<li class="chapter" data-level="11.5" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#event-specific-cumulative-mortality-curves"><i class="fa fa-check"></i><b>11.5</b> Event-specific cumulative mortality curves</a></li>
+<li class="chapter" data-level="11.6" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#regression-modelling-of-overall-mortality."><i class="fa fa-check"></i><b>11.6</b> Regression modelling of overall mortality.</a></li>
+<li class="chapter" data-level="11.7" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#modelling-event-specific-hazards"><i class="fa fa-check"></i><b>11.7</b> Modelling event-specific hazards</a></li>
+<li class="chapter" data-level="11.8" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#lexis-object-with-multi-state-set-up"><i class="fa fa-check"></i><b>11.8</b> Lexis object with multi-state set-up</a></li>
+<li class="chapter" data-level="11.9" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#optional-poisson-regression-as-an-alternative-to-cox-model"><i class="fa fa-check"></i><b>11.9</b> Optional: Poisson regression as an alternative to Cox model</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html"><i class="fa fa-check"></i><b>12</b> Time-splitting, time-scales and SMR</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#age-specific-mortality"><i class="fa fa-check"></i><b>12.1</b> Age-specific mortality</a></li>
+<li class="chapter" data-level="12.2" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#further-time-scales-period-and-duration"><i class="fa fa-check"></i><b>12.2</b> Further time scales: period and duration</a></li>
+<li class="chapter" data-level="12.3" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#smr"><i class="fa fa-check"></i><b>12.3</b> SMR</a></li>
+<li class="chapter" data-level="12.4" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#smr-modeling"><i class="fa fa-check"></i><b>12.4</b> SMR modeling</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><i class="fa fa-check"></i><b>13</b> Nested case-control study and case-cohort study: Risk factors of coronary heart disease</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#reading-the-cohort-data-illustrating-the-study-base-and-risk-sets"><i class="fa fa-check"></i><b>13.1</b> Reading the cohort data, illustrating the study base and risk sets</a></li>
+<li class="chapter" data-level="13.2" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#nested-case-control-study"><i class="fa fa-check"></i><b>13.2</b> Nested case-control study</a></li>
+<li class="chapter" data-level="13.3" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#case-cohort-study"><i class="fa fa-check"></i><b>13.3</b> Case-cohort study</a></li>
+<li class="chapter" data-level="13.4" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#do-these-estimates-resemble-those-obtained-from-nested-case-control-data"><i class="fa fa-check"></i><b>13.4</b> Do these estimates resemble those obtained from nested case-control data?</a></li>
+<li class="chapter" data-level="13.5" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#full-cohort-analysis-and-comparisons"><i class="fa fa-check"></i><b>13.5</b> Full cohort analysis and comparisons</a></li>
+<li class="chapter" data-level="13.6" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#further-exercises-and-homework"><i class="fa fa-check"></i><b>13.6</b> Further exercises and homework</a></li>
+</ul></li>
+<li class="chapter" data-level="14" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html"><i class="fa fa-check"></i><b>14</b> Causal inference 2: Model-based estimation of causal estimands</a>
+<ul>
+<li class="chapter" data-level="14.1" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#control-of-confounding"><i class="fa fa-check"></i><b>14.1</b> Control of confounding</a></li>
+<li class="chapter" data-level="14.2" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#generation-of-target-population-and-true-models"><i class="fa fa-check"></i><b>14.2</b> Generation of target population and true models</a></li>
+<li class="chapter" data-level="14.3" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#factual-and-counterfactual-risks---associational-and-causal-contrasts"><i class="fa fa-check"></i><b>14.3</b> Factual and counterfactual risks - associational and causal contrasts</a></li>
+<li class="chapter" data-level="14.4" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#outcome-modelling-and-estimation-of-causal-contrasts-by-g-formula"><i class="fa fa-check"></i><b>14.4</b> Outcome modelling and estimation of causal contrasts by g-formula</a></li>
+<li class="chapter" data-level="14.5" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#inverse-probability-weighting-ipw-by"><i class="fa fa-check"></i><b>14.5</b> Inverse probability weighting (IPW) by</a></li>
+<li class="chapter" data-level="14.6" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#improving-ipw-estimation-and-using-r-package-psweight"><i class="fa fa-check"></i><b>14.6</b> Improving IPW estimation and using R package <code>PSweight</code></a></li>
+<li class="chapter" data-level="14.7" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#targeted-maximum-likelihood-estimation-tmle"><i class="fa fa-check"></i><b>14.7</b> Targeted maximum likelihood estimation (TMLE)</a></li>
+<li class="chapter" data-level="14.8" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#tmle-with-superlearner"><i class="fa fa-check"></i><b>14.8</b> TMLE with SuperLearner</a></li>
+</ul></li>
+<li class="chapter" data-level="15" data-path="time-dependent-variables-and-multiple-states.html"><a href="time-dependent-variables-and-multiple-states.html"><i class="fa fa-check"></i><b>15</b> Time-dependent variables and multiple states</a>
+<ul>
+<li class="chapter" data-level="15.1" data-path="time-dependent-variables-and-multiple-states.html"><a href="time-dependent-variables-and-multiple-states.html#the-renal-failure-dataset"><i class="fa fa-check"></i><b>15.1</b> The renal failure dataset</a></li>
+<li class="chapter" data-level="15.2" data-path="time-dependent-variables-and-multiple-states.html"><a href="time-dependent-variables-and-multiple-states.html#splitting-the-follow-up-time"><i class="fa fa-check"></i><b>15.2</b> Splitting the follow-up time</a></li>
+<li class="chapter" data-level="15.3" data-path="time-dependent-variables-and-multiple-states.html"><a href="time-dependent-variables-and-multiple-states.html#prediction-from-the-multistate-model"><i class="fa fa-check"></i><b>15.3</b> Prediction from the multistate model</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/SPE-R/SPE" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Statistical Practice in Epidemiology with R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="reading-data-into-r" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">Chapter 2</span> Reading data into <code>R</code><a href="reading-data-into-r.html#reading-data-into-r" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="introduction" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> Introduction<a href="reading-data-into-r.html#introduction" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<blockquote>
+<p><em>If you want to have rabbit stew, first catch the rabbit</em> – Old saying, origin unknown</p>
+</blockquote>
+<p><code>R</code> is a language and environment for data analysis. If you
+want to do something interesting with it, you need data.</p>
+<p>For teaching purposes, data sets are often embedded in <code>R</code>
+packages. The base <code>R</code> distribution contains a whole package
+dedicated to data which includes around 100 data sets. This is
+attached towards the end of the search path, and you can see its
+contents with</p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="reading-data-into-r.html#cb59-1" tabindex="-1"></a><span class="fu">objects</span>(<span class="st">&quot;package:datasets&quot;</span>)</span></code></pre></div>
+<p>A description of all of these objects is available using the <code>help()</code>
+function. For example</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="reading-data-into-r.html#cb60-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">help</span>(Titanic)</span></code></pre></div>
+<p>gives an explanation of the <code>Titanic</code> data set, along with
+references giving the source of the data.</p>
+<p>The <code>Epi</code> package also contains some data sets. These are not
+available automatically when you load the <code>Epi</code> package, but
+you can make a copy in your workspace using the <code>data()</code>
+function. For example</p>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="reading-data-into-r.html#cb61-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
+<span id="cb61-2"><a href="reading-data-into-r.html#cb61-2" tabindex="-1"></a><span class="fu">data</span>(bdendo)</span></code></pre></div>
+<p>will create a data frame called <code>bdendo</code> in your workspace
+containing data from a case-control study of endometrial cancer.
+Datasets in the <code>Epi</code> package also have help pages: type
+<code>help(bdendo)</code> for further information.</p>
+<p>To go back to the cooking analogy, these data sets are the equivalent
+of microwave ready meals, carefully packaged and requiring minimal
+work by the consumer. Your own data will never be able in this form
+and you must work harder to read it in to <code>R</code>.</p>
+<p>This exercise introduces you to the basics of reading external data
+into <code>R</code>. It consists of reading the same data from different
+formats. Although this may appear repetitive, it allows you to see
+the many options available to you, and should allow you to recognize
+when things go wrong.</p>
+<blockquote>
+<p><strong>getting the data</strong> You will need to download the zip file <code>data.zip</code> from the course web site (<a href="https://github.com/SPE-R/SPE/raw/gh-spe-material/SPE-all-material.zip" class="uri">https://github.com/SPE-R/SPE/raw/gh-spe-material/SPE-all-material.zip</a>) and unpack this in your working directory. This will create a sub-directory <code>data</code> containing (among other things) the files <code>fem.dat</code>, <code>fem-dot.dat</code>, <code>fem.csv</code>, and <code>fem.dta</code> (Reminder: use <code>setwd()</code> to set
+your working directory).</p>
+</blockquote>
+</div>
+<div id="data-sources" class="section level2 hasAnchor" number="2.2">
+<h2><span class="header-section-number">2.2</span> Data sources<a href="reading-data-into-r.html#data-sources" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Sources of data can be classified into three groups:</p>
+<ul>
+<li>Data in human readable form, which can be inspected with a text editor.</li>
+<li>Data in binary format, which can only be read by a program that
+understands that format (SAS, SPSS, Stata, Excel, …).</li>
+<li>Online data from a database management system (DBMS)</li>
+</ul>
+<p>This exercise will deal with the first two forms of
+data. Epidemiological data sets are rarely large enough to justify
+being kept in a DBMS. If you want further details on this topic, you
+can consult the <em>R Data Import/Export</em> manual that comes with
+<code>R</code>.</p>
+</div>
+<div id="data-in-text-files" class="section level2 hasAnchor" number="2.3">
+<h2><span class="header-section-number">2.3</span> Data in text files<a href="reading-data-into-r.html#data-in-text-files" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Human-readable data files are generally kept in a rectangular format,
+with individual records in single rows and variables in columns. Such
+data can be read into a data frame in <code>R</code>.</p>
+<p>Before reading in the data, you should inspect the file in a text
+editor and ask three questions:</p>
+<ul>
+<li>How are columns in the table separated?</li>
+<li>How are missing values represented?</li>
+<li>Are variable names included in the file?</li>
+</ul>
+<p>The file <code>fem.dat</code> contains data on 118 female psychiatric
+patients. The data set contains nine variables.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ID</td>
+<td align="left">Patient identifier</td>
+</tr>
+<tr class="even">
+<td align="left">AGE</td>
+<td align="left">Age in years</td>
+</tr>
+<tr class="odd">
+<td align="left">IQ</td>
+<td align="left">Intelligence Quotient (IQ) score</td>
+</tr>
+<tr class="even">
+<td align="left">ANXIETY</td>
+<td align="left">Anxiety (1=none, 2=mild, 3=moderate,4=severe)</td>
+</tr>
+<tr class="odd">
+<td align="left">DEPRESS</td>
+<td align="left">Depression (1=none, 2=mild, 3=moderate or severe)</td>
+</tr>
+<tr class="even">
+<td align="left">SLEEP</td>
+<td align="left">Sleeping normally (1=yes, 2=no)</td>
+</tr>
+<tr class="odd">
+<td align="left">SEX</td>
+<td align="left">Lost interest in sex (1=yes, 2=no)</td>
+</tr>
+<tr class="even">
+<td align="left">LIFE</td>
+<td align="left">Considered suicide (1=yes, 2=no)</td>
+</tr>
+<tr class="odd">
+<td align="left">WEIGHT</td>
+<td align="left">Weight change (kg) in previous 6 months</td>
+</tr>
+</tbody>
+</table>
+<p>Inspect the file <code>fem.dat</code> with a text editor to answer the
+questions above.</p>
+<p>The most general function for reading in free-format data is
+<code>read.table()</code>. This function reads a text file and returns a
+data frame. It tries to guess the correct format of each variable in
+the data frame (integer, double precision, or text).</p>
+<p>Read in the table with:</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="reading-data-into-r.html#cb62-1" tabindex="-1"></a>fem <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">&quot;./data/fem.dat&quot;</span>, <span class="at">header=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<p>Note that you must assign the result of <code>read.table()</code> to an
+object. If this is not done, the data frame will be printed to the
+screen and then lost.</p>
+<p>You can see the names of the variables with</p>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="reading-data-into-r.html#cb63-1" tabindex="-1"></a><span class="fu">names</span>(fem)</span></code></pre></div>
+<p>The structure of the data frame can be seen with</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="reading-data-into-r.html#cb64-1" tabindex="-1"></a><span class="fu">str</span>(fem)</span></code></pre></div>
+<p>You can also inspect the top few rows with</p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="reading-data-into-r.html#cb65-1" tabindex="-1"></a><span class="fu">head</span>(fem)</span></code></pre></div>
+<p>Note that the IQ of subject 9 is -99, which is an illegal value:
+nobody can have a negative IQ. In fact -99 has been used in this file
+to represent a missing value. In <code>R</code> the special value
+<code>NA</code> (<em>Not Available</em>) is used to represent missing values. All
+<code>R</code> functions recognize <code>NA</code> values and will handle them
+appropriately, although sometimes the appropriate response is to stop
+the calculation with an error message.</p>
+<p>You can recode the missing values with</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="reading-data-into-r.html#cb66-1" tabindex="-1"></a>fem<span class="sc">$</span>IQ[fem<span class="sc">$</span>IQ <span class="sc">==</span> <span class="sc">-</span><span class="dv">99</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span></code></pre></div>
+<p>Of course it is much better to handle special missing value codes
+when reading in the data. This can be done with the
+<code>na.strings</code> argument of the <code>read.table()</code>
+function. See below.</p>
+</div>
+<div id="things-that-can-go-wrong" class="section level2 hasAnchor" number="2.4">
+<h2><span class="header-section-number">2.4</span> Things that can go wrong<a href="reading-data-into-r.html#things-that-can-go-wrong" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Sooner or later when reading data into <code>R</code>, you will make a
+mistake. The frustrating part of reading data into <code>R</code> is that
+most mistakes are not fatal: they simply cause the function to return
+a data frame that is <em>not what you wanted.</em> There are three
+common mistakes, which you should learn to recognize.</p>
+</div>
+<div id="forgetting-the-headers" class="section level2 hasAnchor" number="2.5">
+<h2><span class="header-section-number">2.5</span> Forgetting the headers<a href="reading-data-into-r.html#forgetting-the-headers" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The first row of the file <code>fem.dat</code> contains the variable names.
+The <code>read.table()</code> function does not assume this by default so
+you have to specify this with the argument <code>header=TRUE</code>. See
+what happens when you forget to include this option:</p>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="reading-data-into-r.html#cb67-1" tabindex="-1"></a>fem2 <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">&quot;data/fem.dat&quot;</span>)</span>
+<span id="cb67-2"><a href="reading-data-into-r.html#cb67-2" tabindex="-1"></a><span class="fu">str</span>(fem2)</span>
+<span id="cb67-3"><a href="reading-data-into-r.html#cb67-3" tabindex="-1"></a><span class="fu">head</span>(fem2)</span></code></pre></div>
+<p>and compare the resulting data frame with <code>fem</code>. What are
+the names of the variables in the data frame? What is the class
+of the variables?</p>
+<blockquote>
+<p><strong>Explanation:</strong> Remember that <code>read.table()</code> tries to guess
+the mode of the variables in the text file. Without the
+<code>header=TRUE</code> option it reads the first row, containing the
+variable names, as data, and guesses that all the variables are
+character, not numeric. By default, all character variables are
+coerced to factors by <code>read.table</code>. The result is a data frame
+consisting entirely of factors. (You can prevent the conversion of
+character variables to factors with the argument <code>as.is=TRUE</code>).</p>
+</blockquote>
+<p>If the variable names are not specified in the file, then they are
+given default names <code>V1</code>, <code>V2</code>, … . You will soon realise this
+mistake if you try to access a variable in the data frame by, for
+example</p>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="reading-data-into-r.html#cb68-1" tabindex="-1"></a>fem2<span class="sc">$</span>IQ </span></code></pre></div>
+<p>as the variable will not exist</p>
+<p>There is one case where omitting the <code>header=TRUE</code> option is
+harmless (apart from the situation where there is no header line,
+obviously). When the first row of the file contains <strong>one less</strong>
+value than subsequent lines, <code>read.table()</code> infers that the first
+row contains the variable names, and the first column of every
+subsequent row contains its <strong>row name</strong>.</p>
+</div>
+<div id="using-the-wrong-separator" class="section level2 hasAnchor" number="2.6">
+<h2><span class="header-section-number">2.6</span> Using the wrong separator<a href="reading-data-into-r.html#using-the-wrong-separator" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>By default, <code>read.table</code> assumes that data values are separated
+by any amount of white space. Other possibilities can be specified
+using the <code>sep</code> argument. See what happens when you assume the
+wrong separator, in this case a tab, which is specified using the
+escape sequence <code>"\t"</code></p>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="reading-data-into-r.html#cb69-1" tabindex="-1"></a>fem3 <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">&quot;data/fem.dat&quot;</span>, <span class="at">sep=</span><span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span>)</span>
+<span id="cb69-2"><a href="reading-data-into-r.html#cb69-2" tabindex="-1"></a><span class="fu">str</span>(fem3)</span></code></pre></div>
+<p>How many variables are there in the data set?</p>
+<blockquote>
+<p><strong>Explanation:</strong> If you mis-specify the separator,
+<code>read.table()</code> reads the whole line as a single character
+variable. Once again, character variables are coerced to factors, so
+you get a data frame with a single factor variable.</p>
+</blockquote>
+</div>
+<div id="mis-specifying-the-representation-of-missing-values" class="section level2 hasAnchor" number="2.7">
+<h2><span class="header-section-number">2.7</span> Mis-specifying the representation of missing values<a href="reading-data-into-r.html#mis-specifying-the-representation-of-missing-values" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The file <code>fem-dot.dat</code> contains a version of the FEM dataset in
+which all missing values are represented with a dot. This is a common
+way of representing missing values, but is not recognized by default
+by the <code>read.table()</code> function, which assumes that missing values
+are represented by <em>NA</em>.</p>
+<p>Inspect the file with a text editor, and then see what happens when
+you read the file in incorrectly:</p>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="reading-data-into-r.html#cb70-1" tabindex="-1"></a>fem4 <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">&quot;data/fem-dot.dat&quot;</span>, <span class="at">header=</span><span class="cn">TRUE</span>)</span>
+<span id="cb70-2"><a href="reading-data-into-r.html#cb70-2" tabindex="-1"></a><span class="fu">str</span>(fem4)</span></code></pre></div>
+<p>You should have enough clues by now to work out what went wrong.</p>
+<p>You can read the data correctly using the <code>na.strings</code> argument</p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="reading-data-into-r.html#cb71-1" tabindex="-1"></a>fem4 <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">&quot;data/fem-dot.dat&quot;</span>, <span class="at">header=</span><span class="cn">TRUE</span>, <span class="at">na.strings=</span><span class="st">&quot;.&quot;</span>)</span></code></pre></div>
+</div>
+<div id="spreadsheet-data" class="section level2 hasAnchor" number="2.8">
+<h2><span class="header-section-number">2.8</span> Spreadsheet data<a href="reading-data-into-r.html#spreadsheet-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Spreadsheets have become a common way of exchanging data. All
+spreadsheet programs can save a single sheet in <em>comma-separated
+variable</em> (CSV) format, which can then be read into <code>R</code>. There
+are two functions in <code>R</code> for reading in CSV data:
+<code>read.csv()</code> and <code>read.csv2()</code>.</p>
+<p>Both of these are wrappers around the <code>read.table()</code> function,
+<em>i.e.</em> the <code>read.table()</code> function is still doing the work
+of reading in the data but the <code>read.csv()</code> function provides
+default argument values for reading in CSV file so all you need to
+do is specify the file name.</p>
+<p>You can see what these default arguments are with the <code>args()</code>
+function.</p>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="reading-data-into-r.html#cb72-1" tabindex="-1"></a><span class="fu">args</span>(read.csv)</span>
+<span id="cb72-2"><a href="reading-data-into-r.html#cb72-2" tabindex="-1"></a><span class="fu">args</span>(read.csv2)</span></code></pre></div>
+<p>See if you can spot the difference between <code>read.csv</code> and
+<code>read.csv2</code>.</p>
+<blockquote>
+<p><strong>Explanation:</strong> The CSV format is not a single standard. The
+file format depends on the <em>locale</em> of your computer – the
+settings that determine how numbers are represented. In some
+countries, the decimal separator is a point <em>.</em> and the variable
+separator in a CSV file is a comma <em>,</em>. In other countries, the
+decimal separator is a comma <em>,</em> and the variable separator is a
+semi-colon <em>;</em>. This is reflected in the different default values
+for the arguments <code>sep</code> and <code>dec</code>. The
+<code>read.csv()</code> function is used for the first format and the
+<code>read.csv2()</code> function is used for the second format.</p>
+</blockquote>
+<p>The file <code>fem.csv</code> contains the FEM dataset in CSV format.
+Inspect the file to work out which format is used, and read it into
+<code>R</code>.</p>
+</div>
+<div id="reading-data-from-the-internet" class="section level2 hasAnchor" number="2.9">
+<h2><span class="header-section-number">2.9</span> Reading data from the Internet<a href="reading-data-into-r.html#reading-data-from-the-internet" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>You can also read in data from a remote web site. The <code>file</code>
+argument of <code>read.table()</code> does not need to be a local file on
+your computer; it can be a Uniform Resource Locator (URL), <em>i.e.</em>
+a web address.</p>
+<p>A copy of the file <code>fem.dat</code> is held at
+(<a href="https://www.bendixcarstensen.com/SPE/data/fem.dat" class="uri">https://www.bendixcarstensen.com/SPE/data/fem.dat</a>). You can
+read it in with</p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="reading-data-into-r.html#cb73-1" tabindex="-1"></a>fem6 <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">&quot;http://www.bendixcarstensen.com/SPE/data/fem.dat&quot;</span>,</span>
+<span id="cb73-2"><a href="reading-data-into-r.html#cb73-2" tabindex="-1"></a>                   <span class="at">header=</span><span class="cn">TRUE</span>)</span>
+<span id="cb73-3"><a href="reading-data-into-r.html#cb73-3" tabindex="-1"></a><span class="fu">str</span>(fem6)</span></code></pre></div>
+</div>
+<div id="reading-from-the-clipboard" class="section level2 hasAnchor" number="2.10">
+<h2><span class="header-section-number">2.10</span> Reading from the clipboard<a href="reading-data-into-r.html#reading-from-the-clipboard" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>On Microsoft Windows, you can copy values directly from an open Excel
+spreadsheet using the clipboard. Highlight the cells you want to copy
+in the spread sheet and select copy from the pull-down edit menu. Then
+type <code>read.table(file="clipboard")</code> to read the data in.</p>
+<p>There are two reasons why this is a bad idea</p>
+<ul>
+<li>It is not reproducible. In order to read the data in again you
+need to complete exactly the same sequence of mouse moves and clicks,
+and there is no record of what you did before.</li>
+<li>Copying from the clipboard loses precision. If you have a value
+<code>1.23456789</code> in your spreadsheet, but have formatted the cell so it
+is displayed to two decimal places, then the value read into
+<code>R</code> will be the truncated value <code>1.23</code>.</li>
+</ul>
+</div>
+<div id="binary-data" class="section level2 hasAnchor" number="2.11">
+<h2><span class="header-section-number">2.11</span> Binary data<a href="reading-data-into-r.html#binary-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The <code>foreign</code> package allows you to read data in binary formats
+used by other statistical packages. Since <code>R</code> is an open source
+project, it can only read binary formats that are themselves <em>open</em>,
+in the sense that the standards for reading and writing data are
+well-documented. For example, there is a function in the
+<code>foreign</code> package for reading SAS XPORT files, a format that
+has been adopted as a standard by the US Food and Drug Administration
+((<a href="http://www.sas.com/govedu/fda/faq.html" class="uri">http://www.sas.com/govedu/fda/faq.html</a>)). However, there is no
+function in the <code>foreign</code> package for reading native SAS
+binaries (<code>SAS7BDAT</code> files). Other packages are available from
+CRAN ((<a href="http://cran.r-project.org" class="uri">http://cran.r-project.org</a>)) that offer the possibility of
+reading SAS binary files: see the <code>haven</code> and <code>sas7bdat</code>
+packages.</p>
+<p>The file <code>fem.dta</code> contains the FEM dataset in the format
+used by Stata. Read it into <code>R</code> with</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="reading-data-into-r.html#cb74-1" tabindex="-1"></a><span class="fu">library</span>(foreign)</span>
+<span id="cb74-2"><a href="reading-data-into-r.html#cb74-2" tabindex="-1"></a>fem5 <span class="ot">&lt;-</span> <span class="fu">read.dta</span>(<span class="st">&quot;data/fem.dta&quot;</span>)</span>
+<span id="cb74-3"><a href="reading-data-into-r.html#cb74-3" tabindex="-1"></a><span class="fu">head</span>(fem5)</span></code></pre></div>
+<p>The Stata data set contains value and variable labels.
+Stata variables with value labels are automatically converted to
+factors.</p>
+<p>There is no equivalent of variable labels in an <code>R</code> data frame,
+but the original variable labels are not lost. They are still attached
+to the data frame as an invisible <em>attribute</em>, which you can see
+with</p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="reading-data-into-r.html#cb75-1" tabindex="-1"></a><span class="fu">attr</span>(fem5, <span class="st">&quot;var.labels&quot;</span>)</span></code></pre></div>
+<p>A lot of <em>meta-data</em> is attached to the data in the form of
+attributes. You can see the whole list of attributes with</p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="reading-data-into-r.html#cb76-1" tabindex="-1"></a><span class="fu">attributes</span>(fem5)</span></code></pre></div>
+<p>or just the attribute names with</p>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="reading-data-into-r.html#cb77-1" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">attributes</span>(fem5))</span></code></pre></div>
+<p>The <code>read.dta()</code> function can only read data from Stata
+versions 5–12. The R Core Team has not been able to keep up with
+changes in the Stata format. You may wish to try the <code>haven</code>
+package and the <code>readstata13</code> package, both available from
+CRAN.</p>
+</div>
+<div id="summary" class="section level2 hasAnchor" number="2.12">
+<h2><span class="header-section-number">2.12</span> Summary<a href="reading-data-into-r.html#summary" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In this exercise we have seen how to create a data frame in <code>R</code>
+from an external text file. We have also reviewed some common mistakes
+that result in garbled data.</p>
+<p>The capabilities of the <code>foreign</code> package for reading binary
+data have also been demonstrated with a sample Stata data set.</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="practice-with-basic-r.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="data-manipulation-with-tidyverse.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/SPE-R/SPE/edit/master/dinput-e.rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf", "_main.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

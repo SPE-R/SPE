@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 3 Data manipulation with tidyverse | Statistical Practice in Epidemiology with R</title>
+  <meta name="description" content="This is the SPE-R 2024 exercises book" />
+  <meta name="generator" content="bookdown 0.39 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 3 Data manipulation with tidyverse | Statistical Practice in Epidemiology with R" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This is the SPE-R 2024 exercises book" />
+  <meta name="github-repo" content="spe-r/spe" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 3 Data manipulation with tidyverse | Statistical Practice in Epidemiology with R" />
+  
+  <meta name="twitter:description" content="This is the SPE-R 2024 exercises book" />
+  
+
+<meta name="author" content="Krista Fischer" />
+<meta name="author" content="Martyn Plummer" />
+<meta name="author" content="Janne Pitkäniemi" />
+<meta name="author" content="Bendix Carstensen" />
+<meta name="author" content="Damien Georges" />
+<meta name="author" content="Esa Läärä" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="reading-data-into-r.html"/>
+<link rel="next" href="tabulation.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">SPE-R practicals</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>About</a></li>
+<li class="chapter" data-level="1" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html"><i class="fa fa-check"></i><b>1</b> Practice with basic R</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#the-working-directory"><i class="fa fa-check"></i><b>1.1</b> The working directory</a></li>
+<li class="chapter" data-level="1.2" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#the-workspace"><i class="fa fa-check"></i><b>1.2</b> The workspace</a></li>
+<li class="chapter" data-level="1.3" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#using-r-as-a-calculator"><i class="fa fa-check"></i><b>1.3</b> Using R as a calculator</a></li>
+<li class="chapter" data-level="1.4" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#vectors"><i class="fa fa-check"></i><b>1.4</b> Vectors</a></li>
+<li class="chapter" data-level="1.5" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#sequences"><i class="fa fa-check"></i><b>1.5</b> Sequences</a></li>
+<li class="chapter" data-level="1.6" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#displaying-and-changing-parts-of-a-vector-indexing"><i class="fa fa-check"></i><b>1.6</b> Displaying and changing parts of a vector (indexing)</a></li>
+<li class="chapter" data-level="1.7" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#lists"><i class="fa fa-check"></i><b>1.7</b> Lists</a></li>
+<li class="chapter" data-level="1.8" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#data-frames"><i class="fa fa-check"></i><b>1.8</b> Data frames</a></li>
+<li class="chapter" data-level="1.9" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#working-with-built-in-data-frames"><i class="fa fa-check"></i><b>1.9</b> Working with built-in data frames</a></li>
+<li class="chapter" data-level="1.10" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#referencing-parts-of-the-data-frame-indexing"><i class="fa fa-check"></i><b>1.10</b> Referencing parts of the data frame (indexing)</a></li>
+<li class="chapter" data-level="1.11" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#summaries"><i class="fa fa-check"></i><b>1.11</b> Summaries</a></li>
+<li class="chapter" data-level="1.12" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#generating-new-variables"><i class="fa fa-check"></i><b>1.12</b> Generating new variables</a></li>
+<li class="chapter" data-level="1.13" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#turning-a-variable-into-a-factor"><i class="fa fa-check"></i><b>1.13</b> Turning a variable into a factor</a></li>
+<li class="chapter" data-level="1.14" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#frequency-tables"><i class="fa fa-check"></i><b>1.14</b> Frequency tables</a></li>
+<li class="chapter" data-level="1.15" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#grouping-the-values-of-a-numeric-variable"><i class="fa fa-check"></i><b>1.15</b> Grouping the values of a numeric variable</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html"><i class="fa fa-check"></i><b>2</b> Reading data into <code>R</code></a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#introduction"><i class="fa fa-check"></i><b>2.1</b> Introduction</a></li>
+<li class="chapter" data-level="2.2" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#data-sources"><i class="fa fa-check"></i><b>2.2</b> Data sources</a></li>
+<li class="chapter" data-level="2.3" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#data-in-text-files"><i class="fa fa-check"></i><b>2.3</b> Data in text files</a></li>
+<li class="chapter" data-level="2.4" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#things-that-can-go-wrong"><i class="fa fa-check"></i><b>2.4</b> Things that can go wrong</a></li>
+<li class="chapter" data-level="2.5" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#forgetting-the-headers"><i class="fa fa-check"></i><b>2.5</b> Forgetting the headers</a></li>
+<li class="chapter" data-level="2.6" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#using-the-wrong-separator"><i class="fa fa-check"></i><b>2.6</b> Using the wrong separator</a></li>
+<li class="chapter" data-level="2.7" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#mis-specifying-the-representation-of-missing-values"><i class="fa fa-check"></i><b>2.7</b> Mis-specifying the representation of missing values</a></li>
+<li class="chapter" data-level="2.8" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#spreadsheet-data"><i class="fa fa-check"></i><b>2.8</b> Spreadsheet data</a></li>
+<li class="chapter" data-level="2.9" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#reading-data-from-the-internet"><i class="fa fa-check"></i><b>2.9</b> Reading data from the Internet</a></li>
+<li class="chapter" data-level="2.10" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#reading-from-the-clipboard"><i class="fa fa-check"></i><b>2.10</b> Reading from the clipboard</a></li>
+<li class="chapter" data-level="2.11" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#binary-data"><i class="fa fa-check"></i><b>2.11</b> Binary data</a></li>
+<li class="chapter" data-level="2.12" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#summary"><i class="fa fa-check"></i><b>2.12</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html"><i class="fa fa-check"></i><b>3</b> Data manipulation with <code>tidyverse</code></a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#introduction-1"><i class="fa fa-check"></i><b>3.1</b> Introduction</a></li>
+<li class="chapter" data-level="3.2" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#the-births-data"><i class="fa fa-check"></i><b>3.2</b> The <code>births</code> data</a></li>
+<li class="chapter" data-level="3.3" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#tibble-vs-data.frame"><i class="fa fa-check"></i><b>3.3</b> <code>tibble</code> vs <code>data.frame</code></a></li>
+<li class="chapter" data-level="3.4" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#piping-functions"><i class="fa fa-check"></i><b>3.4</b> Piping functions</a></li>
+<li class="chapter" data-level="3.5" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#mutate-columns"><i class="fa fa-check"></i><b>3.5</b> <code>mutate</code> columns</a></li>
+<li class="chapter" data-level="3.6" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#select-columns-filter-and-arrange-rows"><i class="fa fa-check"></i><b>3.6</b> <code>select</code> columns, <code>filter</code> and <code>arrange</code> rows</a></li>
+<li class="chapter" data-level="3.7" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#group_by-and-summarise-data"><i class="fa fa-check"></i><b>3.7</b> <code>group_by</code> and <code>summarise</code> data</a></li>
+<li class="chapter" data-level="3.8" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#multiple-grouping"><i class="fa fa-check"></i><b>3.8</b> Multiple grouping</a></li>
+<li class="chapter" data-level="3.9" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#bind-and-join-tables"><i class="fa fa-check"></i><b>3.9</b> Bind and join tables</a></li>
+<li class="chapter" data-level="3.10" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#data-visualization-with-ggplot2"><i class="fa fa-check"></i><b>3.10</b> Data Visualization with ggplot2</a></li>
+<li class="chapter" data-level="3.11" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#pivoting-data-with-tidyr"><i class="fa fa-check"></i><b>3.11</b> pivoting data with tidyr</a></li>
+<li class="chapter" data-level="3.12" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#reading-files-with-readr"><i class="fa fa-check"></i><b>3.12</b> reading files with readr</a></li>
+<li class="chapter" data-level="3.13" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#string-manipulation-with-stringr"><i class="fa fa-check"></i><b>3.13</b> String manipulation with stringr</a></li>
+<li class="chapter" data-level="3.14" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#purrr-package-to-apply-functions-to-list"><i class="fa fa-check"></i><b>3.14</b> purrr package to apply functions to list</a></li>
+<li class="chapter" data-level="3.15" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#bonus-rendering-tables"><i class="fa fa-check"></i><b>3.15</b> Bonus: Rendering tables</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="tabulation.html"><a href="tabulation.html"><i class="fa fa-check"></i><b>4</b> Tabulation</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="tabulation.html"><a href="tabulation.html#introduction-2"><i class="fa fa-check"></i><b>4.1</b> Introduction</a></li>
+<li class="chapter" data-level="4.2" data-path="tabulation.html"><a href="tabulation.html#the-births-data-1"><i class="fa fa-check"></i><b>4.2</b> The births data</a></li>
+<li class="chapter" data-level="4.3" data-path="tabulation.html"><a href="tabulation.html#one-way-tables"><i class="fa fa-check"></i><b>4.3</b> One-way tables</a></li>
+<li class="chapter" data-level="4.4" data-path="tabulation.html"><a href="tabulation.html#improving-the-presentation-of-tables"><i class="fa fa-check"></i><b>4.4</b> Improving the Presentation of Tables</a></li>
+<li class="chapter" data-level="4.5" data-path="tabulation.html"><a href="tabulation.html#two-way-tables"><i class="fa fa-check"></i><b>4.5</b> Two-way Tables</a></li>
+<li class="chapter" data-level="4.6" data-path="tabulation.html"><a href="tabulation.html#printing"><i class="fa fa-check"></i><b>4.6</b> Printing</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="graphics-in-r.html"><a href="graphics-in-r.html"><i class="fa fa-check"></i><b>5</b> Graphics in R</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="graphics-in-r.html"><a href="graphics-in-r.html#simple-plot-on-the-screen"><i class="fa fa-check"></i><b>5.1</b> Simple plot on the screen</a></li>
+<li class="chapter" data-level="5.2" data-path="graphics-in-r.html"><a href="graphics-in-r.html#colours"><i class="fa fa-check"></i><b>5.2</b> Colours</a></li>
+<li class="chapter" data-level="5.3" data-path="graphics-in-r.html"><a href="graphics-in-r.html#adding-to-a-plot"><i class="fa fa-check"></i><b>5.3</b> Adding to a plot</a></li>
+<li class="chapter" data-level="5.4" data-path="graphics-in-r.html"><a href="graphics-in-r.html#using-indexing-for-plot-elements"><i class="fa fa-check"></i><b>5.4</b> Using indexing for plot elements</a></li>
+<li class="chapter" data-level="5.5" data-path="graphics-in-r.html"><a href="graphics-in-r.html#generating-colours"><i class="fa fa-check"></i><b>5.5</b> Generating colours</a></li>
+<li class="chapter" data-level="5.6" data-path="graphics-in-r.html"><a href="graphics-in-r.html#saving-your-graphs-for-use-in-other-documents"><i class="fa fa-check"></i><b>5.6</b> Saving your graphs for use in other documents</a></li>
+<li class="chapter" data-level="5.7" data-path="graphics-in-r.html"><a href="graphics-in-r.html#interacting-with-a-plot"><i class="fa fa-check"></i><b>5.7</b> Interacting with a plot</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><i class="fa fa-check"></i><b>6</b> Analysis of hazard rates, their ratios and differences and binary regression</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#hand-calculations-for-a-single-rate"><i class="fa fa-check"></i><b>6.1</b> Hand calculations for a single rate</a></li>
+<li class="chapter" data-level="6.2" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-for-a-single-rate-with-logarithmic-link"><i class="fa fa-check"></i><b>6.2</b> Poisson model for a single rate with logarithmic link</a></li>
+<li class="chapter" data-level="6.3" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-for-a-single-rate-with-identity-link"><i class="fa fa-check"></i><b>6.3</b> Poisson model for a single rate with identity link</a></li>
+<li class="chapter" data-level="6.4" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-assuming-the-same-rate-for-several-periods"><i class="fa fa-check"></i><b>6.4</b> Poisson model assuming the same rate for several periods</a></li>
+<li class="chapter" data-level="6.5" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#analysis-of-rate-ratio"><i class="fa fa-check"></i><b>6.5</b> Analysis of rate ratio</a></li>
+<li class="chapter" data-level="6.6" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#analysis-of-rate-difference"><i class="fa fa-check"></i><b>6.6</b> Analysis of rate difference</a></li>
+<li class="chapter" data-level="6.7" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#binary-regression"><i class="fa fa-check"></i><b>6.7</b> Binary regression</a></li>
+<li class="chapter" data-level="6.8" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#optionalhomework-hand-calculations-and-calculations-using-matrix-tools"><i class="fa fa-check"></i><b>6.8</b> Optional/Homework: Hand calculations and calculations using matrix tools</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html"><i class="fa fa-check"></i><b>7</b> Estimation of effects: simple and more complex</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#response-and-explanatory-variables"><i class="fa fa-check"></i><b>7.1</b> Response and explanatory variables</a></li>
+<li class="chapter" data-level="7.2" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#data-set-births"><i class="fa fa-check"></i><b>7.2</b> Data set <code>births</code></a></li>
+<li class="chapter" data-level="7.3" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#simple-estimation-with-effx-lm-and-glm"><i class="fa fa-check"></i><b>7.3</b> Simple estimation with <code>effx()</code>, <code>lm()</code> and <code>glm()</code></a></li>
+<li class="chapter" data-level="7.4" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#confirms-this-3032.8-3229.9-197.1."><i class="fa fa-check"></i><b>7.4</b> confirms this (<span class="math inline">\(3032.8-3229.9=-197.1\)</span>).</a></li>
+<li class="chapter" data-level="7.5" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#factors-on-more-than-two-levels"><i class="fa fa-check"></i><b>7.5</b> Factors on more than two levels</a></li>
+<li class="chapter" data-level="7.6" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#stratified-effects-and-interaction-or-effect-measure-modification-1.8.5"><i class="fa fa-check"></i><b>7.6</b> Stratified effects, and interaction or effect-measure modification %% 1.8.5</a></li>
+<li class="chapter" data-level="7.7" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#controlling-or-adjusting-for-the-effect-of-hyp-for-sex"><i class="fa fa-check"></i><b>7.7</b> Controlling or adjusting for the effect of hyp for sex</a></li>
+<li class="chapter" data-level="7.8" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#numeric-exposures"><i class="fa fa-check"></i><b>7.8</b> Numeric exposures</a></li>
+<li class="chapter" data-level="7.9" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#checking-the-assumptions-of-the-linear-model"><i class="fa fa-check"></i><b>7.9</b> Checking the assumptions of the linear model</a></li>
+<li class="chapter" data-level="7.10" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#penalized-spline-model"><i class="fa fa-check"></i><b>7.10</b> Penalized spline model</a></li>
+<li class="chapter" data-level="7.11" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#analysis-of-binary-outcomes"><i class="fa fa-check"></i><b>7.11</b> Analysis of binary outcomes</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html"><i class="fa fa-check"></i><b>8</b> Poisson regression &amp; analysis of curved effects</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html#testis-cancer-data-input-and-housekeeping"><i class="fa fa-check"></i><b>8.1</b> Testis cancer: Data input and housekeeping</a></li>
+<li class="chapter" data-level="8.2" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html#some-descriptive-analysis"><i class="fa fa-check"></i><b>8.2</b> Some descriptive analysis</a></li>
+<li class="chapter" data-level="8.3" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html#age-and-period-as-categorical-factors"><i class="fa fa-check"></i><b>8.3</b> Age and period as categorical factors</a></li>
+<li class="chapter" data-level="8.4" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html#generalized-additive-model-with-penalized-splines"><i class="fa fa-check"></i><b>8.4</b> Generalized additive model with penalized splines</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="causal-inference.html"><a href="causal-inference.html"><i class="fa fa-check"></i><b>9</b> Causal inference</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="causal-inference.html"><a href="causal-inference.html#proper-adjustment-for-confounding-in-regression-models"><i class="fa fa-check"></i><b>9.1</b> Proper adjustment for confounding in regression models</a></li>
+<li class="chapter" data-level="9.2" data-path="causal-inference.html"><a href="causal-inference.html#dag-tools-in-the-package-dagitty"><i class="fa fa-check"></i><b>9.2</b> DAG tools in the package <code>dagitty</code></a></li>
+<li class="chapter" data-level="9.3" data-path="causal-inference.html"><a href="causal-inference.html#instrumental-variables-estimation-mendelian-randomization"><i class="fa fa-check"></i><b>9.3</b> Instrumental variables estimation: Mendelian randomization</a></li>
+<li class="chapter" data-level="9.4" data-path="causal-inference.html"><a href="causal-inference.html#why-are-simulation-exercises-useful-for-causal-inference"><i class="fa fa-check"></i><b>9.4</b> Why are simulation exercises useful for causal inference?</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="graphics-meccano.html"><a href="graphics-meccano.html"><i class="fa fa-check"></i><b>10</b> Graphics meccano</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="graphics-meccano.html"><a href="graphics-meccano.html#base-graphics"><i class="fa fa-check"></i><b>10.1</b> Base graphics</a></li>
+<li class="chapter" data-level="10.2" data-path="graphics-meccano.html"><a href="graphics-meccano.html#using-ggplot2"><i class="fa fa-check"></i><b>10.2</b> Using ggplot2</a></li>
+<li class="chapter" data-level="10.3" data-path="graphics-meccano.html"><a href="graphics-meccano.html#grid-graphics"><i class="fa fa-check"></i><b>10.3</b> Grid graphics</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html"><i class="fa fa-check"></i><b>11</b> Survival analysis with competing risks: Oral cancer patients</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#description-of-the-data"><i class="fa fa-check"></i><b>11.1</b> Description of the data</a></li>
+<li class="chapter" data-level="11.2" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#loading-the-packages-and-the-data"><i class="fa fa-check"></i><b>11.2</b> Loading the packages and the data</a></li>
+<li class="chapter" data-level="11.3" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#total-mortality-kaplanmeier-analyses"><i class="fa fa-check"></i><b>11.3</b> Total mortality: Kaplan–Meier analyses</a></li>
+<li class="chapter" data-level="11.4" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#total-mortality-by-stage"><i class="fa fa-check"></i><b>11.4</b> Total mortality by stage</a></li>
+<li class="chapter" data-level="11.5" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#event-specific-cumulative-mortality-curves"><i class="fa fa-check"></i><b>11.5</b> Event-specific cumulative mortality curves</a></li>
+<li class="chapter" data-level="11.6" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#regression-modelling-of-overall-mortality."><i class="fa fa-check"></i><b>11.6</b> Regression modelling of overall mortality.</a></li>
+<li class="chapter" data-level="11.7" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#modelling-event-specific-hazards"><i class="fa fa-check"></i><b>11.7</b> Modelling event-specific hazards</a></li>
+<li class="chapter" data-level="11.8" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#lexis-object-with-multi-state-set-up"><i class="fa fa-check"></i><b>11.8</b> Lexis object with multi-state set-up</a></li>
+<li class="chapter" data-level="11.9" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#optional-poisson-regression-as-an-alternative-to-cox-model"><i class="fa fa-check"></i><b>11.9</b> Optional: Poisson regression as an alternative to Cox model</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html"><i class="fa fa-check"></i><b>12</b> Time-splitting, time-scales and SMR</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#age-specific-mortality"><i class="fa fa-check"></i><b>12.1</b> Age-specific mortality</a></li>
+<li class="chapter" data-level="12.2" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#further-time-scales-period-and-duration"><i class="fa fa-check"></i><b>12.2</b> Further time scales: period and duration</a></li>
+<li class="chapter" data-level="12.3" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#smr"><i class="fa fa-check"></i><b>12.3</b> SMR</a></li>
+<li class="chapter" data-level="12.4" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#smr-modeling"><i class="fa fa-check"></i><b>12.4</b> SMR modeling</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><i class="fa fa-check"></i><b>13</b> Nested case-control study and case-cohort study: Risk factors of coronary heart disease</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#reading-the-cohort-data-illustrating-the-study-base-and-risk-sets"><i class="fa fa-check"></i><b>13.1</b> Reading the cohort data, illustrating the study base and risk sets</a></li>
+<li class="chapter" data-level="13.2" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#nested-case-control-study"><i class="fa fa-check"></i><b>13.2</b> Nested case-control study</a></li>
+<li class="chapter" data-level="13.3" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#case-cohort-study"><i class="fa fa-check"></i><b>13.3</b> Case-cohort study</a></li>
+<li class="chapter" data-level="13.4" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#do-these-estimates-resemble-those-obtained-from-nested-case-control-data"><i class="fa fa-check"></i><b>13.4</b> Do these estimates resemble those obtained from nested case-control data?</a></li>
+<li class="chapter" data-level="13.5" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#full-cohort-analysis-and-comparisons"><i class="fa fa-check"></i><b>13.5</b> Full cohort analysis and comparisons</a></li>
+<li class="chapter" data-level="13.6" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#further-exercises-and-homework"><i class="fa fa-check"></i><b>13.6</b> Further exercises and homework</a></li>
+</ul></li>
+<li class="chapter" data-level="14" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html"><i class="fa fa-check"></i><b>14</b> Causal inference 2: Model-based estimation of causal estimands</a>
+<ul>
+<li class="chapter" data-level="14.1" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#control-of-confounding"><i class="fa fa-check"></i><b>14.1</b> Control of confounding</a></li>
+<li class="chapter" data-level="14.2" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#generation-of-target-population-and-true-models"><i class="fa fa-check"></i><b>14.2</b> Generation of target population and true models</a></li>
+<li class="chapter" data-level="14.3" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#factual-and-counterfactual-risks---associational-and-causal-contrasts"><i class="fa fa-check"></i><b>14.3</b> Factual and counterfactual risks - associational and causal contrasts</a></li>
+<li class="chapter" data-level="14.4" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#outcome-modelling-and-estimation-of-causal-contrasts-by-g-formula"><i class="fa fa-check"></i><b>14.4</b> Outcome modelling and estimation of causal contrasts by g-formula</a></li>
+<li class="chapter" data-level="14.5" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#inverse-probability-weighting-ipw-by"><i class="fa fa-check"></i><b>14.5</b> Inverse probability weighting (IPW) by</a></li>
+<li class="chapter" data-level="14.6" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#improving-ipw-estimation-and-using-r-package-psweight"><i class="fa fa-check"></i><b>14.6</b> Improving IPW estimation and using R package <code>PSweight</code></a></li>
+<li class="chapter" data-level="14.7" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#targeted-maximum-likelihood-estimation-tmle"><i class="fa fa-check"></i><b>14.7</b> Targeted maximum likelihood estimation (TMLE)</a></li>
+<li class="chapter" data-level="14.8" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#tmle-with-superlearner"><i class="fa fa-check"></i><b>14.8</b> TMLE with SuperLearner</a></li>
+</ul></li>
+<li class="chapter" data-level="15" data-path="time-dependent-variables-and-multiple-states.html"><a href="time-dependent-variables-and-multiple-states.html"><i class="fa fa-check"></i><b>15</b> Time-dependent variables and multiple states</a>
+<ul>
+<li class="chapter" data-level="15.1" data-path="time-dependent-variables-and-multiple-states.html"><a href="time-dependent-variables-and-multiple-states.html#the-renal-failure-dataset"><i class="fa fa-check"></i><b>15.1</b> The renal failure dataset</a></li>
+<li class="chapter" data-level="15.2" data-path="time-dependent-variables-and-multiple-states.html"><a href="time-dependent-variables-and-multiple-states.html#splitting-the-follow-up-time"><i class="fa fa-check"></i><b>15.2</b> Splitting the follow-up time</a></li>
+<li class="chapter" data-level="15.3" data-path="time-dependent-variables-and-multiple-states.html"><a href="time-dependent-variables-and-multiple-states.html#prediction-from-the-multistate-model"><i class="fa fa-check"></i><b>15.3</b> Prediction from the multistate model</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/SPE-R/SPE" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Statistical Practice in Epidemiology with R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="data-manipulation-with-tidyverse" class="section level1 hasAnchor" number="3">
+<h1><span class="header-section-number">Chapter 3</span> Data manipulation with <code>tidyverse</code><a href="data-manipulation-with-tidyverse.html#data-manipulation-with-tidyverse" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="introduction-1" class="section level2 hasAnchor" number="3.1">
+<h2><span class="header-section-number">3.1</span> Introduction<a href="data-manipulation-with-tidyverse.html#introduction-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In this chapter we will produce <em>more or less</em> the same outputs than in chapter 1.2 and 1.4 using
+<code>tidyverse</code> packages framework.</p>
+<p>The main objective of this exercise is to get familiar you with some of the main <code>tidyverse</code> features.</p>
+<p>This is an <strong>optional practical</strong> for participants having already good basic R skills.
+&gt; All the rest of the course can be done without knowledge of <code>tidyverse</code>.</p>
+</div>
+<div id="the-births-data" class="section level2 hasAnchor" number="3.2">
+<h2><span class="header-section-number">3.2</span> The <code>births</code> data<a href="data-manipulation-with-tidyverse.html#the-births-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We will work with <code>births</code> data-set from <code>Epi</code> package.
+First of all, load the <code>Epi</code> and <code>tidyverse</code> packages.
+Then load the births data-set.</p>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="data-manipulation-with-tidyverse.html#cb78-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
+<span id="cb78-2"><a href="data-manipulation-with-tidyverse.html#cb78-2" tabindex="-1"></a><span class="fu">suppressPackageStartupMessages</span>(<span class="fu">library</span>(tidyverse))</span>
+<span id="cb78-3"><a href="data-manipulation-with-tidyverse.html#cb78-3" tabindex="-1"></a><span class="fu">data</span>(births) </span></code></pre></div>
+<p>You can type <code>?birth</code> in the <code>R</code> console to get a description of the <code>birth</code> data-set. (Alternatively, you can refer to chapter 1.3.2)</p>
+</div>
+<div id="tibble-vs-data.frame" class="section level2 hasAnchor" number="3.3">
+<h2><span class="header-section-number">3.3</span> <code>tibble</code> vs <code>data.frame</code><a href="data-manipulation-with-tidyverse.html#tibble-vs-data.frame" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Most <code>dplyr</code> functions outputs return <code>tibble</code> object instead of
+<code>data.frame</code>.
+Inspect the class and characteristics of the <code>births</code> object.</p>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="data-manipulation-with-tidyverse.html#cb79-1" tabindex="-1"></a><span class="fu">class</span>(births)</span>
+<span id="cb79-2"><a href="data-manipulation-with-tidyverse.html#cb79-2" tabindex="-1"></a><span class="fu">head</span>(births)</span></code></pre></div>
+<p><strong>Note:</strong> As any <code>R</code> object this can be summarized using <code>str</code> function.</p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="data-manipulation-with-tidyverse.html#cb80-1" tabindex="-1"></a><span class="fu">str</span>(births)</span></code></pre></div>
+<p><code>births</code> object is a 500 x 8 data.frame.
+Let’s convert <code>births</code> to <code>tibble</code> format with <code>as_tibble</code> function.</p>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb81-1"><a href="data-manipulation-with-tidyverse.html#cb81-1" tabindex="-1"></a>births_tbl <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(births)</span>
+<span id="cb81-2"><a href="data-manipulation-with-tidyverse.html#cb81-2" tabindex="-1"></a></span>
+<span id="cb81-3"><a href="data-manipulation-with-tidyverse.html#cb81-3" tabindex="-1"></a><span class="fu">class</span>(births_tbl)</span>
+<span id="cb81-4"><a href="data-manipulation-with-tidyverse.html#cb81-4" tabindex="-1"></a>births_tbl</span>
+<span id="cb81-5"><a href="data-manipulation-with-tidyverse.html#cb81-5" tabindex="-1"></a></span>
+<span id="cb81-6"><a href="data-manipulation-with-tidyverse.html#cb81-6" tabindex="-1"></a><span class="co"># another way to visualize data set is to use glimpse function</span></span>
+<span id="cb81-7"><a href="data-manipulation-with-tidyverse.html#cb81-7" tabindex="-1"></a><span class="fu">glimpse</span>(births_tbl)</span></code></pre></div>
+<p>You can see that <code>tibble</code> objects inherits from <code>data.frame</code> which implies that all functions
+working with <code>data.frame</code> objects will work with <code>tibble</code>. The opposite is
+not necessary true. <code>tibble</code> has a couple of extra features compared to classical
+<code>data.frame</code>. One of them is a slightly more user-friendly console print. The main
+difference is probably that <code>tibble</code> objects supports grouping/nesting features.
+Some examples we be done will see latter on.</p>
+</div>
+<div id="piping-functions" class="section level2 hasAnchor" number="3.4">
+<h2><span class="header-section-number">3.4</span> Piping functions<a href="data-manipulation-with-tidyverse.html#piping-functions" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>This is one of the most popular features of <code>tidyverse</code> grammar. It enables function chaining in
+<code>R</code>. Function output is transparently passed as input to the next function and so on.
+It can help to make the code more comprehensive and readable.
+Here is an example of classic vs piped functions.</p>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="data-manipulation-with-tidyverse.html#cb82-1" tabindex="-1"></a><span class="fu">head</span>(births, <span class="dv">4</span>)</span>
+<span id="cb82-2"><a href="data-manipulation-with-tidyverse.html#cb82-2" tabindex="-1"></a>births <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">4</span>)</span></code></pre></div>
+<p><strong>Note:</strong> By default the chained object is given as the first argument to the following
+function.
+You can use <code>.</code> if this is not the case. This trick works only with <code>dplyr</code> pipe <code>%&gt;%</code></p>
+<p>Here is a dummy example where we do not give the first argument to <code>head</code> function but the second one.</p>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb83-1"><a href="data-manipulation-with-tidyverse.html#cb83-1" tabindex="-1"></a><span class="dv">4</span> <span class="sc">%&gt;%</span> <span class="fu">head</span>(births, .)</span></code></pre></div>
+<p>Which could be also be achieve with <code>base</code> pipe <code>|&gt;</code> with a slightly more complex syntax.</p>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="data-manipulation-with-tidyverse.html#cb84-1" tabindex="-1"></a><span class="dv">4</span> <span class="sc">|&gt;</span> (\(.) <span class="fu">head</span>(births, .))()  <span class="co"># Note the extra parentheses</span></span></code></pre></div>
+</div>
+<div id="mutate-columns" class="section level2 hasAnchor" number="3.5">
+<h2><span class="header-section-number">3.5</span> <code>mutate</code> columns<a href="data-manipulation-with-tidyverse.html#mutate-columns" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><code>mutate</code> will allow you to add and or modify columns in a <code>tibble</code>.
+Let’s create 2 new variables :</p>
+<ul>
+<li><code>agegrp</code> (5 years mother’s age group)</li>
+<li><code>gest4</code> (gestation time split in 4 categories)</li>
+</ul>
+<p>And modify 2 others:</p>
+<ul>
+<li><code>hyp</code> (factor version of <code>hyp</code>; <code>normal</code> vs <code>hyper</code>)</li>
+<li><code>sex</code> (factor version of <code>sex</code>; <code>M</code> vs <code>F</code>)</li>
+</ul>
+<div class="sourceCode" id="cb85"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb85-1"><a href="data-manipulation-with-tidyverse.html#cb85-1" tabindex="-1"></a>births_tbl <span class="ot">&lt;-</span></span>
+<span id="cb85-2"><a href="data-manipulation-with-tidyverse.html#cb85-2" tabindex="-1"></a>  births_tbl <span class="sc">|&gt;</span></span>
+<span id="cb85-3"><a href="data-manipulation-with-tidyverse.html#cb85-3" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb85-4"><a href="data-manipulation-with-tidyverse.html#cb85-4" tabindex="-1"></a>    <span class="co"># modify hyp varible (conversion into factor)</span></span>
+<span id="cb85-5"><a href="data-manipulation-with-tidyverse.html#cb85-5" tabindex="-1"></a>    <span class="at">hyp =</span> <span class="fu">factor</span>(hyp, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;normal&quot;</span>, <span class="st">&quot;hyper&quot;</span>)),</span>
+<span id="cb85-6"><a href="data-manipulation-with-tidyverse.html#cb85-6" tabindex="-1"></a>    <span class="co"># creating a new variable aggrep</span></span>
+<span id="cb85-7"><a href="data-manipulation-with-tidyverse.html#cb85-7" tabindex="-1"></a>    <span class="at">agegrp =</span> <span class="fu">cut</span>(matage, <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">25</span>, <span class="dv">30</span>, <span class="dv">35</span>, <span class="dv">40</span>, <span class="dv">45</span>), <span class="at">right =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb85-8"><a href="data-manipulation-with-tidyverse.html#cb85-8" tabindex="-1"></a>    <span class="co"># modify sex variable (conversion into factor)</span></span>
+<span id="cb85-9"><a href="data-manipulation-with-tidyverse.html#cb85-9" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">factor</span>(sex, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>)),</span>
+<span id="cb85-10"><a href="data-manipulation-with-tidyverse.html#cb85-10" tabindex="-1"></a>    <span class="co"># creating a new variable gest4 with case_when instead of cut</span></span>
+<span id="cb85-11"><a href="data-manipulation-with-tidyverse.html#cb85-11" tabindex="-1"></a>    <span class="at">gest4 =</span> </span>
+<span id="cb85-12"><a href="data-manipulation-with-tidyverse.html#cb85-12" tabindex="-1"></a>      <span class="fu">case_when</span>(</span>
+<span id="cb85-13"><a href="data-manipulation-with-tidyverse.html#cb85-13" tabindex="-1"></a>        gestwks <span class="sc">&lt;</span> <span class="dv">25</span> <span class="sc">~</span> <span class="st">&#39;less than 25 weeks&#39;</span>,</span>
+<span id="cb85-14"><a href="data-manipulation-with-tidyverse.html#cb85-14" tabindex="-1"></a>        gestwks <span class="sc">&gt;=</span> <span class="dv">25</span> <span class="sc">&amp;</span> gestwks <span class="sc">&lt;</span> <span class="dv">30</span>  <span class="sc">~</span> <span class="st">&#39;25-30 weeks&#39;</span>,</span>
+<span id="cb85-15"><a href="data-manipulation-with-tidyverse.html#cb85-15" tabindex="-1"></a>        gestwks <span class="sc">&gt;=</span> <span class="dv">30</span> <span class="sc">&amp;</span> gestwks <span class="sc">&lt;</span> <span class="dv">35</span>  <span class="sc">~</span> <span class="st">&#39;30-35 weeks&#39;</span>,</span>
+<span id="cb85-16"><a href="data-manipulation-with-tidyverse.html#cb85-16" tabindex="-1"></a>        gestwks <span class="sc">&gt;=</span> <span class="dv">35</span>   <span class="sc">~</span> <span class="st">&#39;more than 35 weeks&#39;</span></span>
+<span id="cb85-17"><a href="data-manipulation-with-tidyverse.html#cb85-17" tabindex="-1"></a>      ) </span>
+<span id="cb85-18"><a href="data-manipulation-with-tidyverse.html#cb85-18" tabindex="-1"></a>  )</span>
+<span id="cb85-19"><a href="data-manipulation-with-tidyverse.html#cb85-19" tabindex="-1"></a></span>
+<span id="cb85-20"><a href="data-manipulation-with-tidyverse.html#cb85-20" tabindex="-1"></a>births_tbl</span></code></pre></div>
+<p>You can see as header the type of data contained in each column.
+For instance <code>&lt;dbl&gt;</code> stands for double (i.e. numeric value) and <code>fct</code>
+stands for factor.
+In <code>R</code> <code>data.frame</code> (/ <code>tibble</code>) data type
+must be the same within a column (e.g. numeric only) but can be of different type across columns. (note: <code>matrix</code> object supports only one type of data)</p>
+<p>Note that <code>case_when</code> function do not return a <code>factor</code> but a <code>character</code> variable in this case.
+You will have to force the conversion from <code>character</code> to <code>factor</code> if needed.</p>
+</div>
+<div id="select-columns-filter-and-arrange-rows" class="section level2 hasAnchor" number="3.6">
+<h2><span class="header-section-number">3.6</span> <code>select</code> columns, <code>filter</code> and <code>arrange</code> rows<a href="data-manipulation-with-tidyverse.html#select-columns-filter-and-arrange-rows" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><code>select</code> is used for column sub-setting while filter is for row sub-setting.
+They are equivalent to the <code>[]</code> in <code>R</code> base language.
+Let’s display a table where only babies’ <code>id</code>, <code>sex</code>, <code>bweight</code> and mothers’
+<code>agegrp</code> are kept for babies with a <code>bweight</code> above 4000g.</p>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="data-manipulation-with-tidyverse.html#cb86-1" tabindex="-1"></a>births_tbl <span class="sc">|&gt;</span></span>
+<span id="cb86-2"><a href="data-manipulation-with-tidyverse.html#cb86-2" tabindex="-1"></a>  <span class="co"># select only id, women age group, sex and birth weight of the baby</span></span>
+<span id="cb86-3"><a href="data-manipulation-with-tidyverse.html#cb86-3" tabindex="-1"></a>  <span class="fu">select</span>(id, agegrp, sex, bweight) <span class="sc">|&gt;</span></span>
+<span id="cb86-4"><a href="data-manipulation-with-tidyverse.html#cb86-4" tabindex="-1"></a>  <span class="co"># keep only babies weighing more than 4000g</span></span>
+<span id="cb86-5"><a href="data-manipulation-with-tidyverse.html#cb86-5" tabindex="-1"></a>  <span class="fu">filter</span>(bweight <span class="sc">&gt;</span> <span class="dv">4000</span>) </span></code></pre></div>
+<p><code>select</code> can also be useful to reorder and rename columns.
+<code>arrange</code> is a nice feature to reorder observations according to chosen attributes.
+Let’s rename <code>agegrp</code>, <code>sex</code> and <code>bweight</code> with better looking labels (e.g. <code>Age group</code>, <code>Sex</code>, <code>Birth weight</code>) and reorder the table according to babies’ decreasing birth weight.</p>
+<div class="sourceCode" id="cb87"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb87-1"><a href="data-manipulation-with-tidyverse.html#cb87-1" tabindex="-1"></a>births_tbl <span class="sc">|&gt;</span></span>
+<span id="cb87-2"><a href="data-manipulation-with-tidyverse.html#cb87-2" tabindex="-1"></a>  <span class="co"># select only id, women age group, sex and birth weight of the baby</span></span>
+<span id="cb87-3"><a href="data-manipulation-with-tidyverse.html#cb87-3" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb87-4"><a href="data-manipulation-with-tidyverse.html#cb87-4" tabindex="-1"></a>    id, </span>
+<span id="cb87-5"><a href="data-manipulation-with-tidyverse.html#cb87-5" tabindex="-1"></a>    <span class="st">&#39;Age group&#39;</span> <span class="ot">=</span> agegrp, </span>
+<span id="cb87-6"><a href="data-manipulation-with-tidyverse.html#cb87-6" tabindex="-1"></a>    <span class="at">Sex =</span> sex, </span>
+<span id="cb87-7"><a href="data-manipulation-with-tidyverse.html#cb87-7" tabindex="-1"></a>    <span class="st">&#39;Birth weight&#39;</span> <span class="ot">=</span> bweight</span>
+<span id="cb87-8"><a href="data-manipulation-with-tidyverse.html#cb87-8" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb87-9"><a href="data-manipulation-with-tidyverse.html#cb87-9" tabindex="-1"></a>  <span class="co"># rearrange rows to put the heaviest newborn on top</span></span>
+<span id="cb87-10"><a href="data-manipulation-with-tidyverse.html#cb87-10" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="st">`</span><span class="at">Birth weight</span><span class="st">`</span>))</span></code></pre></div>
+<p><strong>Note:</strong> <code>tibble</code> supports blank spaces in the column names which can be handy for final table
+rendering. When you want to work with columns with blank spaces, do not forget to use the <span class="math inline">\(``\)</span>
+(back-quote).
+Try to produce the same table but arranging the rows by decreasing birth weights within each sex.</p>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="data-manipulation-with-tidyverse.html#cb88-1" tabindex="-1"></a>births_tbl <span class="sc">|&gt;</span></span>
+<span id="cb88-2"><a href="data-manipulation-with-tidyverse.html#cb88-2" tabindex="-1"></a>  <span class="co"># select only id, women age group, sex and birth weight of the baby</span></span>
+<span id="cb88-3"><a href="data-manipulation-with-tidyverse.html#cb88-3" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb88-4"><a href="data-manipulation-with-tidyverse.html#cb88-4" tabindex="-1"></a>    id, </span>
+<span id="cb88-5"><a href="data-manipulation-with-tidyverse.html#cb88-5" tabindex="-1"></a>    <span class="st">&#39;Age group&#39;</span> <span class="ot">=</span> agegrp, </span>
+<span id="cb88-6"><a href="data-manipulation-with-tidyverse.html#cb88-6" tabindex="-1"></a>    <span class="at">Sex =</span> sex, </span>
+<span id="cb88-7"><a href="data-manipulation-with-tidyverse.html#cb88-7" tabindex="-1"></a>    <span class="st">&#39;Birth weight&#39;</span> <span class="ot">=</span> bweight</span>
+<span id="cb88-8"><a href="data-manipulation-with-tidyverse.html#cb88-8" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb88-9"><a href="data-manipulation-with-tidyverse.html#cb88-9" tabindex="-1"></a>  <span class="co"># rearrange rows to put the heaviest newborn on top</span></span>
+<span id="cb88-10"><a href="data-manipulation-with-tidyverse.html#cb88-10" tabindex="-1"></a>  <span class="fu">arrange</span>(Sex, <span class="fu">desc</span>(<span class="st">`</span><span class="at">Birth weight</span><span class="st">`</span>))</span></code></pre></div>
+<p>You can arrange the <code>tibble</code> according to more than one column.</p>
+</div>
+<div id="group_by-and-summarise-data" class="section level2 hasAnchor" number="3.7">
+<h2><span class="header-section-number">3.7</span> <code>group_by</code> and <code>summarise</code> data<a href="data-manipulation-with-tidyverse.html#group_by-and-summarise-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>One greatest features of <code>dplyr</code> is the ability to aggregate data sharing a common attribute to process per group operations.
+Here we want to compute the number of boys and girls in the data-set.
+The idea here is to split the <code>births</code> table in two groups. One with the boys, the other with the girls and to count the number of rows in each group.</p>
+<div class="sourceCode" id="cb89"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb89-1"><a href="data-manipulation-with-tidyverse.html#cb89-1" tabindex="-1"></a>births<span class="fl">.01</span> <span class="ot">&lt;-</span></span>
+<span id="cb89-2"><a href="data-manipulation-with-tidyverse.html#cb89-2" tabindex="-1"></a>  births_tbl <span class="sc">|&gt;</span></span>
+<span id="cb89-3"><a href="data-manipulation-with-tidyverse.html#cb89-3" tabindex="-1"></a>  <span class="co"># group the data according to the sex attribute</span></span>
+<span id="cb89-4"><a href="data-manipulation-with-tidyverse.html#cb89-4" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">|&gt;</span></span>
+<span id="cb89-5"><a href="data-manipulation-with-tidyverse.html#cb89-5" tabindex="-1"></a>  <span class="co"># count the number of rows/individuals in each group</span></span>
+<span id="cb89-6"><a href="data-manipulation-with-tidyverse.html#cb89-6" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb89-7"><a href="data-manipulation-with-tidyverse.html#cb89-7" tabindex="-1"></a>    <span class="at">count =</span> <span class="fu">n</span>()</span>
+<span id="cb89-8"><a href="data-manipulation-with-tidyverse.html#cb89-8" tabindex="-1"></a>  )</span>
+<span id="cb89-9"><a href="data-manipulation-with-tidyverse.html#cb89-9" tabindex="-1"></a>births<span class="fl">.01</span></span></code></pre></div>
+<p><strong>Note:</strong> <code>n</code> function is equivalent to <code>nrow</code></p>
+<p>Now we have the number of boys and girls, we can compute the distribution (in percentage) of newborns per sex.</p>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="data-manipulation-with-tidyverse.html#cb90-1" tabindex="-1"></a>births<span class="fl">.02</span> <span class="ot">&lt;-</span></span>
+<span id="cb90-2"><a href="data-manipulation-with-tidyverse.html#cb90-2" tabindex="-1"></a>  births<span class="fl">.01</span> <span class="sc">|&gt;</span></span>
+<span id="cb90-3"><a href="data-manipulation-with-tidyverse.html#cb90-3" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb90-4"><a href="data-manipulation-with-tidyverse.html#cb90-4" tabindex="-1"></a>    <span class="at">percent =</span> count <span class="sc">/</span> <span class="fu">sum</span>(count) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb90-5"><a href="data-manipulation-with-tidyverse.html#cb90-5" tabindex="-1"></a>  )</span></code></pre></div>
+<p><strong>Trick:</strong> most of <code>dplyr</code> functions can be combined with a column selection execution statement using
+<code>across</code> function. This can be very handy in some cases.
+As an example below a code to compute the <code>sum</code> of every <code>birth.02</code> numerical columns (numerical columns only)</p>
+<div class="sourceCode" id="cb91"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb91-1"><a href="data-manipulation-with-tidyverse.html#cb91-1" tabindex="-1"></a>births<span class="fl">.03</span> <span class="ot">&lt;-</span></span>
+<span id="cb91-2"><a href="data-manipulation-with-tidyverse.html#cb91-2" tabindex="-1"></a>  births_tbl <span class="sc">|&gt;</span></span>
+<span id="cb91-3"><a href="data-manipulation-with-tidyverse.html#cb91-3" tabindex="-1"></a>  <span class="fu">select</span>(gest4, sex, gestwks, bweight, matage) <span class="sc">|&gt;</span></span>
+<span id="cb91-4"><a href="data-manipulation-with-tidyverse.html#cb91-4" tabindex="-1"></a>  <span class="fu">group_by</span>(gest4, sex) <span class="sc">|&gt;</span></span>
+<span id="cb91-5"><a href="data-manipulation-with-tidyverse.html#cb91-5" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb91-6"><a href="data-manipulation-with-tidyverse.html#cb91-6" tabindex="-1"></a>    <span class="fu">across</span>(</span>
+<span id="cb91-7"><a href="data-manipulation-with-tidyverse.html#cb91-7" tabindex="-1"></a>      <span class="fu">where</span>(is.numeric),</span>
+<span id="cb91-8"><a href="data-manipulation-with-tidyverse.html#cb91-8" tabindex="-1"></a>      <span class="sc">~</span> <span class="fu">mean</span>(.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb91-9"><a href="data-manipulation-with-tidyverse.html#cb91-9" tabindex="-1"></a>    ),</span>
+<span id="cb91-10"><a href="data-manipulation-with-tidyverse.html#cb91-10" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&#39;drop&#39;</span></span>
+<span id="cb91-11"><a href="data-manipulation-with-tidyverse.html#cb91-11" tabindex="-1"></a>  )</span>
+<span id="cb91-12"><a href="data-manipulation-with-tidyverse.html#cb91-12" tabindex="-1"></a>births<span class="fl">.03</span></span></code></pre></div>
+<p><code>across</code> function supports the purrr-style lambda format, e.g. <code>~ mean(.x, na.rm = TRUE)</code>
+where <code>.x</code> refers to the values from the data set to be passed to the function. This is a common notation you will find across several <code>tidyverse</code> functions.</p>
+<p>Some other functions ending by <code>_with</code> can be used conditionally within <code>dplyr</code>.
+As an example we can rename only columns which are not numeric at once (here we want to code all column names using upper characters) using
+the combination of <code>rename_with</code> and <code>where</code>.</p>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="data-manipulation-with-tidyverse.html#cb92-1" tabindex="-1"></a>births<span class="fl">.03</span> <span class="sc">|&gt;</span></span>
+<span id="cb92-2"><a href="data-manipulation-with-tidyverse.html#cb92-2" tabindex="-1"></a>  <span class="fu">rename_with</span>(toupper, <span class="fu">where</span>(<span class="sc">~</span> <span class="sc">!</span><span class="fu">is.numeric</span>(.x)))</span></code></pre></div>
+<p>Let’s now compute the number of births and the mean birth weight according to newborn gender.</p>
+<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="data-manipulation-with-tidyverse.html#cb93-1" tabindex="-1"></a>births<span class="fl">.05</span> <span class="ot">&lt;-</span></span>
+<span id="cb93-2"><a href="data-manipulation-with-tidyverse.html#cb93-2" tabindex="-1"></a>  births_tbl <span class="sc">|&gt;</span></span>
+<span id="cb93-3"><a href="data-manipulation-with-tidyverse.html#cb93-3" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">|&gt;</span></span>
+<span id="cb93-4"><a href="data-manipulation-with-tidyverse.html#cb93-4" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb93-5"><a href="data-manipulation-with-tidyverse.html#cb93-5" tabindex="-1"></a>    <span class="at">count =</span> <span class="fu">n</span>(),</span>
+<span id="cb93-6"><a href="data-manipulation-with-tidyverse.html#cb93-6" tabindex="-1"></a>    <span class="at">bweight.mean =</span> <span class="fu">mean</span>(bweight)</span>
+<span id="cb93-7"><a href="data-manipulation-with-tidyverse.html#cb93-7" tabindex="-1"></a>  )</span>
+<span id="cb93-8"><a href="data-manipulation-with-tidyverse.html#cb93-8" tabindex="-1"></a>births<span class="fl">.05</span></span></code></pre></div>
+<p>With <code>births.05</code> table, compute the global mean birth weight.</p>
+<p><strong>Note:</strong> with such a table the mean baby’s birth weight have to be weighted by number of boys and girls (see. <code>?weighted.mean</code>).</p>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="data-manipulation-with-tidyverse.html#cb94-1" tabindex="-1"></a>births<span class="fl">.05</span> <span class="sc">|&gt;</span></span>
+<span id="cb94-2"><a href="data-manipulation-with-tidyverse.html#cb94-2" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb94-3"><a href="data-manipulation-with-tidyverse.html#cb94-3" tabindex="-1"></a>    <span class="at">count.tot =</span> <span class="fu">sum</span>(count),</span>
+<span id="cb94-4"><a href="data-manipulation-with-tidyverse.html#cb94-4" tabindex="-1"></a>    <span class="at">bweight.mean.tot =</span> <span class="fu">weighted.mean</span>(bweight.mean, count)</span>
+<span id="cb94-5"><a href="data-manipulation-with-tidyverse.html#cb94-5" tabindex="-1"></a>  )</span>
+<span id="cb94-6"><a href="data-manipulation-with-tidyverse.html#cb94-6" tabindex="-1"></a></span>
+<span id="cb94-7"><a href="data-manipulation-with-tidyverse.html#cb94-7" tabindex="-1"></a><span class="co"># this is equivalent to</span></span>
+<span id="cb94-8"><a href="data-manipulation-with-tidyverse.html#cb94-8" tabindex="-1"></a>births_tbl <span class="sc">|&gt;</span></span>
+<span id="cb94-9"><a href="data-manipulation-with-tidyverse.html#cb94-9" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb94-10"><a href="data-manipulation-with-tidyverse.html#cb94-10" tabindex="-1"></a>    <span class="at">count.tot =</span> <span class="fu">n</span>(),</span>
+<span id="cb94-11"><a href="data-manipulation-with-tidyverse.html#cb94-11" tabindex="-1"></a>    <span class="at">bweight.mean.tot =</span> <span class="fu">mean</span>(bweight)</span>
+<span id="cb94-12"><a href="data-manipulation-with-tidyverse.html#cb94-12" tabindex="-1"></a>  )</span></code></pre></div>
+</div>
+<div id="multiple-grouping" class="section level2 hasAnchor" number="3.8">
+<h2><span class="header-section-number">3.8</span> Multiple grouping<a href="data-manipulation-with-tidyverse.html#multiple-grouping" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In some cases, we can be interested in looking at more than a single strata. This can be achieved using multiple grouping.
+Let’s count the number of births per gender and birth weight class (low vs not low)</p>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="data-manipulation-with-tidyverse.html#cb95-1" tabindex="-1"></a>births<span class="fl">.06</span> <span class="ot">&lt;-</span></span>
+<span id="cb95-2"><a href="data-manipulation-with-tidyverse.html#cb95-2" tabindex="-1"></a>  births_tbl <span class="sc">|&gt;</span></span>
+<span id="cb95-3"><a href="data-manipulation-with-tidyverse.html#cb95-3" tabindex="-1"></a>  <span class="fu">group_by</span>(sex, lowbw) <span class="sc">|&gt;</span></span>
+<span id="cb95-4"><a href="data-manipulation-with-tidyverse.html#cb95-4" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb95-5"><a href="data-manipulation-with-tidyverse.html#cb95-5" tabindex="-1"></a>    <span class="at">count =</span> <span class="fu">n</span>()</span>
+<span id="cb95-6"><a href="data-manipulation-with-tidyverse.html#cb95-6" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## `summarise()` has grouped output by &#39;sex&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="data-manipulation-with-tidyverse.html#cb97-1" tabindex="-1"></a>births<span class="fl">.06</span></span></code></pre></div>
+<p>Try then to compute the percentage of babies in each group.
+Look at the difference between the 2 following command lines:</p>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="data-manipulation-with-tidyverse.html#cb98-1" tabindex="-1"></a>births<span class="fl">.06</span> <span class="sc">|&gt;</span></span>
+<span id="cb98-2"><a href="data-manipulation-with-tidyverse.html#cb98-2" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb98-3"><a href="data-manipulation-with-tidyverse.html#cb98-3" tabindex="-1"></a>    <span class="at">percent =</span> count <span class="sc">/</span> <span class="fu">sum</span>(count) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb98-4"><a href="data-manipulation-with-tidyverse.html#cb98-4" tabindex="-1"></a>  )</span>
+<span id="cb98-5"><a href="data-manipulation-with-tidyverse.html#cb98-5" tabindex="-1"></a></span>
+<span id="cb98-6"><a href="data-manipulation-with-tidyverse.html#cb98-6" tabindex="-1"></a>births<span class="fl">.06</span> <span class="sc">|&gt;</span></span>
+<span id="cb98-7"><a href="data-manipulation-with-tidyverse.html#cb98-7" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb98-8"><a href="data-manipulation-with-tidyverse.html#cb98-8" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb98-9"><a href="data-manipulation-with-tidyverse.html#cb98-9" tabindex="-1"></a>    <span class="at">percent =</span> count <span class="sc">/</span> <span class="fu">sum</span>(count) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb98-10"><a href="data-manipulation-with-tidyverse.html#cb98-10" tabindex="-1"></a>  )</span></code></pre></div>
+<p>Are the results the same?</p>
+<p><strong>Note:</strong> summarizing a data-set will remove the last level of grouping but not the other ones if multiple grouping has been performed. In some cases you might have to explicitly ungroup your <code>data.frame</code> before doing further calculations.
+In the previous examples, if you do not ungroup the data-set, percentages are computed per gender. Ungrouping will let you compute the overall
+percentages.</p>
+<p><strong>Trick:</strong> a good practice is to always ungroup the summarized dataset in order to prevent form confusion. You can do it using the <code>.group = 'drop'</code> option in <code>summarize()</code>.</p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="data-manipulation-with-tidyverse.html#cb99-1" tabindex="-1"></a><span class="co"># this tibble will still be grouped by sex</span></span>
+<span id="cb99-2"><a href="data-manipulation-with-tidyverse.html#cb99-2" tabindex="-1"></a>births_tbl <span class="sc">|&gt;</span></span>
+<span id="cb99-3"><a href="data-manipulation-with-tidyverse.html#cb99-3" tabindex="-1"></a>  <span class="fu">group_by</span>(sex, lowbw) <span class="sc">|&gt;</span></span>
+<span id="cb99-4"><a href="data-manipulation-with-tidyverse.html#cb99-4" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb99-5"><a href="data-manipulation-with-tidyverse.html#cb99-5" tabindex="-1"></a>    <span class="at">count =</span> <span class="fu">n</span>()</span>
+<span id="cb99-6"><a href="data-manipulation-with-tidyverse.html#cb99-6" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## `summarise()` has grouped output by &#39;sex&#39;. You can override using the `.groups`
+## argument.</code></pre>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="data-manipulation-with-tidyverse.html#cb101-1" tabindex="-1"></a><span class="co"># this tibble will be group free</span></span>
+<span id="cb101-2"><a href="data-manipulation-with-tidyverse.html#cb101-2" tabindex="-1"></a>births_tbl <span class="sc">|&gt;</span></span>
+<span id="cb101-3"><a href="data-manipulation-with-tidyverse.html#cb101-3" tabindex="-1"></a>  <span class="fu">group_by</span>(sex, lowbw) <span class="sc">|&gt;</span></span>
+<span id="cb101-4"><a href="data-manipulation-with-tidyverse.html#cb101-4" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb101-5"><a href="data-manipulation-with-tidyverse.html#cb101-5" tabindex="-1"></a>    <span class="at">count =</span> <span class="fu">n</span>(),</span>
+<span id="cb101-6"><a href="data-manipulation-with-tidyverse.html#cb101-6" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&#39;drop&#39;</span></span>
+<span id="cb101-7"><a href="data-manipulation-with-tidyverse.html#cb101-7" tabindex="-1"></a>  )</span></code></pre></div>
+<p>The same exercise can be done using gestation time group (<code>gest4</code>) as stratifying variable.
+Lets compute number of births and mean birth weights according to gestation time category.</p>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="data-manipulation-with-tidyverse.html#cb102-1" tabindex="-1"></a>births_tbl <span class="sc">|&gt;</span></span>
+<span id="cb102-2"><a href="data-manipulation-with-tidyverse.html#cb102-2" tabindex="-1"></a>  <span class="fu">group_by</span>(gest4) <span class="sc">|&gt;</span></span>
+<span id="cb102-3"><a href="data-manipulation-with-tidyverse.html#cb102-3" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb102-4"><a href="data-manipulation-with-tidyverse.html#cb102-4" tabindex="-1"></a>    <span class="at">count =</span> <span class="fu">n</span>(),</span>
+<span id="cb102-5"><a href="data-manipulation-with-tidyverse.html#cb102-5" tabindex="-1"></a>    <span class="at">bweight.mean =</span> <span class="fu">mean</span>(bweight)</span>
+<span id="cb102-6"><a href="data-manipulation-with-tidyverse.html#cb102-6" tabindex="-1"></a>  )</span></code></pre></div>
+<p>Any trend?
+It seems that birth weight increases with gestation time.
+We can also spot that in our data-set the gestation time is missing for 10 newborns.
+We will do not consider this observation for the rest of the exercise.<br />
+Lets cross-tabulate the birth weight category and the gestation time groups.</p>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="data-manipulation-with-tidyverse.html#cb103-1" tabindex="-1"></a>births_tbl <span class="sc">|&gt;</span></span>
+<span id="cb103-2"><a href="data-manipulation-with-tidyverse.html#cb103-2" tabindex="-1"></a>  <span class="co"># keep only the newborn with defined gesational time category</span></span>
+<span id="cb103-3"><a href="data-manipulation-with-tidyverse.html#cb103-3" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb103-4"><a href="data-manipulation-with-tidyverse.html#cb103-4" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">is.na</span>(gest4)</span>
+<span id="cb103-5"><a href="data-manipulation-with-tidyverse.html#cb103-5" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb103-6"><a href="data-manipulation-with-tidyverse.html#cb103-6" tabindex="-1"></a>  <span class="fu">group_by</span>(lowbw, gest4) <span class="sc">|&gt;</span></span>
+<span id="cb103-7"><a href="data-manipulation-with-tidyverse.html#cb103-7" tabindex="-1"></a>  <span class="co"># compute the number of babies in each cross category</span></span>
+<span id="cb103-8"><a href="data-manipulation-with-tidyverse.html#cb103-8" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb103-9"><a href="data-manipulation-with-tidyverse.html#cb103-9" tabindex="-1"></a>    <span class="at">count =</span> <span class="fu">n</span>()</span>
+<span id="cb103-10"><a href="data-manipulation-with-tidyverse.html#cb103-10" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb103-11"><a href="data-manipulation-with-tidyverse.html#cb103-11" tabindex="-1"></a>  <span class="co"># compute the percentage of babies in each gestational time category per </span></span>
+<span id="cb103-12"><a href="data-manipulation-with-tidyverse.html#cb103-12" tabindex="-1"></a>  <span class="co"># birth weight category</span></span>
+<span id="cb103-13"><a href="data-manipulation-with-tidyverse.html#cb103-13" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb103-14"><a href="data-manipulation-with-tidyverse.html#cb103-14" tabindex="-1"></a>    <span class="at">percent =</span> count <span class="sc">/</span> <span class="fu">sum</span>(count, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb103-15"><a href="data-manipulation-with-tidyverse.html#cb103-15" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## `summarise()` has grouped output by &#39;lowbw&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<p>Similarly we can be interested in the birth weight distribution per gestational time.</p>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="data-manipulation-with-tidyverse.html#cb105-1" tabindex="-1"></a>births_tbl <span class="sc">|&gt;</span></span>
+<span id="cb105-2"><a href="data-manipulation-with-tidyverse.html#cb105-2" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb105-3"><a href="data-manipulation-with-tidyverse.html#cb105-3" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">is.na</span>(gest4)</span>
+<span id="cb105-4"><a href="data-manipulation-with-tidyverse.html#cb105-4" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb105-5"><a href="data-manipulation-with-tidyverse.html#cb105-5" tabindex="-1"></a>  <span class="fu">group_by</span>(gest4, lowbw) <span class="sc">|&gt;</span></span>
+<span id="cb105-6"><a href="data-manipulation-with-tidyverse.html#cb105-6" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb105-7"><a href="data-manipulation-with-tidyverse.html#cb105-7" tabindex="-1"></a>    <span class="at">count =</span> <span class="fu">n</span>()</span>
+<span id="cb105-8"><a href="data-manipulation-with-tidyverse.html#cb105-8" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb105-9"><a href="data-manipulation-with-tidyverse.html#cb105-9" tabindex="-1"></a>  <span class="co"># compute the percentage of babies in each birth weight category per gestational </span></span>
+<span id="cb105-10"><a href="data-manipulation-with-tidyverse.html#cb105-10" tabindex="-1"></a>  <span class="co"># time category</span></span>
+<span id="cb105-11"><a href="data-manipulation-with-tidyverse.html#cb105-11" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb105-12"><a href="data-manipulation-with-tidyverse.html#cb105-12" tabindex="-1"></a>    <span class="at">percent =</span> count <span class="sc">/</span> <span class="fu">sum</span>(count, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb105-13"><a href="data-manipulation-with-tidyverse.html#cb105-13" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## `summarise()` has grouped output by &#39;gest4&#39;. You can override using the
+## `.groups` argument.</code></pre>
+<p><strong>Note:</strong> grouping order matters! and can be confusing so think about ungrouping intermediate tables.</p>
+</div>
+<div id="bind-and-join-tables" class="section level2 hasAnchor" number="3.9">
+<h2><span class="header-section-number">3.9</span> Bind and join tables<a href="data-manipulation-with-tidyverse.html#bind-and-join-tables" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Another nice feature of <code>dplyr</code> is tables binding and joining. To practice we will create two <code>tibble</code>s:</p>
+<ul>
+<li><code>age</code> an individual database which contains <code>pid</code> (unique individuals id)
+and their <code>age</code> in year</li>
+<li><code>center</code> an study center database which contains <code>pid</code> (unique individuals id)
+and <code>center</code> (the center where an individual is registered coded as a letter)</li>
+</ul>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="data-manipulation-with-tidyverse.html#cb107-1" tabindex="-1"></a>age <span class="ot">&lt;-</span></span>
+<span id="cb107-2"><a href="data-manipulation-with-tidyverse.html#cb107-2" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb107-3"><a href="data-manipulation-with-tidyverse.html#cb107-3" tabindex="-1"></a>    <span class="at">pid =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>,</span>
+<span id="cb107-4"><a href="data-manipulation-with-tidyverse.html#cb107-4" tabindex="-1"></a>    <span class="at">age =</span> <span class="fu">sample</span>(<span class="dv">15</span><span class="sc">:</span><span class="dv">25</span>, <span class="at">size =</span> <span class="dv">6</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb107-5"><a href="data-manipulation-with-tidyverse.html#cb107-5" tabindex="-1"></a>  )</span>
+<span id="cb107-6"><a href="data-manipulation-with-tidyverse.html#cb107-6" tabindex="-1"></a></span>
+<span id="cb107-7"><a href="data-manipulation-with-tidyverse.html#cb107-7" tabindex="-1"></a>center <span class="ot">&lt;-</span></span>
+<span id="cb107-8"><a href="data-manipulation-with-tidyverse.html#cb107-8" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb107-9"><a href="data-manipulation-with-tidyverse.html#cb107-9" tabindex="-1"></a>    <span class="at">pid =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">10</span>),</span>
+<span id="cb107-10"><a href="data-manipulation-with-tidyverse.html#cb107-10" tabindex="-1"></a>    <span class="at">center =</span> <span class="fu">c</span>(<span class="st">&#39;A&#39;</span>, <span class="st">&#39;B&#39;</span>, <span class="st">&#39;A&#39;</span>, <span class="st">&#39;B&#39;</span>, <span class="st">&#39;C&#39;</span>)</span>
+<span id="cb107-11"><a href="data-manipulation-with-tidyverse.html#cb107-11" tabindex="-1"></a>  )</span>
+<span id="cb107-12"><a href="data-manipulation-with-tidyverse.html#cb107-12" tabindex="-1"></a></span>
+<span id="cb107-13"><a href="data-manipulation-with-tidyverse.html#cb107-13" tabindex="-1"></a>age</span>
+<span id="cb107-14"><a href="data-manipulation-with-tidyverse.html#cb107-14" tabindex="-1"></a>center</span></code></pre></div>
+<p>Now the tables are define we will try to make the linkage between individuals ages and the center
+they belong to.
+First of all let’s have a look to <code>bind_rows</code> function.</p>
+<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb108-1"><a href="data-manipulation-with-tidyverse.html#cb108-1" tabindex="-1"></a><span class="fu">bind_rows</span>(age, center)</span></code></pre></div>
+<p>Is it useful?
+Here not really because we do not want to <em>bind</em> the data-set (but <em>join</em> them instead) but that can be in other situations (e.g. several individuals data base to merge..).</p>
+<p><strong>Note:</strong> in <code>bind_rows</code>, if columns names do not match, they are fill with <code>NA</code>.</p>
+<p>Here we want to join the 2 <code>tibble</code> according to their common attribute <code>pid</code>. Depending
+on the context you can be interested in joining tables differently. Have a look at the differences
+between <code>left_join</code>, <code>full_join</code> and <code>inner_join</code>.</p>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="data-manipulation-with-tidyverse.html#cb109-1" tabindex="-1"></a><span class="co"># all individuals from ages are kept</span></span>
+<span id="cb109-2"><a href="data-manipulation-with-tidyverse.html#cb109-2" tabindex="-1"></a><span class="fu">left_join</span>(age, center, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&#39;pid&#39;</span>))</span>
+<span id="cb109-3"><a href="data-manipulation-with-tidyverse.html#cb109-3" tabindex="-1"></a><span class="co"># everithing is kept</span></span>
+<span id="cb109-4"><a href="data-manipulation-with-tidyverse.html#cb109-4" tabindex="-1"></a><span class="fu">full_join</span>(age, center, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&#39;pid&#39;</span>))</span>
+<span id="cb109-5"><a href="data-manipulation-with-tidyverse.html#cb109-5" tabindex="-1"></a><span class="co"># only the individuals present in both dataset are kept</span></span>
+<span id="cb109-6"><a href="data-manipulation-with-tidyverse.html#cb109-6" tabindex="-1"></a><span class="fu">inner_join</span>(age, center, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&#39;pid&#39;</span>))</span></code></pre></div>
+<p>Can you spot the differences between the commands above?
+As an exercise, you can try to compute the individuals’ mean age per center.</p>
+<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb110-1"><a href="data-manipulation-with-tidyverse.html#cb110-1" tabindex="-1"></a><span class="fu">inner_join</span>(age, center, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&#39;pid&#39;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb110-2"><a href="data-manipulation-with-tidyverse.html#cb110-2" tabindex="-1"></a>  <span class="fu">group_by</span>(center) <span class="sc">|&gt;</span></span>
+<span id="cb110-3"><a href="data-manipulation-with-tidyverse.html#cb110-3" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb110-4"><a href="data-manipulation-with-tidyverse.html#cb110-4" tabindex="-1"></a>    <span class="at">mean_age =</span> <span class="fu">mean</span>(age)</span>
+<span id="cb110-5"><a href="data-manipulation-with-tidyverse.html#cb110-5" tabindex="-1"></a>  )</span></code></pre></div>
+<p><strong>Note:</strong> the <code>by</code> argument indicates which column should be use to make the <em>join</em>. In some
+cases, you might have to uses several columns to match (e.g. per sex and age group), this
+can be easily done specifying a vector of column names.</p>
+<p>From now on, we will consider other packages than <code>dplyr</code> from the <code>tidyverse</code> suits.</p>
+</div>
+<div id="data-visualization-with-ggplot2" class="section level2 hasAnchor" number="3.10">
+<h2><span class="header-section-number">3.10</span> Data Visualization with ggplot2<a href="data-manipulation-with-tidyverse.html#data-visualization-with-ggplot2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>One of the package that have contributed to <code>tidyverse</code> success is for sure <code>ggplot2</code>.
+We will go more into the details on how to produce advanced graphs with <code>ggplot2</code> in another practical.
+Let’s just have a quick example of graphic creation using <code>ggplot2</code>.
+Let’s draw a bar plot to visualize the number of births by women age group.
+First you have to create a table with the number of birth per age group.</p>
+<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb111-1"><a href="data-manipulation-with-tidyverse.html#cb111-1" tabindex="-1"></a>birth_per_ageg <span class="ot">&lt;-</span> births_tbl <span class="sc">|&gt;</span> <span class="fu">group_by</span>(agegrp) <span class="sc">|&gt;</span> <span class="fu">summarise</span>(<span class="at">total_births =</span> <span class="fu">n</span>())</span></code></pre></div>
+<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb112-1"><a href="data-manipulation-with-tidyverse.html#cb112-1" tabindex="-1"></a>(gg<span class="fl">.01</span> <span class="ot">&lt;-</span> </span>
+<span id="cb112-2"><a href="data-manipulation-with-tidyverse.html#cb112-2" tabindex="-1"></a>   <span class="fu">ggplot</span>(birth_per_ageg, <span class="fu">aes</span>(<span class="at">x =</span> agegrp, <span class="at">y =</span> total_births)) <span class="sc">+</span> </span>
+<span id="cb112-3"><a href="data-manipulation-with-tidyverse.html#cb112-3" tabindex="-1"></a>   <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">&quot;identity&quot;</span>))</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-103-1.png" width="672" />
+This graph can be customize adding labels and title to the plot:</p>
+<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb113-1"><a href="data-manipulation-with-tidyverse.html#cb113-1" tabindex="-1"></a>(gg<span class="fl">.02</span> <span class="ot">&lt;-</span> </span>
+<span id="cb113-2"><a href="data-manipulation-with-tidyverse.html#cb113-2" tabindex="-1"></a>   gg<span class="fl">.01</span> <span class="sc">+</span>  </span>
+<span id="cb113-3"><a href="data-manipulation-with-tidyverse.html#cb113-3" tabindex="-1"></a>   <span class="fu">xlab</span>(<span class="st">&quot;Women Age Group&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb113-4"><a href="data-manipulation-with-tidyverse.html#cb113-4" tabindex="-1"></a>   <span class="fu">ylab</span>(<span class="st">&quot;Total Births&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb113-5"><a href="data-manipulation-with-tidyverse.html#cb113-5" tabindex="-1"></a>   <span class="fu">ggtitle</span>(<span class="st">&quot;Number of Births per Women Age Group&quot;</span>))</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-104-1.png" width="672" />
+As you can see, plots from <code>ggplot</code> family are built incrementally using the <code>+</code> operator for each additional element.</p>
+</div>
+<div id="pivoting-data-with-tidyr" class="section level2 hasAnchor" number="3.11">
+<h2><span class="header-section-number">3.11</span> pivoting data with tidyr<a href="data-manipulation-with-tidyverse.html#pivoting-data-with-tidyr" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><code>dplyr</code> often comes with its good friend <code>tidyr</code> when we are performing data manipulation. <code>tidyr</code> main features is to reshape tables from long to wide format and vis-versa. Let’s have an example.
+Let’s transform in wide format the previously created <code>birth_per_ageg</code> table.
+We want to have a table with one column per age group containing the <code>total_births</code> numbers.</p>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="data-manipulation-with-tidyverse.html#cb114-1" tabindex="-1"></a>birth_per_ageg</span>
+<span id="cb114-2"><a href="data-manipulation-with-tidyverse.html#cb114-2" tabindex="-1"></a></span>
+<span id="cb114-3"><a href="data-manipulation-with-tidyverse.html#cb114-3" tabindex="-1"></a>birth_per_ageg_wide <span class="ot">&lt;-</span> </span>
+<span id="cb114-4"><a href="data-manipulation-with-tidyverse.html#cb114-4" tabindex="-1"></a>  birth_per_ageg <span class="sc">|&gt;</span></span>
+<span id="cb114-5"><a href="data-manipulation-with-tidyverse.html#cb114-5" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">&#39;agegrp&#39;</span>, <span class="at">values_from =</span> <span class="st">&#39;total_births&#39;</span>)</span>
+<span id="cb114-6"><a href="data-manipulation-with-tidyverse.html#cb114-6" tabindex="-1"></a></span>
+<span id="cb114-7"><a href="data-manipulation-with-tidyverse.html#cb114-7" tabindex="-1"></a>birth_per_ageg_wide</span></code></pre></div>
+<p>This table can easily be formatted back in long format using <code>pivot_longer</code> function:</p>
+<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb115-1"><a href="data-manipulation-with-tidyverse.html#cb115-1" tabindex="-1"></a>birth_per_ageg_long <span class="ot">&lt;-</span> </span>
+<span id="cb115-2"><a href="data-manipulation-with-tidyverse.html#cb115-2" tabindex="-1"></a>  birth_per_ageg_wide <span class="sc">|&gt;</span></span>
+<span id="cb115-3"><a href="data-manipulation-with-tidyverse.html#cb115-3" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">names_to =</span> <span class="st">&#39;agegrp&#39;</span>, <span class="at">values_to =</span> <span class="st">&#39;total_births&#39;</span>)</span>
+<span id="cb115-4"><a href="data-manipulation-with-tidyverse.html#cb115-4" tabindex="-1"></a></span>
+<span id="cb115-5"><a href="data-manipulation-with-tidyverse.html#cb115-5" tabindex="-1"></a>birth_per_ageg_long</span></code></pre></div>
+<p>Are the tables <code>birth_per_ageg</code> and <code>birth_per_ageg_long</code> identical?</p>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="data-manipulation-with-tidyverse.html#cb116-1" tabindex="-1"></a><span class="fu">identical</span>(birth_per_ageg, birth_per_ageg_long)</span></code></pre></div>
+<p>Not really because the factor type of <code>agegrp</code> column has been lost during the transformation.
+Let’s convert <code>agegrp</code> column into a factor. Is the new table identical to <code>birth_per_ageg</code> ?</p>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="data-manipulation-with-tidyverse.html#cb117-1" tabindex="-1"></a>birth_per_ageg_long_02 <span class="ot">&lt;-</span></span>
+<span id="cb117-2"><a href="data-manipulation-with-tidyverse.html#cb117-2" tabindex="-1"></a>  birth_per_ageg_long <span class="sc">|&gt;</span></span>
+<span id="cb117-3"><a href="data-manipulation-with-tidyverse.html#cb117-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">agegrp =</span> <span class="fu">as.factor</span>(agegrp))</span>
+<span id="cb117-4"><a href="data-manipulation-with-tidyverse.html#cb117-4" tabindex="-1"></a></span>
+<span id="cb117-5"><a href="data-manipulation-with-tidyverse.html#cb117-5" tabindex="-1"></a><span class="fu">identical</span>(birth_per_ageg, birth_per_ageg_long_02)</span></code></pre></div>
+<p>Here we have seen the simplest example you can have of table reshaping with <code>tidyr</code>. If you are interested check the dedicated vignette (<code>vignette("pivot")</code>) to learn how to perform more advanced tables reshaping.</p>
+</div>
+<div id="reading-files-with-readr" class="section level2 hasAnchor" number="3.12">
+<h2><span class="header-section-number">3.12</span> reading files with readr<a href="data-manipulation-with-tidyverse.html#reading-files-with-readr" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Another package from <code>tidyverse</code> that can be introduced here is <code>readr</code> that contains a set of functions equivalent to the core <code>R</code> data.frame reading functions (e.g. <code>read.table()</code>, <code>read.csv()</code>, <code>read.delim()</code>, …). The main change is that data are loaded in <code>R</code> as <code>tibble</code> instead of <code>data.frame</code>, type of variables (columns) are <em>guessed</em> if possible, and some extra data checking tests are performed.</p>
+<p>Let’s explore this differences with <code>fem</code> dataset available in <code>data</code> directory.</p>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="data-manipulation-with-tidyverse.html#cb118-1" tabindex="-1"></a><span class="co"># read a csv using core R</span></span>
+<span id="cb118-2"><a href="data-manipulation-with-tidyverse.html#cb118-2" tabindex="-1"></a>fem.csv.core <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&#39;data/fem.csv&#39;</span>)</span>
+<span id="cb118-3"><a href="data-manipulation-with-tidyverse.html#cb118-3" tabindex="-1"></a><span class="co"># read a csv using tidyverse</span></span>
+<span id="cb118-4"><a href="data-manipulation-with-tidyverse.html#cb118-4" tabindex="-1"></a>fem.csv.tidy <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&#39;data/fem.csv&#39;</span>)</span></code></pre></div>
+<pre><code>## Rows: 118 Columns: 9
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## dbl (9): ID, AGE, IQ, ANXIETY, DEPRESS, SLEEP, SEX, LIFE, WEIGHT
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="data-manipulation-with-tidyverse.html#cb120-1" tabindex="-1"></a><span class="co"># compare</span></span>
+<span id="cb120-2"><a href="data-manipulation-with-tidyverse.html#cb120-2" tabindex="-1"></a>fem.csv.core</span>
+<span id="cb120-3"><a href="data-manipulation-with-tidyverse.html#cb120-3" tabindex="-1"></a>fem.csv.tidy</span>
+<span id="cb120-4"><a href="data-manipulation-with-tidyverse.html#cb120-4" tabindex="-1"></a><span class="co"># table dimensions</span></span>
+<span id="cb120-5"><a href="data-manipulation-with-tidyverse.html#cb120-5" tabindex="-1"></a><span class="fu">dim</span>(fem.csv.core)</span>
+<span id="cb120-6"><a href="data-manipulation-with-tidyverse.html#cb120-6" tabindex="-1"></a><span class="fu">dim</span>(fem.csv.tidy)</span>
+<span id="cb120-7"><a href="data-manipulation-with-tidyverse.html#cb120-7" tabindex="-1"></a><span class="co"># compare column types</span></span>
+<span id="cb120-8"><a href="data-manipulation-with-tidyverse.html#cb120-8" tabindex="-1"></a><span class="fu">map</span>(fem.csv.core, class)</span>
+<span id="cb120-9"><a href="data-manipulation-with-tidyverse.html#cb120-9" tabindex="-1"></a><span class="fu">map</span>(fem.csv.tidy, class)</span></code></pre></div>
+<p><strong>note:</strong> in case you do not fully get the last lines and the <code>map()</code> call, it will be explained in the next section on <code>purrr</code> package.</p>
+<p>Here we see that the only difference is the type of object loaded <code>data.frame</code> vs <code>tibble</code> and the default type chosen to cast numeric values (<code>integer</code> vs <code>numeric</code>).</p>
+<p>What about loading <code>occoh.txt</code> you will be using in some other practical in the coming days.</p>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="data-manipulation-with-tidyverse.html#cb121-1" tabindex="-1"></a><span class="co"># read a csv using core R</span></span>
+<span id="cb121-2"><a href="data-manipulation-with-tidyverse.html#cb121-2" tabindex="-1"></a>occoh.txt.core <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">&#39;data/occoh.txt&#39;</span>)</span>
+<span id="cb121-3"><a href="data-manipulation-with-tidyverse.html#cb121-3" tabindex="-1"></a><span class="co"># read a csv using tidyverse</span></span>
+<span id="cb121-4"><a href="data-manipulation-with-tidyverse.html#cb121-4" tabindex="-1"></a>occoh.txt.tidy <span class="ot">&lt;-</span> <span class="fu">read_table</span>(<span class="st">&#39;data/occoh.txt&#39;</span>)</span></code></pre></div>
+<pre><code>## 
+## ── Column specification ────────────────────────────────────────────────────────
+## cols(
+##   id = col_double(),
+##   birth = col_double(),
+##   entry = col_date(format = &quot;&quot;),
+##   exit = col_date(format = &quot;&quot;),
+##   death = col_date(format = &quot;&quot;),
+##   chdeath = col_double()
+## )</code></pre>
+<pre><code>## Warning: 1501 parsing failures.
+## row col  expected    actual             file
+##   1  -- 6 columns 7 columns &#39;data/occoh.txt&#39;
+##   2  -- 6 columns 7 columns &#39;data/occoh.txt&#39;
+##   3  -- 6 columns 7 columns &#39;data/occoh.txt&#39;
+##   4  -- 6 columns 7 columns &#39;data/occoh.txt&#39;
+##   5  -- 6 columns 7 columns &#39;data/occoh.txt&#39;
+## ... ... ......... ......... ................
+## See problems(...) for more details.</code></pre>
+<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb124-1"><a href="data-manipulation-with-tidyverse.html#cb124-1" tabindex="-1"></a>occoh.txt.tidy <span class="ot">&lt;-</span> <span class="fu">read_table</span>(<span class="st">&#39;data/occoh.txt&#39;</span>)</span></code></pre></div>
+<pre><code>## 
+## ── Column specification ────────────────────────────────────────────────────────
+## cols(
+##   id = col_double(),
+##   birth = col_double(),
+##   entry = col_date(format = &quot;&quot;),
+##   exit = col_date(format = &quot;&quot;),
+##   death = col_date(format = &quot;&quot;),
+##   chdeath = col_double()
+## )</code></pre>
+<pre><code>## Warning: 1501 parsing failures.
+## row col  expected    actual             file
+##   1  -- 6 columns 7 columns &#39;data/occoh.txt&#39;
+##   2  -- 6 columns 7 columns &#39;data/occoh.txt&#39;
+##   3  -- 6 columns 7 columns &#39;data/occoh.txt&#39;
+##   4  -- 6 columns 7 columns &#39;data/occoh.txt&#39;
+##   5  -- 6 columns 7 columns &#39;data/occoh.txt&#39;
+## ... ... ......... ......... ................
+## See problems(...) for more details.</code></pre>
+<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb127-1"><a href="data-manipulation-with-tidyverse.html#cb127-1" tabindex="-1"></a><span class="co"># compare</span></span>
+<span id="cb127-2"><a href="data-manipulation-with-tidyverse.html#cb127-2" tabindex="-1"></a>occoh.txt.core</span>
+<span id="cb127-3"><a href="data-manipulation-with-tidyverse.html#cb127-3" tabindex="-1"></a>occoh.txt.tidy</span>
+<span id="cb127-4"><a href="data-manipulation-with-tidyverse.html#cb127-4" tabindex="-1"></a><span class="co"># table dimensions</span></span>
+<span id="cb127-5"><a href="data-manipulation-with-tidyverse.html#cb127-5" tabindex="-1"></a><span class="fu">dim</span>(occoh.txt.core)</span>
+<span id="cb127-6"><a href="data-manipulation-with-tidyverse.html#cb127-6" tabindex="-1"></a><span class="fu">dim</span>(occoh.txt.tidy)</span>
+<span id="cb127-7"><a href="data-manipulation-with-tidyverse.html#cb127-7" tabindex="-1"></a><span class="co"># compare column types</span></span>
+<span id="cb127-8"><a href="data-manipulation-with-tidyverse.html#cb127-8" tabindex="-1"></a><span class="fu">map</span>(occoh.txt.core, class)</span>
+<span id="cb127-9"><a href="data-manipulation-with-tidyverse.html#cb127-9" tabindex="-1"></a><span class="fu">map</span>(occoh.txt.tidy, class)</span></code></pre></div>
+<p>As you can see, in addition to inferring the type of columns in the input data (here some dates), using <code>readr</code> to load you data-set can help you to detect inconsistencies in input data formatting (there are no true problem here).</p>
+<p>If you are interested, you can explore the other functions of <code>readr</code> and see how you can tune it.</p>
+</div>
+<div id="string-manipulation-with-stringr" class="section level2 hasAnchor" number="3.13">
+<h2><span class="header-section-number">3.13</span> String manipulation with stringr<a href="data-manipulation-with-tidyverse.html#string-manipulation-with-stringr" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Another popular <code>tidyverse</code> popular package is <code>stringr</code> package. This package is specialized in the string manipulation. Here are couple of examples.</p>
+<p>Let’s create a character vector with the following elements representing country names: “Estonia”, “Finland”, “Denmark”, “United Kingdom”, “France”.</p>
+<div class="sourceCode" id="cb128"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb128-1"><a href="data-manipulation-with-tidyverse.html#cb128-1" tabindex="-1"></a>countries <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Estonia&quot;</span>, <span class="st">&quot;Finland&quot;</span>, <span class="st">&quot;Denmark&quot;</span>, <span class="st">&quot;United Kingdom&quot;</span>, <span class="st">&quot;France&quot;</span>)</span></code></pre></div>
+<p>With <code>stringr</code> functions perform the following actions.</p>
+<p>Extract the first three characters from each country name:</p>
+<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb129-1"><a href="data-manipulation-with-tidyverse.html#cb129-1" tabindex="-1"></a>country_initials <span class="ot">&lt;-</span> <span class="fu">str_sub</span>(countries, <span class="at">start =</span> <span class="dv">1</span>, <span class="at">end =</span> <span class="dv">3</span>)</span></code></pre></div>
+<p>Convert all country names to uppercase:</p>
+<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb130-1"><a href="data-manipulation-with-tidyverse.html#cb130-1" tabindex="-1"></a>countries_upper <span class="ot">&lt;-</span> <span class="fu">str_to_upper</span>(countries)</span></code></pre></div>
+<p>Replace “United” with “Utd” in each country name:</p>
+<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb131-1"><a href="data-manipulation-with-tidyverse.html#cb131-1" tabindex="-1"></a>countries_modified <span class="ot">&lt;-</span> <span class="fu">str_replace</span>(countries, <span class="st">&quot;United&quot;</span>, <span class="st">&quot;Utd&quot;</span>)</span></code></pre></div>
+<p>Find the positions of the letter “n” in each country name:</p>
+<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="data-manipulation-with-tidyverse.html#cb132-1" tabindex="-1"></a>a_positions <span class="ot">&lt;-</span> <span class="fu">str_locate_all</span>(countries, <span class="st">&quot;n&quot;</span>)</span></code></pre></div>
+<p>As you can see, the output of <code>str_locate_all</code> is a list (one element per character string) containing a 2 column table with one line for each match. The first column (start) being the position of the beginning of the match and the second one (end) being the end of the match. In our case, since we are searching for a single character match, this 2 indexes are always the same.</p>
+<p>Count the number of characters in each country name:</p>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="data-manipulation-with-tidyverse.html#cb133-1" tabindex="-1"></a>character_counts <span class="ot">&lt;-</span> <span class="fu">str_length</span>(countries)</span></code></pre></div>
+<p>These examples demonstrate various string manipulation operations using the <code>stringr</code> package. You can modify the exercises, combine several operations or explore other string manipulation functions provided by <code>stringr</code> to further practice and enhance your skills in manipulating and analyzing text data.</p>
+</div>
+<div id="purrr-package-to-apply-functions-to-list" class="section level2 hasAnchor" number="3.14">
+<h2><span class="header-section-number">3.14</span> purrr package to apply functions to list<a href="data-manipulation-with-tidyverse.html#purrr-package-to-apply-functions-to-list" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Among my favorite <code>tidyverse</code> packages, you will find <code>purrr</code>. This package contains
+several functions that are very similar to <code>lapply</code> function.</p>
+<p>Apply a function to each element of the vector using map(). Here producing the mean of some grades per class:</p>
+<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb134-1"><a href="data-manipulation-with-tidyverse.html#cb134-1" tabindex="-1"></a><span class="co"># define the grade dataset</span></span>
+<span id="cb134-2"><a href="data-manipulation-with-tidyverse.html#cb134-2" tabindex="-1"></a>grades <span class="ot">&lt;-</span> </span>
+<span id="cb134-3"><a href="data-manipulation-with-tidyverse.html#cb134-3" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb134-4"><a href="data-manipulation-with-tidyverse.html#cb134-4" tabindex="-1"></a>    <span class="at">c1 =</span> <span class="fu">c</span>(<span class="dv">80</span>, <span class="dv">85</span>, <span class="dv">90</span>), </span>
+<span id="cb134-5"><a href="data-manipulation-with-tidyverse.html#cb134-5" tabindex="-1"></a>    <span class="at">c2 =</span> <span class="fu">c</span>(<span class="dv">75</span>, <span class="dv">70</span>, <span class="dv">85</span>, <span class="dv">88</span>), </span>
+<span id="cb134-6"><a href="data-manipulation-with-tidyverse.html#cb134-6" tabindex="-1"></a>    <span class="at">c3 =</span> <span class="fu">c</span>(<span class="dv">90</span>, <span class="dv">85</span>, <span class="dv">95</span>)</span>
+<span id="cb134-7"><a href="data-manipulation-with-tidyverse.html#cb134-7" tabindex="-1"></a>  )</span>
+<span id="cb134-8"><a href="data-manipulation-with-tidyverse.html#cb134-8" tabindex="-1"></a><span class="co"># compute grades</span></span>
+<span id="cb134-9"><a href="data-manipulation-with-tidyverse.html#cb134-9" tabindex="-1"></a>mean_grades <span class="ot">&lt;-</span> <span class="fu">map</span>(grades, mean)</span></code></pre></div>
+<p>By default <code>map()</code> return a list. One of the nice feature of <code>purrr</code> functions is to be able to specify the type of output you want (e.g. <code>_dbl</code> for numeric, <code>_chr</code> for characters, …).
+Check and try to explain the differences between the following command lines:</p>
+<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb135-1"><a href="data-manipulation-with-tidyverse.html#cb135-1" tabindex="-1"></a><span class="fu">map</span>(grades, mean)</span>
+<span id="cb135-2"><a href="data-manipulation-with-tidyverse.html#cb135-2" tabindex="-1"></a><span class="fu">map_dbl</span>(grades, mean)</span>
+<span id="cb135-3"><a href="data-manipulation-with-tidyverse.html#cb135-3" tabindex="-1"></a><span class="fu">map_chr</span>(grades, mean)</span></code></pre></div>
+<pre><code>## Warning: Automatic coercion from double to character was deprecated in purrr 1.0.0.
+## ℹ Please use an explicit call to `as.character()` within `map_chr()` instead.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.</code></pre>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb137-1"><a href="data-manipulation-with-tidyverse.html#cb137-1" tabindex="-1"></a><span class="fu">map_df</span>(grades, mean)</span></code></pre></div>
+<p>Other nice features of <code>map</code> like functions is he availability to support more than one argument.
+<code>map2()</code> for 2 arguments and <code>pmap()</code> for more than 2. This can be very handy in some conditions.
+If you are interested you can have a look to this function help file and play with the examples.</p>
+<p><code>purrr</code> package has also a set of functions that can be used to apply iteratively a function using <code>reduce</code> and/or <code>accumulate</code>. The 2 functions behave the same way, it takes the 2 first element of a list, apply a function taking 2 arguments. The results is combined with the third element of the list and given as input to the same function and so on.. The only difference is that accumulate return intermediate results while reduce return only the final results.</p>
+<p>Here an example of the cumulative product of the 10 first numbers.</p>
+<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb138-1"><a href="data-manipulation-with-tidyverse.html#cb138-1" tabindex="-1"></a><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span> <span class="sc">|&gt;</span> purrr<span class="sc">::</span><span class="fu">reduce</span>(<span class="st">`</span><span class="at">*</span><span class="st">`</span>)</span>
+<span id="cb138-2"><a href="data-manipulation-with-tidyverse.html#cb138-2" tabindex="-1"></a><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span> <span class="sc">|&gt;</span> purrr<span class="sc">::</span><span class="fu">accumulate</span>(<span class="st">`</span><span class="at">*</span><span class="st">`</span>)</span></code></pre></div>
+<p><code>purrr</code> have many of others useful features. Please check the dedicated documentation if you want to go further with this package.</p>
+</div>
+<div id="bonus-rendering-tables" class="section level2 hasAnchor" number="3.15">
+<h2><span class="header-section-number">3.15</span> Bonus: Rendering tables<a href="data-manipulation-with-tidyverse.html#bonus-rendering-tables" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Once you have produced a nice data-set we can be interested in rendering it in a nice format that can meet presentation/publication expectations. The <code>kableExtra</code> table can be useful to achieve this goal.</p>
+<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb139-1"><a href="data-manipulation-with-tidyverse.html#cb139-1" tabindex="-1"></a><span class="co"># if(!require(kableExtra)) install.packages(&#39;kableExtra&#39;)</span></span>
+<span id="cb139-2"><a href="data-manipulation-with-tidyverse.html#cb139-2" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb139-3"><a href="data-manipulation-with-tidyverse.html#cb139-3" tabindex="-1"></a></span>
+<span id="cb139-4"><a href="data-manipulation-with-tidyverse.html#cb139-4" tabindex="-1"></a>births<span class="fl">.08</span> <span class="ot">&lt;-</span></span>
+<span id="cb139-5"><a href="data-manipulation-with-tidyverse.html#cb139-5" tabindex="-1"></a>  births_tbl <span class="sc">|&gt;</span></span>
+<span id="cb139-6"><a href="data-manipulation-with-tidyverse.html#cb139-6" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb139-7"><a href="data-manipulation-with-tidyverse.html#cb139-7" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">is.na</span>(gest4)</span>
+<span id="cb139-8"><a href="data-manipulation-with-tidyverse.html#cb139-8" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb139-9"><a href="data-manipulation-with-tidyverse.html#cb139-9" tabindex="-1"></a>  <span class="fu">group_by</span>(gest4) <span class="sc">|&gt;</span></span>
+<span id="cb139-10"><a href="data-manipulation-with-tidyverse.html#cb139-10" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb139-11"><a href="data-manipulation-with-tidyverse.html#cb139-11" tabindex="-1"></a>    <span class="at">N =</span> <span class="fu">n</span>()</span>
+<span id="cb139-12"><a href="data-manipulation-with-tidyverse.html#cb139-12" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb139-13"><a href="data-manipulation-with-tidyverse.html#cb139-13" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb139-14"><a href="data-manipulation-with-tidyverse.html#cb139-14" tabindex="-1"></a>    <span class="st">`</span><span class="at">(%)</span><span class="st">`</span> <span class="ot">=</span> (N <span class="sc">/</span> <span class="fu">sum</span>(N)) <span class="sc">|&gt;</span> scales<span class="sc">::</span><span class="fu">percent</span>()</span>
+<span id="cb139-15"><a href="data-manipulation-with-tidyverse.html#cb139-15" tabindex="-1"></a>  )</span>
+<span id="cb139-16"><a href="data-manipulation-with-tidyverse.html#cb139-16" tabindex="-1"></a></span>
+<span id="cb139-17"><a href="data-manipulation-with-tidyverse.html#cb139-17" tabindex="-1"></a><span class="co"># default</span></span>
+<span id="cb139-18"><a href="data-manipulation-with-tidyverse.html#cb139-18" tabindex="-1"></a>births<span class="fl">.08</span></span>
+<span id="cb139-19"><a href="data-manipulation-with-tidyverse.html#cb139-19" tabindex="-1"></a></span>
+<span id="cb139-20"><a href="data-manipulation-with-tidyverse.html#cb139-20" tabindex="-1"></a><span class="co"># markdown flavor (useful fo automatic report production with knitr)</span></span>
+<span id="cb139-21"><a href="data-manipulation-with-tidyverse.html#cb139-21" tabindex="-1"></a><span class="co"># births.08 |&gt;</span></span>
+<span id="cb139-22"><a href="data-manipulation-with-tidyverse.html#cb139-22" tabindex="-1"></a><span class="co">#   knitr::kable(fromat = &#39;markdown&#39;)</span></span>
+<span id="cb139-23"><a href="data-manipulation-with-tidyverse.html#cb139-23" tabindex="-1"></a></span>
+<span id="cb139-24"><a href="data-manipulation-with-tidyverse.html#cb139-24" tabindex="-1"></a><span class="co"># create an html version of the table and save it on the hard drive</span></span>
+<span id="cb139-25"><a href="data-manipulation-with-tidyverse.html#cb139-25" tabindex="-1"></a>births<span class="fl">.08</span> <span class="sc">|&gt;</span></span>
+<span id="cb139-26"><a href="data-manipulation-with-tidyverse.html#cb139-26" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="sc">|&gt;</span></span>
+<span id="cb139-27"><a href="data-manipulation-with-tidyverse.html#cb139-27" tabindex="-1"></a>  <span class="fu">kable_styling</span>(</span>
+<span id="cb139-28"><a href="data-manipulation-with-tidyverse.html#cb139-28" tabindex="-1"></a>    <span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">&quot;striped&quot;</span>, <span class="st">&quot;hover&quot;</span>, <span class="st">&quot;condensed&quot;</span>, <span class="st">&quot;responsive&quot;</span>),</span>
+<span id="cb139-29"><a href="data-manipulation-with-tidyverse.html#cb139-29" tabindex="-1"></a>    <span class="at">full_width =</span> <span class="cn">FALSE</span></span>
+<span id="cb139-30"><a href="data-manipulation-with-tidyverse.html#cb139-30" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb139-31"><a href="data-manipulation-with-tidyverse.html#cb139-31" tabindex="-1"></a>  <span class="fu">save_kable</span>(<span class="at">file =</span> <span class="st">&#39;births.08.html&#39;</span>, <span class="at">self_contained =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><strong>note:</strong> One other very cool package to produce advance formatted Excel spreadsheet I am using more and more is <code>openxlsx</code>. Check it out if you are interested.</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="reading-data-into-r.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="tabulation.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/SPE-R/SPE/edit/master/tidyverse-e.rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf", "_main.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
