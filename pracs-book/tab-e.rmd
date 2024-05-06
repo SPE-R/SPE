@@ -1,5 +1,5 @@
 ```{r, include=FALSE}
-knitr::opts_chunk$set(results='hide', prefix.string='./graph/tab')
+knitr::opts_chunk$set(results = "hide", prefix.string = "./graph/tab")
 ```
 
 # Tabulation
@@ -37,16 +37,26 @@ birth weight. These data are available in the Epi package:
 ```{r Looking at births data b}
 library(Epi)
 data(births)
-names(births) 
-head(births)  
+names(births)
+head(births)
 ```
 In order to work with this data set we need to transform some of the variables
 into factors. This is done with the following commands:
 ```{r }
-births$hyp <- factor(births$hyp,labels=c("normal","hyper"))
-births$sex <- factor(births$sex,labels=c("M","F"))
-births$agegrp <- cut(births$matage,breaks=c(20,25,30,35,40,45),right=FALSE)
-births$gest4 <- cut(births$gestwks,breaks=c(20,35,37,39,45),right=FALSE)
+births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
+births$sex <- factor(births$sex, labels = c("M", "F"))
+births$agegrp <- 
+  cut(
+    births$matage, 
+    breaks = c(20, 25, 30, 35, 40, 45), 
+    right = FALSE
+  )
+births$gest4 <- 
+  cut(
+    births$gestwks, 
+    breaks = c(20, 35, 37, 39, 45), 
+    right = FALSE
+  )
 ```
 Now use `str(births)` to examine the modified data frame. We have
 transformed the binary variables `hyp` and `sex` into factors
@@ -70,7 +80,11 @@ specifying the frame.
 You can display several summary statistics in the same table by
 giving a list of expressions to the `contents` argument:
 ```{r sex2}
-stat.table(index = sex, contents = list(count(), percent(sex)), data=births)
+stat.table(
+  index = sex, 
+  contents = list(count(), percent(sex)), 
+  data = births
+)
 ```
 Only a limited set of expressions are allowed: see the help page
 for `stat.table` for details.
@@ -80,26 +94,34 @@ in your call to `stat.table`.  Do this for the above table. Check
 that the percentages add up to 100 and the total for `count()` is the
 same as the number of rows of the data frame `births`.
 ```{r sex3, echo=F}
-stat.table(index = sex, contents = list(count(), percent(sex)),
-  margin=TRUE, data=births)
+stat.table(
+  index = sex, contents = list(count(), percent(sex)),
+  margin = TRUE, data = births
+)
 ```
 To see how the mean birth weight changes with `sex`, try
 ```{r bwsex1}
-stat.table(index = sex, contents = mean(bweight), data=births)
+stat.table(index = sex, contents = mean(bweight), data = births)
 ```
 
 Add the count to this table. Add also the margin with `margin=TRUE`. 
 ```{r bwsex2, echo=FALSE}
-stat.table(index = sex, contents = list(count(), mean(bweight)), 
-   margin=TRUE, data=births)
+stat.table(
+  index = sex, contents = list(count(), mean(bweight)),
+  margin = TRUE, data = births
+)
 ```
 As an alternative to `bweight` we can look at `lowbw` with
 ```{r lowbwsex1}
-stat.table(index = sex, contents = percent(lowbw), data=births)
+stat.table(index = sex, contents = percent(lowbw), data = births)
 ```
 All the percentages are 100! To use the `percent` function the variable `lowbw` must also be in the index, as in
 ```{r lowbwsex2}
-stat.table(index = list(sex,lowbw), contents = percent(lowbw), data=births)
+stat.table(
+  index = list(sex, lowbw), 
+  contents = percent(lowbw), 
+  data = births
+)
 ```
 The final column is the percentage of babies with low birth weight by different categories of gestation.
 
@@ -109,15 +131,19 @@ The final column is the percentage of babies with low birth weight by different 
 -  Show how the percentage of low birth weight babies changes with `gest4`.
 
 ```{r  exercise on tables, echo=F}
-stat.table(index = gest4, contents = count(), data=births)
-stat.table(index = gest4, contents = mean(bweight), data=births)
-stat.table(index = list(lowbw,gest4), contents = percent(lowbw), data=births)
+stat.table(index = gest4, contents = count(), data = births)
+stat.table(index = gest4, contents = mean(bweight), data = births)
+stat.table(
+  index = list(lowbw, gest4), 
+  contents = percent(lowbw), 
+  data = births
+)
 ```
 
 Another way of obtaining the percentage of low birth weight babies by
 gestation is to use the ratio function:
 ```{r ratio}
-stat.table(gest4,ratio(lowbw,1,100),data=births)
+stat.table(gest4, ratio(lowbw, 1, 100), data = births)
 ```
 This only works because `lowbw` is coded 0/1, with 1 for low birth
 weight.
@@ -135,15 +161,17 @@ on the `contents` argument, but these are not always very informative.
 Supply your own column headings using *tagged* lists as the
 value of the `contents` argument, within a `stat.table` call:
 ```{r tagged}
-stat.table(gest4,contents = list( N=count(), 
-     "(%)" = percent(gest4)),data=births)
+stat.table(gest4, contents = list(
+  N = count(),
+  "(%)" = percent(gest4)
+), data = births)
 ```
 This improves the readability of the table.  It remains to give an
 informative title to the index variable. You can do this in the same way:
 instead of giving `gest4` as the `index` argument to `stat.table`,
 use a named list:
 ```{r named}
-stat.table(index = list("Gestation time" = gest4),data=births)
+stat.table(index = list("Gestation time" = gest4), data = births)
 ```
 
 ## Two-way Tables
@@ -151,18 +179,25 @@ stat.table(index = list("Gestation time" = gest4),data=births)
 The following call gives a $2\times 2$ table showing the mean birth weight
 cross-classified by `sex` and `hyp`.
 ```{r twoway}
-stat.table(list(sex,hyp), contents=mean(bweight), data=births)
+stat.table(
+  list(sex, hyp), 
+  contents = mean(bweight), 
+  data = births
+)
 ```
 Add the count to this table and repeat the function call using `margin = TRUE` to calculate the
 marginal tables.
 ```{r twoway2, echo=F}
-stat.table(list(sex,hyp), contents=list(count(), mean(bweight)),
-   margin=T, data=births)
+stat.table(list(sex, hyp),
+  contents = list(count(), mean(bweight)),
+  margin = TRUE, 
+  data = births
+)
 ```
 Use `stat.table` with the ratio function to obtain a $2\times 2$ table of percent low birth weight by `sex` and `hyp`.
 ```{r  two way tables exc, echo=F} 
-stat.table(list(sex,hyp), contents=list(count(),mean(bweight)),margin=T, data=births)
-stat.table(list(sex,hyp), contents=list(count(),ratio(lowbw,1,100)),margin=T, data=births)
+stat.table(list(sex, hyp), contents = list(count(), mean(bweight)), margin = TRUE, data = births)
+stat.table(list(sex, hyp), contents = list(count(), ratio(lowbw, 1, 100)), margin = TRUE, data = births)
 ```
 You can have fine-grained control over which margins to calculate by
 giving a logical vector to the `margin` argument.  Use `margin=c(FALSE, TRUE)`
@@ -183,14 +218,18 @@ There are two arguments to the print method for `stat.table`. The
 `digits` argument which controls
 the number of digits printed after the decimal point. This table
 ```{r printing1}
-odds.tab <- stat.table(gest4, list("odds of low bw" = ratio(lowbw,1-lowbw)), 
-              data=births)
+odds.tab <- 
+  stat.table(
+    gest4, 
+    list("odds of low bw" = ratio(lowbw, 1 - lowbw)),
+    data = births
+)
 print(odds.tab)
 ```
 shows a table of odds that the baby has low birth weight. Use
 `width=15` and `digits=3` and see the difference.
 ```{r  printing2, echo=F}
-print(odds.tab, width=15, digits=3)
+print(odds.tab, width = 15, digits = 3)
 ```
 
 

@@ -1,5 +1,5 @@
 ```{r, include=FALSE}
-knitr::opts_chunk$set(results='hide',keep.source=TRUE,include=TRUE,eps=FALSE,prefix.string='./graph/causInf2')
+knitr::opts_chunk$set(results = "hide", keep.source = TRUE, include = TRUE, eps = FALSE, prefix.string = "./graph/causInf2")
 ```
 
 <!-- ```{r include=FALSE, warning=FALSE, message=FALSE} -->
@@ -37,8 +37,8 @@ The assumed causal diagram is shown below.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results=TRUE, fig.show=TRUE}
 library(dagitty)
-d <- 
-dagitty("dag {
+d <-
+  dagitty("dag {
   Z2 -> Z3 -> Y
   Z2 -> Z4 -> Y
   Z2 -> Y
@@ -59,7 +59,6 @@ dagitty::coordinates(d) <-
   )
 
 plot(d)
-
 ```
 
 
@@ -122,11 +121,13 @@ library(tmle)
 for the exposure and outcome based on the assumed
 true outcome model and the true exposure model.
 ```{r true models}
-EX <- function( z2, z3, z4) {
-           plogis(-5 + 0.05*z2 + 0.25*z3 + 0.5*z4 + 0.4*z2*z4) }
+EX <- function(z2, z3, z4) {
+  plogis(-5 + 0.05 * z2 + 0.25 * z3 + 0.5 * z4 + 0.4 * z2 * z4)
+}
 EY <- function(x, z1, z2, z3, z4) {
-           plogis(-1 + x - 0.1*z1 + 0.35*z2 + 0.25*z3 +
-                 0.20*z4 + 0.15*z2*z4) }
+  plogis(-1 + x - 0.1 * z1 + 0.35 * z2 + 0.25 * z3 +
+    0.20 * z4 + 0.15 * z2 * z4)
+}
 ```
 
 3. Define the function for the generation of data
@@ -134,12 +135,12 @@ by simulating random values from pertinent probability distributions
 based  on the given assumptions.
 ```{r data generation function}
 genData <- function(N) {
-  z1 <- rbinom(N, size=1, prob=0.5)             # Bern(0.5)
-  z2 <- rbinom(N, size=1, prob=0.65)            # Bern(0.65)
-  z3 <- trunc(runif(N, min=1, max=5), digits=0) # DiscUnif(1,4)
-  z4 <- trunc(runif(N, min=1, max=6), digits=0) # DiscUnif(1,5)
-   x <- rbinom(N, size=1, prob=EX(z2, z3, z4) )
-   y <- rbinom(N, size=1, prob=EY(x, z1, z2, z3, z4) )
+  z1 <- rbinom(N, size = 1, prob = 0.5) # Bern(0.5)
+  z2 <- rbinom(N, size = 1, prob = 0.65) # Bern(0.65)
+  z3 <- trunc(runif(N, min = 1, max = 5), digits = 0) # DiscUnif(1,4)
+  z4 <- trunc(runif(N, min = 1, max = 6), digits = 0) # DiscUnif(1,5)
+  x <- rbinom(N, size = 1, prob = EX(z2, z3, z4))
+  y <- rbinom(N, size = 1, prob = EY(x, z1, z2, z3, z4))
   data.frame(z1, z2, z3, z4, x, y)
 }
 ```
@@ -163,13 +164,13 @@ risk ratio, and odds ratio.
 Before that define a useful function
 ```{r association}
 Contr <- function(mu1, mu0) {
-   RD <- mu1 - mu0
-   RR <- mu1/mu0
-   OR <- (mu1/(1-mu1)) /(mu0/(1-mu0))
-   return(c(mu1, mu0, RD=RD, RR=RR, OR=OR))
+  RD <- mu1 - mu0
+  RR <- mu1 / mu0
+  OR <- (mu1 / (1 - mu1)) / (mu0 / (1 - mu0))
+  return(c(mu1, mu0, RD = RD, RR = RR, OR = OR))
 }
-Ey1 <- with(dd, sum(y==1 & x==1)/sum(x==1) )
-Ey0 <- with(dd, sum(y==1 & x==0)/sum(x==0) )
+Ey1 <- with(dd, sum(y == 1 & x == 1) / sum(x == 1))
+Ey0 <- with(dd, sum(y == 1 & x == 0) / sum(x == 0))
 round(Contr(Ey1, Ey0), 4)
 ```
 How much bigger is the risk of death of those factually exposed
@@ -190,8 +191,10 @@ $$
 \end{aligned}
 $$
 ```{r true contrasts}
-dd <- transform(dd, EY1.ind = EY(x=1, z1, z2, z3, z4),
-                    EY0.ind = EY(x=0, z1, z2, z3, z4) )
+dd <- transform(dd,
+  EY1.ind = EY(x = 1, z1, z2, z3, z4),
+  EY0.ind = EY(x = 0, z1, z2, z3, z4)
+)
 EY1 <- mean(dd$EY1.ind)
 EY0 <- mean(dd$EY0.ind)
 round(Contr(EY1, EY0), 4)
@@ -227,8 +230,8 @@ Fit this model on the target population using function `glm()`
 <!-- % estimate of the possible bias due to misspecification of the outcome -->
 <!-- % model -->
 ```{r outcome model}
-mY  <- glm(y ~ x + z1 + z2 + z3 + z4, family = binomial, data = dd)
-round(ci.lin(mY, Exp=TRUE)[, c(1,5)], 3)
+mY <- glm(y ~ x + z1 + z2 + z3 + z4, family = binomial, data = dd)
+round(ci.lin(mY, Exp = TRUE)[, c(1, 5)], 3)
 ```
 There is not much idea in looking at the
 standard errors or confidence intervals in such a big  population.
@@ -241,11 +244,15 @@ risks  $\widetilde{Y_i}^{X_i=x}$ for both exposure levels
 $x=0,1$ separately,
 keeping the individual values of the $Z$-variables as they are.
 ```{r predict}
-dd$yh <- predict(mY, type = "response")    #  fitted values
-dd$yp1 <- predict(mY, newdata=data.frame( x=rep(1,N),       # x=1
-          dd[,c("z1","z2","z3","z4")]), type = "response")
-dd$yp0 <- predict(mY, newdata=data.frame( x=rep(0,N),       # x=0
-          dd[,c("z1","z2","z3","z4")]), type = "response")
+dd$yh <- predict(mY, type = "response") #  fitted values
+dd$yp1 <- predict(mY, newdata = data.frame(
+  x = rep(1, N), # x=1
+  dd[, c("z1", "z2", "z3", "z4")]
+), type = "response")
+dd$yp0 <- predict(mY, newdata = data.frame(
+  x = rep(0, N), # x=0
+  dd[, c("z1", "z2", "z3", "z4")]
+), type = "response")
 ```
 3. Applying the method of standardization or g-formula
 compute now the point estimates
@@ -277,12 +284,14 @@ coefficient in the logistic model. Which one is closer to 1?
 `stdReg`
 (see [Sjölander 2016](https://doi.org/10.1007/s10654-016-0157-3))
 ```{r stdReg}
-mY.std <- stdGlm(fit=mY, data=dd, X="x")
+mY.std <- stdGlm(fit = mY, data = dd, X = "x")
 summary(mY.std)
-round(summary(mY.std, contrast = "difference", reference=0)$est.table, 4)
-round(summary(mY.std, contrast = "ratio", reference=0)$est.table, 4)
-round(summary(mY.std, transform="odds",
-           contrast = "ratio", reference=0)$est.table, 4)
+round(summary(mY.std, contrast = "difference", reference = 0)$est.table, 4)
+round(summary(mY.std, contrast = "ratio", reference = 0)$est.table, 4)
+round(summary(mY.std,
+  transform = "odds",
+  contrast = "ratio", reference = 0
+)$est.table, 4)
 ```
 Check that you got the same point estimates as in the previous item.
 Again, the confidence intervals are not very meaningful when
@@ -313,8 +322,8 @@ the distribution of $Z$ in the exposed subset of the target population.
 The risks and their contrasts are estimated from the fit
 of the outcome model:
 ```{r g-formula-att}
-EY1att.g <- mean(subset(dd, x==1)$yp1)
-EY0att.g <- mean(subset(dd, x==1)$yp0)
+EY1att.g <- mean(subset(dd, x == 1)$yp1)
+EY0att.g <- mean(subset(dd, x == 1)$yp0)
 round(Contr(EY1att.g, EY0att.g), 4)
 ```
 Compare the results here with those for the whole
@@ -327,8 +336,8 @@ among the exposed or among the whole population?
 based on the true model are similarly obtained from the quantities
 in item 3(b) above:
 ```{r true among exposed}
-EY1att <- mean(subset(dd, x==1)$EY1.ind)
-EY0att <- mean(subset(dd, x==1)$EY0.ind)
+EY1att <- mean(subset(dd, x == 1)$EY1.ind)
+EY0att <- mean(subset(dd, x == 1)$EY0.ind)
 round(Contr(EY1att, EY0att), 4)
 ```
 Compare the estimates in the previous item with the true values
@@ -351,9 +360,10 @@ p_i = E(X_i| Z_{1i} = z_{1i}, \dots, Z_{4i} = z_{4i})
       \gamma_3 z_{i3} + \gamma_4 z_{4i} ), \quad i=1, \dots N 
 $$
 ```{r exposure model}
-mX <- glm(x ~  z1 + z2 + z3 + z4,
-     family = binomial(link=logit), data = dd)
-round(ci.lin(mX, Exp=TRUE)[, c(1, 5)], 4)
+mX <- glm(x ~ z1 + z2 + z3 + z4,
+  family = binomial(link = logit), data = dd
+)
+round(ci.lin(mX, Exp = TRUE)[, c(1, 5)], 4)
 ```
 
 2. Extract the propensity scores, i.e. fitted
@@ -361,10 +371,10 @@ probabilities of belonging to exposure group 1:
 $$ PS_i = \widehat{p_i} $$,
 and compare their distribution between the two groups.
 ```{r propScore, fig=FALSE}
-dd$PS = predict(mX, type = "response")
+dd$PS <- predict(mX, type = "response")
 summary(dd$PS)
-with( subset(dd, x==0), plot(density(PS), lty=2) )
-with( subset(dd, x==1), lines(density(PS), lty=1) )
+with(subset(dd, x == 0), plot(density(PS), lty = 2))
+with(subset(dd, x == 1), lines(density(PS), lty = 1))
 ```
 How different are the distributions? Are they sufficiently overlapping?
 
@@ -374,7 +384,7 @@ Look at the sum as well as the distribution summary
 of the weights in the exposure groups. The sum of weights
 should be close to $n$ in both groups.
 ```{r weights}
-dd$w <- ifelse(dd$x==1, 1/dd$PS, 1/(1-dd$PS) )
+dd$w <- ifelse(dd$x == 1, 1 / dd$PS, 1 / (1 - dd$PS))
 with(dd, tapply(w, x, sum))
 ```
 
@@ -391,8 +401,8 @@ $$ \widehat{\text{RD}}_{w} = \widehat{E}_w(Y^{X = 1}) -
        \frac{ \sum_{i=1}^n (1-X_i) W_i Y_i }{\sum_{i=1}^n (1-X_i) W_i}
 $$
 ```{r ipw-estimate}
-EY1.w <- sum( dd$x * dd$w * dd$y ) / sum( dd$x *  dd$w)
-EY0.w <- sum( (1-dd$x) * dd$w * dd$y ) / sum( (1-dd$x) * dd$w)
+EY1.w <- sum(dd$x * dd$w * dd$y) / sum(dd$x * dd$w)
+EY0.w <- sum((1 - dd$x) * dd$w * dd$y) / sum((1 - dd$x) * dd$w)
 round(Contr(EY1.w, EY0.w), 4)
 ```
 These estimates seem to be somewhat downward biased when comparing
@@ -417,9 +427,9 @@ $$
 \end{aligned}
 $$
 ```{r aipw}
-EY1.a <- EY1.g + mean(dd$x *(dd$y - dd$yp1)*dd$w/sum(dd$x*dd$w) )
+EY1.a <- EY1.g + mean(dd$x * (dd$y - dd$yp1) * dd$w / sum(dd$x * dd$w))
 ##  or   EY1.w - mean( ( ( dd$x*dd$w /sum(dd$x*dd$w) ) - 1 )*dd$yp1 )
-EY0.a <- EY0.g + mean( (1 - dd$x)*(dd$y - dd$yp0)*dd$w/sum((1-dd$x)*dd$w) )
+EY0.a <- EY0.g + mean((1 - dd$x) * (dd$y - dd$yp0) * dd$w / sum((1 - dd$x) * dd$w))
 ##  or   EY0.w - mean( ( ( (1-dd$x)*dd$w/sum((1-dd$x)*dd$w) ) - 1 )*dd$yp0 )
 round(Contr(EY1.a, EY0.a), 4)
 ```
@@ -443,13 +453,15 @@ contains all pairwise product terms of the parents of $X$.
 According to the causal diagram, $Z_1$ is not in that subset, so it is left out.
 The exposure model is specified and the weights are obtained as follows.
 ```{r PSweight, fig=FALSE}
-mX2 <- glm(x ~ (z2 + z3 + z4)^2, family=binomial, data=dd)
-round(ci.lin(mX2, Exp=TRUE)[, c(1,5)], 3)
-psw <- SumStat(ps.formula=mX2$formula, data=dd,
-      weight=c("IPW", "treated", "overlap"))
-dd$PS2 <- psw$propensity[, 2]          # propensity scores extracted
-plot(density(dd$PS2[dd$x==0]), lty=2  )
-lines(density(dd$PS2[dd$x==1]), lty=1)
+mX2 <- glm(x ~ (z2 + z3 + z4)^2, family = binomial, data = dd)
+round(ci.lin(mX2, Exp = TRUE)[, c(1, 5)], 3)
+psw <- SumStat(
+  ps.formula = mX2$formula, data = dd,
+  weight = c("IPW", "treated", "overlap")
+)
+dd$PS2 <- psw$propensity[, 2] # propensity scores extracted
+plot(density(dd$PS2[dd$x == 0]), lty = 2)
+lines(density(dd$PS2[dd$x == 1]), lty = 1)
 ```
 Note that apart from ordinary IPW,
 other types of weights can also also obtained. These
@@ -462,7 +474,7 @@ treatment effect in the overlap (or equipoise) population'' (ATO).
 properties of the distribution and to check the
 balance of the propensity scores, for instance
 ```{r check balance, fig=FALSE}
-plot(psw, type="balance", metric="PSD")
+plot(psw, type = "balance", metric = "PSD")
 ```
 It is desirable that the horisontal values of these measures for given
 weights are less than 0.1.
@@ -471,12 +483,12 @@ weights are less than 0.1.
 For relative contrasts, the summary method provides the results
 on the log-scale.
 ```{r ipw-estimation}
-ipwest <- PSweight(ps.formula=mX2, yname="y", data = dd, weight= "IPW")
+ipwest <- PSweight(ps.formula = mX2, yname = "y", data = dd, weight = "IPW")
 ipwest
 summary(ipwest)
-( logRR.ipw <- summary(ipwest, type="RR") )
-round( exp(logRR.ipw$estimates[c(1,4,5)]), 3)
-round( exp(summary(ipwest, type="OR")$estimates[c(1,4,5)]), 3)
+(logRR.ipw <- summary(ipwest, type = "RR"))
+round(exp(logRR.ipw$estimates[c(1, 4, 5)]), 3)
+round(exp(summary(ipwest, type = "OR")$estimates[c(1, 4, 5)]), 3)
 ```
 Compare these with the previous IPW estimate and the
  AIPW estimate as well as the
@@ -496,11 +508,11 @@ then the weights are $W_i = 1$ for the exposed and
 $W_i = \text{PS}_i/(1-\text{PS}_i)$ for the unexposed.
 Call again `PSweight` but with another choice of weight:
 ```{r ps-estimation-att}
-psatt <- PSweight(ps.formula=mX2, yname="y", data = dd, weight= "treated")
+psatt <- PSweight(ps.formula = mX2, yname = "y", data = dd, weight = "treated")
 psatt
-round( summary(psatt)$estimates[1], 4)
-round( exp(summary(psatt,type="RR")$estimates[1]), 3)
-round( exp(summary(psatt, type="OR")$estimates[1]), 3)
+round(summary(psatt)$estimates[1], 4)
+round(exp(summary(psatt, type = "RR")$estimates[1]), 3)
+round(exp(summary(psatt, type = "OR")$estimates[1]), 3)
 ```
 Compare the results here with those
 obtained by g-formula in item 4(e) and with the
@@ -521,7 +533,7 @@ for more details
 above and define the so called clever covariates
 ```{r clever covariates}
 dd$H1 <- dd$x / dd$PS2
-dd$H0 <- (1-dd$x) / (1 - dd$PS2)
+dd$H0 <- (1 - dd$x) / (1 - dd$PS2)
 ```
 2. Then, a working model is fitted for the outcome,
 in which the clever covariates
@@ -531,8 +543,9 @@ $\widehat{\eta}_i = \text{logit}(\widehat Y_i)$
 from the original outcome model `mY`
 as an offset term. Moreover, the intercept is removed.
 ```{r model with clever covariates}
-epsmod <- glm( y ~ -1 + H0 + H1 + offset(qlogis(yh)),
-   family = binomial(link=logit), data=dd )
+epsmod <- glm(y ~ -1 + H0 + H1 + offset(qlogis(yh)),
+  family = binomial(link = logit), data = dd
+)
 eps <- coef(epsmod)
 eps
 ```
@@ -542,8 +555,8 @@ of counterfactual individual risks from the original outcome model  are
 now corrected by the estimated coefficients of the clever covariates,
 and the corrected predictions are returned to the original scale.
 ```{r tmle estimates}
-yp0.H <- plogis( qlogis(dd$yp0) +  eps[1] / (1 - dd$PS2) )
-yp1.H <- plogis( qlogis(dd$yp1) +  eps[2] / dd$PS2 )
+yp0.H <- plogis(qlogis(dd$yp0) + eps[1] / (1 - dd$PS2))
+yp1.H <- plogis(qlogis(dd$yp1) + eps[2] / dd$PS2)
 ```
 -
 
@@ -579,9 +592,11 @@ samp <- dd[sampind, ]
 2. The algorithms to be used in this exercise are chosen
 
 ```{r algorithms}
-SL.library <- c("SL.glm" , "SL.step", "SL.step.interaction",
-               "SL.glm.interaction","SL.gam",
-                "SL.randomForest", "SL.rpart")
+SL.library <- c(
+  "SL.glm", "SL.step", "SL.step.interaction",
+  "SL.glm.interaction", "SL.gam",
+  "SL.randomForest", "SL.rpart"
+)
 ```
 3. Function `tmle()` computes estimates of the causal contrasts of interest.
 Argument `A` is for the exposure variable, and
@@ -589,9 +604,11 @@ argument `W` contains the confounders.
 
 The run can take a while ...
 ```{r tmle SL, eval = FALSE}
-tmlest <- tmle(Y = samp$y, A = samp$x, W = samp[,c("z1", "z2", "z3", "z4")],
-               family = "binomial", Q.SL.library = SL.library,
-               g.SL.library = SL.library)
+tmlest <- tmle(
+  Y = samp$y, A = samp$x, W = samp[, c("z1", "z2", "z3", "z4")],
+  family = "binomial", Q.SL.library = SL.library,
+  g.SL.library = SL.library
+)
 summary(tmlest)
 ```
 Let us take a closer look at the results. In the beginning are reported

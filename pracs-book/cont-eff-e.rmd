@@ -1,5 +1,5 @@
 ```{r, include=FALSE}
-knitr::opts_chunk$set(results='hide',keep.source=TRUE,include=FALSE,eps=FALSE,prefix.string='./graph/cont-eff')
+knitr::opts_chunk$set(results = "hide", keep.source = TRUE, include = FALSE, eps = FALSE, prefix.string = "./graph/cont-eff")
 ```
 
 ```{r echo=FALSE}
@@ -31,12 +31,12 @@ but finally, a penalized spline model is fitted.
 
 Load the packages and the data set, and inspect its structure:
 ```{r data-input}
-library( Epi )
+library(Epi)
 library(mgcv)
-   data( testisDK )
-    str( testisDK )
-summary( testisDK )
-   head( testisDK )
+data(testisDK)
+str(testisDK)
+summary(testisDK)
+head(testisDK)
 ```
 - There are nearly 5000 observations from 90 one-year age groups
   and 54 calendar years. To get a clearer picture of what's going on,
@@ -45,11 +45,13 @@ summary( testisDK )
   - according to the time-honoured practice in epidemiology.
 ```{r housekeeping}
 tdk <- subset(testisDK, A > 14 & A < 80)
-tdk$Age <- cut(tdk$A, br = 5*(3:16), include.lowest=TRUE, right=FALSE)
-   nAge <- length(levels(tdk$Age))
-tdk$Per <- cut(tdk$P, br = seq(1943,1998,by=5), 
-               include.lowest=TRUE, right=FALSE)
-   nPer <- length(levels(tdk$Per))
+tdk$Age <- cut(tdk$A, br = 5 * (3:16), include.lowest = TRUE, right = FALSE)
+nAge <- length(levels(tdk$Age))
+tdk$Per <- cut(tdk$P,
+  br = seq(1943, 1998, by = 5),
+  include.lowest = TRUE, right = FALSE
+)
+nPer <- length(levels(tdk$Per))
 ``` 
 
 
@@ -61,13 +63,17 @@ Computation and tabulation of incidence rates
   incidence rates (per 100,000 y) in each 5 y $\times$ 5 y cell using
   `stat.table()`
 ```{r tabulation}
-tab <- stat.table(  index = list(Age, Per),
-                 contents = list(D = sum(D), 
-                                 Y = sum(Y/1000),
-                              rate = ratio(D, Y, 10^5) ),
-                  margins = TRUE, 
-                     data = tdk ) 
-print(tab, digits=c(sum=0, ratio=1))	
+tab <- stat.table(
+  index = list(Age, Per),
+  contents = list(
+    D = sum(D),
+    Y = sum(Y / 1000),
+    rate = ratio(D, Y, 10^5)
+  ),
+  margins = TRUE,
+  data = tdk
+)
+print(tab, digits = c(sum = 0, ratio = 1))
 ``` 
 Look at the incidence rates in the column margin and in the row
 margin.  In which age group is the marginal age-specific rate highest?
@@ -82,10 +88,12 @@ Do the period-specific marginal rates have any trend over time?
  
 ```{r plot-rates, fig=FALSE}
 str(tab)
-par(mfrow=c(1,1))
-rateplot( rates=tab[3, 1:nAge, 1:nPer], which="ap", ylim=c(1,30), 
-           age=seq(15, 75, 5), per=seq(1943, 1993, 5), 
-           col=heat.colors(16), ann=TRUE )
+par(mfrow = c(1, 1))
+rateplot(
+  rates = tab[3, 1:nAge, 1:nPer], which = "ap", ylim = c(1, 30),
+  age = seq(15, 75, 5), per = seq(1943, 1993, 5),
+  col = heat.colors(16), ann = TRUE
+)
 ```	
 
 Is there any common pattern in the age-incidence curves across the periods?
@@ -101,10 +109,11 @@ In fitting the model we utilize the `poisreg` family object
 found in package `Epi`. 
 
 ```{r mCat}
-tdk$Y <- tdk$Y/100000
-mCat <- glm( cbind(D,Y) ~ Age + Per, 
-             family=poisreg(link=log), data= tdk )
-round( ci.exp( mCat ), 2)
+tdk$Y <- tdk$Y / 100000
+mCat <- glm(cbind(D, Y) ~ Age + Per,
+  family = poisreg(link = log), data = tdk
+)
+round(ci.exp(mCat), 2)
 ``` 
 What do the estimated rate ratios tell about the age and period effects? 
 
@@ -115,19 +124,27 @@ What do the estimated rate ratios tell about the age and period effects?
 ```{r mCat-est, fig=FALSE}
 aMid <- seq(17.5, 77.5, by = 5)
 pMid <- seq(1945, 1995, by = 5)
-par(mfrow=c(1,2))
-plot( c(15,80), c(0.6, 6), type="n", log="y", 
-      cex.lab = 1.5, cex.axis = 1.5, 
-   xlab = "Age (years)", ylab = "Rate ratio") 
-lines( aMid,  c( 1, ci.exp(mCat)[2:13, 1] ), type = "o", pch = 16 )
-segments( aMid[-1],  ci.exp(mCat)[2:13, 2], 
-          aMid[-1], ci.exp(mCat)[2:13, 3] ) 
-plot( c(1943,1998), c(0.6, 6), type="n", log="y", 
-      cex.lab = 1.5, cex.axis = 1.5, 
-   xlab = "Calendar year - 1900", ylab = "Rate ratio") 
-lines( pMid,c( 1, ci.exp(mCat)[14:23, 1] ), type = 'o', pch = 16 )
-segments( pMid[-1],  ci.exp(mCat)[14:23, 2], 
-          pMid[-1],  ci.exp(mCat)[14:23, 3] ) 
+par(mfrow = c(1, 2))
+plot(c(15, 80), c(0.6, 6),
+  type = "n", log = "y",
+  cex.lab = 1.5, cex.axis = 1.5,
+  xlab = "Age (years)", ylab = "Rate ratio"
+)
+lines(aMid, c(1, ci.exp(mCat)[2:13, 1]), type = "o", pch = 16)
+segments(
+  aMid[-1], ci.exp(mCat)[2:13, 2],
+  aMid[-1], ci.exp(mCat)[2:13, 3]
+)
+plot(c(1943, 1998), c(0.6, 6),
+  type = "n", log = "y",
+  cex.lab = 1.5, cex.axis = 1.5,
+  xlab = "Calendar year - 1900", ylab = "Rate ratio"
+)
+lines(pMid, c(1, ci.exp(mCat)[14:23, 1]), type = "o", pch = 16)
+segments(
+  pMid[-1], ci.exp(mCat)[14:23, 2],
+  pMid[-1], ci.exp(mCat)[14:23, 3]
+)
 ``` 
 -  In the fitted model the reference category for each factor was
   the first one.  As age is the dominating factor, it may be more
@@ -137,22 +154,28 @@ segments( pMid[-1],  ci.exp(mCat)[14:23, 2],
   middle period 1968-72.
 ```{r mCat2-new-ref}
 tdk$Per70 <- Relevel(tdk$Per, ref = 6)
-mCat2 <- glm( cbind(D,Y) ~ -1 + Age +Per70, 
-              family=poisreg(link=log), data= tdk )
-round( ci.exp( mCat2 ), 2)
+mCat2 <- glm(cbind(D, Y) ~ -1 + Age + Per70,
+  family = poisreg(link = log), data = tdk
+)
+round(ci.exp(mCat2), 2)
 ``` 
 We shall plot just the point estimates from the latter model
 ```{r mCat2-plot, fig =FALSE}
-par(mfrow=c(1,2))
-plot( c(15,80), c(2, 20), type="n", log="y", cex.lab = 1.5, cex.axis = 1.5, 
-   xlab = "Age (years)", ylab = "Incidence rate (per 100000 y)") 
-lines( aMid,  c(ci.exp(mCat2)[1:13, 1] ), type = "o", pch = 16) 
-plot( c(1943,1998), c(0.4, 2), type="n", log="y", 
-      cex.lab = 1.5, cex.axis = 1.5, 
-   xlab = "Calendar year", ylab = "Rate ratio") 
-lines( pMid, c(ci.exp(mCat2)[14:18, 1], 1, ci.exp(mCat2)[19:23, 1]),  
-   type = "o", pch = 16 )
-abline(h=1, col="gray")
+par(mfrow = c(1, 2))
+plot(c(15, 80), c(2, 20),
+  type = "n", log = "y", cex.lab = 1.5, cex.axis = 1.5,
+  xlab = "Age (years)", ylab = "Incidence rate (per 100000 y)"
+)
+lines(aMid, c(ci.exp(mCat2)[1:13, 1]), type = "o", pch = 16)
+plot(c(1943, 1998), c(0.4, 2),
+  type = "n", log = "y",
+  cex.lab = 1.5, cex.axis = 1.5,
+  xlab = "Calendar year", ylab = "Rate ratio"
+)
+lines(pMid, c(ci.exp(mCat2)[14:18, 1], 1, ci.exp(mCat2)[19:23, 1]),
+  type = "o", pch = 16
+)
+abline(h = 1, col = "gray")
 ```
 
 
@@ -170,9 +193,10 @@ try fitting smooth continuous functions for both time scales.
   parameter is chosen based on an AIC-like criterion known as UBRE.
 ```{r mPen}
 library(mgcv)
-mPen <- mgcv::gam( cbind(D, Y) ~ s(A) + s(P),  
-           family = poisreg(link=log), data = tdk)
-summary(mPen)					
+mPen <- mgcv::gam(cbind(D, Y) ~ s(A) + s(P),
+  family = poisreg(link = log), data = tdk
+)
+summary(mPen)
 ``` 
 The summary is quite brief, and the only estimated coefficient is the
 intercept, which sets the baseline level for the log-rates, against
@@ -184,8 +208,8 @@ On the rate scale the baseline level 5.53 per 100000 y is obtained by
   describing the age and the period effects which are interpreted as
   contrasts to the baseline level on the log-rate scale.
 ```{r mPen-plot, fig=FALSE}
-par(mfrow=c(1,2))
-plot(mPen, seWithMean=TRUE)
+par(mfrow = c(1, 2))
+plot(mPen, seWithMean = TRUE)
 ``` 
 The dashed lines describe the 95% confidence band for the pertinent
 curve.  One could get the impression that year 1968 would be some kind
@@ -214,8 +238,8 @@ hand the period effect takes just about 3 df.
 -  It is a good idea to do some diagnostic checking of the fitted
   model
 ```{r mPen-check}
-par(mfrow=c(2,2))
-gam.check(mPen)					
+par(mfrow = c(2, 2))
+gam.check(mPen)
 ``` 
 The four diagnostic plots are analogous to some of those used in
 the context of linear models for Gaussian responses, but not all of them
@@ -224,19 +248,20 @@ given in the printed output about the value of `k`.
 
 - Let us refit the model but now with an increased `k` for age:
 ```{r mPen2}
-mPen2 <- mgcv::gam( cbind(D,Y) ~ s(A, k=20) + s(P),  
-           family = poisreg(link=log), data = tdk)
+mPen2 <- mgcv::gam(cbind(D, Y) ~ s(A, k = 20) + s(P),
+  family = poisreg(link = log), data = tdk
+)
 summary(mPen2)
-par(mfrow=c(2,2))
-gam.check(mPen2)					
+par(mfrow = c(2, 2))
+gam.check(mPen2)
 ``` 
 With this choice of `k` the df value for age became about 11,
 which is well below $k-1 = 19$. Let us plot the fitted curves from
 this fitting, too
 ```{r mPen2-plot, fig=FALSE}
-par( mfrow=c(1,2) )
-plot( mPen2, seWithMean=TRUE )
-abline( v=1968, h=0, lty=3 )
+par(mfrow = c(1, 2))
+plot(mPen2, seWithMean = TRUE)
+abline(v = 1968, h = 0, lty = 3)
 ``` 
 There does not seem to have happened any essential changes from the
 previously fitted curves, so maybe 8 df could, after all, be quite
@@ -255,17 +280,21 @@ enough for the age effect.
  relative indidence rates in relation to the fitted baseline rate, 
  as determined  by the model intercept.
 ```{r mPen2-newplot}
-par( mfrow=c(1,2) )
-icpt <- coef(mPen2)[1]  #  estimated intecept
-plot( mPen2, seWithMean=TRUE, select=1, rug=FALSE,       
-      yaxt="n", ylim= c(log(1),log(20)) - icpt, 
-      xlab="Age (y)", ylab="Mean rate (/100000 y)" )
-axis(2, at = log( c(1, 2, 5, 10, 20)) - icpt, labels=c(1, 2, 5, 10, 20) )
-plot( mPen2, seWithMean=TRUE, select=2, rug=FALSE, 
-      yaxt="n", ylim=c( log(0.4), log(2) ), 
-      xlab="Calendat year", ylab="Relative rate")
-axis(2, at=log( c(0.5, 0.75, 1, 1.5, 2)), labels = c(0.5, 0.75, 1, 1.5, 2))
-abline( v=1968, h=0, lty=3 )
+par(mfrow = c(1, 2))
+icpt <- coef(mPen2)[1] #  estimated intecept
+plot(mPen2,
+  seWithMean = TRUE, select = 1, rug = FALSE,
+  yaxt = "n", ylim = c(log(1), log(20)) - icpt,
+  xlab = "Age (y)", ylab = "Mean rate (/100000 y)"
+)
+axis(2, at = log(c(1, 2, 5, 10, 20)) - icpt, labels = c(1, 2, 5, 10, 20))
+plot(mPen2,
+  seWithMean = TRUE, select = 2, rug = FALSE,
+  yaxt = "n", ylim = c(log(0.4), log(2)),
+  xlab = "Calendat year", ylab = "Relative rate"
+)
+axis(2, at = log(c(0.5, 0.75, 1, 1.5, 2)), labels = c(0.5, 0.75, 1, 1.5, 2))
+abline(v = 1968, h = 0, lty = 3)
 ```
 
 **Homework** 

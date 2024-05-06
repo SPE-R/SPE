@@ -1,5 +1,5 @@
 ```{r, include=FALSE}
-knitr::opts_chunk$set(results='hide', prefix.string='./graph/logistic')
+knitr::opts_chunk$set(results = "hide", prefix.string = "./graph/logistic")
 ```
 
 # Logistic regression (GLM)
@@ -82,9 +82,9 @@ View the overall structure of the data frame, and list the first 20 rows of `mel
 
 ```{r Reading the data, echo=T}
 library(Epi)
-mel <- read.table("http://bendixcarstensen.com/SPE/data/melanoma.dat", header=TRUE, na.strings=".")
+mel <- read.table("http://bendixcarstensen.com/SPE/data/melanoma.dat", header = TRUE, na.strings = ".")
 str(mel)
-head(mel, n=20)
+head(mel, n = 20)
 ```
 
 ## House keeping
@@ -109,15 +109,15 @@ This is enough housekeeping for now - let's turn to something a bit more interes
 ## One variable at a time
 As a first step it is a good idea to start by looking at the numbers of cases and controls by each variable separately, ignoring age and sex. Try
 ```{r cases and controls by each variable separately}
-with(mel, table(cc,skin))
-stat.table(skin, contents=ratio(cc,1-cc), data=mel)
+with(mel, table(cc, skin))
+stat.table(skin, contents = ratio(cc, 1 - cc), data = mel)
 ```
 to see the numbers of cases and controls, as well as the 
 odds of being a case by skin colour
 
 Now use `effx()` to get crude estimates of the hazard ratios for the effect of skin colour. 
 ```{r Effect of skin}
-effx(cc, type="binary", exposure=skin, data=mel)
+effx(cc, type = "binary", exposure = skin, data = mel)
 ```
 
 
@@ -126,26 +126,25 @@ $\bullet$ Look at the crude effect estimates of `hair`, `eyes` and
 `freckles` in the same way.
 
 ```{r Effects of hair eyes and freckles, echo=F}
-with(mel, table(cc,hair))
-stat.table(hair, contents=ratio(cc,1-cc), data=mel)
-effx(cc,type="binary",exposure=hair,data=mel)
+with(mel, table(cc, hair))
+stat.table(hair, contents = ratio(cc, 1 - cc), data = mel)
+effx(cc, type = "binary", exposure = hair, data = mel)
 
-with(mel, table(cc,eyes))
-stat.table(eyes, contents=ratio(cc,1-cc), data=mel)
-effx(cc, type="binary", exposure=eyes, data=mel)
+with(mel, table(cc, eyes))
+stat.table(eyes, contents = ratio(cc, 1 - cc), data = mel)
+effx(cc, type = "binary", exposure = eyes, data = mel)
 
-with(mel, table(cc,freckles))
-stat.table(freckles, contents=ratio(cc,1-cc),data=mel)
-effx(cc, type="binary", exposure=freckles, data=mel)
+with(mel, table(cc, freckles))
+stat.table(freckles, contents = ratio(cc, 1 - cc), data = mel)
+effx(cc, type = "binary", exposure = freckles, data = mel)
 ```
 ## Generalized linear models with binomial family and logit link
 
 
 The function `effx()` is just a wrapper for the `glm()` function, and you can show this by fitting the glm directly with
 ```{r Fitting the glm}
-mf <- glm(cc ~ freckles, family="binomial", data=mel)
-round(ci.exp( mf ),2)
-
+mf <- glm(cc ~ freckles, family = "binomial", data = mel)
+round(ci.exp(mf), 2)
 ```
 Comparison with the output from `effx()` shows the results to be the same. 
 
@@ -159,11 +158,11 @@ failure/count & poisson
 ## Controlling for age and sex
 Because the probability that a control is selected into the study depends on age and sex it is necessary to control for age and sex. For example, the effect of freckles controlled for age and sex is obtained with
 ```{r controlling for age and sex}
-effx(cc, typ="binary", exposure=freckles, control=list(age.cat,sex),data=mel)
+effx(cc, typ = "binary", exposure = freckles, control = list(age.cat, sex), data = mel)
 ```
 or
 ```{r freckles controlling for age and sex using glm}
-mfas <- glm(cc ~ freckles + age.cat + sex, family="binomial", data=mel)
+mfas <- glm(cc ~ freckles + age.cat + sex, family = "binomial", data = mel)
 round(ci.exp(mfas), 2)
 ```
 Do the adjusted estimates differ from the crude ones
@@ -173,8 +172,8 @@ Do the adjusted estimates differ from the crude ones
 
 There are 2 effects estimated for the 3 levels of `freckles`, and `glm()` provides a test for each effect separately, but to test for no effect at all of `freckles` you need a likelihood ratio test. This involves fitting two models, one without `freckles` and one with, and recording the change in deviance. Because there are some missing values for freckles it is necessary to restrict the first model to those subjects who have values for freckles.
 ```{r Likelihood ratio test for the effects of freckles }
-mas <- glm(cc ~ age.cat + sex, family="binomial", data=subset(mel, !is.na(freckles)) )
-anova(mas, mfas, test="Chisq")
+mas <- glm(cc ~ age.cat + sex, family = "binomial", data = subset(mel, !is.na(freckles)))
+anova(mas, mfas, test = "Chisq")
 ```
 The change in residual deviance is $1785.9-1737.1=48.8$ on $1389-1387=2$ degrees of freedom.
 The $P$-value corresponding to this change is obtained from the upper tail of the
@@ -187,13 +186,17 @@ cumulative distribution of the $\chi^2$-distribution with 2 df:
 $\bullet$
 There are 3 effects for the 4 levels of hair colour (`hair`). 
 To obtain adjusted estimates for the effect of hair colour and to test the pertinent null hypothesis fit the relevant models, print the and use `anova` to test for no effects of hair colour.
-```{r hair colour controlling for age and sex, echo = F}
-mas2 <- glm(cc ~ age.cat + sex, family="binomial", 
-               data=subset(mel, !is.na(hair)) )
-mhas <- glm(cc ~ hair + age.cat + sex, family="binomial", 
-               data=subset(mel, !is.na(hair)) )
+```{r hair colour controlling for age and sex, echo = FALSE}
+mas2 <- glm(cc ~ age.cat + sex,
+  family = "binomial",
+  data = subset(mel, !is.na(hair))
+)
+mhas <- glm(cc ~ hair + age.cat + sex,
+  family = "binomial",
+  data = subset(mel, !is.na(hair))
+)
 round(ci.exp(mhas), 2)
-anova(mas2, mhas, test="Chisq")
+anova(mas2, mhas, test = "Chisq")
 ```
 Compare the estimates with the crude ones and assess the evidence against the null hypothesis. 
 
@@ -205,44 +208,52 @@ From the above you can see that subjects at each of the 3 levels light-brown, bl
 $\bullet$ Use `effx()` to compute the odds-ratio of melanoma
   between persons with red, blonde or light brown hair versus those with dark  hair.
 ```{r Effect of hair2, echo=F}
-effx(cc, type="binary", exposure=hair2, control=list(age.cat,sex), data=mel)
+effx(cc, type = "binary", exposure = hair2, control = list(age.cat, sex), data = mel)
 ```
 Reproduce these results by fitting an appropriate glm.
 ```{r Effect of hair2 using glm, echo=F}
-mh2 <- glm(cc ~ hair2 + age.cat + sex, family="binomial", 
-             data = subset(mel, !is.na(hair2)) )
-ci.exp(mh2 )
+mh2 <- glm(cc ~ hair2 + age.cat + sex,
+  family = "binomial",
+  data = subset(mel, !is.na(hair2))
+)
+ci.exp(mh2)
 ```
 Use also a likelihood ratio test to test for the effect of `hair2`.
 ```{r LR test, echo=FALSE}
-m1 <- glm(cc ~ age.cat + sex, data = subset(mel, !is.na(hair2)) )
-anova(m1, mh2,test="Chisq")
+m1 <- glm(cc ~ age.cat + sex, data = subset(mel, !is.na(hair2)))
+anova(m1, mh2, test = "Chisq")
 ```
 
 ## Controlling for other variables
 
 When you control the effect of an exposure for some variable you are asking a question about what would the effect be if the variable is kept constant. For example, consider the effect of `freckles` controlled for `hair2`. We first stratify by `hair2` with
 ```{r Effect of freckles controlled for age.cat and sex and stratified by hair2 }
-effx(cc, type="binary", exposure=freckles, 
-                  control=list(age.cat,sex), strata=hair2, data=mel)
+effx(cc,
+  type = "binary", exposure = freckles,
+  control = list(age.cat, sex), strata = hair2, data = mel
+)
 ```
 The effect of freckles is still apparent in each of the two strata for hair colour. Use `effx()` to control for `hair2`, too, in addition to `age.cat` and `sex`.
 ```{r Effect of freckles controlled for age.cat sex and hair2 }
-effx(cc, type="binary", exposure=freckles, 
-                  control=list(age.cat,sex,hair2), data=mel)
+effx(cc,
+  type = "binary", exposure = freckles,
+  control = list(age.cat, sex, hair2), data = mel
+)
 ```
 It is tempting to control for variables without thinking about the question you are thereby asking. This can lead to nonsense.
 
 \subsection{Stratification using `glm()` }
 We shall reproduce the output from 
 ```{r Effect of freckles controlled for age.cat and sex and stratified by hair2 bis}
-effx(cc, type="binary", exposure=freckles, 
-           control=list(age.cat,sex), strata=hair2,data=mel)
+effx(cc,
+  type = "binary", exposure = freckles,
+  control = list(age.cat, sex), strata = hair2, data = mel
+)
 ```
 using `glm()`. To do this requires a nested model formula:
 ```{r Nested effects using glm}
-mfas.h <- glm(cc ~ hair2/freckles + age.cat + sex, family="binomial", data=mel)
-ci.exp(mfas.h )
+mfas.h <- glm(cc ~ hair2 / freckles + age.cat + sex, family = "binomial", data = mel)
+ci.exp(mfas.h)
 ```
 In amongst all the other effects you can see the two effects of freckles for dark hair (1.61 and 2.84) and the two effects of freckles for other hair (1.42 and 3.15). 
 
@@ -265,7 +276,7 @@ $\bullet$
 Look at the joint frequency distribution of these new variables
 using `with(mel, table( ))`. Are they strongly associated?
 ```{r Joint frequency of nvsma4 and nvlar3,echo=F}
-stat.table(list(nvsma4,nvlar3),contents=percent(nvlar3),data=mel)
+stat.table(list(nvsma4, nvlar3), contents = percent(nvlar3), data = mel)
 #   High frequencies on the diagonal shows a strong association
 ```
 
@@ -275,8 +286,8 @@ Compute the sex- and age-adjusted OR estimates (with 95% CIs) associated with
 the number of small naevi first by using `effx()`, and 
 then by fitting separate glms including `sex`, `age.cat` and `nvsma4` in the model formula.
 ```{r Effects of naevi on melanoma, echo=F}
-effx(cc,type="binary",exposure=nvsma4,control=list(age.cat,sex),data=mel)
-mns <- glm(cc ~ nvsma4 + age.cat + sex, family="binomial",data=mel)
+effx(cc, type = "binary", exposure = nvsma4, control = list(age.cat, sex), data = mel)
+mns <- glm(cc ~ nvsma4 + age.cat + sex, family = "binomial", data = mel)
 round(ci.exp(mns), 2)
 ```
 
@@ -284,8 +295,8 @@ round(ci.exp(mns), 2)
 $\bullet$
 Do the same with large naevi `nvlar3`.
 ```{r echo=F}
-effx(cc, type="binary", exposure=nvlar3, control=list(age.cat,sex), data=mel)
-mnl <- glm(cc ~ nvlar3 + age.cat + sex, family="binomial", data=mel)
+effx(cc, type = "binary", exposure = nvlar3, control = list(age.cat, sex), data = mel)
+mnl <- glm(cc ~ nvlar3 + age.cat + sex, family = "binomial", data = mel)
 round(ci.exp(mnl), 2)
 ```
 
@@ -295,8 +306,8 @@ Now fit a glm containing
 `age.cat, sex, nvsma4` and `nvlar3`. 
 What is the interpretation of the coefficients for `nvsma4` and `nvlar3`?
 ```{r echo=F}
-mnls <- glm(cc ~ nvsma4 + nvlar3 + age.cat + sex, family="binomial", data=mel)
-# Coeffs for nvsma4 are the effects of nvsma4 controlled for age.cat, sex, and nvlar3. 
+mnls <- glm(cc ~ nvsma4 + nvlar3 + age.cat + sex, family = "binomial", data = mel)
+# Coeffs for nvsma4 are the effects of nvsma4 controlled for age.cat, sex, and nvlar3.
 # Similarly for the coefficients for nvlar3.
 ```
 
@@ -305,23 +316,23 @@ mnls <- glm(cc ~ nvsma4 + nvlar3 + age.cat + sex, family="binomial", data=mel)
  The evidence for the effect of `freckles` is already convincing. However,
  to demonstrate how it is done, we shall perform a linear trend test by treating freckles as a numeric exposure. 
 ```{r Linear effect of freckles}
-mel$fscore<-as.numeric(mel$freckles)
-effx(cc, type="binary", exposure=fscore, control=list(age.cat,sex), data=mel)
+mel$fscore <- as.numeric(mel$freckles)
+effx(cc, type = "binary", exposure = fscore, control = list(age.cat, sex), data = mel)
 ```
 
 You can check for linearity of the log odds of being a case with `fscore` by comparing the model containing `freckles` as a factor with the model containing `freckles` as numeric.
 ```{r  }
-m1 <- glm(cc ~ freckles + age.cat + sex, family="binomial", data=mel)
-m2 <- glm(cc ~ fscore + age.cat + sex, family="binomial", data=mel)
-anova(m2, m1, test="Chisq")
+m1 <- glm(cc ~ freckles + age.cat + sex, family = "binomial", data = mel)
+m2 <- glm(cc ~ fscore + age.cat + sex, family = "binomial", data = mel)
+anova(m2, m1, test = "Chisq")
 ```
 There is no evidence against linearity ($p=0.22$).
 
 It is sometimes helpful to look at the linearity in more detail with
 ```{r Using cumulative contrasts to study linearity }
-m1 <- glm(cc ~ C(freckles, contr.cum) + age.cat + sex, family="binomial",data=mel)
-round(ci.exp(m1 ), 2)
-m2 <- glm(cc ~ fscore + age.cat + sex, family="binomial",data=mel)
+m1 <- glm(cc ~ C(freckles, contr.cum) + age.cat + sex, family = "binomial", data = mel)
+round(ci.exp(m1), 2)
+m2 <- glm(cc ~ fscore + age.cat + sex, family = "binomial", data = mel)
 round(ci.exp(m2), 2)
 ```
 The use of `C(freckles, contr.cum)` makes each odds ratio to compare the odds at that
@@ -341,8 +352,8 @@ If the log-odds are linear then these odds ratios should be the same
  of this matrix:
 
 ```{r Plots}
-m <- glm(cc ~ nvsma4 + nvlar3 + age.cat + sex, family="binomial",data=mel)
-plotEst( exp( ci.lin(m)[ 2:5, -(2:4)] ), xlog=T, vref=1 )
+m <- glm(cc ~ nvsma4 + nvlar3 + age.cat + sex, family = "binomial", data = mel)
+plotEst(exp(ci.lin(m)[2:5, -(2:4)]), xlog = TRUE, vref = 1)
 ```
 The `xlog` argument makes the OR axis logarithmic.
 

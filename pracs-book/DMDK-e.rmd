@@ -1,5 +1,13 @@
 ```{r, include=FALSE}
-knitr::opts_chunk$set(keep.source=TRUE,eps=FALSE,include=TRUE,eval=TRUE, results = 'hide', fig.show = 'hide' ,prefix.string='./graph/DMDK')
+knitr::opts_chunk$set(
+  keep.source = TRUE,
+  eps = FALSE,
+  include = TRUE,
+  eval = TRUE,
+  results = "hide",
+  fig.show = "hide",
+  prefix.string = "./graph/DMDK"
+)
 ```
 
 
@@ -17,8 +25,8 @@ library(popEpi)
 library(mgcv)
 library(tidyverse)
 # sessionInfo()
-data( DMlate)
-str( DMlate)
+data(DMlate)
+str(DMlate)
 ```
 You can get a more detailed explanation of the data by referring to
 the help page:
@@ -30,13 +38,13 @@ the help page:
   event. Make sure that you know what each of the arguments to
   `Lexis` mean:
 ```{r }
-LL <- Lexis(entry = list(A = dodm-dobth,
-                         P = dodm,
-                       dur = 0),
-             exit = list(P = dox),
-      exit.status = factor(!is.na(dodth),
-                           labels = c("Alive","Dead")),
-             data = DMlate)
+LL <- Lexis(
+  entry = list(A = dodm - dobth, P = dodm, dur = 0),
+  exit = list(P = dox),
+  exit.status = 
+    factor(!is.na(dodth), labels = c("Alive", "Dead")),
+  data = DMlate
+)
 ```
 Take a look at the first few lines of the resulting dataset, for
 example using `head()`.
@@ -45,11 +53,14 @@ example using `head()`.
   crude mortality rate by sex. Try:
 ```{r }
 stat.table(sex,
-           list(D = sum(lex.Xst == "Dead"),
-                Y = sum(lex.dur),
-             rate = ratio(lex.Xst == "Dead", lex.dur, 1000)),
-           margins = TRUE,
-           data = LL)
+  list(
+    D = sum(lex.Xst == "Dead"),
+    Y = sum(lex.dur),
+    rate = ratio(lex.Xst == "Dead", lex.dur, 1000)
+  ),
+  margins = TRUE,
+  data = LL
+)
 ```
 -  If we want to assess how mortality depends on age, calendar time
   and duration or how it relates to population mortality, we should
@@ -62,7 +73,8 @@ stat.table(sex,
   age-axis in sutiable intervals (here set to 1/2 year, but really
   immaterial as long as it is small):
 ```{r }
-SL <- splitLexis(LL, breaks = seq(0,125,1/2), time.scale = "A")
+SL <- 
+  splitLexis(LL, breaks = seq(0, 125, 1 / 2), time.scale = "A")
 summary(SL)
 ```
   How many records are now in the dataset? How many person-years?
@@ -74,9 +86,11 @@ summary(SL)
   women separately, using splines as implemented in `gam`.
   We use `k = 20` to be sure to catch any irregularities by age.
 ```{r }
-r.m <- mgcv::gam(cbind(lex.Xst == "Dead", lex.dur) ~ s(A, k = 20),
-            family = poisreg,
-            data = subset(SL, sex == "M"))
+r.m <- mgcv::gam(
+  cbind(lex.Xst == "Dead", lex.dur) ~ s(A, k = 20),
+  family = poisreg,
+  data = subset(SL, sex == "M")
+)
 gam.check(r.m)
 ```
 Make sure you understand all the components on this modeling statement.
@@ -97,7 +111,7 @@ gam.check(r.f)
   the rates in the (inverse) units in which the person-years were
   given; that is the units of `lex.dur`.
 ```{r }
-nd <-  data.frame(A = seq(20,90,0.5))
+nd <- data.frame(A = seq(20, 90, 0.5))
 p.m <- ci.pred(r.m, newdata = nd)
 p.f <- ci.pred(r.f, newdata = nd)
 str(p.m)
@@ -106,9 +120,17 @@ str(p.m)
   example `matplot` or `matshade`.
 ```{r }
 p.f <- ci.pred(r.f, newdata = nd)
-matplot(nd$A, cbind(p.m,p.f) * 1000,
-        type = "l", col = rep(c("blue","red"),each = 3), lwd = c(3,1,1), lty = 1,
-        log = "y", xlab = "Age", ylab = "Mortality of DM ptt per 1000 PY")
+matplot(
+  nd$A,
+  cbind(p.m, p.f) * 1000,
+  type = "l",
+  col = rep(c("blue", "red"), each = 3),
+  lwd = c(3, 1, 1),
+  lty = 1,
+  log = "y",
+  xlab = "Age",
+  ylab = "Mortality of DM ptt per 1000 PY"
+)
 ```
 
 ## Further time scales: period and duration
@@ -119,30 +141,36 @@ matplot(nd$A, cbind(p.m,p.f) * 1000,
   cubic splines indstead of thin plate (`"tp"`) splines which is
   the default. Check if you have a reasonable fit using `gam.check`.
 ```{r }
-Mtp <- mgcv::gam((lex.Xst == "Dead") ~ s(  A, bs = "cr", k = 10) +
-                                 s(  P, bs = "cr", k = 10) +
-                                 s(dur, bs = "cr", k = 10),
-            offset = log(lex.dur),
-            family = poisson,
-            data = subset(SL, sex == "M"))
+Mtp <- mgcv::gam(
+  (lex.Xst == "Dead") ~ s(A, bs = "cr", k = 10) +
+    s(P, bs = "cr", k = 10) +
+    s(dur, bs = "cr", k = 10),
+  offset = log(lex.dur),
+  family = poisson,
+  data = subset(SL, sex == "M")
+)
 ```
 An easier specification of the model exploits the `Lexis` class
 of the dataset, try:
 ```{r }
-Mcr <- gam.Lexis(subset(SL, sex == "M"),
-                 ~ s(  A, bs = "cr", k = 10) +
-                   s(  P, bs = "cr", k = 10) +
-                   s(dur, bs = "cr", k = 10))
+Mcr <- gam.Lexis(
+  subset(SL, sex == "M"),
+  ~ s(A, bs = "cr", k = 10) +
+    s(P, bs = "cr", k = 10) +
+    s(dur, bs = "cr", k = 10)
+)
 summary(Mcr)
 gam.check(Mcr)
 ```
 Fit the same model for women as well. Are the models reasonably fitting?
 
 ```{r }
-Fcr <- gam.Lexis(subset(SL, sex == "F"),
-                 ~ s(  A, bs = "cr", k = 10) +
-                   s(  P, bs = "cr", k = 10) +
-                   s(dur, bs = "cr", k = 10))
+Fcr <- gam.Lexis(
+  subset(SL, sex == "F"),
+  ~ s(A, bs = "cr", k = 10) +
+    s(P, bs = "cr", k = 10) +
+    s(dur, bs = "cr", k = 10)
+)
 summary(Fcr)
 gam.check(Fcr)
 ```
@@ -152,9 +180,9 @@ gam.check(Fcr)
   estimated, so it is useful set up a multi-panel display, and for
   the sake of comparability to set ylim to the same for men and women:
 ```{r }
-par(mfrow = c(2,3))
-plot(Mcr, ylim = c(-3,3))
-plot(Fcr, ylim = c(-3,3))
+par(mfrow = c(2, 3))
+plot(Mcr, ylim = c(-3, 3))
+plot(Fcr, ylim = c(-3, 3))
 ```
 What is the absolute scale for these effects?
 -  Compare the fit of the naive model with just age and the
@@ -177,10 +205,8 @@ What do you conclude?
   the `newdata = ` argument. So a person diagnosed in age 50 in
   1995 will have a mortality measured in cases per 1000 PY as:
 ```{r }
-pts <- seq(0, 12, 1/4)
-nd <- data.frame(A =   50 + pts,
-                 P = 1995 + pts,
-               dur =        pts)
+pts <- seq(0, 12, 1 / 4)
+nd <- data.frame(A = 50 + pts, P = 1995 + pts, dur = pts)
 m.pr <- ci.pred(Mcr, newdata = nd)
 ```
   Note that because we used `gam.Lexis` which uses
@@ -197,15 +223,19 @@ cbind(nd, ci.pred(Mcr, newdata = nd))
 -  From figure it seems that the duration effect is
 over-modeled, so refit constraining the d.f. to 5:
 ```{r rates5,fig = TRUE, width = 10, eval = TRUE}
-Mcr <- gam.Lexis(subset(SL, sex == "M"),
-                 ~ s(  A, bs = "cr", k = 10) +
-                   s(  P, bs = "cr", k = 10) +
-                   s(dur, bs = "cr", k = 5))
+Mcr <- gam.Lexis(
+  subset(SL, sex == "M"),
+  ~ s(A, bs = "cr", k = 10) +
+    s(P, bs = "cr", k = 10) +
+    s(dur, bs = "cr", k = 5)
+)
 summary(Mcr)
-Fcr <- gam.Lexis(subset(SL, sex == "F"),
-                 ~ s(  A, bs = "cr", k = 10) +
-                   s(  P, bs = "cr", k = 10) +
-                   s(dur, bs = "cr", k = 5))
+Fcr <- gam.Lexis(
+  subset(SL, sex == "F"),
+  ~ s(A, bs = "cr", k = 10) +
+    s(P, bs = "cr", k = 10) +
+    s(dur, bs = "cr", k = 5)
+)
 ```
 How does `gam.check()` look for these models?
 Plot the estimated rates from the revised models.
@@ -249,16 +279,18 @@ SL$Am <- floor(SL$A + 0.25)
 SL$Pm <- floor(SL$P + 0.25)
 data(M.dk)
 str(M.dk)
-M.dk <- transform(M.dk, Am = A,
-                        Pm = P,
-                       sex = factor(sex, labels = c("M","F")))
+M.dk <- transform(M.dk,
+  Am = A,
+  Pm = P,
+  sex = factor(sex, labels = c("M", "F"))
+)
 str(M.dk)
 ```
 Then match the rates from `M.dk` into `SL`;
 `sex`, `Am` and `Pm` are the common variables,
 and therefore the match is on these variables:
 ```{r eval = TRUE}
-SLr <- merge(SL, M.dk[,c("sex", "Am", "Pm", "rate")])
+SLr <- merge(SL, M.dk[, c("sex", "Am", "Pm", "rate")])
 dim(SL)
 dim(SLr)
 ```
@@ -281,8 +313,9 @@ SLr$E <- SLr$P * SLr$rate
   those records from the analysis.
 ```{r }
 msmr <- glm((lex.Xst == "Dead") ~ sex - 1 + offset(log(E)),
-             family = poisson,
-             data = subset(SLr, E>0))
+  family = poisson,
+  data = subset(SLr, E > 0)
+)
 ci.exp(msmr)
 ```
   Recogninze the numbers?
@@ -290,16 +323,19 @@ ci.exp(msmr)
 `poisreg` family, try:
 ```{r }
 msmr <- glm(cbind(lex.Xst == "Dead", E) ~ sex - 1,
-            family = poisreg,
-              data = subset(SLr, E > 0))
+  family = poisreg,
+  data = subset(SLr, E > 0)
+)
 ci.exp(msmr)
 ```
   We can assess the ratios of SMRs between men and women by using the
   `ctr.mat` argument which should be a matrix:
 ```{r }
-(CM <- rbind(M = c(1,0),
-             W = c(0,1),
-         'M/F' = c(1,-1)))
+(CM <- rbind(
+  M = c(1, 0),
+  W = c(0, 1),
+  "M/F" = c(1, -1)
+))
 round(ci.exp(msmr, ctr.mat = CM), 2)
 ```
 What do you conclude?

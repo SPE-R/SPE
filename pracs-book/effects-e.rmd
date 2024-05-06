@@ -1,5 +1,5 @@
 ```{r, include=FALSE}
-knitr::opts_chunk$set(results='hide', prefix.string='./graph/effects')
+knitr::opts_chunk$set(results = "hide", prefix.string = "./graph/effects")
 ```
 
 # Estimation of effects: simple and more complex
@@ -93,16 +93,17 @@ We perform similar housekeeping tasks as in the previous exercise.
 ```{r }
 births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
 births$sex <- factor(births$sex, labels = c("M", "F"))
-births$maged <- cut(births$matage, breaks=c(22,35,44), right=FALSE)
-births$gest4 <- cut(births$gestwks, 
-    breaks = c(20, 35, 37, 39, 45), right = FALSE)
+births$maged <- cut(births$matage, breaks = c(22, 35, 44), right = FALSE)
+births$gest4 <- cut(births$gestwks,
+  breaks = c(20, 35, 37, 39, 45), right = FALSE
+)
 ```
 - Have a look at univariate summaries of the different 
 variables in the data; especially
 the location and dispersion of the distribution of  `bweight`.
 ```{r summary}
 summary(births)
-with(births, sd(bweight) )
+with(births, sd(bweight))
 ```
 
 
@@ -116,7 +117,7 @@ means for a metric response.
 - Comparison of two groups is commonly done by the conventional $t$-test and
 the associated confidence interval. 
 ```{r t test for sex on bweight}
-with( births, t.test(bweight ~ sex, var.equal=TRUE) )
+with(births, t.test(bweight ~ sex, var.equal = TRUE))
 ```
 The $P$-value refers to the test
 of the  null hypothesis that there is no effect of `sex` on birth weight
@@ -130,14 +131,14 @@ It is in fact a wrapper of function `glm()` that fits generalized linear models.
 
 - Now, let's do the same analysis with `effx()`
 ```{r Effects of sex on bweight}
-effx(response=bweight, type="metric", exposure=sex, data=births)
+effx(response = bweight, type = "metric", exposure = sex, data = births)
 ```
 The estimated effect of sex on birth weight, measured as a difference 
 in means between girls and boys, 
 is $-197$ g.
 Either the output from `t.test()` above or the command
 ```{r Table of mean birth weight by sex}
-stat.table(sex, mean(bweight), data=births)
+stat.table(sex, mean(bweight), data = births)
 ```
 confirms this ($3032.8-3229.9=-197.1$). 
 - 
@@ -150,20 +151,20 @@ explanatory variable is the binary factor `sex`. With `glm()` one specifies the
 `lm()`, this argument is not needed, because `lm()` fits only models for metric responses
 assuming Gaussian distribution.
 ```{r lm of bweight by sex}
-m1 <- glm(bweight ~ sex, family=gaussian, data=births)
+m1 <- glm(bweight ~ sex, family = gaussian, data = births)
 summary(m1)
 ```
  Note the amount of output that `summary()` method produces.
 The point estimate plus confidence limits can, though, be concisely obtained by function 
 `ci.lin()` found in `Epi` package.  
 ```{r ci.lin of bweight by sex}
-round( ci.lin(m1)[ , c(1,5,6)] , 1)
+round(ci.lin(m1)[, c(1, 5, 6)], 1)
 ```
 - 
 Now, use `effx()` to find the effect of `hyp` (maternal hypertension)
  on `bweight`.
 ```{r Effects of hyp on bweight, echo=FALSE}
-effx(response=bweight, type="metric", exposure=hyp, data=births)
+effx(response = bweight, type = "metric", exposure = hyp, data = births)
 ```
 
 
@@ -174,28 +175,28 @@ The variable `gest4` became as the result of cutting `gestwks`
 
 - We shall find the effects of `gest4` on the metric response `bweight`.
 ```{r Effects of gest4 (four levels) on bweight }
-effx(response=bweight,typ="metric",exposure=gest4,data=births)
+effx(response = bweight, typ = "metric", exposure = gest4, data = births)
 ```
 There are now 3 effect estimates:
-```{r, eval = FALSE}
+```
 [35,37) vs [20,35)  857
 [37,39) vs [20,35) 1360
 [39,45) vs [20,35) 1668
 ```
 The command
 ```{r Table of mean bweight by gest4 }
-stat.table(gest4,mean(bweight),data=births)
+stat.table(gest4, mean(bweight), data = births)
 ```
 confirms that the effect of `gest4` (level~2 vs level~1) is $2590-1733=857$, etc.
 
 - Compute these estimates by `lm()` and find out how the coefficients are related to the group means
 ```{r lm of gest4 on bweight}
 m2 <- lm(bweight ~ gest4, data = births)
-round( ci.lin(m2)[ , c(1,5,6)] , 1)
+round(ci.lin(m2)[, c(1, 5, 6)], 1)
 ```
 
 
-## Stratified effects, and interaction or effect-measure modification %% 1.8.5
+## Stratified effects, and interaction or effect-measure modification
 
 We shall now examine whether and to what extent the 
 *effect*  of `hyp`  on `bweight`, i.e. the 
@@ -206,8 +207,8 @@ We shall now examine whether and to what extent the
 - The following *interaction plot*
 shows how the mean `bweight` depends jointly on `hyp` and `gest4`
 ```{r bweight-by-hyp-gest4, fig = FALSE}
-par(mfrow=c(1,1))
-with( births, interaction.plot(gest4, hyp, bweight) )
+par(mfrow = c(1, 1))
+with(births, interaction.plot(gest4, hyp, bweight))
 ```
 It appears that the mean difference in `bweight` between 
 hypertensive and normotensive 
@@ -216,7 +217,7 @@ mothers is related to gestational age.
 - Let us get numerical values for the mean differences
 in the different `gest4` categories:
 ```{r Effect of hyp on bweight stratified by gest4 }
-effx(bweight, type="metric", exposure=hyp, strata=gest4,data=births)
+effx(bweight, type = "metric", exposure = hyp, strata = gest4, data = births)
 ```
 The estimated effects of `hyp` in the different strata defined by `gest4` thus
 range from about $-100$ g among those with $\geq 39$ weeks of gestation to about $-700$ g among those
@@ -230,15 +231,15 @@ On the other hand, this test may well be not very sensitive given
 - Stratified estimation of effects can also be done by `lm()`,
  and you should get the same results:
 ```{r lm for hyp on bweight stratified by gest4 }
-m3 <- lm(bweight ~ gest4/hyp, data = births)
-round( ci.lin(m3)[ , c(1,5,6)], 1) 
+m3 <- lm(bweight ~ gest4 / hyp, data = births)
+round(ci.lin(m3)[, c(1, 5, 6)], 1)
 ```
 - An equivalent model with an explicit *product term* or
 *interaction term* between `gest4` and `hyp` is
 fitted as follows
 ```{r lmIa for hyp on bweight stratified by gest4 }
 m3I <- lm(bweight ~ gest4 + hyp + gest4:hyp, data = births)
-round( ci.lin(m3I)[ , c(1,5,6)], 1) 
+round(ci.lin(m3I)[, c(1, 5, 6)], 1)
 ```
 From this  output you would find a familiar estimate $-673$ g for those $< 35$ gestational weeks. 
 The remaining coefficients are estimates of the interaction effects such that e.g. $515 = -158 - (-673)$ g 
@@ -251,9 +252,9 @@ Changing the reference level, here to be the 4th category,
 after which an equivalent interaction model is fitted, now using a shorter
 expression for it in the model formula:
 ```{r lmIb for hyp on bweight stratified by gest4b }
-births$gest4b <- Relevel( births$gest4, ref = 4)
-m3Ib <- lm(bweight ~ gest4b*hyp, data = births)
-round( ci.lin(m3Ib)[ , c(1,5,6)], 1) 
+births$gest4b <- Relevel(births$gest4, ref = 4)
+m3Ib <- lm(bweight ~ gest4b * hyp, data = births)
+round(ci.lin(m3Ib)[, c(1, 5, 6)], 1)
 ```
 Notice now the coefficient $-91.6$ for `hyp`. 
 It estimates the contrast `"hyper"` vs. `"normal"` on
@@ -268,7 +269,7 @@ interaction models to those from the corresponding
 is assumed not to be modified by `gest4`:
 ```{r lmIc for hyp on bweight stratified by gest4 }
 m3M <- lm(bweight ~ gest4 + hyp, data = births)
-round( ci.lin(m3M)[ , c(1,5,6)], 1) 
+round(ci.lin(m3M)[, c(1, 5, 6)], 1)
 ```
 The estimate $-201$ g describing the overall  contrast
 between hypertensive and normotensive mothers is obtained
@@ -293,11 +294,11 @@ should not be ignored in this case.
  and then (ii) perform the stratified analysis using the two ways of fitting an interaction model 
 with `lm`.
 ```{r Effects of hyp on lowbw stratified by sex, echo=F}
-effx(bweight, type="metric", exposure=hyp, strata= sex, data=births)
-m4S <- lm(bweight ~ sex/hyp, data = births)
-round( ci.lin(m4S)[ , c(1,5,6)], 1) 
+effx(bweight, type = "metric", exposure = hyp, strata = sex, data = births)
+m4S <- lm(bweight ~ sex / hyp, data = births)
+round(ci.lin(m4S)[, c(1, 5, 6)], 1)
 m4I <- lm(bweight ~ sex + hyp + sex:hyp, data = births)
-round( ci.lin(m4I)[ , c(1,5,6)], 1) 
+round(ci.lin(m4I)[, c(1, 5, 6)], 1)
 ```
 
  Look at the results. Is there evidence for the effect of `hyp` being modified by `sex`?
@@ -311,12 +312,12 @@ by first looking at the estimated effects of `hyp` in the two stata defined by `
 
 - The combining is done by declaring `sex` as a control variable:
 ```{r Effect of hyp on bweight controlled for sex }
-effx(bweight, type="metric", exposure=hyp, control=sex, data=births)
+effx(bweight, type = "metric", exposure = hyp, control = sex, data = births)
 ```
 - The same is done with `lm()` as follows: 
 ```{r lm for hyp on bweight controlled for sex }
 m4 <- lm(bweight ~ sex + hyp, data = births)
-ci.lin(m4)[ , c(1,5,6)]  
+ci.lin(m4)[, c(1, 5, 6)]
 ```
 The estimated effect of `hyp` on `bweight` 
 controlled for `sex` is thus $-448$ g.
@@ -338,8 +339,9 @@ of the response with `gestwks` is roughly linear
 we can estimate the linear effect of `gestwks`, 
 both with `effx()` and with `lm()` as follows:
 ```{r Linear effect of gestwks on bweight }
-effx(response=bweight, type="metric", exposure=gestwks,data=births)
-m5 <- lm(bweight ~ gestwks, data=births) ; ci.lin(m5)[ , c(1,5,6)]
+effx(response = bweight, type = "metric", exposure = gestwks, data = births)
+m5 <- lm(bweight ~ gestwks, data = births)
+ci.lin(m5)[, c(1, 5, 6)]
 ```
 We have fitted a simple linear regression model and 
 obtained estimates of the
@@ -350,7 +352,7 @@ slope coefficient, which is 197 g per each additional week of gestation.
 
 >The linear effect of `gestwks` on the log-odds of `lowbw` can be estimated similarly:
 ```{r Linear effect of gestwks on lowbw }
-effx(response=lowbw, type="binary", exposure=gestwks,data=births)
+effx(response = lowbw, type = "binary", exposure = gestwks, data = births)
 ```
 The linear effect of `gestwks` on the log-odds of `lowbw` is manifested as a reduction by a factor of 0.408 per extra week of gestation, i.e. the odds of a baby having a low birth weight is reduced by a factor of 0.408 per one week increase in gestation.
 
@@ -358,8 +360,10 @@ The linear effect of `gestwks` on the log-odds of `lowbw` is manifested as a red
 but you can study the effects of a 
 numeric exposure stratified by (say) `maged` with
 ```{r Linear effect of gestwks on bweight stratified by maged }
-effx(bweight, type="metric", exposure=gestwks, strata=maged, 
-     data=births)
+effx(bweight,
+  type = "metric", exposure = gestwks, strata = maged,
+  data = births
+)
 ```
 You can control/adjust for a numeric variable by putting it in the control list.
 
@@ -373,12 +377,12 @@ it will provide you some common diagnostic graphs.
 
 - To check whether `bweight` goes up linearly with `gestwks` try
 ```{r Plot-bweight-by-gestwks, fig = FALSE}
-with(births, plot(gestwks,bweight))
+with(births, plot(gestwks, bweight))
 abline(m5)
 ```
 - Moreover, take a look at the basic diagnostic plots for the fitted model.
 ```{r bweight-gestwks-m5-diag, fig= FALSE}
-par(mfrow=c(2,2))
+par(mfrow = c(2, 2))
 plot(m5)
 ```
 What can you say about the agreement with data of the assumptions of the 
@@ -405,8 +409,8 @@ this package.
   expression '`s(X)`' for any explanatory variable `X`,
   for which you wish to fit a smooth function
 ```{r bweight-gestwks-mPs} 
-mPs <- mgcv::gam( bweight ~ s(gestwks), data = births)		
-summary(mPs)	
+mPs <- mgcv::gam(bweight ~ s(gestwks), data = births)
+summary(mPs)
 ```
 From the output given by `summary()` you find that the
 estimated intercept is equal to the overall mean birth
@@ -431,12 +435,11 @@ as an 3rd degree polynomial model would take.
   lines joining the pertinent end points over the $x$-values for which the
   predictions are computed.
 ```{r plotFitPredInt, ECHO=TRUE}
-plotFitPredInt <- function( xval, fit, pred, ...)
-{
-    matshade( xval, fit,  lwd=2, alpha=0.2)
-    matshade( xval, pred, lwd=2, alpha=0.2)
-    matlines( xval, fit,  lty=1, lwd=c(3,2,2), col=c("red","blue","blue") )
-    matlines( xval, pred, lty=1, lwd=c(3,2,2), col=c("red","green","green") )
+plotFitPredInt <- function(xval, fit, pred, ...) {
+  matshade(xval, fit, lwd = 2, alpha = 0.2)
+  matshade(xval, pred, lwd = 2, alpha = 0.2)
+  matlines(xval, fit, lty = 1, lwd = c(3, 2, 2), col = c("red", "blue", "blue"))
+  matlines(xval, pred, lty = 1, lwd = c(3, 2, 2), col = c("red", "green", "green"))
 }
 ```
 -  Finally, create a vector of $x$-values and compute 
@@ -448,18 +451,24 @@ This function creates a matrix of three columns: (1) fitted/predicted
 values, (2) lower limits, (3) upper limits and 
 make the graph:
 ```{r bweight-gestwks-mPs-plot, fig=FALSE}
-nd <- data.frame(gestwks = seq(24, 45, by = 0.25) ) 	
-pr.Ps <- predict( mPs, newdata=nd, se.fit=TRUE )
+nd <- data.frame(gestwks = seq(24, 45, by = 0.25))
+pr.Ps <- predict(mPs, newdata = nd, se.fit = TRUE)
 str(pr.Ps) # with se.fit=TRUE, only two columns: fitted value and its SE
-fit.Ps <- cbind(pr.Ps$fit, 
-                pr.Ps$fit - 2*pr.Ps$se.fit, 
-                pr.Ps$fit + 2*pr.Ps$se.fit)
-pred.Ps <- cbind(pr.Ps$fit,  # must add residual variance to se.fit^2
-                 pr.Ps$fit - 2*sqrt( pr.Ps$se.fit^2 + mPs$sig2), 
-                 pr.Ps$fit + 2*sqrt( pr.Ps$se.fit^2 + mPs$sig2))
-par(mfrow=c(1,1))
-with(births, plot(bweight ~ gestwks, xlim=c(24, 45), 
-                  cex.axis=1.5, cex.lab=1.5) )
+fit.Ps <- cbind(
+  pr.Ps$fit,
+  pr.Ps$fit - 2 * pr.Ps$se.fit,
+  pr.Ps$fit + 2 * pr.Ps$se.fit
+)
+pred.Ps <- cbind(
+  pr.Ps$fit, # must add residual variance to se.fit^2
+  pr.Ps$fit - 2 * sqrt(pr.Ps$se.fit^2 + mPs$sig2),
+  pr.Ps$fit + 2 * sqrt(pr.Ps$se.fit^2 + mPs$sig2)
+)
+par(mfrow = c(1, 1))
+with(births, plot(bweight ~ gestwks,
+  xlim = c(24, 45),
+  cex.axis = 1.5, cex.lab = 1.5
+))
 plotFitPredInt(nd$gestwks, fit.Ps, pred.Ps)
 ```
 Compare this with the graph on slide 20 of the lecture we had. 
@@ -482,9 +491,11 @@ and modelling binary outcome.
 - We start with simple tabulation 
 of the prevalence of `lowbw` by maternal hypertension
 ```{r lowbw-hyp-table}
-stat.table( index=list(hyp, lowbw), 
-            contents=list(count(), percent(lowbw)),
-            margins=TRUE, data=births)
+stat.table(
+  index = list(hyp, lowbw),
+  contents = list(count(), percent(lowbw)),
+  margins = TRUE, data = births
+)
 ```
 It seems that the prevalence for hypertensive mothers
 is about 18 percent points higher,
@@ -494,13 +505,13 @@ or about three times as high as that for normotensive mothers
 estimated by `glm()` with different link functions, whereas
 `effx()` gives only odds ratio:
 ```{r lowbw-hyp-comp}
-binRD <- glm(lowbw ~ hyp, family=binomial(link="identity"), data=births)
-round(ci.lin(binRD)[, c(1,2,5:6)], 3)
-binRR <- glm(lowbw ~ hyp, family=binomial(link="log"), data=births)
-round(ci.lin(binRR, Exp=TRUE)[, c(1,2,5:7)], 3)
-binOR <- glm(lowbw ~ hyp, family=binomial(link="logit"), data=births)
-round(ci.lin(binOR, Exp=TRUE)[, c(1,2,5:7)], 3)
-effx(response=lowbw, type="binary", exposure=hyp, data=births)
+binRD <- glm(lowbw ~ hyp, family = binomial(link = "identity"), data = births)
+round(ci.lin(binRD)[, c(1, 2, 5:6)], 3)
+binRR <- glm(lowbw ~ hyp, family = binomial(link = "log"), data = births)
+round(ci.lin(binRR, Exp = TRUE)[, c(1, 2, 5:7)], 3)
+binOR <- glm(lowbw ~ hyp, family = binomial(link = "logit"), data = births)
+round(ci.lin(binOR, Exp = TRUE)[, c(1, 2, 5:7)], 3)
+effx(response = lowbw, type = "binary", exposure = hyp, data = births)
 ```
 Check that these results were quite compatible with the
 *about* estimates given in the previous item.
@@ -509,13 +520,15 @@ How well is the odds ratio approximating the risk ratio here?
 - The prevalence of low birth weight is expected to be inversely related
 to gestational age (weeks), as is evident from simple tabulation
 ```{r lowbw-gestwks-table}
-stat.table( index=list(gest4, lowbw),
-          contents=list(count(), percent(lowbw)),
-          margins=TRUE, data=births)
+stat.table(
+  index = list(gest4, lowbw),
+  contents = list(count(), percent(lowbw)),
+  margins = TRUE, data = births
+)
 ```
 - Let's jump right away to spline modelling of this relationship
 ```{r lowbw-gestwks-spline, fig=FALSE}
-binm1 <- mgcv::gam(lowbw ~ s(gestwks), family=binomial(link="logit"), data=births)
+binm1 <- mgcv::gam(lowbw ~ s(gestwks), family = binomial(link = "logit"), data = births)
 summary(binm1)
 plot(binm1)
 ```
@@ -525,8 +538,8 @@ of outcome is almost linearly dependent on `gestwks`?
 - Encouraged by the result of the previous item, we continue the analysis
 with `glm()` and assuming logit-linearity
 ```{r lowbw-gestwks-logitlin}
-binm2 <- glm(lowbw ~ I(gestwks-40), family=binomial(link="logit"), data=births)
-round(ci.lin(binm2, Exp=TRUE)[, c(1,2,5:7)], 3)
+binm2 <- glm(lowbw ~ I(gestwks - 40), family = binomial(link = "logit"), data = births)
+round(ci.lin(binm2, Exp = TRUE)[, c(1, 2, 5:7)], 3)
 ```
 Inspect the results. How do you interpret the estimated coefficients
 and their exponentiated values?
@@ -535,8 +548,8 @@ Instead of fitted logits, it can be more informative
 to plot the fitted prevalences against `gestwks`,
 in which we utilize the previously created data frame `nd`
 ```{r lowbw-gestwks-pred, fig=FALSE}
-predm2 <- predict(binm2, newdata=nd, type="response")
-plot( nd$gestwks, predm2, type="l")
+predm2 <- predict(binm2, newdata = nd, type = "response")
+plot(nd$gestwks, predm2, type = "l")
 ```
 - The curve seems to cover practically the whole range of
 the outcome probability scale with a relatively 
@@ -547,8 +560,8 @@ whether the effect of `gestwks` is modified
 by maternal hypertension, so let's fit
 an interaction model and view the results
 ```{r lowbw-gestwks-hyp}
-binm3 <- glm(lowbw ~ hyp*I(gestwks-40), family=binomial, data=births)
-round(ci.lin(binm3, Exp=TRUE)[, c(1,2,5:7)], 3)
+binm3 <- glm(lowbw ~ hyp * I(gestwks - 40), family = binomial, data = births)
+round(ci.lin(binm3, Exp = TRUE)[, c(1, 2, 5:7)], 3)
 ```
 How would you interpret the coefficients and their antilogarithms here?
 
@@ -559,15 +572,17 @@ and the fitted curves on the probability scale between
 the two groups. Function `qlogis()` returns the
 value of the logit transformation of the given argument. 
 ```{r lowbw-gestwks-hyp-pred, fig=FALSE}
-predm3hyp <- predict(binm3, 
-   newdata=data.frame(hyp="hyper", nd), type="response")
-predm3nor <- predict(binm3, 
-   newdata=data.frame(hyp="normal", nd), type="response")
-par(mfrow=c(1,2))
-plot( nd$gestwks, qlogis(predm3hyp), type="l")
-lines( nd$gestwks, qlogis(predm3nor), lty=2)
-plot( nd$gestwks, predm3hyp, type="l")
-lines( nd$gestwks, predm3nor, lty=2)
+predm3hyp <- predict(binm3,
+  newdata = data.frame(hyp = "hyper", nd), type = "response"
+)
+predm3nor <- predict(binm3,
+  newdata = data.frame(hyp = "normal", nd), type = "response"
+)
+par(mfrow = c(1, 2))
+plot(nd$gestwks, qlogis(predm3hyp), type = "l")
+lines(nd$gestwks, qlogis(predm3nor), lty = 2)
+plot(nd$gestwks, predm3hyp, type = "l")
+lines(nd$gestwks, predm3nor, lty = 2)
 ```
 The logit-line starts from a higher level and its slope is steeper
 for the hypertensive mothers, which sounds reasonable.

@@ -1,6 +1,6 @@
 
 ```{r, include=FALSE}
-knitr::opts_chunk$set(keep.source=TRUE,eps=FALSE,include=TRUE, prefix.string='./graph/oral')
+knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.string = "./graph/oral")
 ```
 
 # Survival analysis with competing risks: Oral cancer patients
@@ -43,9 +43,9 @@ Using function `table()` count the numbers of censorings
 as well as deaths from oral cancer and other causes, respectively,
  from the `event` variable.
 ```{r dinput, echo=T,eval=FALSE}
-orca <- read.table("pracs/data/oralca2.txt", header=T)
+orca <- read.table("pracs/data/oralca2.txt", header = TRUE)
 head(orca)
-str(orca) 
+str(orca)
 summary(orca)
 ```
 
@@ -59,7 +59,7 @@ First, construct a *survival object* `orca$suob` from
 the event variable and the follow-up time using function `Surv()`.
 Look at the structure and summary of `!orca$suob!` .
 ```{r Survobject, echo=T,eval=FALSE}
-orca$suob <- Surv(orca$time, 1*(orca$event > 0) )
+orca$suob <- Surv(orca$time, 1 * (orca$event > 0))
 str(orca$suob)
 summary(orca$suob)
 ```
@@ -68,7 +68,7 @@ summary(orca$suob)
 default calculations for a Kaplan--Meier
 analysis of the overall (marginal) survival curve.
 ```{r surv1, echo=T,eval=FALSE}
-s.all <- survfit(suob ~ 1, data=orca)
+s.all <- survfit(suob ~ 1, data = orca)
 ```
 
 See the structure of this object and apply `print()` method on it, too.
@@ -90,7 +90,7 @@ one can draw a curve describing their complements: the cumulative mortality prop
  result of the second command line below.
 ```{r survcdf1, echo=T, fig=T, height=6, width=7,eval=FALSE}
 plot(s.all)
-lines(s.all, fun = "event", mark.time=F, conf.int=F)
+lines(s.all, fun = "event", mark.time = F, conf.int = FALSE)
 ```
 
 The effect of option `mark.time=F` is to omit
@@ -105,9 +105,9 @@ Tumour stage is an important prognostic factor in cancer survival studies.
 marking them with different colours, the order which you may define yourself.
 Also find the median survival time for each stage.
 ```{r cdfstage, echo=T, fig=T, height=6, width=7,eval=FALSE}
-s.stg  <- survfit(suob ~ stage, data= orca)
+s.stg <- survfit(suob ~ stage, data = orca)
 col5 <- c("green", "blue", "black", "red", "gray")
-plot(s.stg, col= col5, fun="event", mark.time=F )
+plot(s.stg, col = col5, fun = "event", mark.time = FALSE)
 s.stg
 ```
 
@@ -117,9 +117,14 @@ and the second one graphs the log-cumulative hazards against log-time
 for the different stages. Compare the two presentations
 with each other and with the one in the previous item.
 ```{r chstage, echo=T, fig=T, height=6, width=12,eval=FALSE}
-par(mfrow=c(1,2))
-plot(s.stg, col= col5, fun="cumhaz", main="cum. hazards" )
-plot(s.stg, col= col5, fun="cloglog", main = "cloglog: log cum.haz"  )
+par(mfrow = c(1, 2))
+plot(s.stg, col = col5, fun = "cumhaz", main = "cum. hazards")
+plot(
+  s.stg, 
+  col = col5, 
+  fun = "cloglog", 
+  main = "cloglog: log cum.haz"
+)
 ```
 
 -  If the survival times were *exponentially*
@@ -142,18 +147,22 @@ into, say, three categories by function `cut()`
 using suitable breakpoints, like 55 and 75 years, and
 cross-tabulate sex and age group:
 ```{r sexage, echo=T,eval=FALSE}
-orca$agegr <- cut(orca$age, br=c(0,55,75, 95))
-stat.table( list( sex, agegr), list( count(), percent(agegr) ),
-             margins=T, data = orca )
+orca$agegr <- cut(orca$age, br = c(0, 55, 75, 95))
+stat.table(list(sex, agegr), list(count(), percent(agegr)),
+  margins = TRUE, 
+  data = orca
+)
 ```
 Male patients are clearly younger than females in these data.
 
 Now, plot Kaplan--Meier curves jointly classified by sex and age.
 ```{r cdfsexage, echo=T, fig=T, height=6, width=7,eval=FALSE}
-s.agrx <- survfit(suob ~ agegr + sex, data=orca)
-par(mfrow=c(1,1))
-plot(s.agrx, fun="event", mark.time=F, xlim = c(0,15),
-             col=rep(c("red", "blue"),3), lty=c(2,2, 1,1, 5,5))
+s.agrx <- survfit(suob ~ agegr + sex, data = orca)
+par(mfrow = c(1, 1))
+plot(s.agrx,
+  fun = "event", mark.time = FALSE, xlim = c(0, 15),
+  col = rep(c("red", "blue"), 3), lty = c(2, 2, 1, 1, 5, 5)
+)
 ```
 
 In each age band the mortality curve for males is on a higher level
@@ -169,8 +178,9 @@ We move on to analysing cumulative mortalities for the
 
 ```{r cif1a, echo=T,eval=FALSE}
 library(survival)
-cif1 <- survfit( Surv( time, event, type="mstate") ~ 1,
-                 data = orca)
+cif1 <- survfit(Surv(time, event, type = "mstate") ~ 1,
+  data = orca
+)
 str(cif1)
 ```
 
@@ -189,9 +199,9 @@ Other arguments are like in the ordinary `plot()` function.
 - Draw two parallel plots describing
 the overall cumulative incidence curves for both causes of death
 ```{r plotcif1, echo=T,fig=T,eval=FALSE}
-par(mfrow=c(1,2))
+par(mfrow = c(1, 2))
 plotCIF(cif1, 1, main = "Cancer death")
-plotCIF(cif1, 2, main= "Other deaths")
+plotCIF(cif1, 2, main = "Other deaths")
 ```
 
 - Compute the estimated
@@ -204,15 +214,20 @@ Cut the $y$-axis for a more efficient graphical presentation
 
 ```{r plotcif2, echo=T, fig=T, height=6, width=10,eval=FALSE}
 col5 <- c("green", "blue", "black", "red", "gray")
-cif2 <- survfit( Surv( time, event, type="mstate") ~ stage,
-                 data = orca)
+cif2 <- survfit(Surv(time, event, type = "mstate") ~ stage,
+  data = orca
+)
 str(cif2)
 
-par(mfrow=c(1,2))
-plotCIF(cif2, 1, main = "Cancer death by stage",
-        col = col5, ylim = c(0, 0.7) )
-plotCIF(cif2, 2, main= "Other deaths by stage",
-        col=col5, ylim = c(0, 0.7) )
+par(mfrow = c(1, 2))
+plotCIF(cif2, 1,
+  main = "Cancer death by stage",
+  col = col5, ylim = c(0, 0.7)
+)
+plotCIF(cif2, 2,
+  main = "Other deaths by stage",
+  col = col5, ylim = c(0, 0.7)
+)
 ```
 
 Compare the two plots. What would you conclude about the
@@ -224,7 +239,7 @@ the lower curve is for the cancer deaths and the upper curve is for total mortal
 and the vertical difference between the two curves describes the
 cumulative mortality from other causes. You can also add some colours for the different zones: 
 ```{r stackedcif1, echo=T, fig=T, eval=FALSE}
-par(mfrow=c(1,1))
+par(mfrow = c(1, 1))
 stackedCIF(cif1, colour = c("gray70", "gray85"))
 ```
 
@@ -240,10 +255,10 @@ The estimated rate ratios and their confidence intervals
 can also here be displayed  by applying `ci.lin()`
 on the fitted model object.
 ```{r cox1, echo=T,eval=FALSE}
-options(show.signif.stars = F)
-m1 <- coxph(suob ~ sex + I((age-65)/10) + stage, data= orca)
-summary( m1 )
-round( ci.exp(m1 ), 4 )
+options(show.signif.stars = FALSE)
+m1 <- coxph(suob ~ sex + I((age - 65) / 10) + stage, data = orca)
+summary(m1)
+round(ci.exp(m1), 4)
 ```
 
 Look at the results. What are the main findings?
@@ -266,10 +281,10 @@ and to pool the first two stage groups into one. After that fit a model in
 the reduced data with the new stage variable.
 ```{r cox2, echo=T,eval=FALSE}
 orca2 <- subset(orca, stage != "unkn")
-orca2$st3 <- Relevel( orca2$stage, list(1:2, 3, 4:5) )
-levels(orca2$st3) = c("I-II", "III", "IV")
-m2 <- update(m1, . ~ . - stage + st3, data=orca2 )
-round( ci.exp(m2 ), 4)
+orca2$st3 <- Relevel(orca2$stage, list(1:2, 3, 4:5))
+levels(orca2$st3) <- c("I-II", "III", "IV")
+m2 <- update(m1, . ~ . - stage + st3, data = orca2)
+round(ci.exp(m2), 4)
 ```
 
 - Plot the predicted cumulative mortality curves by stage,
@@ -279,21 +294,38 @@ based on the fitted model `m2`.
 You need to create a new artificial data frame
 containing the desired values for the covariates.
 ```{r cox2cll, echo=T,eval=FALSE}
-newd <- data.frame( sex = c( rep("Male", 6), rep("Female", 6) ),
-                    age = rep( c( rep(40, 3), rep(80, 3) ), 2 ),
-                    st3 = rep( levels(orca2$st3), 4) )
+newd <- data.frame(
+  sex = c(rep("Male", 6), rep("Female", 6)),
+  age = rep(c(rep(40, 3), rep(80, 3)), 2),
+  st3 = rep(levels(orca2$st3), 4)
+)
 newd
 col3 <- c("green", "black", "red")
-par(mfrow=c(1,2))
-plot( survfit(m2, newdata= subset(newd, sex=="Male" & age==40)),
-     col=col3, fun="event", mark.time=F)
-lines( survfit(m2, newdata= subset(newd, sex=="Female" & age==40)),
-      col= col3, fun="event", lty = 2, mark.time=F)
-plot( survfit(m2, newdata= subset(newd, sex=="Male" & age==80)),
-     ylim = c(0,1), col= col3, fun="event", mark.time=F)
-lines( survfit(m2, newdata= subset(newd, sex=="Female" & age==80)),
-      col=col3, fun="event", lty=2, mark.time=F)
-
+par(mfrow = c(1, 2))
+plot(
+  survfit(
+    m2, newdata = subset(newd, sex == "Male" & age == 40)
+  ),
+  col = col3, fun = "event", mark.time = FALSE
+)
+lines(
+  survfit(
+    m2, newdata = subset(newd, sex == "Female" & age == 40)
+  ),
+  col = col3, fun = "event", lty = 2, mark.time = FALSE
+)
+plot(
+  survfit(
+    m2, newdata = subset(newd, sex == "Male" & age == 80)
+  ),
+  ylim = c(0, 1), col = col3, fun = "event", mark.time = FALSE
+)
+lines(
+  survfit(
+    m2, newdata = subset(newd, sex == "Female" & age == 80)
+  ),
+  col = col3, fun = "event", lty = 2, mark.time = FALSE
+)
 ```
 
 
@@ -305,16 +337,24 @@ with the same covariates as above. In this case
 only cancer deaths are counted as events and deaths from other causes
 are included into censorings.
 ```{r coxhaz1, echo=T,eval=FALSE}
-m2haz1 <- coxph( Surv( time, event==1)  ~ sex + I((age-65)/10) + st3 , data=orca2 )
-round( ci.exp(m2haz1 ), 4)
+m2haz1 <- 
+  coxph(
+    Surv(time, event == 1) ~ sex + I((age - 65) / 10) + st3, 
+    data = orca2
+  )
+round(ci.exp(m2haz1), 4)
 cox.zph(m2haz1)
 ```
 Compare the results with those of model `m2`. What are the major differences?
 
 - Fit a similar model for deaths from other causes and compare the results.
 ```{r coxhaz2, echo=T,eval=FALSE}
-m2haz2 <- coxph( Surv( time, event==2)  ~ sex + I((age-65)/10) + st3 , data=orca2 )
-round( ci.exp(m2haz2 ), 4)
+m2haz2 <- 
+  coxph(
+    Surv(time, event == 2) ~ sex + I((age - 65) / 10) + st3, 
+    data = orca2
+  )
+round(ci.exp(m2haz2), 4)
 cox.zph(m2haz2)
 ```
 
@@ -351,10 +391,13 @@ More detailed explanation of these tools will be given by Bendix later.
 print a summary of it. We shall name the main (and only) time axis
 in this object as `stime`.
 ```{r lexis 1, echo=T,eval=FALSE}
-orca.lex <- Lexis(exit = list(stime = time),
-           exit.status = factor(event,
-   labels = c("Alive", "Oral ca. death", "Other death")),
-                  data = orca)
+orca.lex <- Lexis(
+  exit = list(stime = time),
+  exit.status = factor(event,
+    labels = c("Alive", "Oral ca. death", "Other death")
+  ),
+  data = orca
+)
 summary(orca.lex)
 ```
 
@@ -400,9 +443,9 @@ We shall now demonstrate the numerical equivalence of the Cox model
  as above.
  
 ```{r split, echo=T,eval=FALSE}
-orca2.lex <- subset(orca.lex, stage != "unkn" )
-orca2.lex$st3 <- Relevel( orca2$stage, list(1:2, 3, 4:5) )
-levels(orca2.lex$st3) = c("I-II", "III", "IV")
+orca2.lex <- subset(orca.lex, stage != "unkn")
+orca2.lex$st3 <- Relevel(orca2$stage, list(1:2, 3, 4:5))
+levels(orca2.lex$st3) <- c("I-II", "III", "IV")
 ```
  Then, the break points of time axis are taken from
  the sorted event times, and the `lexis` object is
@@ -411,8 +454,9 @@ levels(orca2.lex$st3) = c("I-II", "III", "IV")
  stored in variable `stime`.
 
 ```{r split b, echo=T,eval=FALSE}
-cuts <- sort(orca2$time[orca2$event==1])
-orca2.spl <- splitLexis( orca2.lex, br = cuts, time.scale="stime" )
+cuts <- sort(orca2$time[orca2$event == 1])
+orca2.spl <- 
+  splitLexis(orca2.lex, br = cuts, time.scale = "stime")
 orca2.spl$timeband <- as.factor(orca2.spl$stime)
 ```
 
@@ -427,7 +471,7 @@ As a result we now have an expanded
 
 ```{r strsplit, echo=T,eval=FALSE}
 str(orca2.spl)
-orca2.spl[ 1:20, ]
+orca2.spl[1:20, ]
 ```
 
 
@@ -436,9 +480,11 @@ as the outcome. The splitted person-years are contained in `lex.dur`,
 and the explanatory variables are the same as in model `m2haz1`.
 -- This fitting may take some time ....
 ```{r poisson, echo=T,eval=FALSE}
-m2pois1 <- glm( 1*(lex.Xst=="Oral ca. death")  ~
-      -1 + timeband + sex + I((age-65)/10) + st3,
-      family=poisson, offset = log(lex.dur), data = orca2.spl)
+m2pois1 <- glm(
+  1 * (lex.Xst == "Oral ca. death") ~
+    -1 + timeband + sex + I((age - 65) / 10) + st3,
+  family = poisson, offset = log(lex.dur), data = orca2.spl
+)
 ```
 We shall display the estimation results graphically
  for the baseline hazard (per 1000 person-years)
@@ -452,12 +498,14 @@ is quantitatively
 named accoding to its leftmost point, it is good to compute the midpoint values `tbmid`
 for the timebands
 ```{r poissonresults, echo=T, fig=T,eval=FALSE}
-tb <- as.numeric(levels(orca2.spl$timeband)) ; ntb <- length(tb)
-tbmid <- (tb[-ntb] + tb[-1])/2   # midpoints of the intervals
-round( ci.exp(m2pois1 ), 3)
-par(mfrow=c(1,1))
-plot( tbmid, 1000*exp(coef(m2pois1)[1:(ntb-1)]),
-            ylim=c(5,3000), log = "xy", type = "l")
+tb <- as.numeric(levels(orca2.spl$timeband))
+ntb <- length(tb)
+tbmid <- (tb[-ntb] + tb[-1]) / 2 # midpoints of the intervals
+round(ci.exp(m2pois1), 3)
+par(mfrow = c(1, 1))
+plot(tbmid, 1000 * exp(coef(m2pois1)[1:(ntb - 1)]),
+  ylim = c(5, 3000), log = "xy", type = "l"
+)
 ```
 
 Compare the regression coefficients and their error margins
@@ -475,14 +523,25 @@ From the same model you should also obtain quite familiar results for the
 rate ratios of interest.
 ```{r poissonspline, echo=T, fig=T,eval=FALSE}
 library(splines)
-m2pspli <- update(m2pois1, . ~  ns(stime, df = 6, intercept = F) +
-        sex + I((age-65)/10) + st3)
-round( ci.exp( m2pspli ), 3)
-news <- data.frame( stime = seq(0,25, length=301), lex.dur = 1000, sex = "Female",
-                    age = 65, st3 = "I-II")
-blhaz <- predict(m2pspli, newdata = news, se.fit = T, type = "link")
+m2pspli <- 
+  update(
+    m2pois1, 
+    . ~ ns(stime, df = 6, intercept = FALSE) +
+      sex + I((age - 65) / 10) + st3)
+round(ci.exp(m2pspli), 3)
+news <- data.frame(
+  stime = seq(0, 25, length = 301), 
+  lex.dur = 1000, 
+  sex = "Female",
+  age = 65, 
+  st3 = "I-II"
+)
+blhaz <- 
+  predict(m2pspli, newdata = news, se.fit = TRUE, type = "link")
 blh95 <- cbind(blhaz$fit, blhaz$se.fit) %*% ci.mat()
-par(mfrow=c(1,1))
-matplot( news$stime, exp(blh95), type = "l", lty = c(1,1,1), lwd = c(2,1,1) ,
-      col = rep("black", 3),  log = "xy", ylim = c(5,3000)  )
+par(mfrow = c(1, 1))
+matplot(news$stime, exp(blh95),
+  type = "l", lty = c(1, 1, 1), lwd = c(2, 1, 1),
+  col = rep("black", 3), log = "xy", ylim = c(5, 3000)
+)
 ```
