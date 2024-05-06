@@ -1,17 +1,10 @@
 ```{r, include=FALSE}
-knitr::opts_chunk$set(keep.source=TRUE,eps=FALSE,include=FALSE,eval=FALSE,prefix.string='./graph/DMDK')
+knitr::opts_chunk$set(keep.source=TRUE,eps=FALSE,include=TRUE,eval=TRUE, results = 'hide', fig.show = 'hide' ,prefix.string='./graph/DMDK')
 ```
-
-<!-- # ```{r echo=FALSE,eval=TRUE,results='hide'} -->
-<!-- # options(width=90, -->
-<!-- #         prompt=" ", continue=" ", # Absence of prompts makes it easier for -->
-<!-- #                                   # students to copy from the final pdf document -->
-<!-- #         SweaveHooks=list( fig=function() -->
-<!-- #         par(mar=c(3,3,1,1),mgp=c(3,1,0)/1.6,las=1,bty="n"))) -->
-<!-- # ``` -->
 
 
 # Time-splitting, time-scales and SMR
+
 This exercise is about mortaity among Danish Diabetes patients. It is
 based on the dataset `DMlate`, a random sample of 10,000
 patients from the Danish Diabetes Register (scrambeled dates), all
@@ -19,11 +12,11 @@ with date of diagnosis after 1994.
 
 -  First load the data and take a look at the data:
 ```{r }
-library( Epi)
+library(Epi)
 library(popEpi)
-library( mgcv)
+library(mgcv)
 library(tidyverse)
-sessionInfo()
+# sessionInfo()
 data( DMlate)
 str( DMlate)
 ```
@@ -81,7 +74,7 @@ summary(SL)
   women separately, using splines as implemented in `gam`.
   We use `k = 20` to be sure to catch any irregularities by age.
 ```{r }
-r.m <- gam(cbind(lex.Xst == "Dead", lex.dur) ~ s(A, k = 20),
+r.m <- mgcv::gam(cbind(lex.Xst == "Dead", lex.dur) ~ s(A, k = 20),
             family = poisreg,
             data = subset(SL, sex == "M"))
 gam.check(r.m)
@@ -126,12 +119,12 @@ matplot(nd$A, cbind(p.m,p.f) * 1000,
   cubic splines indstead of thin plate (`"tp"`) splines which is
   the default. Check if you have a reasonable fit using `gam.check`.
 ```{r }
-Mtp <- gam((lex.Xst == "Dead") ~ s(  A, bs = "cr", k = 10) +
+Mtp <- mgcv::gam((lex.Xst == "Dead") ~ s(  A, bs = "cr", k = 10) +
                                  s(  P, bs = "cr", k = 10) +
                                  s(dur, bs = "cr", k = 10),
             offset = log(lex.dur),
             family = poisson,
-              data = subset(SL, sex == "M"))
+            data = subset(SL, sex == "M"))
 ```
 An easier specification of the model exploits the `Lexis` class
 of the dataset, try:
@@ -144,6 +137,16 @@ summary(Mcr)
 gam.check(Mcr)
 ```
 Fit the same model for women as well. Are the models reasonably fitting?
+
+```{r }
+Fcr <- gam.Lexis(subset(SL, sex == "F"),
+                 ~ s(  A, bs = "cr", k = 10) +
+                   s(  P, bs = "cr", k = 10) +
+                   s(dur, bs = "cr", k = 10))
+summary(Fcr)
+gam.check(Fcr)
+```
+
 -  Plot the estimated effects, using the default plot method for
   `gam` objects. Remember that there are three effects
   estimated, so it is useful set up a multi-panel display, and for
@@ -193,7 +196,7 @@ cbind(nd, ci.pred(Mcr, newdata = nd))
 ```
 -  From figure it seems that the duration effect is
 over-modeled, so refit constraining the d.f. to 5:
-```{r rates5,fig = TRUE, width = 10, eval = FALSE}
+```{r rates5,fig = TRUE, width = 10, eval = TRUE}
 Mcr <- gam.Lexis(subset(SL, sex == "M"),
                  ~ s(  A, bs = "cr", k = 10) +
                    s(  P, bs = "cr", k = 10) +
@@ -240,7 +243,7 @@ table.
   transform the sex variable in `M.dk` to a factor, and must
   for each follow-up interval in the `SL` data have an age and
   a period variable that can be used in merging with the population data.
-```{r eval = FALSE}
+```{r eval = TRUE}
 str(SL)
 SL$Am <- floor(SL$A + 0.25)
 SL$Pm <- floor(SL$P + 0.25)
@@ -254,7 +257,7 @@ str(M.dk)
 Then match the rates from `M.dk` into `SL`;
 `sex`, `Am` and `Pm` are the common variables,
 and therefore the match is on these variables:
-```{r eval = FALSE}
+```{r eval = TRUE}
 SLr <- merge(SL, M.dk[,c("sex", "Am", "Pm", "rate")])
 dim(SL)
 dim(SLr)
@@ -267,14 +270,19 @@ information from both datasets, hence the slightly fewer rows in
    new variable, `E`, say (`E`xpected). Use `stat.table`
    to make a table of observed, expected and the ratio (SMR) by age
    (suitably grouped, look for `cut`) and sex.
--  Fit a poisson model with sex as the explanatory varable and
+
+```{r eval = TRUE, echo=FALSE} 
+SLr$E <- SLr$P * SLr$rate
+```
+
+-  Fit a poisson model with sex as the explanatory variable and
   log-expected as offset to derive the SMR (and c.i.).
   Some of the population mortality rates are 0, so you need to exclude
   those records from the analysis.
 ```{r }
 msmr <- glm((lex.Xst == "Dead") ~ sex - 1 + offset(log(E)),
              family = poisson,
-             data = subset(SLr,E>0))
+             data = subset(SLr, E>0))
 ci.exp(msmr)
 ```
   Recogninze the numbers?
