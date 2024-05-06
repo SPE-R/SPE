@@ -1,57 +1,57 @@
-language: r
-cache: packages
-sudo: required
-
-before_install:
-  - sudo apt-get install latexmk
-  - sudo apt-get install texlive-extra-utils
-  - tlmgr install genmisc floatflt needspace currfile filehook
-  - echo 'Make the latex R style libs accessible'
-  - cp -rf /home/travis/R-bin/lib/R/share/texmf/* /home/travis/texlive/texmf-dist/
-  - texhash
-#  - sudo apt-get install texlive-latex-extra texlive-fonts-recommended latexmk
-
-install:
-  - echo 'R package automatic build switch off'
-
-script:
-  - echo 'Installing dependencies'
-  - Rscript pracs/install-dependencies.R
-  - echo 'Build an compile all the practicals pdf'
-  - make -f pracs/Makefile
-  - echo 'Build the practicals solutions R files'
-  - make -f pracs/Makefile Rsol
-  - echo 'Compile lectures handout'
-  - make -f lectures/Makefile
-  - echo 'Update the software and package requirement page'
-  - Rscript -e 'rmarkdown::render("pracs/prerequest.Rmd", output_dir = "build")'
-  - echo 'keep only the outputs we are interested in'
-  - mkdir -p deploy
-  - mkdir -p deploy/Rsolutions
-  - cp build/pracs.pdf deploy/
-  - cp build/pracs-sol.pdf deploy/
-  - cp build/*-s.R deploy/Rsolutions
-  - cp build/prerequest.md deploy/
-  - cp -r pracs/data  deploy/
-  - cp build-lectures/SPE-2019-lectures-3x1.pdf deploy/
-  - echo 'zip data and Rsolutions directory'
-  - cd deploy
-  - zip -r SPE-all-material.zip *
-  - zip -r data.zip data
-  - zip -r Rsolutions.zip Rsolutions
-  - echo 'clean the build environement'
-  - cd ..
-  - make -f pracs/Makefile clean
-  - make -f lectures/Makefile clean
-  
-deploy:
-  provider: pages
-  local-dir: deploy
-  skip-cleanup: true
-  github-token: $GITHUB_TOKEN  # Set in travis-ci.org dashboard, marked secure
-  keep-history: true
-  repo: SPE-R/SPE-R.github.io
-  target-branch: travis-build
-  on:
-    branch: master
-    # tags: true # build only tagged branches
+# language: r
+# cache: packages
+# sudo: required
+# 
+# before_install:
+#   - sudo apt-get install latexmk
+#   - sudo apt-get install texlive-extra-utils
+#   - tlmgr install genmisc floatflt needspace currfile filehook
+#   - echo 'Make the latex R style libs accessible'
+#   - cp -rf /home/travis/R-bin/lib/R/share/texmf/* /home/travis/texlive/texmf-dist/
+#   - texhash
+# #  - sudo apt-get install texlive-latex-extra texlive-fonts-recommended latexmk
+# 
+# install:
+#   - echo 'R package automatic build switch off'
+# 
+# script:
+#   - echo 'Installing dependencies'
+#   - Rscript pracs/install-dependencies.R
+#   - echo 'Build an compile all the practicals pdf'
+#   - make -f pracs/Makefile
+#   - echo 'Build the practicals solutions R files'
+#   - make -f pracs/Makefile Rsol
+#   - echo 'Compile lectures handout'
+#   - make -f lectures/Makefile
+#   - echo 'Update the software and package requirement page'
+#   - Rscript -e 'rmarkdown::render("pracs/prerequest.Rmd", output_dir = "build")'
+#   - echo 'keep only the outputs we are interested in'
+#   - mkdir -p deploy
+#   - mkdir -p deploy/Rsolutions
+#   - cp build/pracs.pdf deploy/
+#   - cp build/pracs-sol.pdf deploy/
+#   - cp build/*-s.R deploy/Rsolutions
+#   - cp build/prerequest.md deploy/
+#   - cp -r pracs/data  deploy/
+#   - cp build-lectures/SPE-2019-lectures-3x1.pdf deploy/
+#   - echo 'zip data and Rsolutions directory'
+#   - cd deploy
+#   - zip -r SPE-all-material.zip *
+#   - zip -r data.zip data
+#   - zip -r Rsolutions.zip Rsolutions
+#   - echo 'clean the build environement'
+#   - cd ..
+#   - make -f pracs/Makefile clean
+#   - make -f lectures/Makefile clean
+#   
+# deploy:
+#   provider: pages
+#   local-dir: deploy
+#   skip-cleanup: true
+#   github-token: $GITHUB_TOKEN  # Set in travis-ci.org dashboard, marked secure
+#   keep-history: true
+#   repo: SPE-R/SPE-R.github.io
+#   target-branch: travis-build
+#   on:
+#     branch: master
+#     # tags: true # build only tagged branches
