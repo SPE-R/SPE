@@ -5624,14 +5624,14 @@ with date of diagnosis after 1994.
 \end{Shaded}
 
 \begin{verbatim}
-## 
-## Attaching package: 'popEpi'
+
+Attaching package: 'popEpi'
 \end{verbatim}
 
 \begin{verbatim}
-## The following object is masked from 'package:lubridate':
-## 
-##     is.Date
+The following object is masked from 'package:lubridate':
+
+    is.Date
 \end{verbatim}
 
 \begin{Shaded}
@@ -5644,6 +5644,19 @@ with date of diagnosis after 1994.
 \end{Highlighting}
 \end{Shaded}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\textquotesingle{}data.frame\textquotesingle{}:   10000 obs. of  7 variables:}
+\NormalTok{ $ sex  : Factor w/ 2 levels "M","F": 2 1 2 2 1 2 1 1 2 1 ...}
+\NormalTok{ $ dobth: num  1940 1939 1918 1965 1933 ...}
+\NormalTok{ $ dodm : num  1999 2003 2005 2009 2009 ...}
+\NormalTok{ $ dodth: num  NA NA NA NA NA ...}
+\NormalTok{ $ dooad: num  NA 2007 NA NA NA ...}
+\NormalTok{ $ doins: num  NA NA NA NA NA NA NA NA NA NA ...}
+\NormalTok{ $ dox  : num  2010 2010 2010 2010 2010 ...}
+\end{Highlighting}
+\end{Shaded}
+
 You can get a more detailed explanation of the data by referring to
 the help page:
 
@@ -5653,49 +5666,65 @@ the help page:
 \end{Highlighting}
 \end{Shaded}
 
-\begin{itemize}
-\tightlist
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
 \item
   Set up the dataset as a \texttt{Lexis} object with age, calendar
   time and duration of diabetes as timescales, and date of death as
   event. Make sure that you know what each of the arguments to
   \texttt{Lexis} mean:
-\end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{LL }\OtherTok{\textless{}{-}} \FunctionTok{Lexis}\NormalTok{(}
-  \AttributeTok{entry =} \FunctionTok{list}\NormalTok{(}\AttributeTok{A =}\NormalTok{ dodm }\SpecialCharTok{{-}}\NormalTok{ dobth, }\AttributeTok{P =}\NormalTok{ dodm, }\AttributeTok{dur =} \DecValTok{0}\NormalTok{),}
-  \AttributeTok{exit =} \FunctionTok{list}\NormalTok{(}\AttributeTok{P =}\NormalTok{ dox),}
-  \AttributeTok{exit.status =} 
-    \FunctionTok{factor}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(dodth), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Alive"}\NormalTok{, }\StringTok{"Dead"}\NormalTok{)),}
-  \AttributeTok{data =}\NormalTok{ DMlate}
-\NormalTok{)}
+\NormalTok{LL }\OtherTok{\textless{}{-}} \FunctionTok{Lexis}\NormalTok{(}\AttributeTok{entry =} \FunctionTok{list}\NormalTok{(}\AttributeTok{A =}\NormalTok{ dodm }\SpecialCharTok{{-}}\NormalTok{ dobth, }
+                         \AttributeTok{P =}\NormalTok{ dodm, }
+                       \AttributeTok{dur =} \DecValTok{0}\NormalTok{),}
+             \AttributeTok{exit =} \FunctionTok{list}\NormalTok{(}\AttributeTok{P =}\NormalTok{ dox),}
+      \AttributeTok{exit.status =} \FunctionTok{factor}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(dodth), }
+                           \AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Alive"}\NormalTok{, }\StringTok{"Dead"}\NormalTok{)),}
+             \AttributeTok{data =}\NormalTok{ DMlate)}
 \end{Highlighting}
 \end{Shaded}
 
-Take a look at the first few lines of the resulting dataset, for
-example using \texttt{head()}.
-- Get an overview of the mortality by using \texttt{stat.table}
-to tabulate no. deaths, person-years (\texttt{lex.dur}) and the
-crude mortality rate by sex. Try:
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{NOTE: entry.status has been set to "Alive" for all.}
+\NormalTok{NOTE: Dropping  4  rows with duration of follow up \textless{} tol}
+\end{Highlighting}
+\end{Shaded}
+
+  Take a look at the first few lines of the resulting dataset, for
+  example using \texttt{head()}.
+\item
+  Get an overview of the mortality by using \texttt{stat.table}
+  to tabulate no. deaths, person-years (\texttt{lex.dur}) and the
+  crude mortality rate by sex. Try:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{stat.table}\NormalTok{(sex,}
-  \FunctionTok{list}\NormalTok{(}
-    \AttributeTok{D =} \FunctionTok{sum}\NormalTok{(lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{),}
-    \AttributeTok{Y =} \FunctionTok{sum}\NormalTok{(lex.dur),}
-    \AttributeTok{rate =} \FunctionTok{ratio}\NormalTok{(lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{, lex.dur, }\DecValTok{1000}\NormalTok{)}
-\NormalTok{  ),}
-  \AttributeTok{margins =} \ConstantTok{TRUE}\NormalTok{,}
-  \AttributeTok{data =}\NormalTok{ LL}
-\NormalTok{)}
+           \FunctionTok{list}\NormalTok{(}\AttributeTok{D =} \FunctionTok{sum}\NormalTok{(lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{),}
+                \AttributeTok{Y =} \FunctionTok{sum}\NormalTok{(lex.dur),}
+             \AttributeTok{rate =} \FunctionTok{ratio}\NormalTok{(lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{, }
+\NormalTok{                          lex.dur, }
+                          \DecValTok{1000}\NormalTok{)),}
+          \AttributeTok{margins =} \ConstantTok{TRUE}\NormalTok{,}
+             \AttributeTok{data =}\NormalTok{ LL)}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{itemize}
-\tightlist
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} }
+\NormalTok{ sex           D        Y    rate  }
+\NormalTok{ {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} }
+\NormalTok{ M       1343.00 27614.21   48.63  }
+\NormalTok{ F       1156.00 26659.05   43.36  }
+
+\NormalTok{ Total   2499.00 54273.27   46.04  }
+\NormalTok{ {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-} }
+\end{Highlighting}
+\end{Shaded}
 \item
   If we want to assess how mortality depends on age, calendar time
   and duration or how it relates to population mortality, we should
@@ -5703,74 +5732,89 @@ crude mortality rate by sex. Try:
   three time scales. In practice it is sufficient to split it along
   one of the time-scales and then use the value of each of the
   time-scales at the left endpoint of the intervals.
+
   Use \texttt{splitLexis} (or \texttt{splitMulti} from the
   \texttt{popEpi} package) to split the follow-up along the
   age-axis in sutiable intervals (here set to 1/2 year, but really
   immaterial as long as it is small):
-\end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{SL }\OtherTok{\textless{}{-}} 
-  \FunctionTok{splitLexis}\NormalTok{(LL, }\AttributeTok{breaks =} \FunctionTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{125}\NormalTok{, }\DecValTok{1} \SpecialCharTok{/} \DecValTok{2}\NormalTok{), }\AttributeTok{time.scale =} \StringTok{"A"}\NormalTok{)}
+\NormalTok{SL }\OtherTok{\textless{}{-}} \FunctionTok{splitLexis}\NormalTok{(LL, }
+                 \AttributeTok{breaks =} \FunctionTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{125}\NormalTok{, }\DecValTok{1} \SpecialCharTok{/} \DecValTok{2}\NormalTok{), }
+             \AttributeTok{time.scale =} \StringTok{"A"}\NormalTok{)}
 \FunctionTok{summary}\NormalTok{(SL)}
 \end{Highlighting}
 \end{Shaded}
 
-How many records are now in the dataset? How many person-years?
-Compare to the original \texttt{Lexis}-dataset.
+\begin{Shaded}
+\begin{Highlighting}[]
 
-\section{Age-specific mortality}\label{age-specific-mortality}
+\NormalTok{Transitions:}
+\NormalTok{     To}
+\NormalTok{From     Alive Dead  Records:  Events: Risk time:  Persons:}
+\NormalTok{  Alive 115974 2499    118473     2499   54273.27      9996}
+\end{Highlighting}
+\end{Shaded}
 
-\begin{itemize}
-\tightlist
+  How many records are now in the dataset? How many person-years?
+  Compare to the original \texttt{Lexis}-dataset.
+
+  \section{Age-specific mortality}\label{age-specific-mortality}
 \item
   Now estimate age-specific mortality curves for men and
   women separately, using splines as implemented in \texttt{gam}.
   We use \texttt{k\ =\ 20} to be sure to catch any irregularities by age.
-\end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{r.m }\OtherTok{\textless{}{-}}\NormalTok{ mgcv}\SpecialCharTok{::}\FunctionTok{gam}\NormalTok{(}
-  \FunctionTok{cbind}\NormalTok{(lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{, lex.dur) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{k =} \DecValTok{20}\NormalTok{),}
-  \AttributeTok{family =}\NormalTok{ poisreg,}
-  \AttributeTok{data =} \FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"M"}\NormalTok{)}
-\NormalTok{)}
-\FunctionTok{gam.check}\NormalTok{(r.m)}
+\NormalTok{r.m }\OtherTok{\textless{}{-}}\NormalTok{ mgcv}\SpecialCharTok{::}\FunctionTok{gam}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{, lex.dur) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{k =} \DecValTok{20}\NormalTok{),}
+                 \AttributeTok{family =}\NormalTok{ poisreg,}
+                   \AttributeTok{data =} \FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"M"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
-Make sure you understand all the components on this modeling statement.
-Fit the same model for women.
-There is a convenient wrapper for this, exploiting the \texttt{Lexis}
-structure of data, but which does not have an update
+  Make sure you understand all the components on this modeling statement.
+  Fit the same model for women.
+
+  There is a convenient wrapper for this, exploiting the \texttt{Lexis}
+  structure of data, but which does not have an update
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{r.m }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"M"}\NormalTok{), }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{k =} \DecValTok{20}\NormalTok{))}
-\NormalTok{r.f }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"F"}\NormalTok{), }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{k =} \DecValTok{20}\NormalTok{))}
-\FunctionTok{gam.check}\NormalTok{(r.m)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{gam.check}\NormalTok{(r.f)}
+\NormalTok{mgcv::gam Poisson analysis of Lexis object subset(SL, sex == "M") with log link:}
+\NormalTok{Rates for the transition:}
+\NormalTok{Alive{-}\textgreater{}Dead}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{itemize}
-\tightlist
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{r.f }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"F"}\NormalTok{), }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{k =} \DecValTok{20}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mgcv::gam Poisson analysis of Lexis object subset(SL, sex == "F") with log link:}
+\NormalTok{Rates for the transition:}
+\NormalTok{Alive{-}\textgreater{}Dead}
+\end{Highlighting}
+\end{Shaded}
 \item
   Now, extract the estimated rates by using the wrapper function
   \texttt{ci.pred} that computes predicted rates and confidence
   limits for these.
-  However, when using the\texttt{glm.Lexis} or \texttt{gam.Lexis} we
-  aviod this; they rely on the \texttt{poisreg} family that will return
+
+  \texttt{glm.Lexis} and \texttt{gam.Lexis} use the \texttt{poisreg} family that will return
   the rates in the (inverse) units in which the person-years were
-  given; that is the units of \texttt{lex.dur}.
-\end{itemize}
+  given; that is the units in which \texttt{lex.dur} is recorded.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -5781,94 +5825,146 @@ structure of data, but which does not have an update
 \end{Highlighting}
 \end{Shaded}
 
-\begin{itemize}
-\tightlist
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ num [1:141, 1:3] 0.00132 0.00137 0.00142 0.00147 0.00152 ...}
+\NormalTok{ {-} attr(*, "dimnames")=List of 2}
+\NormalTok{  ..$ : chr [1:141] "1" "2" "3" "4" ...}
+\NormalTok{  ..$ : chr [1:3] "Estimate" "2.5\%" "97.5\%"}
+\end{Highlighting}
+\end{Shaded}
 \item
   Plot the predicted rates for men and women together - using for
   example \texttt{matplot} or \texttt{matshade}.
-\end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{p.f }\OtherTok{\textless{}{-}} \FunctionTok{ci.pred}\NormalTok{(r.f, }\AttributeTok{newdata =}\NormalTok{ nd)}
-\FunctionTok{matplot}\NormalTok{(}
-\NormalTok{  nd}\SpecialCharTok{$}\NormalTok{A,}
-  \FunctionTok{cbind}\NormalTok{(p.m, p.f) }\SpecialCharTok{*} \DecValTok{1000}\NormalTok{,}
-  \AttributeTok{type =} \StringTok{"l"}\NormalTok{,}
-  \AttributeTok{col =} \FunctionTok{rep}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{, }\StringTok{"red"}\NormalTok{), }\AttributeTok{each =} \DecValTok{3}\NormalTok{),}
-  \AttributeTok{lwd =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{),}
-  \AttributeTok{lty =} \DecValTok{1}\NormalTok{,}
-  \AttributeTok{log =} \StringTok{"y"}\NormalTok{,}
-  \AttributeTok{xlab =} \StringTok{"Age"}\NormalTok{,}
-  \AttributeTok{ylab =} \StringTok{"Mortality of DM ptt per 1000 PY"}
-\NormalTok{)}
+\FunctionTok{matplot}\NormalTok{(nd}\SpecialCharTok{$}\NormalTok{A, }\FunctionTok{cbind}\NormalTok{(p.m, p.f) }\SpecialCharTok{*} \DecValTok{1000}\NormalTok{,}
+        \AttributeTok{type =} \StringTok{"l"}\NormalTok{,}
+         \AttributeTok{col =} \FunctionTok{rep}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{, }\StringTok{"red"}\NormalTok{), }\AttributeTok{each =} \DecValTok{3}\NormalTok{),}
+         \AttributeTok{lwd =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{),}
+         \AttributeTok{lty =} \DecValTok{1}\NormalTok{,}
+         \AttributeTok{log =} \StringTok{"y"}\NormalTok{,}
+        \AttributeTok{xlab =} \StringTok{"Age"}\NormalTok{,}
+        \AttributeTok{ylab =} \StringTok{"Mortality of DM ptt per 1000 PY"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\section{Further time scales: period and duration}\label{further-time-scales-period-and-duration}
-
-\begin{itemize}
-\tightlist
+  \section{Further time scales: period and duration}\label{further-time-scales-period-and-duration}
 \item
   We now want to model the mortality rates among diabetes patients
   also including current date and duration of diabetes, using penalized
   splines. Use the argument \texttt{bs\ =\ "cr"} to \texttt{s()} to get
-  cubic splines indstead of thin plate (\texttt{"tp"}) splines which is
-  the default. Check if you have a reasonable fit using \texttt{gam.check}.
-\end{itemize}
+  cubic splines instead of thin plate (\texttt{"tp"}) splines which is
+  the default.
+
+  As before specify the model exploiting the \texttt{Lexis} class
+  of the dataset, try:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{Mtp }\OtherTok{\textless{}{-}}\NormalTok{ mgcv}\SpecialCharTok{::}\FunctionTok{gam}\NormalTok{(}
-\NormalTok{  (lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
-    \FunctionTok{s}\NormalTok{(P, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
-    \FunctionTok{s}\NormalTok{(dur, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{),}
-  \AttributeTok{offset =} \FunctionTok{log}\NormalTok{(lex.dur),}
-  \AttributeTok{family =}\NormalTok{ poisson,}
-  \AttributeTok{data =} \FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"M"}\NormalTok{)}
-\NormalTok{)}
+\NormalTok{Mcr }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"M"}\NormalTok{),}
+                 \SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
+                   \FunctionTok{s}\NormalTok{(P, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
+                 \FunctionTok{s}\NormalTok{(dur, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
-An easier specification of the model exploits the \texttt{Lexis} class
-of the dataset, try:
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mgcv::gam Poisson analysis of Lexis object subset(SL, sex == "M") with log link:}
+\NormalTok{Rates for the transition:}
+\NormalTok{Alive{-}\textgreater{}Dead}
+\end{Highlighting}
+\end{Shaded}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{Mcr }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}
-  \FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"M"}\NormalTok{),}
-  \SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
-    \FunctionTok{s}\NormalTok{(P, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
-    \FunctionTok{s}\NormalTok{(dur, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{)}
-\NormalTok{)}
 \FunctionTok{summary}\NormalTok{(Mcr)}
-\FunctionTok{gam.check}\NormalTok{(Mcr)}
 \end{Highlighting}
 \end{Shaded}
-
-Fit the same model for women as well. Are the models reasonably fitting?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{Fcr }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}
-  \FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"F"}\NormalTok{),}
-  \SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
-    \FunctionTok{s}\NormalTok{(P, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
-    \FunctionTok{s}\NormalTok{(dur, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{)}
-\NormalTok{)}
-\FunctionTok{summary}\NormalTok{(Fcr)}
-\FunctionTok{gam.check}\NormalTok{(Fcr)}
+
+\NormalTok{Family: poisson }
+\NormalTok{Link function: log }
+
+\NormalTok{Formula:}
+\NormalTok{cbind(trt(Lx$lex.Cst, Lx$lex.Xst) \%in\% trnam, Lx$lex.dur) \textasciitilde{} s(A, }
+\NormalTok{    bs = "cr", k = 10) + s(P, bs = "cr", k = 10) + s(dur, bs = "cr", }
+\NormalTok{    k = 10)}
+
+\NormalTok{Parametric coefficients:}
+\NormalTok{            Estimate Std. Error z value Pr(\textgreater{}|z|)}
+\NormalTok{(Intercept) {-}3.54074    0.04938   {-}71.7   \textless{}2e{-}16}
+
+\NormalTok{Approximate significance of smooth terms:}
+\NormalTok{         edf Ref.df  Chi.sq  p{-}value}
+\NormalTok{s(A)   3.645  4.517 1013.20  \textless{} 2e{-}16}
+\NormalTok{s(P)   1.024  1.048   17.58 3.48e{-}05}
+\NormalTok{s(dur) 7.586  8.384   74.46  \textless{} 2e{-}16}
+
+\NormalTok{R{-}sq.(adj) =  0.00333   Deviance explained = 9.87\%}
+\NormalTok{UBRE = {-}0.8054  Scale est. = 1         n = 60347}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{itemize}
-\tightlist
+  Fit the same model for women as well. Are the models reasonably fitting?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Fcr }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"F"}\NormalTok{),}
+                 \SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
+                   \FunctionTok{s}\NormalTok{(P, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
+                 \FunctionTok{s}\NormalTok{(dur, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mgcv::gam Poisson analysis of Lexis object subset(SL, sex == "F") with log link:}
+\NormalTok{Rates for the transition:}
+\NormalTok{Alive{-}\textgreater{}Dead}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(Fcr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\NormalTok{Family: poisson }
+\NormalTok{Link function: log }
+
+\NormalTok{Formula:}
+\NormalTok{cbind(trt(Lx$lex.Cst, Lx$lex.Xst) \%in\% trnam, Lx$lex.dur) \textasciitilde{} s(A, }
+\NormalTok{    bs = "cr", k = 10) + s(P, bs = "cr", k = 10) + s(dur, bs = "cr", }
+\NormalTok{    k = 10)}
+
+\NormalTok{Parametric coefficients:}
+\NormalTok{            Estimate Std. Error z value Pr(\textgreater{}|z|)}
+\NormalTok{(Intercept) {-}3.78483    0.05808  {-}65.17   \textless{}2e{-}16}
+
+\NormalTok{Approximate significance of smooth terms:}
+\NormalTok{         edf Ref.df Chi.sq  p{-}value}
+\NormalTok{s(A)   2.667  3.366 988.49  \textless{} 2e{-}16}
+\NormalTok{s(P)   1.904  2.391  20.08 0.000136}
+\NormalTok{s(dur) 5.973  6.972  38.98  \textless{} 2e{-}16}
+
+\NormalTok{R{-}sq.(adj) =  0.00417   Deviance explained = 11.1\%}
+\NormalTok{UBRE = {-}0.82405  Scale est. = 1         n = 58126}
+\end{Highlighting}
+\end{Shaded}
 \item
   Plot the estimated effects, using the default plot method for
   \texttt{gam} objects. Remember that there are three effects
   estimated, so it is useful set up a multi-panel display, and for
   the sake of comparability to set ylim to the same for men and women:
-\end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -5878,9 +5974,18 @@ Fit the same model for women as well. Are the models reasonably fitting?
 \end{Highlighting}
 \end{Shaded}
 
-What is the absolute scale for these effects?
-- Compare the fit of the naive model with just age and the
-three-factor models, using \texttt{anova}, e.g.:
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfcol =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(Mcr, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{3}\NormalTok{, }\DecValTok{3}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(Fcr, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{3}\NormalTok{, }\DecValTok{3}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+  What is the absolute scale for these effects?
+\item
+  Compare the fit of the naive model with just age and the
+  three-factor models, using \texttt{anova}, e.g.:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -5888,20 +5993,37 @@ three-factor models, using \texttt{anova}, e.g.:
 \end{Highlighting}
 \end{Shaded}
 
-What do you conclude?
-- The model we fitted has three time-scales: current age, current
-date and current duration of diabetes, so the effects that we report
-are not immediately interpretable, as they are (as in any kind of
-multiple regressions) to be interpreted as \emph{all else equal} which
-they are not, as the three time scales advance simultaneously at the
-same pace.
-The reporting would therefore more naturally be on the
-mortality scale as a function of age, but showing the mortality
-for persons diagnosed in different ages, using separate displays
-for separate years of diagnosis.
-This is most easily done using the \texttt{ci.pred} function with
-the \texttt{newdata\ =} argument. So a person diagnosed in age 50 in
-1995 will have a mortality measured in cases per 1000 PY as:
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Analysis of Deviance Table}
+
+\NormalTok{Model 1: cbind(trt(Lx$lex.Cst, Lx$lex.Xst) \%in\% trnam, Lx$lex.dur) \textasciitilde{} s(A, }
+\NormalTok{    bs = "cr", k = 10) + s(P, bs = "cr", k = 10) + s(dur, bs = "cr", }
+\NormalTok{    k = 10)}
+\NormalTok{Model 2: cbind(trt(Lx$lex.Cst, Lx$lex.Xst) \%in\% trnam, Lx$lex.dur) \textasciitilde{} s(A, }
+\NormalTok{    k = 20)}
+\NormalTok{  Resid. Df Resid. Dev      Df Deviance  Pr(\textgreater{}Chi)}
+\NormalTok{1     60332      11717                           }
+\NormalTok{2     60340      11812 {-}7.9484  {-}95.094 \textless{} 2.2e{-}16}
+\end{Highlighting}
+\end{Shaded}
+
+  What do you conclude?
+\item
+  The model we fitted has three time-scales: current age, current
+  date and current duration of diabetes, so the effects that we report
+  are not immediately interpretable, as they are (as in any kind of
+  multiple regressions) to be interpreted as \emph{all else equal} which
+  they are not, as the three time scales advance simultaneously at the
+  same pace.
+
+  The reporting would therefore more naturally be on the
+  mortality scale as a function of age, but showing the mortality
+  for persons diagnosed in different ages, using separate displays
+  for separate years of diagnosis.
+  This is most easily done using the \texttt{ci.pred} function with
+  the \texttt{newdata\ =} argument. So a person diagnosed in age 50 in
+  1995 will have a mortality measured in cases per 1000 PY as:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -5911,49 +6033,63 @@ the \texttt{newdata\ =} argument. So a person diagnosed in age 50 in
 \end{Highlighting}
 \end{Shaded}
 
-Note that because we used \texttt{gam.Lexis} which uses
-the \texttt{poisreg} family we need not specify \texttt{lex.dur} as a
-variable in the prediction data frame \texttt{nd}. Predictions will
-be rates in the same units as \texttt{lex.dur}.
-Now take a look at the result from the \texttt{ci.pred} statement and
-construct prediction of mortality for men and women diagnosed in a
-range of ages, say 50, 60, 70, and plot these together in the same
-graph:
+  Note that because we used \texttt{gam.Lexis} which uses
+  the \texttt{poisreg} family we need not specify \texttt{lex.dur} as a
+  variable in the prediction data frame \texttt{nd}. Predictions will
+  be rates in the same units as \texttt{lex.dur}.
+
+  Now take a look at the result from the \texttt{ci.pred} statement and
+  construct prediction of mortality for men and women diagnosed in a
+  range of ages, say 50, 60, 70, and plot these together in the same
+  graph:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{cbind}\NormalTok{(nd, }\FunctionTok{ci.pred}\NormalTok{(Mcr, }\AttributeTok{newdata =}\NormalTok{ nd))}
+\FunctionTok{cbind}\NormalTok{(nd, }\FunctionTok{ci.pred}\NormalTok{(Mcr, }\AttributeTok{newdata =}\NormalTok{ nd))[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{,]}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{itemize}
-\tightlist
 \item
   From figure it seems that the duration effect is
   over-modeled, so refit constraining the d.f. to 5:
-\end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{Mcr }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}
-  \FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"M"}\NormalTok{),}
-  \SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
-    \FunctionTok{s}\NormalTok{(P, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
-    \FunctionTok{s}\NormalTok{(dur, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{5}\NormalTok{)}
-\NormalTok{)}
-\FunctionTok{summary}\NormalTok{(Mcr)}
-\NormalTok{Fcr }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}
-  \FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"F"}\NormalTok{),}
-  \SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
-    \FunctionTok{s}\NormalTok{(P, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
-    \FunctionTok{s}\NormalTok{(dur, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{5}\NormalTok{)}
-\NormalTok{)}
+\NormalTok{Mcr }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"M"}\NormalTok{),}
+                 \SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
+                   \FunctionTok{s}\NormalTok{(P, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
+                 \FunctionTok{s}\NormalTok{(dur, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{5}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
-How does \texttt{gam.check()} look for these models?
-Plot the estimated rates from the revised models.
-What do you conclude from the plots?
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mgcv::gam Poisson analysis of Lexis object subset(SL, sex == "M") with log link:}
+\NormalTok{Rates for the transition:}
+\NormalTok{Alive{-}\textgreater{}Dead}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Fcr }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"F"}\NormalTok{),}
+                 \SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
+                   \FunctionTok{s}\NormalTok{(P, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
+                 \FunctionTok{s}\NormalTok{(dur, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{5}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mgcv::gam Poisson analysis of Lexis object subset(SL, sex == "F") with log link:}
+\NormalTok{Rates for the transition:}
+\NormalTok{Alive{-}\textgreater{}Dead}
+\end{Highlighting}
+\end{Shaded}
+
+  How does \texttt{gam.check()} look for these models?
+  Plot the estimated rates from the revised models.
+  What do you conclude from the plots?
+\end{enumerate}
 
 \section{SMR}\label{smr}
 
@@ -5975,13 +6111,14 @@ second split by date, so that follow-up in the diabetes patients is in
 the same classification of age and data as the population mortality
 table.
 
-\begin{itemize}
-\tightlist
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{11}
 \item
   We will use the former approach, using the dataset split in
   6 month intervals, and then include as an extra variable the
-  population mortality as available from the data set
-  \texttt{M.dk}.
+  population mortality as available from the data set \texttt{M.dk}.
+
   First create the variables in the diabetes dataset that we need
   for matching with the population mortality data, that is sex and
   age and date at the midpoint of each of the intervals (or rater at a
@@ -5991,15 +6128,63 @@ table.
   transform the sex variable in \texttt{M.dk} to a factor, and must
   for each follow-up interval in the \texttt{SL} data have an age and
   a period variable that can be used in merging with the population data.
-\end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{str}\NormalTok{(SL)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Classes \textquotesingle{}Lexis\textquotesingle{} and \textquotesingle{}data.frame\textquotesingle{}:   118473 obs. of  14 variables:}
+\NormalTok{ $ lex.id : int  1 1 1 1 1 1 1 1 1 1 ...}
+\NormalTok{ $ A      : num  58.7 59 59.5 60 60.5 ...}
+\NormalTok{ $ P      : num  1999 1999 2000 2000 2001 ...}
+\NormalTok{ $ dur    : num  0 0.339 0.839 1.339 1.839 ...}
+\NormalTok{ $ lex.dur: num  0.339 0.5 0.5 0.5 0.5 ...}
+\NormalTok{ $ lex.Cst: Factor w/ 2 levels "Alive","Dead": 1 1 1 1 1 1 1 1 1 1 ...}
+\NormalTok{ $ lex.Xst: Factor w/ 2 levels "Alive","Dead": 1 1 1 1 1 1 1 1 1 1 ...}
+\NormalTok{ $ sex    : Factor w/ 2 levels "M","F": 2 2 2 2 2 2 2 2 2 2 ...}
+\NormalTok{ $ dobth  : num  1940 1940 1940 1940 1940 ...}
+\NormalTok{ $ dodm   : num  1999 1999 1999 1999 1999 ...}
+\NormalTok{ $ dodth  : num  NA NA NA NA NA NA NA NA NA NA ...}
+\NormalTok{ $ dooad  : num  NA NA NA NA NA NA NA NA NA NA ...}
+\NormalTok{ $ doins  : num  NA NA NA NA NA NA NA NA NA NA ...}
+\NormalTok{ $ dox    : num  2010 2010 2010 2010 2010 ...}
+\NormalTok{ {-} attr(*, "breaks")=List of 3}
+\NormalTok{  ..$ A  : num [1:251] 0 0.5 1 1.5 2 2.5 3 3.5 4 4.5 ...}
+\NormalTok{  ..$ P  : NULL}
+\NormalTok{  ..$ dur: NULL}
+\NormalTok{ {-} attr(*, "time.scales")= chr [1:3] "A" "P" "dur"}
+\NormalTok{ {-} attr(*, "time.since")= chr [1:3] "" "" ""}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{SL}\SpecialCharTok{$}\NormalTok{Am }\OtherTok{\textless{}{-}} \FunctionTok{floor}\NormalTok{(SL}\SpecialCharTok{$}\NormalTok{A }\SpecialCharTok{+} \FloatTok{0.25}\NormalTok{)}
 \NormalTok{SL}\SpecialCharTok{$}\NormalTok{Pm }\OtherTok{\textless{}{-}} \FunctionTok{floor}\NormalTok{(SL}\SpecialCharTok{$}\NormalTok{P }\SpecialCharTok{+} \FloatTok{0.25}\NormalTok{)}
 \FunctionTok{data}\NormalTok{(M.dk)}
 \FunctionTok{str}\NormalTok{(M.dk)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\textquotesingle{}data.frame\textquotesingle{}:   7800 obs. of  6 variables:}
+\NormalTok{ $ A   : num  0 0 0 0 0 0 0 0 0 0 ...}
+\NormalTok{ $ sex : num  1 2 1 2 1 2 1 2 1 2 ...}
+\NormalTok{ $ P   : num  1974 1974 1975 1975 1976 ...}
+\NormalTok{ $ D   : num  459 303 435 311 405 258 332 205 312 233 ...}
+\NormalTok{ $ Y   : num  35963 34383 36099 34652 34965 ...}
+\NormalTok{ $ rate: num  12.76 8.81 12.05 8.97 11.58 ...}
+\NormalTok{ {-} attr(*, "Contents")= chr "Number of deaths and risk time in Denmark"}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{M.dk }\OtherTok{\textless{}{-}} \FunctionTok{transform}\NormalTok{(M.dk,}
   \AttributeTok{Am =}\NormalTok{ A,}
   \AttributeTok{Pm =}\NormalTok{ P,}
@@ -6009,35 +6194,67 @@ table.
 \end{Highlighting}
 \end{Shaded}
 
-Then match the rates from \texttt{M.dk} into \texttt{SL};
-\texttt{sex}, \texttt{Am} and \texttt{Pm} are the common variables,
-and therefore the match is on these variables:
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\textquotesingle{}data.frame\textquotesingle{}:   7800 obs. of  8 variables:}
+\NormalTok{ $ A   : num  0 0 0 0 0 0 0 0 0 0 ...}
+\NormalTok{ $ sex : Factor w/ 2 levels "M","F": 1 2 1 2 1 2 1 2 1 2 ...}
+\NormalTok{ $ P   : num  1974 1974 1975 1975 1976 ...}
+\NormalTok{ $ D   : num  459 303 435 311 405 258 332 205 312 233 ...}
+\NormalTok{ $ Y   : num  35963 34383 36099 34652 34965 ...}
+\NormalTok{ $ rate: num  12.76 8.81 12.05 8.97 11.58 ...}
+\NormalTok{ $ Am  : num  0 0 0 0 0 0 0 0 0 0 ...}
+\NormalTok{ $ Pm  : num  1974 1974 1975 1975 1976 ...}
+\end{Highlighting}
+\end{Shaded}
+
+  Then match the rates from \texttt{M.dk} into \texttt{SL};
+  \texttt{sex}, \texttt{Am} and \texttt{Pm} are the common variables,
+  and therefore the match is on these variables:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{SLr }\OtherTok{\textless{}{-}} \FunctionTok{merge}\NormalTok{(SL, M.dk[, }\FunctionTok{c}\NormalTok{(}\StringTok{"sex"}\NormalTok{, }\StringTok{"Am"}\NormalTok{, }\StringTok{"Pm"}\NormalTok{, }\StringTok{"rate"}\NormalTok{)])}
 \FunctionTok{dim}\NormalTok{(SL)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{[1] 118473     16}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{dim}\NormalTok{(SLr)}
 \end{Highlighting}
 \end{Shaded}
 
-This merge (remember to \texttt{?merge}!) only takes rows that have
-information from both datasets, hence the slightly fewer rows in
-\texttt{SLr} than in \texttt{SL}.
-- Compute the expected number of deaths as the person-time
-multiplied by the corresponding population rate, and put it in a
-new variable, \texttt{E}, say (\texttt{E}xpected). Use \texttt{stat.table}
-to make a table of observed, expected and the ratio (SMR) by age
-(suitably grouped, look for \texttt{cut}) and sex.
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{[1] 118454     17}
+\end{Highlighting}
+\end{Shaded}
 
-\begin{itemize}
-\tightlist
+  This merge (remember to \texttt{?merge}!) only takes rows that have
+  information from both datasets, hence the slightly fewer rows in
+  \texttt{SLr} than in \texttt{SL}.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Compute the expected number of deaths as the person-time
+    multiplied by the corresponding population rate, and put it in a
+    new variable, \texttt{E}, say (\texttt{E}xpected). Use \texttt{stat.table}
+    to make a table of observed, expected and the ratio (SMR) by age
+    (suitably grouped, look for \texttt{cut}) and sex.
+  \end{itemize}
 \item
   Fit a poisson model with sex as the explanatory variable and
   log-expected as offset to derive the SMR (and c.i.).
   Some of the population mortality rates are 0, so you need to exclude
   those records from the analysis.
-\end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6049,9 +6266,22 @@ to make a table of observed, expected and the ratio (SMR) by age
 \end{Highlighting}
 \end{Shaded}
 
-Recogninze the numbers?
-- The same model can be fitted a bit simpler by the
-\texttt{poisreg} family, try:
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{        exp(Est.)         2.5\%        97.5\%}
+\NormalTok{sexM 3.784095e{-}07 3.586958e{-}07 3.992066e{-}07}
+\NormalTok{sexF 3.470965e{-}07 3.276291e{-}07 3.677207e{-}07}
+\end{Highlighting}
+\end{Shaded}
+
+  Recogninze the numbers?
+
+  \begin{itemize}
+  \tightlist
+  \item
+    The same model can be fitted a bit simpler by the
+    \texttt{poisreg} family, try:
+  \end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6063,8 +6293,16 @@ Recogninze the numbers?
 \end{Highlighting}
 \end{Shaded}
 
-We can assess the ratios of SMRs between men and women by using the
-\texttt{ctr.mat} argument which should be a matrix:
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{        exp(Est.)         2.5\%        97.5\%}
+\NormalTok{sexM 3.784095e{-}07 3.586958e{-}07 3.992066e{-}07}
+\NormalTok{sexF 3.470965e{-}07 3.276290e{-}07 3.677208e{-}07}
+\end{Highlighting}
+\end{Shaded}
+
+  We can assess the ratios of SMRs between men and women by using the
+  \texttt{ctr.mat} argument which should be a matrix:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6073,16 +6311,41 @@ We can assess the ratios of SMRs between men and women by using the
   \AttributeTok{W =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{),}
   \StringTok{"M/F"} \OtherTok{=} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{)}
 \NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{    [,1] [,2]}
+\NormalTok{M      1    0}
+\NormalTok{W      0    1}
+\NormalTok{M/F    1   {-}1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{round}\NormalTok{(}\FunctionTok{ci.exp}\NormalTok{(msmr, }\AttributeTok{ctr.mat =}\NormalTok{ CM), }\DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-What do you conclude?
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{    exp(Est.) 2.5\% 97.5\%}
+\NormalTok{M        0.00 0.00  0.00}
+\NormalTok{W        0.00 0.00  0.00}
+\NormalTok{M/F      1.09 1.01  1.18}
+\end{Highlighting}
+\end{Shaded}
+
+  What do you conclude?
+\end{enumerate}
 
 \section{SMR modeling}\label{smr-modeling}
 
-\begin{itemize}
-\tightlist
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{13}
 \item
   Now model the SMR using age and date of diagnosis and diabetes
   duration as explanatory variables, including the expected-number
@@ -6095,7 +6358,7 @@ What do you conclude?
   is 0).
   Plot the estimated smooth effects for both men and women using
   e.g.~\texttt{plot.gam}. What do you see?
-\item
+
   Plot the predicted SMRs from the models for men and women
   diagnosed in ages 50, 60 and 70 as you dif for the rates. What do
   you see?
@@ -6109,7 +6372,7 @@ What do you conclude?
 \item
   Use your previous code to plot the predicted mortality from this
   model too. Are the predicted SMR curves credible?
-\end{itemize}
+\end{enumerate}
 
 \chapter{Nested case-control study and case-cohort study: Risk factors of coronary heart disease}\label{nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease}
 
@@ -6224,14 +6487,14 @@ This exercise is divided into five main parts:
 \end{Shaded}
 
 \begin{verbatim}
-## 
-## Attaching package: 'survival'
+
+Attaching package: 'survival'
 \end{verbatim}
 
 \begin{verbatim}
-## The following object is masked from 'package:popEpi':
-## 
-##     Surv
+The following object is masked from 'package:popEpi':
+
+    Surv
 \end{verbatim}
 
 \begin{Shaded}
@@ -6845,7 +7108,7 @@ For simplicity, covariates \(Z_3\) and \(Z_4\) are treated as
 continuous variables in the models.
 The assumed causal diagram is shown below.
 
-\includegraphics{_main_files/figure-latex/unnamed-chunk-232-1.pdf}
+\includegraphics{_main_files/figure-latex/unnamed-chunk-233-1.pdf}
 
 For more generic notation, the probabilities of \(Y=1\) will
 be expressed as expectations, e.g.~\(E(Y^{X=x}) = P(Y^{X=x}=1)\) and
@@ -6912,57 +7175,57 @@ appears weaker for the outcome model.
 \end{Shaded}
 
 \begin{verbatim}
-## Loading required package: nnls
+Loading required package: nnls
 \end{verbatim}
 
 \begin{verbatim}
-## Loading required package: gam
+Loading required package: gam
 \end{verbatim}
 
 \begin{verbatim}
-## Loading required package: splines
+Loading required package: splines
 \end{verbatim}
 
 \begin{verbatim}
-## Loading required package: foreach
+Loading required package: foreach
 \end{verbatim}
 
 \begin{verbatim}
-## 
-## Attaching package: 'foreach'
+
+Attaching package: 'foreach'
 \end{verbatim}
 
 \begin{verbatim}
-## The following objects are masked from 'package:purrr':
-## 
-##     accumulate, when
+The following objects are masked from 'package:purrr':
+
+    accumulate, when
 \end{verbatim}
 
 \begin{verbatim}
-## Loaded gam 1.22-3
+Loaded gam 1.22-3
 \end{verbatim}
 
 \begin{verbatim}
-## 
-## Attaching package: 'gam'
+
+Attaching package: 'gam'
 \end{verbatim}
 
 \begin{verbatim}
-## The following objects are masked from 'package:mgcv':
-## 
-##     gam, gam.control, gam.fit, s
+The following objects are masked from 'package:mgcv':
+
+    gam, gam.control, gam.fit, s
 \end{verbatim}
 
 \begin{verbatim}
-## Super Learner
+Super Learner
 \end{verbatim}
 
 \begin{verbatim}
-## Version: 2.0-29
+Version: 2.0-29
 \end{verbatim}
 
 \begin{verbatim}
-## Package created on 2024-02-06
+Package created on 2024-02-06
 \end{verbatim}
 
 \begin{Shaded}
@@ -6972,32 +7235,32 @@ appears weaker for the outcome model.
 \end{Shaded}
 
 \begin{verbatim}
-## Loading required package: glmnet
+Loading required package: glmnet
 \end{verbatim}
 
 \begin{verbatim}
-## Loading required package: Matrix
+Loading required package: Matrix
 \end{verbatim}
 
 \begin{verbatim}
-## 
-## Attaching package: 'Matrix'
+
+Attaching package: 'Matrix'
 \end{verbatim}
 
 \begin{verbatim}
-## The following objects are masked from 'package:tidyr':
-## 
-##     expand, pack, unpack
+The following objects are masked from 'package:tidyr':
+
+    expand, pack, unpack
 \end{verbatim}
 
 \begin{verbatim}
-## Loaded glmnet 4.1-8
+Loaded glmnet 4.1-8
 \end{verbatim}
 
 \begin{verbatim}
-## Welcome to the tmle package, version 2.0.1
-## 
-## Use tmleNews() to see details on changes and bug fixes
+Welcome to the tmle package, version 2.0.1
+
+Use tmleNews() to see details on changes and bug fixes
 \end{verbatim}
 
 \begin{enumerate}
@@ -7794,13 +8057,11 @@ Variable & Description \\
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
-\tightlist
 \item
   The dataset is in Stata-format, so you must read the dataset
   using \texttt{read.dta} from the \texttt{foreign} package (which is
   part of the standard \texttt{R}-distribution). At the same time, convert
   \texttt{sex} to a proper factor. Choose where to read the dataset.
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7815,23 +8076,6 @@ Variable & Description \\
 \FunctionTok{head}\NormalTok{(renal)}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{|   id sex      dob      doe      dor      dox event}
-\NormalTok{| 1 17   M 1967.944 1996.013       NA 1997.094     2}
-\NormalTok{| 2 26   F 1959.306 1989.535 1989.814 1996.136     1}
-\NormalTok{| 3 27   F 1962.014 1987.846       NA 1993.239     3}
-\NormalTok{| 4 33   M 1950.747 1995.243 1995.717 2003.993     0}
-\NormalTok{| 5 42   F 1961.296 1987.884 1996.650 2003.955     0}
-\NormalTok{| 6 46   F 1952.374 1983.419       NA 1991.484     2}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{1}
-\tightlist
 \item
   Use the \texttt{Lexis} function to declare the data as
   survival data with age, calendar time and time since entry into
@@ -7842,7 +8086,6 @@ Variable & Description \\
   \texttt{NRA}) is the first, as \texttt{Lexis} assumes that
   everyone starts in this state (unless of course
   \texttt{entry.status} is specified):
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7857,7 +8100,7 @@ Variable & Description \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{| NOTE: entry.status has been set to "NRA" for all.}
+\NormalTok{NOTE: entry.status has been set to "NRA" for all.}
 \end{Highlighting}
 \end{Shaded}
 
@@ -7869,27 +8112,27 @@ Variable & Description \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{| Classes \textquotesingle{}Lexis\textquotesingle{} and \textquotesingle{}data.frame\textquotesingle{}: 125 obs. of  14 variables:}
-\NormalTok{|  $ per    : num  1996 1990 1988 1995 1988 ...}
-\NormalTok{|  $ age    : num  28.1 30.2 25.8 44.5 26.6 ...}
-\NormalTok{|  $ tfi    : num  0 0 0 0 0 0 0 0 0 0 ...}
-\NormalTok{|  $ lex.dur: num  1.08 6.6 5.39 8.75 16.07 ...}
-\NormalTok{|  $ lex.Cst: Factor w/ 2 levels "NRA","ESRD": 1 1 1 1 1 1 1 1 1 1 ...}
-\NormalTok{|  $ lex.Xst: Factor w/ 2 levels "NRA","ESRD": 2 2 2 1 1 2 2 1 2 1 ...}
-\NormalTok{|  $ lex.id : int  1 2 3 4 5 6 7 8 9 10 ...}
-\NormalTok{|  $ id     : num  17 26 27 33 42 46 47 55 62 64 ...}
-\NormalTok{|  $ sex    : Factor w/ 2 levels "M","F": 1 2 2 1 2 2 1 1 2 1 ...}
-\NormalTok{|  $ dob    : num  1968 1959 1962 1951 1961 ...}
-\NormalTok{|  $ doe    : num  1996 1990 1988 1995 1988 ...}
-\NormalTok{|  $ dor    : num  NA 1990 NA 1996 1997 ...}
-\NormalTok{|  $ dox    : num  1997 1996 1993 2004 2004 ...}
-\NormalTok{|  $ event  : num  2 1 3 0 0 2 1 0 2 0 ...}
-\NormalTok{|  {-} attr(*, "time.scales")= chr [1:3] "per" "age" "tfi"}
-\NormalTok{|  {-} attr(*, "time.since")= chr [1:3] "" "" ""}
-\NormalTok{|  {-} attr(*, "breaks")=List of 3}
-\NormalTok{|   ..$ per: NULL}
-\NormalTok{|   ..$ age: NULL}
-\NormalTok{|   ..$ tfi: NULL}
+\NormalTok{Classes \textquotesingle{}Lexis\textquotesingle{} and \textquotesingle{}data.frame\textquotesingle{}:   125 obs. of  14 variables:}
+\NormalTok{ $ per    : num  1996 1990 1988 1995 1988 ...}
+\NormalTok{ $ age    : num  28.1 30.2 25.8 44.5 26.6 ...}
+\NormalTok{ $ tfi    : num  0 0 0 0 0 0 0 0 0 0 ...}
+\NormalTok{ $ lex.dur: num  1.08 6.6 5.39 8.75 16.07 ...}
+\NormalTok{ $ lex.Cst: Factor w/ 2 levels "NRA","ESRD": 1 1 1 1 1 1 1 1 1 1 ...}
+\NormalTok{ $ lex.Xst: Factor w/ 2 levels "NRA","ESRD": 2 2 2 1 1 2 2 1 2 1 ...}
+\NormalTok{ $ lex.id : int  1 2 3 4 5 6 7 8 9 10 ...}
+\NormalTok{ $ id     : num  17 26 27 33 42 46 47 55 62 64 ...}
+\NormalTok{ $ sex    : Factor w/ 2 levels "M","F": 1 2 2 1 2 2 1 1 2 1 ...}
+\NormalTok{ $ dob    : num  1968 1959 1962 1951 1961 ...}
+\NormalTok{ $ doe    : num  1996 1990 1988 1995 1988 ...}
+\NormalTok{ $ dor    : num  NA 1990 NA 1996 1997 ...}
+\NormalTok{ $ dox    : num  1997 1996 1993 2004 2004 ...}
+\NormalTok{ $ event  : num  2 1 3 0 0 2 1 0 2 0 ...}
+\NormalTok{ {-} attr(*, "time.scales")= chr [1:3] "per" "age" "tfi"}
+\NormalTok{ {-} attr(*, "time.since")= chr [1:3] "" "" ""}
+\NormalTok{ {-} attr(*, "breaks")=List of 3}
+\NormalTok{  ..$ per: NULL}
+\NormalTok{  ..$ age: NULL}
+\NormalTok{  ..$ tfi: NULL}
 \end{Highlighting}
 \end{Shaded}
 
@@ -7901,55 +8144,43 @@ Variable & Description \\
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|      }
-\NormalTok{| Transitions:}
-\NormalTok{|      To}
-\NormalTok{| From  NRA ESRD  Records:  Events: Risk time:  Persons:}
-\NormalTok{|   NRA  48   77       125       77    1084.67       125}
+
+\NormalTok{Transitions:}
+\NormalTok{     To}
+\NormalTok{From  NRA ESRD  Records:  Events: Risk time:  Persons:}
+\NormalTok{  NRA  48   77       125       77    1084.67       125}
 \end{Highlighting}
 \end{Shaded}
 
-Make sure you know what the variables in \texttt{Lr} stand for.
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{2}
-\tightlist
+  Make sure you know what the variables in \texttt{Lr} stand for.
 \item
   Visualize the follow-up in a Lexis-diagram, by using the
   \texttt{plot} method for \texttt{Lexis} objects.
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-   \FunctionTok{plot}\NormalTok{(Lr, }\AttributeTok{col =} \StringTok{"black"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{3}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(Lr, }\AttributeTok{col =} \StringTok{"black"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{3}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-   \FunctionTok{subset}\NormalTok{(Lr, age }\SpecialCharTok{\textless{}} \DecValTok{0}\NormalTok{)}
+\FunctionTok{subset}\NormalTok{(Lr, age }\SpecialCharTok{\textless{}} \DecValTok{0}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|  lex.id     per    age tfi lex.dur lex.Cst lex.Xst  id sex      dob      doe dor      dox}
-\NormalTok{|      88 1989.34 {-}38.81   0     3.5     NRA    ESRD 586   M 2028.155 1989.343  NA 1992.839}
-\NormalTok{|  event}
-\NormalTok{|      1}
+\NormalTok{ lex.id     per    age tfi lex.dur lex.Cst lex.Xst  id sex      dob      doe dor      dox}
+\NormalTok{     88 1989.34 {-}38.81   0     3.5     NRA    ESRD 586   M 2028.155 1989.343  NA 1992.839}
+\NormalTok{ event}
+\NormalTok{     1}
 \end{Highlighting}
 \end{Shaded}
 
-What is wrong here? List the data for the person with negative entry age.
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{3}
-\tightlist
+  What is wrong here? List the data for the person with negative entry age.
 \item
   Correct the data and make a new plot, for example by:
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7961,10 +8192,10 @@ What is wrong here? List the data for the person with negative entry age.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|  lex.id     per   age tfi lex.dur lex.Cst lex.Xst  id sex      dob      doe dor      dox}
-\NormalTok{|      88 1989.34 61.19   0     3.5     NRA    ESRD 586   M 1928.155 1989.343  NA 1992.839}
-\NormalTok{|  event}
-\NormalTok{|      1}
+\NormalTok{ lex.id     per   age tfi lex.dur lex.Cst lex.Xst  id sex      dob      doe dor      dox}
+\NormalTok{     88 1989.34 61.19   0     3.5     NRA    ESRD 586   M 1928.155 1989.343  NA 1992.839}
+\NormalTok{ event}
+\NormalTok{     1}
 \end{Highlighting}
 \end{Shaded}
 
@@ -7973,16 +8204,10 @@ What is wrong here? List the data for the person with negative entry age.
 \FunctionTok{plot}\NormalTok{(Lr, }\AttributeTok{col =} \StringTok{"black"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{3}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{4}
-\tightlist
 \item
-  Now make a Cox-regression analysis of the endpoint ESRD with
+  Now make a Cox-regression analysis of ESRD occurrence with
   the variables sex and age at entry into the study, using time
   since entry to the study as time scale.
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7994,34 +8219,29 @@ What is wrong here? List the data for the person with negative entry age.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{| Call:}
-\NormalTok{| coxph(formula = Surv(lex.dur, lex.Xst == "ESRD") \textasciitilde{} I(age/10) + }
-\NormalTok{|     sex, data = Lr)}
-\NormalTok{| }
-\NormalTok{|   n= 125, number of events= 77 }
-\NormalTok{| }
-\NormalTok{|              coef exp(coef) se(coef)      z Pr(\textgreater{}|z|)}
-\NormalTok{| I(age/10)  0.5514    1.7357   0.1402  3.932 8.43e{-}05}
-\NormalTok{| sexF      {-}0.1817    0.8338   0.2727 {-}0.666    0.505}
-\NormalTok{| }
-\NormalTok{|           exp(coef) exp({-}coef) lower .95 upper .95}
-\NormalTok{| I(age/10)    1.7357     0.5761    1.3186     2.285}
-\NormalTok{| sexF         0.8338     1.1993    0.4886     1.423}
-\NormalTok{| }
-\NormalTok{| Concordance= 0.612  (se = 0.036 )}
-\NormalTok{| Likelihood ratio test= 16.07  on 2 df,   p=3e{-}04}
-\NormalTok{| Wald test            = 16.38  on 2 df,   p=3e{-}04}
-\NormalTok{| Score (logrank) test = 16.77  on 2 df,   p=2e{-}04}
+\NormalTok{Call:}
+\NormalTok{coxph(formula = Surv(lex.dur, lex.Xst == "ESRD") \textasciitilde{} I(age/10) + }
+\NormalTok{    sex, data = Lr)}
+
+\NormalTok{  n= 125, number of events= 77 }
+
+\NormalTok{             coef exp(coef) se(coef)      z Pr(\textgreater{}|z|)}
+\NormalTok{I(age/10)  0.5514    1.7357   0.1402  3.932 8.43e{-}05}
+\NormalTok{sexF      {-}0.1817    0.8338   0.2727 {-}0.666    0.505}
+
+\NormalTok{          exp(coef) exp({-}coef) lower .95 upper .95}
+\NormalTok{I(age/10)    1.7357     0.5761    1.3186     2.285}
+\NormalTok{sexF         0.8338     1.1993    0.4886     1.423}
+
+\NormalTok{Concordance= 0.612  (se = 0.036 )}
+\NormalTok{Likelihood ratio test= 16.07  on 2 df,   p=3e{-}04}
+\NormalTok{Wald test            = 16.38  on 2 df,   p=3e{-}04}
+\NormalTok{Score (logrank) test = 16.77  on 2 df,   p=2e{-}04}
 \end{Highlighting}
 \end{Shaded}
 
-What is the hazard ratio between males and females?
-Between two persons who differ 10 years in age at entry?
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{5}
-\tightlist
+  What is the hazard ratio between males and females?
+  Between two persons who differ 10 years in age at entry?
 \item
   The main focus of the paper was to assess whether the occurrence of
   remission (return to a lower level of albumin excretion, an
@@ -8029,25 +8249,23 @@ Between two persons who differ 10 years in age at entry?
   \emph{Remission} is a time-dependent variable which is initially 0, but
   takes the value 1 when remission occurs. In order to handle this, each
   person who sees a remission must have two records:
-\end{enumerate}
 
-\begin{itemize}
-\tightlist
-\item
-  One record for the time before remission, where entry is
-  \texttt{doe}, exit is \texttt{dor}, remission is 0, and event is
-  0.
-\item
-  One record for the time after remission, where entry is
-  \texttt{dor}, exit is \texttt{dox}, remission is 1, and event is 0
-  or 1 according to whether the person had an event at \texttt{dox}.
-\end{itemize}
+  \begin{itemize}
+  \tightlist
+  \item
+    One record for the time before remission, where entry is
+    \texttt{doe}, exit is \texttt{dor}, remission is 0, and event is 0.
+  \item
+    One record for the time after remission, where entry is
+    \texttt{dor}, exit is \texttt{dox}, remission is 1, and event is 0
+    or 1 according to whether the person had an event at \texttt{dox}.
+  \end{itemize}
 
-This is accomplished using the \texttt{cutLexis} function on the
-\texttt{Lexis} object, where we introduce a remission state \texttt{Rem}.
-Also use \texttt{split.state=TRUE} to
-have different ESRD states according to whether a person had had
-remission or not prioer to ESRD. The statement to do this is:
+  This is accomplished using the \texttt{cutLexis} function on the
+  \texttt{Lexis} object, where we introduce a remission state \texttt{Rem}.
+  Also use \texttt{split.state=TRUE} to
+  have different ESRD states according to whether a person had had
+  remission or not prioer to ESRD. The statement to do this is:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8061,28 +8279,22 @@ remission or not prioer to ESRD. The statement to do this is:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|      }
-\NormalTok{| Transitions:}
-\NormalTok{|      To}
-\NormalTok{| From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{|   NRA  24  29   69         0       122       98     824.77       122}
-\NormalTok{|   Rem   0  24    0         8        32        8     259.90        32}
-\NormalTok{|   Sum  24  53   69         8       154      106    1084.67       125}
+
+\NormalTok{Transitions:}
+\NormalTok{     To}
+\NormalTok{From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
+\NormalTok{  NRA  24  29   69         0       122       98     824.77       122}
+\NormalTok{  Rem   0  24    0         8        32        8     259.90        32}
+\NormalTok{  Sum  24  53   69         8       154      106    1084.67       125}
 \end{Highlighting}
 \end{Shaded}
 
-List the records from a few select persons (choose values for
-\texttt{lex.id}, using for example \texttt{subset(Lc,\ lex.id\ \%in\%\ c(5,7,9))}).
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{7}
-\tightlist
+  List the records from a few select persons (choose values for
+  \texttt{lex.id}, using for example \texttt{subset(Lc,\ lex.id\ \%in\%\ c(5,7,9))}).
 \item
   Now show how the states are connected and the number of transitions
   between them by using \texttt{boxes}. This is an interactive command
   that requires you to click in the graph window:
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8090,7 +8302,7 @@ List the records from a few select persons (choose values for
 \end{Highlighting}
 \end{Shaded}
 
-It has a couple of fancy arguments, try:
+  It has a couple of fancy arguments, try:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8098,13 +8310,8 @@ It has a couple of fancy arguments, try:
 \end{Highlighting}
 \end{Shaded}
 
-You may even be tempted to read the help page for
-\texttt{boxes.Lexis} \ldots{}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{8}
-\tightlist
+  You may even be tempted to read the help page for
+  \texttt{boxes.Lexis} \ldots{}
 \item
   Plot a Lexis diagram where different coloring is
   used for different segments of the follow-up. The
@@ -8113,7 +8320,6 @@ You may even be tempted to read the help page for
   \texttt{lex.Xst} as appropriate --- indexing by a factor corresponds
   to indexing by the \emph{index number} of the factor levels, so you
   must be know which order the factor levels are in:
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8123,7 +8329,7 @@ You may even be tempted to read the help page for
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{| [1] "NRA"       "Rem"       "ESRD"      "ESRD(Rem)"}
+\NormalTok{[1] "NRA"       "Rem"       "ESRD"      "ESRD(Rem)"}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8141,11 +8347,6 @@ You may even be tempted to read the help page for
            \AttributeTok{col =} \StringTok{"black"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{9}
-\tightlist
 \item
   Make a Cox-regression of mortality rates (i.e.~endpoint \texttt{ESRD} or
   \texttt{ESRD(Rem)}) with sex, age at entry and remission as
@@ -8154,7 +8355,6 @@ You may even be tempted to read the help page for
   indicate that each record represents follow-up from
   \texttt{tfi} to \texttt{tfi+lex.dur}. Make sure that you know
   why what goes where here in the call to \texttt{coxph}.
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8164,7 +8364,7 @@ You may even be tempted to read the help page for
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{| [1] "ESRD"      "ESRD(Rem)"}
+\NormalTok{[1] "ESRD"      "ESRD(Rem)"}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8182,50 +8382,44 @@ You may even be tempted to read the help page for
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{| Call:}
-\NormalTok{| coxph(formula = Surv(tfi, tfi + lex.dur, lex.Xst \%in\% EP) \textasciitilde{} sex + }
-\NormalTok{|     I((doe {-} dob {-} 50)/10) + (lex.Cst == "Rem"), data = Lc)}
-\NormalTok{| }
-\NormalTok{|   n= 154, number of events= 77 }
-\NormalTok{| }
-\NormalTok{|                            coef exp(coef) se(coef)      z Pr(\textgreater{}|z|)}
-\NormalTok{| sexF                   {-}0.05534   0.94616  0.27500 {-}0.201 0.840517}
-\NormalTok{| I((doe {-} dob {-} 50)/10)  0.52190   1.68522  0.13655  3.822 0.000132}
-\NormalTok{| lex.Cst == "Rem"TRUE   {-}1.26241   0.28297  0.38483 {-}3.280 0.001036}
-\NormalTok{| }
-\NormalTok{|                        exp(coef) exp({-}coef) lower .95 upper .95}
-\NormalTok{| sexF                      0.9462     1.0569    0.5519    1.6220}
-\NormalTok{| I((doe {-} dob {-} 50)/10)    1.6852     0.5934    1.2895    2.2024}
-\NormalTok{| lex.Cst == "Rem"TRUE      0.2830     3.5339    0.1331    0.6016}
-\NormalTok{| }
-\NormalTok{| Concordance= 0.664  (se = 0.033 )}
-\NormalTok{| Likelihood ratio test= 30.31  on 3 df,   p=1e{-}06}
-\NormalTok{| Wald test            = 27.07  on 3 df,   p=6e{-}06}
-\NormalTok{| Score (logrank) test = 29.41  on 3 df,   p=2e{-}06}
+\NormalTok{Call:}
+\NormalTok{coxph(formula = Surv(tfi, tfi + lex.dur, lex.Xst \%in\% EP) \textasciitilde{} sex + }
+\NormalTok{    I((doe {-} dob {-} 50)/10) + (lex.Cst == "Rem"), data = Lc)}
+
+\NormalTok{  n= 154, number of events= 77 }
+
+\NormalTok{                           coef exp(coef) se(coef)      z Pr(\textgreater{}|z|)}
+\NormalTok{sexF                   {-}0.05534   0.94616  0.27500 {-}0.201 0.840517}
+\NormalTok{I((doe {-} dob {-} 50)/10)  0.52190   1.68522  0.13655  3.822 0.000132}
+\NormalTok{lex.Cst == "Rem"TRUE   {-}1.26241   0.28297  0.38483 {-}3.280 0.001036}
+
+\NormalTok{                       exp(coef) exp({-}coef) lower .95 upper .95}
+\NormalTok{sexF                      0.9462     1.0569    0.5519    1.6220}
+\NormalTok{I((doe {-} dob {-} 50)/10)    1.6852     0.5934    1.2895    2.2024}
+\NormalTok{lex.Cst == "Rem"TRUE      0.2830     3.5339    0.1331    0.6016}
+
+\NormalTok{Concordance= 0.664  (se = 0.033 )}
+\NormalTok{Likelihood ratio test= 30.31  on 3 df,   p=1e{-}06}
+\NormalTok{Wald test            = 27.07  on 3 df,   p=6e{-}06}
+\NormalTok{Score (logrank) test = 29.41  on 3 df,   p=2e{-}06}
 \end{Highlighting}
 \end{Shaded}
 
-What is the effect of of remission on the rate of ESRD?
+  What is the effect of of remission on the rate of ESRD?
 
-\section{Splitting the follow-up time}\label{splitting-the-follow-up-time}
+  \section{Splitting the follow-up time}\label{splitting-the-follow-up-time}
 
-In order to explore the effect of remission on the rate of ESRD, we
-split the data further into small pieces of follow-up. To this
-end we use the function \texttt{splitLexis}. The rates can then be
-modeled using a Poisson-model, and the shape of the effect of the
-underlying \emph{rates} be explored. Furthermore, we can allow effects of both
-time since NRA and current age. To this end we will use splines, so we
-need the \texttt{splines} and also the \texttt{mgcv} packages.
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{10}
-\tightlist
+  In order to explore the effect of remission on the rate of ESRD, we
+  split the data further into small pieces of follow-up. To this
+  end we use the function \texttt{splitLexis}. The rates can then be
+  modeled using a Poisson-model, and the shape of the effect of the
+  underlying \emph{rates} be explored. Furthermore, we can allow effects of both
+  time since NRA and current age. To this end we will use splines, so we
+  need the \texttt{splines} and also the \texttt{mgcv} packages.
 \item
   Now split the follow-up time every month after entry, and verify
   that the number of events and risk time is the same as before and
   after the split:
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8236,13 +8430,13 @@ need the \texttt{splines} and also the \texttt{mgcv} packages.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|      }
-\NormalTok{| Transitions:}
-\NormalTok{|      To}
-\NormalTok{| From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{|   NRA  24  29   69         0       122       98     824.77       122}
-\NormalTok{|   Rem   0  24    0         8        32        8     259.90        32}
-\NormalTok{|   Sum  24  53   69         8       154      106    1084.67       125}
+
+\NormalTok{Transitions:}
+\NormalTok{     To}
+\NormalTok{From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
+\NormalTok{  NRA  24  29   69         0       122       98     824.77       122}
+\NormalTok{  Rem   0  24    0         8        32        8     259.90        32}
+\NormalTok{  Sum  24  53   69         8       154      106    1084.67       125}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8254,20 +8448,15 @@ need the \texttt{splines} and also the \texttt{mgcv} packages.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|      }
-\NormalTok{| Transitions:}
-\NormalTok{|      To}
-\NormalTok{| From   NRA  Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{|   NRA 9854   29   69         0      9952       98     824.77       122}
-\NormalTok{|   Rem    0 3139    0         8      3147        8     259.90        32}
-\NormalTok{|   Sum 9854 3168   69         8     13099      106    1084.67       125}
+
+\NormalTok{Transitions:}
+\NormalTok{     To}
+\NormalTok{From   NRA  Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
+\NormalTok{  NRA 9854   29   69         0      9952       98     824.77       122}
+\NormalTok{  Rem    0 3139    0         8      3147        8     259.90        32}
+\NormalTok{  Sum 9854 3168   69         8     13099      106    1084.67       125}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{11}
-\tightlist
 \item
   Now fit the Poisson-model corresponding to the Cox-model
   we fitted previously. The function \texttt{Ns()} produces a model
@@ -8275,7 +8464,6 @@ need the \texttt{splines} and also the \texttt{mgcv} packages.
   baseline hazard explicitly (think of the \texttt{Ns} terms as the
   baseline hazard that is not visible in the Cox-model). You
   can use the wrapper function \texttt{glm.Lexis}
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8288,10 +8476,10 @@ need the \texttt{splines} and also the \texttt{mgcv} packages.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{| stats::glm Poisson analysis of Lexis object sLc with log link:}
-\NormalTok{| Rates for transitions:}
-\NormalTok{| NRA{-}\textgreater{}ESRD}
-\NormalTok{| Rem{-}\textgreater{}ESRD(Rem)}
+\NormalTok{stats::glm Poisson analysis of Lexis object sLc with log link:}
+\NormalTok{Rates for transitions:}
+\NormalTok{NRA{-}\textgreater{}ESRD}
+\NormalTok{Rem{-}\textgreater{}ESRD(Rem)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8303,28 +8491,22 @@ need the \texttt{splines} and also the \texttt{mgcv} packages.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|                                    exp(Est.)        2.5\%        97.5\%}
-\NormalTok{| (Intercept)                       0.01664432 0.003956666   0.07001685}
-\NormalTok{| Ns(tfi, knots = c(0, 2, 5, 10))1  5.18917655 1.949197027  13.81469029}
-\NormalTok{| Ns(tfi, knots = c(0, 2, 5, 10))2 34.20004199 1.764818735 662.75524463}
-\NormalTok{| Ns(tfi, knots = c(0, 2, 5, 10))3  4.43318269 2.179977108   9.01528219}
-\NormalTok{| sexF                              0.91751162 0.536258443   1.56981691}
-\NormalTok{| I((doe {-} dob {-} 40)/10)            1.70082390 1.300813859   2.22384004}
-\NormalTok{| I(lex.Cst == "Rem")TRUE           0.27927558 0.131396852   0.59358233}
+\NormalTok{                                   exp(Est.)        2.5\%        97.5\%}
+\NormalTok{(Intercept)                       0.01664432 0.003956666   0.07001685}
+\NormalTok{Ns(tfi, knots = c(0, 2, 5, 10))1  5.18917655 1.949197027  13.81469029}
+\NormalTok{Ns(tfi, knots = c(0, 2, 5, 10))2 34.20004199 1.764818735 662.75524463}
+\NormalTok{Ns(tfi, knots = c(0, 2, 5, 10))3  4.43318269 2.179977108   9.01528219}
+\NormalTok{sexF                              0.91751162 0.536258443   1.56981691}
+\NormalTok{I((doe {-} dob {-} 40)/10)            1.70082390 1.300813859   2.22384004}
+\NormalTok{I(lex.Cst == "Rem")TRUE           0.27927558 0.131396852   0.59358233}
 \end{Highlighting}
 \end{Shaded}
 
-How does the effects of sex change from the Cox-model?
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{12}
-\tightlist
+  How does the effects of sex change from the Cox-model?
 \item
   Try instead using the \texttt{gam} function from the
   \texttt{mgcv} package. There is convenience wrapper for this for
   \texttt{Lexis} objects as well:
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8332,17 +8514,16 @@ How does the effects of sex change from the Cox-model?
 \NormalTok{mx }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(sLc,}
                 \SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(tfi, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+} 
 \NormalTok{                  sex }\SpecialCharTok{+} \FunctionTok{I}\NormalTok{((doe }\SpecialCharTok{{-}}\NormalTok{ dob }\SpecialCharTok{{-}} \DecValTok{40}\NormalTok{) }\SpecialCharTok{/} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+} 
-                  \FunctionTok{I}\NormalTok{(lex.Cst }\SpecialCharTok{==} \StringTok{"Rem"}\NormalTok{)}
-\NormalTok{)}
+                  \FunctionTok{I}\NormalTok{(lex.Cst }\SpecialCharTok{==} \StringTok{"Rem"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{| mgcv::gam Poisson analysis of Lexis object sLc with log link:}
-\NormalTok{| Rates for transitions:}
-\NormalTok{| NRA{-}\textgreater{}ESRD}
-\NormalTok{| Rem{-}\textgreater{}ESRD(Rem)}
+\NormalTok{mgcv::gam Poisson analysis of Lexis object sLc with log link:}
+\NormalTok{Rates for transitions:}
+\NormalTok{NRA{-}\textgreater{}ESRD}
+\NormalTok{Rem{-}\textgreater{}ESRD(Rem)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8354,10 +8535,10 @@ How does the effects of sex change from the Cox-model?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|                         exp(Est.)      2.5\%     97.5\%}
-\NormalTok{| I(lex.Cst == "Rem")TRUE 0.2792756 0.1313969 0.5935823}
-\NormalTok{| I((doe {-} dob {-} 40)/10)  1.7008239 1.3008139 2.2238400}
-\NormalTok{| sexF                    0.9175116 0.5362584 1.5698169}
+\NormalTok{                        exp(Est.)      2.5\%     97.5\%}
+\NormalTok{I(lex.Cst == "Rem")TRUE 0.2792756 0.1313969 0.5935823}
+\NormalTok{I((doe {-} dob {-} 40)/10)  1.7008239 1.3008139 2.2238400}
+\NormalTok{sexF                    0.9175116 0.5362584 1.5698169}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8369,24 +8550,18 @@ How does the effects of sex change from the Cox-model?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|                         exp(Est.)      2.5\%     97.5\%}
-\NormalTok{| I(lex.Cst == "Rem")TRUE 0.2784659 0.1309446 0.5921838}
-\NormalTok{| I((doe {-} dob {-} 40)/10)  1.6992069 1.2995225 2.2218192}
-\NormalTok{| sexF                    0.9309945 0.5435486 1.5946150}
+\NormalTok{                        exp(Est.)      2.5\%     97.5\%}
+\NormalTok{I(lex.Cst == "Rem")TRUE 0.2784659 0.1309446 0.5921838}
+\NormalTok{I((doe {-} dob {-} 40)/10)  1.6992069 1.2995225 2.2218192}
+\NormalTok{sexF                    0.9309945 0.5435486 1.5946150}
 \end{Highlighting}
 \end{Shaded}
 
-We see that there is virtually no difference between the two
-approaches in terms of the regression parameters.
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{13}
-\tightlist
+  We see that there is virtually no difference between the two
+  approaches in terms of the regression parameters.
 \item
   Extract the regression parameters from the models using
   \texttt{ci.exp} and compare with the estimates from the Cox-model:
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8396,10 +8571,10 @@ approaches in terms of the regression parameters.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|                         exp(Est.)      2.5\%     97.5\%            P}
-\NormalTok{| sexF                    0.9309945 0.5435486 1.5946150 0.7945394004}
-\NormalTok{| I((doe {-} dob {-} 40)/10)  1.6992069 1.2995225 2.2218192 0.0001066910}
-\NormalTok{| I(lex.Cst == "Rem")TRUE 0.2784659 0.1309446 0.5921838 0.0008970863}
+\NormalTok{                        exp(Est.)      2.5\%     97.5\%            P}
+\NormalTok{sexF                    0.9309945 0.5435486 1.5946150 0.7945394004}
+\NormalTok{I((doe {-} dob {-} 40)/10)  1.6992069 1.2995225 2.2218192 0.0001066910}
+\NormalTok{I(lex.Cst == "Rem")TRUE 0.2784659 0.1309446 0.5921838 0.0008970863}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8411,10 +8586,10 @@ approaches in terms of the regression parameters.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|                        exp(Est.)      2.5\%    97.5\%}
-\NormalTok{| sexF                   0.9461646 0.5519334 1.621985}
-\NormalTok{| I((doe {-} dob {-} 50)/10) 1.6852196 1.2895097 2.202360}
-\NormalTok{| lex.Cst == "Rem"TRUE   0.2829710 0.1330996 0.601599}
+\NormalTok{                       exp(Est.)      2.5\%    97.5\%}
+\NormalTok{sexF                   0.9461646 0.5519334 1.621985}
+\NormalTok{I((doe {-} dob {-} 50)/10) 1.6852196 1.2895097 2.202360}
+\NormalTok{lex.Cst == "Rem"TRUE   0.2829710 0.1330996 0.601599}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8426,19 +8601,14 @@ approaches in terms of the regression parameters.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|                         exp(Est.) 2.5\% 97.5\%}
-\NormalTok{| sexF                         0.97 0.97  0.97}
-\NormalTok{| I((doe {-} dob {-} 40)/10)       1.01 1.01  1.01}
-\NormalTok{| I(lex.Cst == "Rem")TRUE      0.99 0.99  0.99}
+\NormalTok{                        exp(Est.) 2.5\% 97.5\%}
+\NormalTok{sexF                         0.97 0.97  0.97}
+\NormalTok{I((doe {-} dob {-} 40)/10)       1.01 1.01  1.01}
+\NormalTok{I(lex.Cst == "Rem")TRUE      0.99 0.99  0.99}
 \end{Highlighting}
 \end{Shaded}
 
-How large are the differences in estimated regression parameters?
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{14}
-\tightlist
+  How large are the differences in estimated regression parameters?
 \item
   The model has the same assumptions as the Cox-model about
   proportionality of rates, but there is an additional assumption that
@@ -8448,7 +8618,6 @@ How large are the differences in estimated regression parameters?
   model. The \texttt{gam} model optimizes the shape of the smoother by
   general cross-validation. Try to look at the shape of the
   estimated effect of \texttt{tfi}:
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8456,12 +8625,7 @@ How large are the differences in estimated regression parameters?
 \end{Highlighting}
 \end{Shaded}
 
-Is this a useful plot?
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{15}
-\tightlist
+  Is this a useful plot?
 \item
   However, \texttt{plot} (well, \texttt{plot.gam}) does not give you the \emph{absolute}
   level of the underlying rates because it bypasses the intercept. So
@@ -8470,7 +8634,6 @@ Is this a useful plot?
   in the model specification is entered as \texttt{doe-dob}, hence
   the prediction data frame must have these two variables and not
   the age, but it is only the difference that matters for the prediction:
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8485,12 +8648,12 @@ Is this a useful plot?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{| \textquotesingle{}data.frame\textquotesingle{}: 201 obs. of  5 variables:}
-\NormalTok{|  $ tfi    : num  0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 ...}
-\NormalTok{|  $ sex    : chr  "M" "M" "M" "M" ...}
-\NormalTok{|  $ doe    : num  1990 1990 1990 1990 1990 1990 1990 1990 1990 1990 ...}
-\NormalTok{|  $ dob    : num  1940 1940 1940 1940 1940 1940 1940 1940 1940 1940 ...}
-\NormalTok{|  $ lex.Cst: chr  "NRA" "NRA" "NRA" "NRA" ...}
+\NormalTok{\textquotesingle{}data.frame\textquotesingle{}:   201 obs. of  5 variables:}
+\NormalTok{ $ tfi    : num  0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 ...}
+\NormalTok{ $ sex    : chr  "M" "M" "M" "M" ...}
+\NormalTok{ $ doe    : num  1990 1990 1990 1990 1990 1990 1990 1990 1990 1990 ...}
+\NormalTok{ $ dob    : num  1940 1940 1940 1940 1940 1940 1940 1940 1940 1940 ...}
+\NormalTok{ $ lex.Cst: chr  "NRA" "NRA" "NRA" "NRA" ...}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8501,25 +8664,26 @@ Is this a useful plot?
          \AttributeTok{plot =} \ConstantTok{TRUE}\NormalTok{,}
          \AttributeTok{type =} \StringTok{"l"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{3}\SpecialCharTok{:}\DecValTok{4}\NormalTok{, }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"forestgreen"}\NormalTok{),}
          \AttributeTok{log =} \StringTok{"y"}\NormalTok{, }\AttributeTok{xlab =} \StringTok{"Time since entry (years)"}\NormalTok{,}
-         \AttributeTok{ylab =} \StringTok{"ESRD rate (per 100 PY) for 50 year man"}
-\NormalTok{)}
+         \AttributeTok{ylab =} \StringTok{"ESRD rate (per 100 PY) for 50 year old men"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-Try to overlay with the corresponding prediction from the
-\texttt{glm} model using \texttt{Ns}.
+  Try to overlay with the corresponding prediction from the
+  \texttt{glm} model using \texttt{Ns}.
+\end{enumerate}
 
-\section{Prediction from the multistate model}\label{prediction-from-the-multistate-model}
+\#\# Prediction from the multistate model
 
+\begin{verbatim}
 If we want to make proper statements about the survival and disease
 probabilities we must know not only how the occurrence of remission
 influences the rate of death/ESRD, but we must also model the
 occurrence rate of remission itself.
+\end{verbatim}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \setcounter{enumi}{16}
-\tightlist
 \item
   The rates of ESRD were modelled by a Poisson model with
   effects of age and time since NRA --- in the models \texttt{mp}
@@ -8530,7 +8694,6 @@ occurrence rate of remission itself.
   that only the records that represent follow-up in the \texttt{NRA}
   state should be used; this is most easily done using the
   \texttt{gam.Lexis} function
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8542,9 +8705,9 @@ occurrence rate of remission itself.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{| mgcv::gam Poisson analysis of Lexis object sLc with log link:}
-\NormalTok{| Rates for the transition:}
-\NormalTok{| NRA{-}\textgreater{}Rem}
+\NormalTok{mgcv::gam Poisson analysis of Lexis object sLc with log link:}
+\NormalTok{Rates for the transition:}
+\NormalTok{NRA{-}\textgreater{}Rem}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8556,25 +8719,25 @@ occurrence rate of remission itself.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{| }
-\NormalTok{| Family: poisson }
-\NormalTok{| Link function: log }
-\NormalTok{| }
-\NormalTok{| Formula:}
-\NormalTok{| cbind(trt(Lx$lex.Cst, Lx$lex.Xst) \%in\% trnam, Lx$lex.dur) \textasciitilde{} s(tfi, }
-\NormalTok{|     k = 10) + sex}
-\NormalTok{| }
-\NormalTok{| Parametric coefficients:}
-\NormalTok{|             Estimate Std. Error z value Pr(\textgreater{}|z|)}
-\NormalTok{| (Intercept)  {-}3.7025     0.2582 {-}14.339   \textless{}2e{-}16}
-\NormalTok{| sexF          0.9579     0.3728   2.569   0.0102}
-\NormalTok{| }
-\NormalTok{| Approximate significance of smooth terms:}
-\NormalTok{|          edf Ref.df Chi.sq p{-}value}
-\NormalTok{| s(tfi) 1.013  1.025  0.066   0.813}
-\NormalTok{| }
-\NormalTok{| R{-}sq.(adj) =  {-}5.65e{-}06   Deviance explained = 1.65\%}
-\NormalTok{| UBRE = {-}0.96024  Scale est. = 1         n = 9952}
+
+\NormalTok{Family: poisson }
+\NormalTok{Link function: log }
+
+\NormalTok{Formula:}
+\NormalTok{cbind(trt(Lx$lex.Cst, Lx$lex.Xst) \%in\% trnam, Lx$lex.dur) \textasciitilde{} s(tfi, }
+\NormalTok{    k = 10) + sex}
+
+\NormalTok{Parametric coefficients:}
+\NormalTok{            Estimate Std. Error z value Pr(\textgreater{}|z|)}
+\NormalTok{(Intercept)  {-}3.7025     0.2582 {-}14.339   \textless{}2e{-}16}
+\NormalTok{sexF          0.9579     0.3728   2.569   0.0102}
+
+\NormalTok{Approximate significance of smooth terms:}
+\NormalTok{         edf Ref.df Chi.sq p{-}value}
+\NormalTok{s(tfi) 1.013  1.025  0.066   0.813}
+
+\NormalTok{R{-}sq.(adj) =  {-}5.65e{-}06   Deviance explained = 1.65\%}
+\NormalTok{UBRE = {-}0.96024  Scale est. = 1         n = 9952}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8586,27 +8749,22 @@ occurrence rate of remission itself.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|              exp(Est.)       2.5\%      97.5\%            P}
-\NormalTok{| (Intercept) 0.02466174 0.01486718 0.04090901 1.254019e{-}46}
-\NormalTok{| sexF        2.60620470 1.25503844 5.41202779 1.019130e{-}02}
-\NormalTok{| s(tfi).1    1.00499489 0.89131271 1.13317662 9.351638e{-}01}
-\NormalTok{| s(tfi).2    0.99623769 0.80778743 1.22865188 9.718940e{-}01}
-\NormalTok{| s(tfi).3    0.99822247 0.91911268 1.08414140 9.663137e{-}01}
-\NormalTok{| s(tfi).4    1.00188999 0.89006998 1.12775801 9.750528e{-}01}
-\NormalTok{| s(tfi).5    0.99842904 0.92280785 1.08024715 9.687920e{-}01}
-\NormalTok{| s(tfi).6    0.99817367 0.90142303 1.10530865 9.719666e{-}01}
-\NormalTok{| s(tfi).7    1.00168704 0.92615949 1.08337380 9.663850e{-}01}
-\NormalTok{| s(tfi).8    0.99448155 0.68445450 1.44493689 9.768400e{-}01}
-\NormalTok{| s(tfi).9    0.94790052 0.63349476 1.41834700 7.946918e{-}01}
+\NormalTok{             exp(Est.)       2.5\%      97.5\%            P}
+\NormalTok{(Intercept) 0.02466174 0.01486718 0.04090901 1.254019e{-}46}
+\NormalTok{sexF        2.60620470 1.25503844 5.41202779 1.019130e{-}02}
+\NormalTok{s(tfi).1    1.00499489 0.89131271 1.13317662 9.351638e{-}01}
+\NormalTok{s(tfi).2    0.99623769 0.80778743 1.22865188 9.718940e{-}01}
+\NormalTok{s(tfi).3    0.99822247 0.91911268 1.08414140 9.663137e{-}01}
+\NormalTok{s(tfi).4    1.00188999 0.89006998 1.12775801 9.750528e{-}01}
+\NormalTok{s(tfi).5    0.99842904 0.92280785 1.08024715 9.687920e{-}01}
+\NormalTok{s(tfi).6    0.99817367 0.90142303 1.10530865 9.719666e{-}01}
+\NormalTok{s(tfi).7    1.00168704 0.92615949 1.08337380 9.663850e{-}01}
+\NormalTok{s(tfi).8    0.99448155 0.68445450 1.44493689 9.768400e{-}01}
+\NormalTok{s(tfi).9    0.94790052 0.63349476 1.41834700 7.946918e{-}01}
 \end{Highlighting}
 \end{Shaded}
 
-What is the remission rate-ratio between men and women?
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{17}
-\tightlist
+  What is the remission rate-ratio between men and women?
 \item
   If we want to predict the probability of being in each of the
   three states using these estimated rates, we may resort to
@@ -8621,19 +8779,18 @@ What is the remission rate-ratio between men and women?
   This is accomplished using the function \texttt{simLexis}. The input
   to this is the initial status of the persons whose life-course we
   shall simulate, and the transition rates in suitable form:
-\end{enumerate}
 
-\begin{itemize}
-\tightlist
-\item
-  Suppose we want predictions for men aged 50 at
-  NRA. The input is in the form of a \texttt{Lexis} object (where
-  \texttt{lex.dur} and \texttt{lex.Xst} will be ignored). Note that in
-  order to carry over the \texttt{time.scales} and the
-  \texttt{time.since} attributes, we construct the input object using
-  \texttt{subset} to select columns, and \texttt{NULL} to select rows
-  (see the example in the help file for \texttt{simLexis}):
-\end{itemize}
+  \begin{itemize}
+  \tightlist
+  \item
+    Suppose we want predictions for men aged 50 at
+    NRA. The input is in the form of a \texttt{Lexis} object (where
+    \texttt{lex.dur} and \texttt{lex.Xst} will be ignored). Note that in
+    order to carry over the \texttt{time.scales} and the
+    \texttt{time.since} attributes, we construct the input object using
+    \texttt{subset} to select columns, and \texttt{NULL} to select rows
+    (see the example in the help file for \texttt{simLexis}):
+  \end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8644,24 +8801,24 @@ What is the remission rate-ratio between men and women?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{| Classes \textquotesingle{}Lexis\textquotesingle{} and \textquotesingle{}data.frame\textquotesingle{}: 0 obs. of  11 variables:}
-\NormalTok{|  $ lex.id : int }
-\NormalTok{|  $ per    : num }
-\NormalTok{|  $ age    : num }
-\NormalTok{|  $ tfi    : num }
-\NormalTok{|  $ lex.dur: num }
-\NormalTok{|  $ lex.Cst: Factor w/ 4 levels "NRA","Rem","ESRD",..: }
-\NormalTok{|  $ lex.Xst: Factor w/ 4 levels "NRA","Rem","ESRD",..: }
-\NormalTok{|  $ id     : num }
-\NormalTok{|  $ sex    : Factor w/ 2 levels "M","F": }
-\NormalTok{|  $ dob    : num }
-\NormalTok{|  $ doe    : num }
-\NormalTok{|  {-} attr(*, "time.scales")= chr [1:3] "per" "age" "tfi"}
-\NormalTok{|  {-} attr(*, "time.since")= chr [1:3] "" "" ""}
-\NormalTok{|  {-} attr(*, "breaks")=List of 3}
-\NormalTok{|   ..$ per: NULL}
-\NormalTok{|   ..$ age: NULL}
-\NormalTok{|   ..$ tfi: num [1:361] 0 0.0833 0.1667 0.25 0.3333 ...}
+\NormalTok{Classes \textquotesingle{}Lexis\textquotesingle{} and \textquotesingle{}data.frame\textquotesingle{}:   0 obs. of  11 variables:}
+\NormalTok{ $ lex.id : int }
+\NormalTok{ $ per    : num }
+\NormalTok{ $ age    : num }
+\NormalTok{ $ tfi    : num }
+\NormalTok{ $ lex.dur: num }
+\NormalTok{ $ lex.Cst: Factor w/ 4 levels "NRA","Rem","ESRD",..: }
+\NormalTok{ $ lex.Xst: Factor w/ 4 levels "NRA","Rem","ESRD",..: }
+\NormalTok{ $ id     : num }
+\NormalTok{ $ sex    : Factor w/ 2 levels "M","F": }
+\NormalTok{ $ dob    : num }
+\NormalTok{ $ doe    : num }
+\NormalTok{ {-} attr(*, "time.scales")= chr [1:3] "per" "age" "tfi"}
+\NormalTok{ {-} attr(*, "time.since")= chr [1:3] "" "" ""}
+\NormalTok{ {-} attr(*, "breaks")=List of 3}
+\NormalTok{  ..$ per: NULL}
+\NormalTok{  ..$ age: NULL}
+\NormalTok{  ..$ tfi: num [1:361] 0 0.0833 0.1667 0.25 0.3333 ...}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8673,7 +8830,7 @@ What is the remission rate-ratio between men and women?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{| [1] "per" "age" "tfi"}
+\NormalTok{[1] "per" "age" "tfi"}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8697,9 +8854,9 @@ What is the remission rate-ratio between men and women?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|  lex.id  per age tfi lex.dur lex.Cst lex.Xst id sex  dob  doe}
-\NormalTok{|       1 2000  50   0      NA     NRA    \textless{}NA\textgreater{} NA   M 1950 2000}
-\NormalTok{|       1 2000  50   0      NA     NRA    \textless{}NA\textgreater{} NA   F 1950 2000}
+\NormalTok{ lex.id  per age tfi lex.dur lex.Cst lex.Xst id sex  dob  doe}
+\NormalTok{      1 2000  50   0      NA     NRA    \textless{}NA\textgreater{} NA   M 1950 2000}
+\NormalTok{      1 2000  50   0      NA     NRA    \textless{}NA\textgreater{} NA   F 1950 2000}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8711,37 +8868,33 @@ What is the remission rate-ratio between men and women?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{| Classes \textquotesingle{}Lexis\textquotesingle{} and \textquotesingle{}data.frame\textquotesingle{}: 2 obs. of  11 variables:}
-\NormalTok{|  $ lex.id : num  1 1}
-\NormalTok{|  $ per    : num  2000 2000}
-\NormalTok{|  $ age    : num  50 50}
-\NormalTok{|  $ tfi    : num  0 0}
-\NormalTok{|  $ lex.dur: num  NA NA}
-\NormalTok{|  $ lex.Cst: Factor w/ 4 levels "NRA","Rem","ESRD",..: 1 1}
-\NormalTok{|  $ lex.Xst: Factor w/ 4 levels "NRA","Rem","ESRD",..: NA NA}
-\NormalTok{|  $ id     : num  NA NA}
-\NormalTok{|  $ sex    : Factor w/ 2 levels "M","F": 1 2}
-\NormalTok{|  $ dob    : num  1950 1950}
-\NormalTok{|  $ doe    : num  2000 2000}
-\NormalTok{|  {-} attr(*, "breaks")=List of 3}
-\NormalTok{|   ..$ per: NULL}
-\NormalTok{|   ..$ age: NULL}
-\NormalTok{|   ..$ tfi: num [1:361] 0 0.0833 0.1667 0.25 0.3333 ...}
-\NormalTok{|  {-} attr(*, "time.scales")= chr [1:3] "per" "age" "tfi"}
-\NormalTok{|  {-} attr(*, "time.since")= chr [1:3] "" "" ""}
+\NormalTok{Classes \textquotesingle{}Lexis\textquotesingle{} and \textquotesingle{}data.frame\textquotesingle{}:   2 obs. of  11 variables:}
+\NormalTok{ $ lex.id : num  1 1}
+\NormalTok{ $ per    : num  2000 2000}
+\NormalTok{ $ age    : num  50 50}
+\NormalTok{ $ tfi    : num  0 0}
+\NormalTok{ $ lex.dur: num  NA NA}
+\NormalTok{ $ lex.Cst: Factor w/ 4 levels "NRA","Rem","ESRD",..: 1 1}
+\NormalTok{ $ lex.Xst: Factor w/ 4 levels "NRA","Rem","ESRD",..: NA NA}
+\NormalTok{ $ id     : num  NA NA}
+\NormalTok{ $ sex    : Factor w/ 2 levels "M","F": 1 2}
+\NormalTok{ $ dob    : num  1950 1950}
+\NormalTok{ $ doe    : num  2000 2000}
+\NormalTok{ {-} attr(*, "breaks")=List of 3}
+\NormalTok{  ..$ per: NULL}
+\NormalTok{  ..$ age: NULL}
+\NormalTok{  ..$ tfi: num [1:361] 0 0.0833 0.1667 0.25 0.3333 ...}
+\NormalTok{ {-} attr(*, "time.scales")= chr [1:3] "per" "age" "tfi"}
+\NormalTok{ {-} attr(*, "time.since")= chr [1:3] "" "" ""}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{itemize}
-\tightlist
-\item
   The other input for the simulation is the models for the transitions. This is given as
   a list with an element for each transient state (that is \texttt{NRA} and
   \texttt{Rem}), each of which is again a list with names equal to the
   states that can be reached from the transient state. The content of
   the list will be \texttt{glm} objects, in this case the models we
   just fitted, describing the transition rates:
-\end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8751,9 +8904,9 @@ What is the remission rate-ratio between men and women?
 \end{Highlighting}
 \end{Shaded}
 
-With this as input we can now generate a cohort, using \texttt{N=5}
-to simulate life course of 10 persons (5 for each set of starting values
-in \texttt{inL}):
+  With this as input we can now generate a cohort, using \texttt{N=5}
+  to simulate life course of 10 persons (5 for each set of starting values
+  in \texttt{inL}):
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8763,30 +8916,30 @@ in \texttt{inL}):
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|  lex.id     per   age  tfi lex.dur lex.Cst   lex.Xst id sex  dob  doe cens}
-\NormalTok{|       1 2000.00 50.00 0.00    6.37     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{|       2 2000.00 50.00 0.00    2.77     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{|       3 2000.00 50.00 0.00    4.56     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{|       4 2000.00 50.00 0.00    8.35     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{|       5 2000.00 50.00 0.00    4.21     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{|       6 2000.00 50.00 0.00    5.46     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{|       7 2000.00 50.00 0.00    1.99     NRA       Rem NA   M 1950 2000 2020}
-\NormalTok{|       7 2001.99 51.99 1.99   18.01     Rem       Rem NA   M 1950 2000 2020}
-\NormalTok{|       8 2000.00 50.00 0.00    3.97     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{|       9 2000.00 50.00 0.00    4.75     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{|      10 2000.00 50.00 0.00    5.68     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{|      11 2000.00 50.00 0.00    3.71     NRA      ESRD NA   F 1950 2000 2020}
-\NormalTok{|      12 2000.00 50.00 0.00    4.76     NRA       Rem NA   F 1950 2000 2020}
-\NormalTok{|      12 2004.76 54.76 4.76    9.92     Rem ESRD(Rem) NA   F 1950 2000 2020}
-\NormalTok{|      13 2000.00 50.00 0.00    5.67     NRA      ESRD NA   F 1950 2000 2020}
-\NormalTok{|      14 2000.00 50.00 0.00    5.86     NRA      ESRD NA   F 1950 2000 2020}
-\NormalTok{|      15 2000.00 50.00 0.00   10.21     NRA      ESRD NA   F 1950 2000 2020}
-\NormalTok{|      16 2000.00 50.00 0.00    0.49     NRA       Rem NA   F 1950 2000 2020}
-\NormalTok{|      16 2000.49 50.49 0.49    1.83     Rem ESRD(Rem) NA   F 1950 2000 2020}
-\NormalTok{|      17 2000.00 50.00 0.00    6.45     NRA      ESRD NA   F 1950 2000 2020}
-\NormalTok{|      18 2000.00 50.00 0.00    0.82     NRA      ESRD NA   F 1950 2000 2020}
-\NormalTok{|      19 2000.00 50.00 0.00    1.27     NRA      ESRD NA   F 1950 2000 2020}
-\NormalTok{|      20 2000.00 50.00 0.00   12.64     NRA      ESRD NA   F 1950 2000 2020}
+\NormalTok{ lex.id     per   age  tfi lex.dur lex.Cst   lex.Xst id sex  dob  doe cens}
+\NormalTok{      1 2000.00 50.00 0.00    6.37     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{      2 2000.00 50.00 0.00    2.77     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{      3 2000.00 50.00 0.00    4.56     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{      4 2000.00 50.00 0.00    8.35     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{      5 2000.00 50.00 0.00    4.21     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{      6 2000.00 50.00 0.00    5.46     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{      7 2000.00 50.00 0.00    1.99     NRA       Rem NA   M 1950 2000 2020}
+\NormalTok{      7 2001.99 51.99 1.99   18.01     Rem       Rem NA   M 1950 2000 2020}
+\NormalTok{      8 2000.00 50.00 0.00    3.97     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{      9 2000.00 50.00 0.00    4.75     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{     10 2000.00 50.00 0.00    5.68     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{     11 2000.00 50.00 0.00    3.71     NRA      ESRD NA   F 1950 2000 2020}
+\NormalTok{     12 2000.00 50.00 0.00    4.76     NRA       Rem NA   F 1950 2000 2020}
+\NormalTok{     12 2004.76 54.76 4.76    9.92     Rem ESRD(Rem) NA   F 1950 2000 2020}
+\NormalTok{     13 2000.00 50.00 0.00    5.67     NRA      ESRD NA   F 1950 2000 2020}
+\NormalTok{     14 2000.00 50.00 0.00    5.86     NRA      ESRD NA   F 1950 2000 2020}
+\NormalTok{     15 2000.00 50.00 0.00   10.21     NRA      ESRD NA   F 1950 2000 2020}
+\NormalTok{     16 2000.00 50.00 0.00    0.49     NRA       Rem NA   F 1950 2000 2020}
+\NormalTok{     16 2000.49 50.49 0.49    1.83     Rem ESRD(Rem) NA   F 1950 2000 2020}
+\NormalTok{     17 2000.00 50.00 0.00    6.45     NRA      ESRD NA   F 1950 2000 2020}
+\NormalTok{     18 2000.00 50.00 0.00    0.82     NRA      ESRD NA   F 1950 2000 2020}
+\NormalTok{     19 2000.00 50.00 0.00    1.27     NRA      ESRD NA   F 1950 2000 2020}
+\NormalTok{     20 2000.00 50.00 0.00   12.64     NRA      ESRD NA   F 1950 2000 2020}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8798,38 +8951,32 @@ in \texttt{inL}):
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{| $M}
-\NormalTok{|      }
-\NormalTok{| Transitions:}
-\NormalTok{|      To}
-\NormalTok{| From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{|   NRA   0   1    9         0        10       10      48.12        10}
-\NormalTok{|   Rem   0   1    0         0         1        0      18.01         1}
-\NormalTok{|   Sum   0   2    9         0        11       10      66.12        10}
-\NormalTok{| }
-\NormalTok{| $F}
-\NormalTok{|      }
-\NormalTok{| Transitions:}
-\NormalTok{|      To}
-\NormalTok{| From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{|   NRA   0   2    8         0        10       10      51.87        10}
-\NormalTok{|   Rem   0   0    0         2         2        2      11.75         2}
-\NormalTok{|   Sum   0   2    8         2        12       12      63.62        10}
+\NormalTok{$M}
+
+\NormalTok{Transitions:}
+\NormalTok{     To}
+\NormalTok{From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
+\NormalTok{  NRA   0   1    9         0        10       10      48.12        10}
+\NormalTok{  Rem   0   1    0         0         1        0      18.01         1}
+\NormalTok{  Sum   0   2    9         0        11       10      66.12        10}
+
+\NormalTok{$F}
+
+\NormalTok{Transitions:}
+\NormalTok{     To}
+\NormalTok{From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
+\NormalTok{  NRA   0   2    8         0        10       10      51.87        10}
+\NormalTok{  Rem   0   0    0         2         2        2      11.75         2}
+\NormalTok{  Sum   0   2    8         2        12       12      63.62        10}
 \end{Highlighting}
 \end{Shaded}
 
-What type of object have you got as \texttt{iL}?.
-Simulate a couple of thousand persons; remember \emph{not} to list the result.
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{18}
-\tightlist
+  What type of object have you got as \texttt{iL}?.
+  Simulate a couple of thousand persons; remember \emph{not} to list the result.
 \item
   Now generate the life course of 5,000 persons, and look at the summary.
   The \texttt{system.time} command is just to tell you how long it
   took, you may want to start with 1000 just to see how long that takes.
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8839,8 +8986,8 @@ Simulate a couple of thousand persons; remember \emph{not} to list the result.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|    user  system elapsed }
-\NormalTok{|   2.505   3.108   1.961}
+\NormalTok{   user  system elapsed }
+\NormalTok{  2.568   3.004   1.942 }
 \end{Highlighting}
 \end{Shaded}
 
@@ -8852,37 +8999,31 @@ Simulate a couple of thousand persons; remember \emph{not} to list the result.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{| $M}
-\NormalTok{|      }
-\NormalTok{| Transitions:}
-\NormalTok{|      To}
-\NormalTok{| From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{|   NRA  46  78  376         0       500      454    2707.59       500}
-\NormalTok{|   Rem   0  51    0        27        78       27     569.15        78}
-\NormalTok{|   Sum  46 129  376        27       578      481    3276.74       500}
-\NormalTok{| }
-\NormalTok{| $F}
-\NormalTok{|      }
-\NormalTok{| Transitions:}
-\NormalTok{|      To}
-\NormalTok{| From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{|   NRA  27 168  305         0       500      473    2481.57       500}
-\NormalTok{|   Rem   0  96    0        72       168       72    1092.90       168}
-\NormalTok{|   Sum  27 264  305        72       668      545    3574.47       500}
+\NormalTok{$M}
+
+\NormalTok{Transitions:}
+\NormalTok{     To}
+\NormalTok{From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
+\NormalTok{  NRA  46  78  376         0       500      454    2707.59       500}
+\NormalTok{  Rem   0  51    0        27        78       27     569.15        78}
+\NormalTok{  Sum  46 129  376        27       578      481    3276.74       500}
+
+\NormalTok{$F}
+
+\NormalTok{Transitions:}
+\NormalTok{     To}
+\NormalTok{From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
+\NormalTok{  NRA  27 168  305         0       500      473    2481.57       500}
+\NormalTok{  Rem   0  96    0        72       168       72    1092.90       168}
+\NormalTok{  Sum  27 264  305        72       668      545    3574.47       500}
 \end{Highlighting}
 \end{Shaded}
 
-Why are there so many ESRD-events in the resulting data set?
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{19}
-\tightlist
+  Why are there so many ESRD-events in the resulting data set?
 \item
   Now count how many persons are present in each state
   at each time for the first 10 years after entry (which is at age 50). This
   can be done by using \texttt{nState}. Try:
-\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8898,37 +9039,31 @@ Why are there so many ESRD-events in the resulting data set?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|       State}
-\NormalTok{| when   NRA Rem ESRD ESRD(Rem)}
-\NormalTok{|   50   500   0    0         0}
-\NormalTok{|   50.1 497   1    2         0}
-\NormalTok{|   50.2 492   5    3         0}
-\NormalTok{|   50.3 489   8    3         0}
-\NormalTok{|   50.4 478  19    3         0}
-\NormalTok{|   50.5 471  24    5         0}
-\NormalTok{|   50.6 467  26    7         0}
-\NormalTok{|   50.7 465  27    8         0}
-\NormalTok{|   50.8 461  29   10         0}
-\NormalTok{|   50.9 453  32   15         0}
-\NormalTok{|   51   447  35   18         0}
-\NormalTok{|   51.1 441  36   23         0}
-\NormalTok{|   51.2 433  41   26         0}
-\NormalTok{|   51.3 427  44   29         0}
-\NormalTok{|   51.4 425  44   31         0}
+\NormalTok{      State}
+\NormalTok{when   NRA Rem ESRD ESRD(Rem)}
+\NormalTok{  50   500   0    0         0}
+\NormalTok{  50.1 497   1    2         0}
+\NormalTok{  50.2 492   5    3         0}
+\NormalTok{  50.3 489   8    3         0}
+\NormalTok{  50.4 478  19    3         0}
+\NormalTok{  50.5 471  24    5         0}
+\NormalTok{  50.6 467  26    7         0}
+\NormalTok{  50.7 465  27    8         0}
+\NormalTok{  50.8 461  29   10         0}
+\NormalTok{  50.9 453  32   15         0}
+\NormalTok{  51   447  35   18         0}
+\NormalTok{  51.1 441  36   23         0}
+\NormalTok{  51.2 433  41   26         0}
+\NormalTok{  51.3 427  44   29         0}
+\NormalTok{  51.4 425  44   31         0}
 \end{Highlighting}
 \end{Shaded}
 
-What is in the object \texttt{nStf}?
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{20}
-\tightlist
+  What is in the object \texttt{nStf}?
 \item
   With the counts of persons in each state at the
-  designated time points (in \texttt{nStm}), compute the cumulative fraction over the
-  states, arranged in order given by \texttt{perm}:
-\end{enumerate}
+  designated time points (in \texttt{nStm}), compute the cumulative
+  fraction over the states, arranged in order given by \texttt{perm}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8940,14 +9075,14 @@ What is in the object \texttt{nStf}?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|       State}
-\NormalTok{| when     Rem   NRA ESRD ESRD(Rem)}
-\NormalTok{|   50   0.000 1.000    1         1}
-\NormalTok{|   50.1 0.002 0.996    1         1}
-\NormalTok{|   50.2 0.010 0.994    1         1}
-\NormalTok{|   50.3 0.016 0.994    1         1}
-\NormalTok{|   50.4 0.038 0.994    1         1}
-\NormalTok{|   50.5 0.048 0.990    1         1}
+\NormalTok{      State}
+\NormalTok{when     Rem   NRA ESRD ESRD(Rem)}
+\NormalTok{  50   0.000 1.000    1         1}
+\NormalTok{  50.1 0.002 0.996    1         1}
+\NormalTok{  50.2 0.010 0.994    1         1}
+\NormalTok{  50.3 0.016 0.994    1         1}
+\NormalTok{  50.4 0.038 0.994    1         1}
+\NormalTok{  50.5 0.048 0.990    1         1}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8959,27 +9094,21 @@ What is in the object \texttt{nStf}?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{|       State}
-\NormalTok{| when     Rem   NRA  ESRD ESRD(Rem)}
-\NormalTok{|   59.5 0.226 0.352 0.898         1}
-\NormalTok{|   59.6 0.222 0.348 0.894         1}
-\NormalTok{|   59.7 0.224 0.346 0.894         1}
-\NormalTok{|   59.8 0.222 0.338 0.892         1}
-\NormalTok{|   59.9 0.220 0.334 0.890         1}
-\NormalTok{|   60   0.222 0.330 0.890         1}
+\NormalTok{      State}
+\NormalTok{when     Rem   NRA  ESRD ESRD(Rem)}
+\NormalTok{  59.5 0.226 0.352 0.898         1}
+\NormalTok{  59.6 0.222 0.348 0.894         1}
+\NormalTok{  59.7 0.224 0.346 0.894         1}
+\NormalTok{  59.8 0.222 0.338 0.892         1}
+\NormalTok{  59.9 0.220 0.334 0.890         1}
+\NormalTok{  60   0.222 0.330 0.890         1}
 \end{Highlighting}
 \end{Shaded}
 
-What do the entries in \texttt{ppf} represent?
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{21}
-\tightlist
+  What do the entries in \texttt{ppf} represent?
 \item
-  Try to plot the cumulative probabilities using the \texttt{plot}
-  method for \texttt{pState} objects:
-\end{enumerate}
+  Try to plot the cumulative probabilities using the \texttt{plot} method
+  for \texttt{pState} objects:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8987,34 +9116,32 @@ What do the entries in \texttt{ppf} represent?
 \end{Highlighting}
 \end{Shaded}
 
-Is this useful?
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{22}
-\tightlist
+  Is this useful?
 \item
   Now try to improve the plot so that it is easier to read, and
-  easier to compare between men and women:
-\end{enumerate}
+  easier to compare between men and women, for example:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\CommentTok{\# Men}
 \FunctionTok{plot}\NormalTok{(ppm, }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"limegreen"}\NormalTok{, }\StringTok{"red"}\NormalTok{, }\StringTok{"\#991111"}\NormalTok{, }\StringTok{"forestgreen"}\NormalTok{))}
-\FunctionTok{lines}\NormalTok{(}\FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(ppm)), ppm[, }\StringTok{"Rem"}\NormalTok{], }\AttributeTok{lwd =} \DecValTok{4}\NormalTok{)}
+\FunctionTok{lines}\NormalTok{(}\FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(ppm)), ppm[, }\StringTok{"NRA"}\NormalTok{], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
 \FunctionTok{text}\NormalTok{(}\FloatTok{59.5}\NormalTok{, }\FloatTok{0.95}\NormalTok{, }\StringTok{"Men"}\NormalTok{, }\AttributeTok{adj =} \DecValTok{1}\NormalTok{, }\AttributeTok{col =} \StringTok{"white"}\NormalTok{, }\AttributeTok{font =} \DecValTok{2}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{)}
 \FunctionTok{axis}\NormalTok{(}\AttributeTok{side =} \DecValTok{4}\NormalTok{, }\AttributeTok{at =} \DecValTok{0}\SpecialCharTok{:}\DecValTok{10} \SpecialCharTok{/} \DecValTok{10}\NormalTok{)}
 \FunctionTok{axis}\NormalTok{(}\AttributeTok{side =} \DecValTok{4}\NormalTok{, }\AttributeTok{at =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{99} \SpecialCharTok{/} \DecValTok{100}\NormalTok{, }\AttributeTok{labels =} \ConstantTok{NA}\NormalTok{, }\AttributeTok{tck =} \SpecialCharTok{{-}}\FloatTok{0.01}\NormalTok{)}
-\FunctionTok{plot}\NormalTok{(ppf, }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"limegreen"}\NormalTok{, }\StringTok{"red"}\NormalTok{, }\StringTok{"\#991111"}\NormalTok{, }\StringTok{"forestgreen"}\NormalTok{), }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(}\DecValTok{60}\NormalTok{, }\DecValTok{50}\NormalTok{))}
-\FunctionTok{lines}\NormalTok{(}\FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(ppf)), ppf[, }\StringTok{"Rem"}\NormalTok{], }\AttributeTok{lwd =} \DecValTok{4}\NormalTok{)}
+\CommentTok{\# Women }
+\FunctionTok{plot}\NormalTok{(ppf, }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"limegreen"}\NormalTok{, }\StringTok{"red"}\NormalTok{, }\StringTok{"\#991111"}\NormalTok{, }\StringTok{"forestgreen"}\NormalTok{),}
+          \AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(}\DecValTok{60}\NormalTok{, }\DecValTok{50}\NormalTok{)) }\CommentTok{\# inverted x{-}axis}
+\FunctionTok{lines}\NormalTok{(}\FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{rownames}\NormalTok{(ppf)), ppf[, }\StringTok{"NRA"}\NormalTok{], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
 \FunctionTok{text}\NormalTok{(}\FloatTok{59.5}\NormalTok{, }\FloatTok{0.95}\NormalTok{, }\StringTok{"Women"}\NormalTok{, }\AttributeTok{adj =} \DecValTok{0}\NormalTok{, }\AttributeTok{col =} \StringTok{"white"}\NormalTok{, }\AttributeTok{font =} \DecValTok{2}\NormalTok{, }\AttributeTok{cex =} \FloatTok{1.2}\NormalTok{)}
 \FunctionTok{axis}\NormalTok{(}\AttributeTok{side =} \DecValTok{2}\NormalTok{, }\AttributeTok{at =} \DecValTok{0}\SpecialCharTok{:}\DecValTok{10} \SpecialCharTok{/} \DecValTok{10}\NormalTok{)}
 \FunctionTok{axis}\NormalTok{(}\AttributeTok{side =} \DecValTok{2}\NormalTok{, }\AttributeTok{at =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{99} \SpecialCharTok{/} \DecValTok{100}\NormalTok{, }\AttributeTok{labels =} \ConstantTok{NA}\NormalTok{, }\AttributeTok{tck =} \SpecialCharTok{{-}}\FloatTok{0.01}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-What is the 10-year risk of remission for men and women respectively?
+  What is the 10-year risk of remission for men and women respectively?
+\end{enumerate}
 
   \bibliography{book.bib,packages.bib}
 
