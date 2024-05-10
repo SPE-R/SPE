@@ -1,13 +1,29 @@
-```{r, include=FALSE}
-knitr::opts_chunk$set(
-  keep.source = TRUE,
-  eps = FALSE,
-  include = TRUE,
-  eval = TRUE,
-  results = "hide",
-  fig.show = "hide",
-  prefix.string = "./graph/DMDK"
-)
+---
+output:
+  html_document: default
+  pdf_document: default
+editor_options:
+  chunk_output_type: console
+---
+```{r, include = FALSE}
+knitr::opts_chunk$set(keep.source = TRUE, 
+                          results = "verbatim", 
+                          include = TRUE, 
+                             eval = TRUE, 
+                          comment = "")
+```
+
+```{r echo=FALSE,eval=TRUE}
+options(width = 90,
+        show.signif.stars = FALSE,
+        prompt = " ", continue = " ",
+        SweaveHooks = list(
+        fig = function()
+        par(mar = c(3,3,1,1),
+            mgp = c(3,1,0) / 1.6,
+            las = 1,
+            bty = "n", 
+           lend = "butt")))
 ```
 
 
@@ -33,215 +49,199 @@ the help page:
 ```{r eval = FALSE}
 ?DMlate
 ```
--  Set up the dataset as a `Lexis` object with age, calendar
-  time and duration of diabetes as timescales, and date of death as
-  event. Make sure that you know what each of the arguments to
-  `Lexis` mean:
-```{r }
-LL <- Lexis(
-  entry = list(A = dodm - dobth, P = dodm, dur = 0),
-  exit = list(P = dox),
-  exit.status = 
-    factor(!is.na(dodth), labels = c("Alive", "Dead")),
-  data = DMlate
-)
-```
-Take a look at the first few lines of the resulting dataset, for
-example using `head()`.
--  Get an overview of the mortality by using `stat.table`
-  to tabulate no. deaths, person-years (`lex.dur`) and the
-  crude mortality rate by sex. Try:
-```{r }
-stat.table(sex,
-  list(
-    D = sum(lex.Xst == "Dead"),
-    Y = sum(lex.dur),
-    rate = ratio(lex.Xst == "Dead", lex.dur, 1000)
-  ),
-  margins = TRUE,
-  data = LL
-)
-```
--  If we want to assess how mortality depends on age, calendar time
-  and duration or how it relates to population mortality, we should
-  in principle split the follow-up along all
-  three time scales. In practice it is sufficient to split it along
-  one of the time-scales and then use the value of each of the
-  time-scales at the left endpoint of the intervals.
-  Use `splitLexis` (or `splitMulti` from the
-  `popEpi` package) to split the follow-up along the
-  age-axis in sutiable intervals (here set to 1/2 year, but really
-  immaterial as long as it is small):
-```{r }
-SL <- 
-  splitLexis(LL, breaks = seq(0, 125, 1 / 2), time.scale = "A")
-summary(SL)
-```
-  How many records are now in the dataset? How many person-years?
-  Compare to the original `Lexis`-dataset.
+1.  Set up the dataset as a `Lexis` object with age, calendar
+    time and duration of diabetes as timescales, and date of death as
+    event. Make sure that you know what each of the arguments to
+    `Lexis` mean:
+    ```{r }
+    LL <- Lexis(entry = list(A = dodm - dobth, 
+                             P = dodm, 
+                           dur = 0),
+                 exit = list(P = dox),
+          exit.status = factor(!is.na(dodth), 
+                               labels = c("Alive", "Dead")),
+                 data = DMlate)
+    ```
+    Take a look at the first few lines of the resulting dataset, for
+    example using `head()`.
 
-## Age-specific mortality
+1.  Get an overview of the mortality by using `stat.table`
+    to tabulate no. deaths, person-years (`lex.dur`) and the
+    crude mortality rate by sex. Try:
+    ```{r }
+    stat.table(sex,
+               list(D = sum(lex.Xst == "Dead"),
+                    Y = sum(lex.dur),
+                 rate = ratio(lex.Xst == "Dead", 
+                              lex.dur, 
+                              1000)),
+              margins = TRUE,
+                 data = LL)
+    ```
+2.  If we want to assess how mortality depends on age, calendar time
+    and duration or how it relates to population mortality, we should
+    in principle split the follow-up along all
+    three time scales. In practice it is sufficient to split it along
+    one of the time-scales and then use the value of each of the
+    time-scales at the left endpoint of the intervals.
 
--  Now estimate age-specific mortality curves for men and
-  women separately, using splines as implemented in `gam`.
-  We use `k = 20` to be sure to catch any irregularities by age.
-```{r }
-r.m <- mgcv::gam(
-  cbind(lex.Xst == "Dead", lex.dur) ~ s(A, k = 20),
-  family = poisreg,
-  data = subset(SL, sex == "M")
-)
-gam.check(r.m)
-```
-Make sure you understand all the components on this modeling statement.
-Fit the same model for women.
-There is a convenient wrapper for this, exploiting the `Lexis`
-structure of data, but which does not have an update
-```{r }
-r.m <- gam.Lexis(subset(SL, sex == "M"), ~ s(A, k = 20))
-r.f <- gam.Lexis(subset(SL, sex == "F"), ~ s(A, k = 20))
-gam.check(r.m)
-gam.check(r.f)
-```
--  Now, extract the estimated rates by using the wrapper function
-  `ci.pred` that computes predicted rates and confidence
-  limits for these.
-  However, when using the`glm.Lexis` or `gam.Lexis` we
-  aviod this; they rely on the `poisreg` family that will return
-  the rates in the (inverse) units in which the person-years were
-  given; that is the units of `lex.dur`.
-```{r }
-nd <- data.frame(A = seq(20, 90, 0.5))
-p.m <- ci.pred(r.m, newdata = nd)
-p.f <- ci.pred(r.f, newdata = nd)
-str(p.m)
-```
--  Plot the predicted rates for men and women together - using for
-  example `matplot` or `matshade`.
-```{r }
-p.f <- ci.pred(r.f, newdata = nd)
-matplot(
-  nd$A,
-  cbind(p.m, p.f) * 1000,
-  type = "l",
-  col = rep(c("blue", "red"), each = 3),
-  lwd = c(3, 1, 1),
-  lty = 1,
-  log = "y",
-  xlab = "Age",
-  ylab = "Mortality of DM ptt per 1000 PY"
-)
-```
+    Use `splitLexis` (or `splitMulti` from the
+    `popEpi` package) to split the follow-up along the
+    age-axis in sutiable intervals (here set to 1/2 year, but really
+    immaterial as long as it is small):
+    ```{r }
+    SL <- splitLexis(LL, 
+                     breaks = seq(0, 125, 1 / 2), 
+                 time.scale = "A")
+    summary(SL)
+    ```
+    How many records are now in the dataset? How many person-years?
+    Compare to the original `Lexis`-dataset.
 
-## Further time scales: period and duration
+    ## Age-specific mortality
 
--  We now want to model the mortality rates among diabetes patients
-  also including current date and duration of diabetes, using penalized
-  splines.  Use the argument `bs = "cr"` to `s()` to get
-  cubic splines indstead of thin plate (`"tp"`) splines which is
-  the default. Check if you have a reasonable fit using `gam.check`.
-```{r }
-Mtp <- mgcv::gam(
-  (lex.Xst == "Dead") ~ s(A, bs = "cr", k = 10) +
-    s(P, bs = "cr", k = 10) +
-    s(dur, bs = "cr", k = 10),
-  offset = log(lex.dur),
-  family = poisson,
-  data = subset(SL, sex == "M")
-)
-```
-An easier specification of the model exploits the `Lexis` class
-of the dataset, try:
-```{r }
-Mcr <- gam.Lexis(
-  subset(SL, sex == "M"),
-  ~ s(A, bs = "cr", k = 10) +
-    s(P, bs = "cr", k = 10) +
-    s(dur, bs = "cr", k = 10)
-)
-summary(Mcr)
-gam.check(Mcr)
-```
-Fit the same model for women as well. Are the models reasonably fitting?
-
-```{r }
-Fcr <- gam.Lexis(
-  subset(SL, sex == "F"),
-  ~ s(A, bs = "cr", k = 10) +
-    s(P, bs = "cr", k = 10) +
-    s(dur, bs = "cr", k = 10)
-)
-summary(Fcr)
-gam.check(Fcr)
-```
-
--  Plot the estimated effects, using the default plot method for
-  `gam` objects. Remember that there are three effects
-  estimated, so it is useful set up a multi-panel display, and for
-  the sake of comparability to set ylim to the same for men and women:
-```{r }
-par(mfrow = c(2, 3))
-plot(Mcr, ylim = c(-3, 3))
-plot(Fcr, ylim = c(-3, 3))
-```
-What is the absolute scale for these effects?
--  Compare the fit of the naive model with just age and the
-  three-factor models, using `anova`, e.g.:
-```{r }
-anova(Mcr, r.m, test = "Chisq")
-```
-What do you conclude?
--  The model we fitted has three time-scales: current age, current
-  date and current duration of diabetes, so the effects that we report
-  are not immediately interpretable, as they are (as in any kind of
-  multiple regressions) to be interpreted as *all else equal* which
-  they are not, as the three time scales advance simultaneously at the
-  same pace.
-  The reporting would therefore more naturally be on the
-  mortality scale as a function of age, but showing the mortality
-  for persons diagnosed in different ages, using separate displays
-  for separate years of diagnosis.
-  This is most easily done using the `ci.pred` function with
-  the `newdata = ` argument. So a person diagnosed in age 50 in
-  1995 will have a mortality measured in cases per 1000 PY as:
-```{r }
-pts <- seq(0, 12, 1 / 4)
-nd <- data.frame(A = 50 + pts, P = 1995 + pts, dur = pts)
-m.pr <- ci.pred(Mcr, newdata = nd)
-```
-  Note that because we used `gam.Lexis` which uses
-  the `poisreg` family we need not specify `lex.dur` as a
-  variable in the prediction data frame `nd`. Predictions will
-  be rates in the same units as `lex.dur`.
-  Now take a look at the result from the `ci.pred` statement and
-  construct prediction of mortality for men and women diagnosed in a
-  range of ages, say 50, 60, 70, and plot these together in the same
-  graph:
-```{r eval = FALSE,results='hide'}
-cbind(nd, ci.pred(Mcr, newdata = nd))
-```
--  From figure it seems that the duration effect is
-over-modeled, so refit constraining the d.f. to 5:
-```{r rates5,fig = TRUE, width = 10, eval = TRUE}
-Mcr <- gam.Lexis(
-  subset(SL, sex == "M"),
-  ~ s(A, bs = "cr", k = 10) +
-    s(P, bs = "cr", k = 10) +
-    s(dur, bs = "cr", k = 5)
-)
-summary(Mcr)
-Fcr <- gam.Lexis(
-  subset(SL, sex == "F"),
-  ~ s(A, bs = "cr", k = 10) +
-    s(P, bs = "cr", k = 10) +
-    s(dur, bs = "cr", k = 5)
-)
-```
-How does `gam.check()` look for these models?
-Plot the estimated rates from the revised models.
-What do you conclude from the plots?
-
+1.  Now estimate age-specific mortality curves for men and
+    women separately, using splines as implemented in `gam`.
+    We use `k = 20` to be sure to catch any irregularities by age.
+    ```{r }
+    r.m <- mgcv::gam(cbind(lex.Xst == "Dead", lex.dur) ~ s(A, k = 20),
+                     family = poisreg,
+                       data = subset(SL, sex == "M"))
+    ```
+    Make sure you understand all the components on this modeling statement.
+    Fit the same model for women.
+    
+    There is a convenient wrapper for this, exploiting the `Lexis`
+    structure of data, but which does not have an update
+    ```{r }
+    r.m <- gam.Lexis(subset(SL, sex == "M"), ~ s(A, k = 20))
+    r.f <- gam.Lexis(subset(SL, sex == "F"), ~ s(A, k = 20))
+    ```
+3.  Now, extract the estimated rates by using the wrapper function
+      `ci.pred` that computes predicted rates and confidence
+      limits for these.
+      
+      `glm.Lexis` and `gam.Lexis` use the `poisreg` family that will return
+      the rates in the (inverse) units in which the person-years were
+      given; that is the units in which `lex.dur` is recorded.
+    ```{r }
+    nd <- data.frame(A = seq(20, 90, 0.5))
+    p.m <- ci.pred(r.m, newdata = nd)
+    p.f <- ci.pred(r.f, newdata = nd)
+    str(p.m)
+    ```
+4.  Plot the predicted rates for men and women together - using for
+      example `matplot` or `matshade`.
+    ```{r }
+    matplot(nd$A, cbind(p.m, p.f) * 1000,
+            type = "l",
+             col = rep(c("blue", "red"), each = 3),
+             lwd = c(3, 1, 1),
+             lty = 1,
+             log = "y",
+            xlab = "Age",
+            ylab = "Mortality of DM ptt per 1000 PY")
+    ```
+    
+    ## Further time scales: period and duration
+    
+5.  We now want to model the mortality rates among diabetes patients
+    also including current date and duration of diabetes, using penalized
+    splines.  Use the argument `bs = "cr"` to `s()` to get
+    cubic splines instead of thin plate (`"tp"`) splines which is
+    the default. 
+    
+    As before specify the model exploiting the `Lexis` class
+    of the dataset, try:
+    ```{r }
+    Mcr <- gam.Lexis(subset(SL, sex == "M"),
+                     ~ s(A, bs = "cr", k = 10) +
+                       s(P, bs = "cr", k = 10) +
+                     s(dur, bs = "cr", k = 10))
+    summary(Mcr)
+    ```
+    Fit the same model for women as well. Are the models reasonably fitting?
+    
+    ```{r }
+    Fcr <- gam.Lexis(subset(SL, sex == "F"),
+                     ~ s(A, bs = "cr", k = 10) +
+                       s(P, bs = "cr", k = 10) +
+                     s(dur, bs = "cr", k = 10))
+    summary(Fcr)
+    ```
+    
+6.  Plot the estimated effects, using the default plot method for
+      `gam` objects. Remember that there are three effects
+      estimated, so it is useful set up a multi-panel display, and for
+      the sake of comparability to set ylim to the same for men and women:
+    ```{r }
+    par(mfrow = c(2, 3))
+    plot(Mcr, ylim = c(-3, 3))
+    plot(Fcr, ylim = c(-3, 3))
+    ```
+    ```{r }
+    par(mfcol = c(3, 2))
+    plot(Mcr, ylim = c(-3, 3))
+    plot(Fcr, ylim = c(-3, 3))
+    ```
+    What is the absolute scale for these effects?
+    
+7.  Compare the fit of the naive model with just age and the
+      three-factor models, using `anova`, e.g.:
+    ```{r }
+    anova(Mcr, r.m, test = "Chisq")
+    ```
+    What do you conclude?
+    
+8.  The model we fitted has three time-scales: current age, current
+    date and current duration of diabetes, so the effects that we report
+    are not immediately interpretable, as they are (as in any kind of
+    multiple regressions) to be interpreted as *all else equal* which
+    they are not, as the three time scales advance simultaneously at the
+    same pace.
+   
+    The reporting would therefore more naturally be on the
+    mortality scale as a function of age, but showing the mortality
+    for persons diagnosed in different ages, using separate displays
+    for separate years of diagnosis.
+    This is most easily done using the `ci.pred` function with
+    the `newdata = ` argument. So a person diagnosed in age 50 in
+    1995 will have a mortality measured in cases per 1000 PY as:
+    ```{r }
+    pts <- seq(0, 12, 1 / 4)
+    nd <- data.frame(A = 50 + pts, P = 1995 + pts, dur = pts)
+    m.pr <- ci.pred(Mcr, newdata = nd)
+    ```
+    Note that because we used `gam.Lexis` which uses
+    the `poisreg` family we need not specify `lex.dur` as a
+    variable in the prediction data frame `nd`. Predictions will
+    be rates in the same units as `lex.dur`.
+    
+    Now take a look at the result from the `ci.pred` statement and
+    construct prediction of mortality for men and women diagnosed in a
+    range of ages, say 50, 60, 70, and plot these together in the same
+    graph:
+    ```{r eval = FALSE, results='hide'}
+    cbind(nd, ci.pred(Mcr, newdata = nd))[1:10,]
+    ```
+9.  From figure it seems that the duration effect is
+    over-modeled, so refit constraining the d.f. to 5:
+    ```{r rates5,fig = TRUE, width = 10, eval = TRUE}
+    Mcr <- gam.Lexis(subset(SL, sex == "M"),
+                     ~ s(A, bs = "cr", k = 10) +
+                       s(P, bs = "cr", k = 10) +
+                     s(dur, bs = "cr", k = 5))
+    Fcr <- gam.Lexis(subset(SL, sex == "F"),
+                     ~ s(A, bs = "cr", k = 10) +
+                       s(P, bs = "cr", k = 10) +
+                     s(dur, bs = "cr", k = 5))
+    ```
+    How does `gam.check()` look for these models?
+    Plot the estimated rates from the revised models.
+    What do you conclude from the plots?
+    
 ## SMR
+    
 The SMR is the **S**tandardized **M**ortality
 **R**atio, which is the mortality rate-ratio between the diabetes
 patients and the general population.  In real studies we would
@@ -260,108 +260,111 @@ second split by date, so that follow-up in the diabetes patients is in
 the same classification of age and data as the population mortality
 table.
 
--  We will use the former approach, using the dataset split in
-  6 month intervals, and then include as an extra variable the
-  population mortality as available from the data set
-  `M.dk`.
-  First create the variables in the diabetes dataset that we need
-  for matching with the population mortality data, that is sex and
-  age and date at the midpoint of each of the intervals (or rater at a
-  point 3 months after the left endpoint of the interval; recall
-  we split the follow-up in 6 month intervals).
-  We need to have variables of the same type when we merge, so we must
-  transform the sex variable in `M.dk` to a factor, and must
-  for each follow-up interval in the `SL` data have an age and
-  a period variable that can be used in merging with the population data.
-```{r eval = TRUE}
-str(SL)
-SL$Am <- floor(SL$A + 0.25)
-SL$Pm <- floor(SL$P + 0.25)
-data(M.dk)
-str(M.dk)
-M.dk <- transform(M.dk,
-  Am = A,
-  Pm = P,
-  sex = factor(sex, labels = c("M", "F"))
-)
-str(M.dk)
-```
-Then match the rates from `M.dk` into `SL`;
-`sex`, `Am` and `Pm` are the common variables,
-and therefore the match is on these variables:
-```{r eval = TRUE}
-SLr <- merge(SL, M.dk[, c("sex", "Am", "Pm", "rate")])
-dim(SL)
-dim(SLr)
-```
-This merge (remember to `?merge`!) only takes rows that have
-information from both datasets, hence the slightly fewer rows in
-`SLr` than in `SL`.
--  Compute the expected number of deaths as the person-time
-   multiplied by the corresponding population rate, and put it in a
-   new variable, `E`, say (`E`xpected). Use `stat.table`
-   to make a table of observed, expected and the ratio (SMR) by age
-   (suitably grouped, look for `cut`) and sex.
-
-```{r eval = TRUE, echo=FALSE} 
-SLr$E <- SLr$P * SLr$rate
-```
-
--  Fit a poisson model with sex as the explanatory variable and
-  log-expected as offset to derive the SMR (and c.i.).
-  Some of the population mortality rates are 0, so you need to exclude
-  those records from the analysis.
-```{r }
-msmr <- glm((lex.Xst == "Dead") ~ sex - 1 + offset(log(E)),
-  family = poisson,
-  data = subset(SLr, E > 0)
-)
-ci.exp(msmr)
-```
-  Recogninze the numbers?
--  The same model can be fitted a bit simpler by the
-`poisreg` family, try:
-```{r }
-msmr <- glm(cbind(lex.Xst == "Dead", E) ~ sex - 1,
-  family = poisreg,
-  data = subset(SLr, E > 0)
-)
-ci.exp(msmr)
-```
-  We can assess the ratios of SMRs between men and women by using the
-  `ctr.mat` argument which should be a matrix:
-```{r }
-(CM <- rbind(
-  M = c(1, 0),
-  W = c(0, 1),
-  "M/F" = c(1, -1)
-))
-round(ci.exp(msmr, ctr.mat = CM), 2)
-```
-What do you conclude?
-
+12. We will use the former approach, using the dataset split in
+    6 month intervals, and then include as an extra variable the
+    population mortality as available from the data set `M.dk`.
+    
+    First create the variables in the diabetes dataset that we need
+    for matching with the population mortality data, that is sex and
+    age and date at the midpoint of each of the intervals (or rater at a
+    point 3 months after the left endpoint of the interval; recall
+    we split the follow-up in 6 month intervals).
+    We need to have variables of the same type when we merge, so we must
+    transform the sex variable in `M.dk` to a factor, and must
+    for each follow-up interval in the `SL` data have an age and
+    a period variable that can be used in merging with the population data.
+    ```{r eval = TRUE}
+    str(SL)
+    SL$Am <- floor(SL$A + 0.25)
+    SL$Pm <- floor(SL$P + 0.25)
+    data(M.dk)
+    str(M.dk)
+    M.dk <- transform(M.dk,
+      Am = A,
+      Pm = P,
+      sex = factor(sex, labels = c("M", "F"))
+    )
+    str(M.dk)
+    ```
+    Then match the rates from `M.dk` into `SL`;
+    `sex`, `Am` and `Pm` are the common variables,
+    and therefore the match is on these variables:
+    ```{r eval = TRUE}
+    SLr <- merge(SL, M.dk[, c("sex", "Am", "Pm", "rate")])
+    dim(SL)
+    dim(SLr)
+    ```
+    This merge (remember to `?merge`!) only takes rows that have
+    information from both datasets, hence the slightly fewer rows in
+    `SLr` than in `SL`.
+    -  Compute the expected number of deaths as the person-time
+       multiplied by the corresponding population rate, and put it in a
+       new variable, `E`, say (`E`xpected). Use `stat.table`
+       to make a table of observed, expected and the ratio (SMR) by age
+       (suitably grouped, look for `cut`) and sex.
+    
+    ```{r eval = TRUE, echo=FALSE} 
+    SLr$E <- SLr$P * SLr$rate
+    ```
+    
+10. Fit a poisson model with sex as the explanatory variable and
+    log-expected as offset to derive the SMR (and c.i.).
+    Some of the population mortality rates are 0, so you need to exclude
+    those records from the analysis.
+    ```{r }
+    msmr <- glm((lex.Xst == "Dead") ~ sex - 1 + offset(log(E)),
+      family = poisson,
+      data = subset(SLr, E > 0)
+    )
+    ci.exp(msmr)
+    ```
+      Recogninze the numbers?
+    -  The same model can be fitted a bit simpler by the
+    `poisreg` family, try:
+    ```{r }
+    msmr <- glm(cbind(lex.Xst == "Dead", E) ~ sex - 1,
+      family = poisreg,
+      data = subset(SLr, E > 0)
+    )
+    ci.exp(msmr)
+    ```
+      We can assess the ratios of SMRs between men and women by using the
+      `ctr.mat` argument which should be a matrix:
+    ```{r }
+    (CM <- rbind(
+      M = c(1, 0),
+      W = c(0, 1),
+      "M/F" = c(1, -1)
+    ))
+    round(ci.exp(msmr, ctr.mat = CM), 2)
+    ```
+    What do you conclude?
+    
 ## SMR modeling
+    
+14.  Now model the SMR using age and date of diagnosis and diabetes
+     duration as explanatory variables, including the expected-number
+     instead of the person-years, using separate models for
+     men and women.
+     You cannot use `gam.Lexis` from the code you used for
+     fitting models for the rates, you need to use `gam` with
+     the `poisreg` family. And remember to exclude those units
+     where no deaths in the population occur (that is where the rate
+     is 0).
+     Plot the estimated smooth effects for both men and women using
+     e.g. `plot.gam`. What do you see?
 
--  Now model the SMR using age and date of diagnosis and diabetes
-  duration as explanatory variables, including the expected-number
-  instead of the person-years, using separate models for
-  men and women.
-  You cannot use `gam.Lexis` from the code you used for
-  fitting models for the rates, you need to use `gam` with
-  the `poisreg` family. And remember to exclude those units
-  where no deaths in the population occur (that is where the rate
-  is 0).
-  Plot the estimated smooth effects for both men and women using
-  e.g. `plot.gam`. What do you see?
--  Plot the predicted SMRs from the models for men and women
-  diagnosed in ages 50, 60 and 70 as you dif for the rates. What do
-  you see?
--  Try to simplify the model to one with a simple sex effect,
-  separate linear effects of age and date of follow-up for each
-  sex, and a smooth effect of duration common for both sexes,
-  giving an estimate of the change in SMR by age and calendar
-  time. How much does SMR change by each year of age? And by each
-  calendar year?
--  Use your previous code to plot the predicted mortality from this
-  model too. Are the predicted SMR curves credible?
+     Plot the predicted SMRs from the models for men and women
+     diagnosed in ages 50, 60 and 70 as you dif for the rates. What do
+     you see?
 
+12.  Try to simplify the model to one with a simple sex effect,
+     separate linear effects of age and date of follow-up for each
+     sex, and a smooth effect of duration common for both sexes,
+     giving an estimate of the change in SMR by age and calendar
+     time. How much does SMR change by each year of age? And by each
+     calendar year?
+
+12.  Use your previous code to plot the predicted mortality from this
+     model too. Are the predicted SMR curves credible?
+    
