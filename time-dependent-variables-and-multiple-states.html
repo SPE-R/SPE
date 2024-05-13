@@ -274,8 +274,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="12" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html"><i class="fa fa-check"></i><b>12</b> Time-splitting, time-scales and SMR</a>
 <ul>
-<li class="chapter" data-level="12.1" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#smr"><i class="fa fa-check"></i><b>12.1</b> SMR</a></li>
-<li class="chapter" data-level="12.2" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#smr-modeling"><i class="fa fa-check"></i><b>12.2</b> SMR modeling</a></li>
+<li class="chapter" data-level="12.1" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#age-specific-mortality"><i class="fa fa-check"></i><b>12.1</b> Age-specific mortality</a></li>
+<li class="chapter" data-level="12.2" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#smr"><i class="fa fa-check"></i><b>12.2</b> SMR</a></li>
+<li class="chapter" data-level="12.3" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#smr-modeling"><i class="fa fa-check"></i><b>12.3</b> SMR modeling</a></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><i class="fa fa-check"></i><b>13</b> Nested case-control study and case-cohort study: Risk factors of coronary heart disease</a>
 <ul>
@@ -386,7 +387,7 @@ part of the standard <code>R</code>-distribution). At the same time, convert
 <code>sex</code> to a proper factor. Choose where to read the dataset.</p>
 <div class="sourceCode" id="cb383"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb383-1"><a href="time-dependent-variables-and-multiple-states.html#cb383-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
 <span id="cb383-2"><a href="time-dependent-variables-and-multiple-states.html#cb383-2" tabindex="-1"></a><span class="fu">library</span>(survival)</span>
-<span id="cb383-3"><a href="time-dependent-variables-and-multiple-states.html#cb383-3" tabindex="-1"></a><span class="fu">clear</span>()</span>
+<span id="cb383-3"><a href="time-dependent-variables-and-multiple-states.html#cb383-3" tabindex="-1"></a><span class="fu">library</span>(mgcv)</span>
 <span id="cb383-4"><a href="time-dependent-variables-and-multiple-states.html#cb383-4" tabindex="-1"></a><span class="fu">library</span>(foreign)</span>
 <span id="cb383-5"><a href="time-dependent-variables-and-multiple-states.html#cb383-5" tabindex="-1"></a><span class="co"># renal &lt;- read.dta(</span></span>
 <span id="cb383-6"><a href="time-dependent-variables-and-multiple-states.html#cb383-6" tabindex="-1"></a><span class="co">#  &quot;https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/renal.dta&quot;)</span></span>
@@ -633,11 +634,10 @@ I(lex.Cst == &quot;Rem&quot;)TRUE           0.27927558 0.131396852   0.59358233<
 <li><p>Try instead using the <code>gam</code> function from the
 <code>mgcv</code> package. There is convenience wrapper for this for
 <code>Lexis</code> objects as well:</p>
-<div class="sourceCode" id="cb417"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb417-1"><a href="time-dependent-variables-and-multiple-states.html#cb417-1" tabindex="-1"></a><span class="fu">library</span>(mgcv)</span>
-<span id="cb417-2"><a href="time-dependent-variables-and-multiple-states.html#cb417-2" tabindex="-1"></a>mx <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(sLc,</span>
-<span id="cb417-3"><a href="time-dependent-variables-and-multiple-states.html#cb417-3" tabindex="-1"></a>                <span class="sc">~</span> <span class="fu">s</span>(tfi, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span> </span>
-<span id="cb417-4"><a href="time-dependent-variables-and-multiple-states.html#cb417-4" tabindex="-1"></a>                  sex <span class="sc">+</span> <span class="fu">I</span>((doe <span class="sc">-</span> dob <span class="sc">-</span> <span class="dv">40</span>) <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> </span>
-<span id="cb417-5"><a href="time-dependent-variables-and-multiple-states.html#cb417-5" tabindex="-1"></a>                  <span class="fu">I</span>(lex.Cst <span class="sc">==</span> <span class="st">&quot;Rem&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb417"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb417-1"><a href="time-dependent-variables-and-multiple-states.html#cb417-1" tabindex="-1"></a>mx <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(sLc,</span>
+<span id="cb417-2"><a href="time-dependent-variables-and-multiple-states.html#cb417-2" tabindex="-1"></a>                <span class="sc">~</span> <span class="fu">s</span>(tfi, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span> </span>
+<span id="cb417-3"><a href="time-dependent-variables-and-multiple-states.html#cb417-3" tabindex="-1"></a>                  sex <span class="sc">+</span> <span class="fu">I</span>((doe <span class="sc">-</span> dob <span class="sc">-</span> <span class="dv">40</span>) <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> </span>
+<span id="cb417-4"><a href="time-dependent-variables-and-multiple-states.html#cb417-4" tabindex="-1"></a>                  <span class="fu">I</span>(lex.Cst <span class="sc">==</span> <span class="st">&quot;Rem&quot;</span>))</span></code></pre></div>
 <pre class="custom-output"><code>mgcv::gam Poisson analysis of Lexis object sLc with log link:
 Rates for transitions:
 NRA-&gt;ESRD
@@ -905,7 +905,7 @@ The <code>system.time</code> command is just to tell you how long it
 took, you may want to start with 500 just to see how long that takes.</p>
 <div class="sourceCode" id="cb453"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb453-1"><a href="time-dependent-variables-and-multiple-states.html#cb453-1" tabindex="-1"></a><span class="fu">system.time</span>(sM <span class="ot">&lt;-</span> <span class="fu">simLexis</span>(Tr, inL, <span class="at">N =</span> <span class="dv">500</span>, <span class="at">t.range =</span> <span class="dv">12</span>))</span></code></pre></div>
 <pre class="custom-output"><code>   user  system elapsed 
-  2.508   3.227   2.002 </code></pre>
+  2.626   2.989   1.965 </code></pre>
 <div class="sourceCode" id="cb455"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb455-1"><a href="time-dependent-variables-and-multiple-states.html#cb455-1" tabindex="-1"></a><span class="fu">summary</span>(sM, <span class="at">by =</span> <span class="st">&quot;sex&quot;</span>)</span></code></pre></div>
 <pre class="custom-output"><code>$M
 
