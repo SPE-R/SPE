@@ -5,17 +5,19 @@ output:
   editor_options:
   chunk_output_type: console
 ---
-```{r, include=FALSE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(keep.source = TRUE, 
                           results = "verbatim", 
                           include = TRUE, 
                              eval = TRUE, 
                           comment = "")
+knitr::opts_knit$set(global.par  = TRUE)
 ```
 
 ```{r echo=FALSE, eval=TRUE}
 options(width = 90,
-        show.signif.stars = FALSE)
+        show.signif.stars = FALSE,
+        prompt = " ", continue = " ")
 par(mar = c(3,3,1,1),
     mgp = c(3,1,0) / 1.6,
     las = 1,
@@ -63,7 +65,7 @@ the study at death or kidney failure (dialysis or transplant).
     ```{r,  results = "hide" }
     library(Epi)
     library(survival)
-    clear()
+    library(mgcv)
     library(foreign)
     # renal <- read.dta(
     #  "https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/renal.dta")
@@ -157,6 +159,7 @@ the study at death or kidney failure (dialysis or transplant).
     ```{r Lc-boxes,fig=TRUE}
     boxes(Lc, boxpos = TRUE, scale.R = 100, show.BE = TRUE, hm = 1.5, wm = 1.5)
     ```
+
     You may even be tempted to read the help page for
     `boxes.Lexis` ...
     
@@ -238,7 +241,6 @@ the study at death or kidney failure (dialysis or transplant).
     `mgcv` package. There is convenience wrapper for this for
     `Lexis` objects as well:
     ```{r }
-    library(mgcv)
     mx <- gam.Lexis(sLc,
                     ~ s(tfi, k = 10) + 
                       sex + I((doe - dob - 40) / 10) + 
@@ -269,6 +271,7 @@ the study at death or kidney failure (dialysis or transplant).
     ```{r }
     plot(mx)
     ```
+
     Is this a useful plot?
     
 16. However, `plot` (well, `plot.gam`) does not give you the *absolute*
@@ -419,6 +422,7 @@ the study at death or kidney failure (dialysis or transplant).
     ```{r plot-pp,fig=TRUE}
     plot(ppf)
     ```
+
     Is this useful?
     
 23. Now try to improve the plot so that it is easier to read, and
@@ -439,5 +443,6 @@ the study at death or kidney failure (dialysis or transplant).
     axis(side = 2, at = 0:10 / 10)
     axis(side = 2, at = 1:99 / 100, labels = NA, tck = -0.01)
     ```
+  
     What is the 10-year risk of remission for men and women respectively?
   
