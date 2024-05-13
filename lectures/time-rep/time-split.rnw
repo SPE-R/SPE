@@ -1,8 +1,12 @@
 \SweaveOpts{results=verbatim,keep.source=TRUE,include=FALSE,eps=FALSE}
 <<echo=FALSE>>=
-options( width=90,
-         SweaveHooks=list( fig=function()
-         par(mar=c(3,3,1,1),mgp=c(3,1,0)/1.6,las=1,bty="n") ) )
+options(width = 90,
+        SweaveHooks = list(fig = function()
+        par(mar = c(3,3,1,1),
+            mgp = c(3,1,0)/1.6,
+            las = 1,
+            bty = "n",
+           lend = "butt")))
 @ %
 
 %----------------------------------------------------------------------
@@ -108,6 +112,38 @@ If follow-up is long, stratification by categories of\\
 \end{frame}
 
 %----------------------------------------------------------------------
+\begin{frame}{Statistical model for follow-up data}
+  \begin{itemize}
+  \item \textbf{Data}:
+
+    \begin{itemize}
+    \item status and time at entry
+    \item status and time at exit
+    \item \ldots \textbf{observed} risk time and events (= change of status):\\
+        \textbf{empirical} occurrence rates $(d, y)$
+    \end{itemize}
+    
+  \item \textbf{Model} for occurrence rates:
+
+    \begin{itemize}
+    \item $\textcolor{blue}{\lambda(t, x)}
+          = \ptxt{event in $(t,t+\dif t] | $ alive at $t$} / \dif t$
+    \item parametric specification of how $\textcolor{blue}{\lambda}$ depends on $t$ and $x$
+    \item log-likelihood is a function of $\textcolor{blue}{\lambda}$ and
+      \textbf{data}
+    \item Simplest case with constant $\textcolor{blue}{\lambda}$:
+          $\text{log-likelihood} = d\,\textcolor{blue}{\log(\lambda) - \lambda}y$
+    \item log-likelihood for a Poisson variate $\textcolor{orange}{d}$ with expectation
+  $\textcolor{orange}{\lambda y}$ is:\\ 
+  $\textcolor{orange}{d}\,\textcolor{blue}{\log(\lambda)} - \textcolor{orange}{\lambda y}$,
+  the same as the rate log-likelihood
+\item not a Poisson \textbf{model}, but a Poisson \textbf{likelihood}
+  \end{itemize}
+  
+  \end{itemize}
+\end{frame}
+
+%----------------------------------------------------------------------
 \begin{frame}[fragile]
 
 \setlength{\unitlength}{1pt}
@@ -124,7 +160,7 @@ If follow-up is long, stratification by categories of\\
  \put(120,37){\makebox(0,0)[cb]{$y$}}
  }
 
- \put(240,41){\makebox(0,0)[cb]{$d$}}
+ \put(240,37){\makebox(0,0)[lb]{$d \in (0,1)$}}
  \put( 10,20){\makebox(0,0)[c]{$t_0$}}
 }
 \onslide<2->{\put( 80,20){\makebox(0,0)[c]{$t_1$}}}
@@ -146,7 +182,7 @@ If follow-up is long, stratification by categories of\\
 \vspace*{-1em}
 \begin{align*}
   & \hspace*{-1ex} \text{Probability}
-& & \hspace*{-1ex} \text{log-Likelihood} \\[1ex]
+& & \hspace*{-1ex} \text{log-Lik ($\lambda$ constant)} \\[1ex]
   & \hspace*{-1ex} \textcolor{blue}{\operatorname{P}(\text{\textcolor{black}{$d$} at $t_\text{x}$} | \text{entry $t_0$})}
   & \qquad
   & \hspace*{-1ex} d\,\textcolor{blue}{\log(\lambda) - \lambda}y\\[1ex]
@@ -178,7 +214,8 @@ If follow-up is long, stratification by categories of\\
  \put(120,37){\makebox(0,0)[cb]{$y$}}
  }
 
- \put(240,41){\makebox(0,0)[cb]{$d$}}
+ \put(240,37){\makebox(0,0)[lb]{$d \in (0,1)$}}
+%\put(240,41){\makebox(0,0)[cb]{$d$}}
  \put( 10,20){\makebox(0,0)[c]{$t_0$}}
 }
 \onslide<1->{\put( 80,20){\makebox(0,0)[c]{$t_1$}}}
@@ -200,10 +237,11 @@ If follow-up is long, stratification by categories of\\
 \vspace*{-1em}
 \begin{align*}
   & \hspace*{-1ex} \text{Probability}
-& & \hspace*{-1ex} \text{log-Likelihood} \\[1ex]
+& & \hspace*{-1ex} \text{log-Lik ($\lambda$ varies)} \\[1ex]
   & \hspace*{-1ex} \textcolor{blue}{\operatorname{P}(\text{\textcolor{black}{$d$} at $t_\text{x}$} | \text{entry $t_0$})}
   & \qquad
-  & \hspace*{-1ex} d\,\textcolor{blue}{\log(\lambda) - \lambda}y\\[1ex]
+  & % \hspace*{-1ex} d\,\textcolor{blue}{\log(\lambda) - \lambda}y\\[1ex]
+    \\[1ex]
   &\onslide<1->{\textcolor{red}{ = \operatorname{P}(\text{surv $t_0\rightarrow \textcolor{red}{t_1}$} | \text{entry $t_0$}) } }
 & &\onslide<1->{\textcolor{red}{\,=\,}0\,\textcolor{red}{ \log(\lambda_{\textcolor{forestgreen}{1}})
                                                              - \lambda_{\textcolor{forestgreen}{1}}} y_1}\\
@@ -626,7 +664,7 @@ summary(splx)
 %----------------------------------------------------------------------
 \begin{frame}[fragile]{Likelihood for time-split data}
   \begin{itemize}[<+->]
-  \item We assume that rates are constant in each (small) intervals
+  \item We assume that rates are constant in each (small) interval
   \item Each observation in the dataset represents an interval,
     contributing a term to the (log-)likelihood for the rate
   \item Each \textbf{term} \alert<4->{looks like} a contribution from a Poisson variate
@@ -747,7 +785,7 @@ Observations (records) classified by $p$---person and $i$---interval
 \item Covariates are:
 
 \begin{itemize}
-\item timescales (age, period, time in study)
+\item timescales (age, period, time since entry)
 \item other variables for this person (constant in each interval).
 \end{itemize}
 
@@ -828,10 +866,11 @@ round(ci.exp(m0), 2)
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]{Fitting a simple model}
+\begin{frame}[fragile]{Fitting a simple model to a \code{Lexis} object}
 \small
 The wrapper \code{glm.Lexis} requires that \code{lex.Cst} and \code{lex.Xst}
-are factors\\---use \code{factorize} to make them:
+are factors\\---use \code{factorize} to make them that:
+\vspace*{-1ex}
 <<>>=
 splf <- factorize(spl2)
 m0 <- glm.Lexis(splf, ~ factor(contrast) - 1, scale = 100)
