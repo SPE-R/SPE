@@ -37,27 +37,27 @@ options(width = 90,
 
 \end{frame}
 
-%----------------------------------------------------------------------
-\begin{frame}[fragile]{Representation of follow-up data}
-A cohort or follow-up study records
-\textbf{events} and \textbf{risk time}
+%% %----------------------------------------------------------------------
+%% \begin{frame}[fragile]{Representation of follow-up data}
+%% A cohort or follow-up study records
+%% \textbf{events} and \textbf{risk time}
 
-The outcome is thus \textbf{bivariate}: $(d,y)$
+%% The outcome is thus \textbf{bivariate}: $(d,y)$
 
-Follow-up \textbf{data} for each individual must therefore have (at
-least) three pieces of information recorded:
-\begin{center}
-\begin{tabular}{lll}
-\toprule
-Date of entry  & \verb+entry+ & date variable\\
-Date of exit   & \verb+exit+  & date variable\\
-Status at exit & \verb+fail+  & indicator (mostly $0/1$)\\
-\bottomrule
-\end{tabular}
-\end{center}
-These are specific for each \textbf{type} of outcome.
+%% Follow-up \textbf{data} for each individual must therefore have (at
+%% least) three pieces of information recorded:
+%% \begin{center}
+%% \begin{tabular}{lll}
+%% \toprule
+%% Date of entry  & \verb+entry+ & date variable\\
+%% Date of exit   & \verb+exit+  & date variable\\
+%% Status at exit & \verb+fail+  & indicator (mostly $0/1$)\\
+%% \bottomrule
+%% \end{tabular}
+%% \end{center}
+%% These are specific for each \textbf{type} of outcome.
 
-\end{frame}
+%% \end{frame}
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile]{Stratification by age}
@@ -108,12 +108,12 @@ If follow-up is long, stratification by categories of\\
 \end{center}
 \pause
 --- allowing rates to vary across age-bands\\ \pause
---- how do we do the split and why is it OK?
+--- how do we split follow-up by age and why is it OK?
 \end{frame}
 
 %----------------------------------------------------------------------
 \begin{frame}{Statistical model for follow-up data}
-  \begin{itemize}
+  \begin{itemize}[<+->]
   \item \textbf{Data}:
 
     \begin{itemize}
@@ -122,24 +122,26 @@ If follow-up is long, stratification by categories of\\
     \item \ldots \textbf{observed} risk time and events (= change of status):\\
         \textbf{empirical} occurrence rates $(d, y)$
     \end{itemize}
-    
+
   \item \textbf{Model} for occurrence rates:
 
     \begin{itemize}
     \item $\textcolor{blue}{\lambda(t, x)}
-          = \ptxt{event in $(t,t+\dif t] | $ alive at $t$} / \dif t$
+          = \ptxt{event in $(t,t+\dif t] | $ alive at $t$, x} / \dif t$
     \item parametric specification of how $\textcolor{blue}{\lambda}$ depends on $t$ and $x$
-    \item log-likelihood is a function of $\textcolor{blue}{\lambda}$ and
-      \textbf{data}
-    \item Simplest case with constant $\textcolor{blue}{\lambda}$:
-          $\text{log-likelihood} = d\,\textcolor{blue}{\log(\lambda) - \lambda}y$
-    \item log-likelihood for a Poisson variate $\textcolor{orange}{d}$ with expectation
-  $\textcolor{orange}{\lambda y}$ is:\\ 
-  $\textcolor{orange}{d}\,\textcolor{blue}{\log(\lambda)} - \textcolor{orange}{\lambda y}$,
+    \item likelihood is a function of $\textcolor{blue}{\lambda}$ and
+      \textbf{data}: $\ptxt{data $|$ model, $\lambda$}$
+    \item simplest case with constant $\textcolor{blue}{\lambda}$:
+          $\text{log-likelihood} = \textcolor{forestgreen}{d}\,\textcolor{blue}{\log(\lambda)
+            - \lambda}\textcolor{forestgreen}{y}$
+    \item log-likelihood for a Poisson variate $\textcolor{forestgreen}{d}$ with expectation
+  $\textcolor{blue}{\lambda y}$ is:\\
+  $\textcolor{forestgreen}{d}\,\textcolor{blue}{\log(\lambda)} - \textcolor{blue}{\lambda y}$,
   the same as the rate log-likelihood
-\item not a Poisson \textbf{model}, but a Poisson \textbf{likelihood}
+\item rate model is not a Poisson \textbf{model}, but the
+  \textbf{likelihood} is the same
   \end{itemize}
-  
+
   \end{itemize}
 \end{frame}
 
@@ -399,7 +401,7 @@ id       Bdate       Entry        Exit  St     risk  int
 \begin{frame}[fragile]{Follow-up intervals on several timescales}
   \begin{itemize}[<+->]
   \item The risk-time is the same on all timescales
-  \item Only need the entry point on each time scale:
+  \item So only need the \textbf{entry} point on each time scale:
 
   \begin{itemize}
     \item Age at entry.
@@ -430,7 +432,7 @@ data(thoro)
 thoro <- cal.yr(thoro)
 @
 <<>>=
-thoro[1:6,1:8]
+thoro[1:4,1:8]
 @
 \ \\[-1em]
 %% Timescales of interest:
@@ -442,10 +444,11 @@ thoro[1:6,1:8]
 %% <<results=hide,echo=FALSE>>=
 <<>>=
 thL <- Lexis(entry = list(age = injecdat-birthdat,
-                          dte = injecdat,
-                          tfi = 0 ),
-              exit = list(dte = exitdat),
-       exit.status = as.numeric(exitstat == 1),
+                          dat = injecdat,
+                          tfi = 0),
+              exit = list(dat = exitdat),
+       exit.status = factor(exitstat == 1,
+                            labels = c("Alive","Dead")),
               data = thoro)
 summary(thL, timeScales = TRUE)
 @
@@ -458,10 +461,11 @@ summary(thL, timeScales = TRUE)
 \renewcommand{\baselinestretch}{0.9}
 \begin{semiverbatim}
 thL <- Lexis(\alert<2>{entry = list(age = injecdat-birthdat,
-                          \alert<5->{dte = injecdat},
+                          \alert<5->{dat = injecdat},
                           tfi = 0)},
-              \alert<3>{exit = list(\alert<5->{dte = exitdat})},
-       exit.status = as.numeric(exitstat==1),
+              \alert<3>{exit = list(\alert<5->{dat = exitdat})},
+       exit.status = factor(exitstat == 1,
+                            labels = c("Alive","Dead")),
               data = thoro)
 \end{semiverbatim}
 \renewcommand{\baselinestretch}{1.0}
@@ -472,10 +476,10 @@ timescales,} \onslide<3->{\\ but
 \alert<3>{\texttt{exit}} is only needed on \textbf{one}
 timescale (or vice versa)}: \onslide<4->{\\
 \alert<4->{Follow-up time} is the same on all timescales:}
-\onslide<5->{\alert<5->{\hfill \small \texttt{exitdat - injecdat}}}
+\onslide<5->{\alert<5->{\small \texttt{exitdat - injecdat}}}
 
 \onslide<6->{One element of \texttt{entry} and \texttt{exit} must have
-same name (\alert<6->{\texttt{dte}}).}
+same name (\alert<6->{\texttt{dat}}).}
 \end{frame}
 
 %----------------------------------------------------------------------
@@ -484,18 +488,18 @@ same name (\alert<6->{\texttt{dte}}).}
 \renewcommand{\baselinestretch}{0.9}
 \begin{semiverbatim}
 > thL[1:4,1:9]
-    age     dte tfi \alert<3>{lex.dur} \alert<5>{lex.Cst} \alert<4>{lex.Xst} lex.id
-1 22.18 1938.79   0 \alert<3>{  37.99} \alert<5>{      0} \alert<4>{      1}      1
-2 49.54 1945.77   0 \alert<3>{  18.59} \alert<5>{      0} \alert<4>{      1}      2
-3 68.20 1955.18   0 \alert<3>{   1.40} \alert<5>{      0} \alert<4>{      1}      3
-4 20.80 1957.61   0 \alert<3>{  34.52} \alert<5>{      0} \alert<4>{      0}      4
+    age     dat tfi \alert<3>{lex.dur} \alert<5>{lex.Cst} \alert<4>{lex.Xst} lex.id
+1 22.18 1938.79   0 \alert<3>{  37.99} \alert<5>{  Alive} \alert<4>{   Dead}      1
+2 49.54 1945.77   0 \alert<3>{  18.59} \alert<5>{  Alive} \alert<4>{   Dead}      2
+3 68.20 1955.18   0 \alert<3>{   1.40} \alert<5>{  Alive} \alert<4>{   Dead}      3
+4 20.80 1957.61   0 \alert<3>{  34.52} \alert<5>{  Alive} \alert<4>{  Alive}      4
 ...
 \pause
 > summary(thL)
 Transitions:
      \alert<4>{To}
-\alert<5>{From} \alert<4>{  0    1} Records:  \alert<4>{Events:}  \alert<3>{Risk time:}  Persons:
-\alert<5>{   0} \alert<4>{504 1964}     2468  \alert<4>{   1964}  \alert<3>{  51934.08}      2468
+\alert<5>{From} \alert<4>{Alive Dead} Records:  \alert<4>{Events:}  \alert<3>{Risk time:}  Persons:
+\alert<5>{   0} \alert<4>{  504 1964}     2468  \alert<4>{   1964}  \alert<3>{  51934.08}      2468
 \end{semiverbatim}
 \renewcommand{\baselinestretch}{1.0}
 \end{frame}
@@ -537,10 +541,10 @@ Transitions:
 \vspace*{-1.5ex}
 {\scriptsize
 \begin{verbatim}
-> plot( thL, 2:1, lwd=5, col=c("red","blue")[thL$contrast],
-+       grid=TRUE, lty.grid=1, col.grid=gray(0.7),
-+       xlim=1930+c(0,70), xaxs="i", ylim=  10+c(0,70), yaxs="i", las=1 )
-> points( thL, 2:1, pch=c(NA,3)[thL$lex.Xst+1],lwd=3, cex=1.5 )
+> plot(thL, 2:1, lwd=5, col=c("red", "blue")[thL$contrast],
++      grid = TRUE, lty.grid = 1, col.grid = gray(0.7),
++      xlim = 1930 + c(0,70), xaxs = "i", ylim = 10 +c(0, 70), yaxs = "i", las = 1 )
+> points( thL, 2:1, pch=c(NA,3)[thL$lex.Xst], lwd = 3, cex = 1.5 )
 \end{verbatim}}
 \end{frame}
 
@@ -567,7 +571,7 @@ Transitions:
 \begin{semiverbatim}
 > spl1 <- splitLexis( thL, time.scale="age", breaks=seq(0,100,20) )
 > round(spl1,1)
-   age    dte  tfi lex.dur lex.Cst lex.Xst   id sex birthdat contrast injecdat volume
+   age    dat  tfi lex.dur lex.Cst lex.Xst   id sex birthdat contrast injecdat volume
 \alert<2>{1 22.2 1938.8  0.0    17.8       0       0    1   2   1916.6        1   1938.8     22}
 \alert<2>{2 40.0 1956.6 17.8    20.0       0       0    1   2   1916.6        1   1938.8     22}
 \alert<2>{3 60.0 1976.6 37.8     0.2       0       1    1   2   1916.6        1   1938.8     22}
@@ -591,7 +595,7 @@ Transitions:
 \begin{semiverbatim}
 > spl2 <- splitLexis( spl1, time.scale="tfi", breaks=c(0,1,5,20,100) )
 > round( spl2, 1 )
-   lex.id  age    dte  tfi lex.dur lex.Cst lex.Xst   id sex birthdat contrast injecdat volume
+   lex.id  age    dat  tfi lex.dur lex.Cst lex.Xst   id sex birthdat contrast injecdat volume
 \alert<2>{1       1 22.2 1938.8  0.0     1.0       0       0    1   2   1916.6        1   1938.8     22}
 \alert<2,4>{2       1 23.2 1939.8  1.0     4.0       0       0    1   2   1916.6        1   1938.8     22}
 \alert<2,4>{3       1 27.2 1943.8  5.0    12.8       0       0    1   2   1916.6        1   1938.8     22}
@@ -818,25 +822,25 @@ Observations (records) classified by $p$---person and $i$---interval
 \begin{frame}[fragile]{Fitting a simple model---data:}
 <<>>=
 stat.table(contrast,
-           list(D = sum(lex.Xst),
+           list(D = sum(lex.Xst == "Dead"),
                 Y = sum(lex.dur),
-             Rate = ratio(lex.Xst, lex.dur, 100)),
+             Rate = ratio(lex.Xst == "Dead", lex.dur, 100)),
            margin = TRUE,
              data = spl2)
 @
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]{Fitting a simple model}
+\begin{frame}[fragile]{Fitting a simple model with \code{poisson}}
 <<echo=FALSE>>=
 stat.table(contrast,
-           list(D = sum(lex.Xst),
+           list(D = sum(lex.Xst == "Dead"),
                 Y = sum(lex.dur),
-             Rate = ratio(lex.Xst, lex.dur, 100)),
+             Rate = ratio(lex.Xst == "Dead", lex.dur, 100)),
              data = spl2)
 @ %
 <<>>=
-m0 <- glm((lex.Xst==1) ~ factor(contrast) - 1,
+m0 <- glm((lex.Xst == "Dead") ~ factor(contrast) - 1,
           offset = log(lex.dur / 100),
           family = poisson,
             data = spl2)
@@ -847,16 +851,16 @@ round(ci.exp(m0), 2)
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]{Fitting a simple model}
+\begin{frame}[fragile]{Fitting a simple model with \code{poisreg}}
 <<echo=FALSE>>=
 stat.table(contrast,
-           list(D = sum(lex.Xst),
+           list(D = sum(lex.Xst == "Dead"),
                 Y = sum(lex.dur),
-             Rate = ratio(lex.Xst, lex.dur, 100)),
+             Rate = ratio(lex.Xst == "Dead", lex.dur, 100)),
              data = spl2)
 @ %
 <<>>=
-m0 <- glm(cbind(lex.Xst, lex.dur / 100) ~ factor(contrast) - 1,
+m0 <- glm(cbind(lex.Xst == "Dead", lex.dur / 100) ~ factor(contrast) - 1,
           family = poisreg,
             data = spl2)
 round(ci.exp(m0), 2)
@@ -866,14 +870,13 @@ round(ci.exp(m0), 2)
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]{Fitting a simple model to a \code{Lexis} object}
+\begin{frame}[fragile]{Fitting a simaple model with \code{glm.Lexis}}
 \small
 The wrapper \code{glm.Lexis} requires that \code{lex.Cst} and \code{lex.Xst}
-are factors\\---use \code{factorize} to make them that:
+are factors --- see \code{factorize}:
 \vspace*{-1ex}
 <<>>=
-splf <- factorize(spl2)
-m0 <- glm.Lexis(splf, ~ factor(contrast) - 1, scale = 100)
+m0 <- glm.Lexis(spl2, ~ factor(contrast) - 1, scale = 100)
 round(ci.exp(m0), 2)
 @  %
 \small
@@ -885,9 +888,9 @@ person-years in a \code{Lexis} object
 \begin{frame}[fragile]{Fitting a simple model --- aggregate data}
 <<echo=FALSE>>=
 stat.table(contrast,
-           list(D = sum(lex.Xst),
+           list(D = sum(lex.Xst == "Dead"),
                 Y = sum(lex.dur),
-             Rate = ratio(lex.Xst, lex.dur, 100)),
+             Rate = ratio(lex.Xst == "Dead", lex.dur, 100)),
              data = spl2)
 @ %
 \vspace*{-1em}
