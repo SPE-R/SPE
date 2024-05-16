@@ -124,30 +124,27 @@ From  NRA ESRD  Records:  Events: Risk time:  Persons:
 \end{center}
 \end{frame}
 
-%----------------------------------------------------------------------
-\begin{frame}
-   \frametitle{Illness-death model}
-\begin{center}
-\includegraphics[height=0.6\textheight,keepaspectratio]{./NRA-death-par3}
-\end{center}
-\vspace*{-2em}
-\begin{tabular}{rl}
-$\lambda$: & remission rate.\\
-$\mu_\text{NRA}$: & mortality/ESRD rate \textbf{before} remission.\\
-$\mu_\text{rem}$: & mortality/ESRD rate \textbf{after} remission.
-\end{tabular}
-\end{frame}
+% %----------------------------------------------------------------------
+% \begin{frame}{Illness-death model}
+% \begin{center}
+% \includegraphics[height=0.6\textheight,keepaspectratio]{./NRA-death-par3}
+% \end{center}
+% \vspace*{-2em}
+% \begin{tabular}{rl}
+% $\lambda$: & remission rate.\\
+% $\mu_\text{NRA}$: & mortality/ESRD rate \textbf{before} remission.\\
+% $\mu_\text{rem}$: & mortality/ESRD rate \textbf{after} remission.
+% \end{tabular}
+% \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]
-  \frametitle{Cutting follow-up at remission: \texttt{cutLexis}}
+\begin{frame}[fragile]{Cutting follow-up at remission: \texttt{cutLexis}}
 \renewcommand{\baselinestretch}{0.8}
 \footnotesize
 \begin{verbatim}
 > Lc <- cutLexis(Lr, cut = Lr$dor,
 +                timescale = "per",
-+                new.state = "Rem",
-+         precursor.states = "NRA")
++                new.state = "Rem")
 > summary(Lc)
 
 Transitions:
@@ -162,8 +159,7 @@ From  NRA Rem ESRD  Records:  Events: Risk time:  Persons:
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]
-  \frametitle{Showing states and FU: \texttt{boxes.Lexis}}
+\begin{frame}[fragile]{Showing states and FU: \texttt{boxes.Lexis}}
 \renewcommand{\baselinestretch}{0.8}
 \footnotesize
 \begin{verbatim}
@@ -177,16 +173,14 @@ From  NRA Rem ESRD  Records:  Events: Risk time:  Persons:
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]
-  \frametitle{Cutting follow up at events: \texttt{cutLexis}}
+\begin{frame}[fragile]{Cutting follow up at events: \texttt{cutLexis}}
 \renewcommand{\baselinestretch}{0.8}
 \footnotesize
 \begin{semiverbatim}
 > Lc <- cutLexis( Lr, cut = Lr$dor,
 +               timescale = "per",
 +               new.state = "Rem",
-+        precursor.states = "NRA",
-+            \alert<2->{split.states = TRUE} )
++            \alert<2->{split.states = TRUE})
 > summary( Lc )
 
 Transitions:
@@ -201,8 +195,7 @@ From  NRA Rem ESRD\alert<3>{ ESRD(Rem)}  Records:  Events: Risk time:  Persons:
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]
-  \frametitle{Showing states and FU: \texttt{boxes.Lexis}}
+\begin{frame}[fragile]{Showing states and FU: \texttt{boxes.Lexis}}
 \renewcommand{\baselinestretch}{0.8}
 \footnotesize
 \begin{verbatim}
@@ -216,62 +209,67 @@ From  NRA Rem ESRD\alert<3>{ ESRD(Rem)}  Records:  Events: Risk time:  Persons:
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]
-  \frametitle{Likelihood for a general MS-model}
+\begin{frame}[fragile]{Likelihood for a general MS-model}
   \begin{itemize}[<+->]
   \item Product of likelihoods for each transition\\
         --- each one as for a survival model
   \item \textbf{Risk time} is the risk time in the ``From'' state
   \item \textbf{Events} are transitions to the ``To'' state
   \item All other transitions out of ``From'' are treated as \textbf{censorings}
-  \item Possible to fit models separately for each transition
+  \item Possible to fit models
+
+    \begin{itemize}
+    \item separately for each transition
+    \item jointly for transitions from \textbf{different} states
+    \item jointly for different transitions out of the \textbf{same}
+      state: \textbf{don't!}  
+    \end{itemize}
+    
   \end{itemize}
 \end{frame}
 
-%----------------------------------------------------------------------
-\begin{frame}
-\ \\[-3ex]
-\includegraphics[height=0.55\textheight,keepaspectratio]{NRA-death-par4}
-\ \\[-1ex]
-Cox-analysis with remission as time-dependent covariate:
-\begin{itemize}[<+->]
-\item Ignores $\lambda$, the remission rate.
-\item Assumes $\mu_\text{NRA}$ and $\mu_\text{rem}$ use the same timescale.
-\end{itemize}
-\end{frame}
+% %----------------------------------------------------------------------
+% \begin{frame}
+% \ \\[-3ex]
+% \includegraphics[height=0.55\textheight,keepaspectratio]{NRA-death-par4}
+% \ \\[-1ex]
+% Cox-analysis with remission as time-dependent covariate:
+% \begin{itemize}[<+->]
+% \item Ignores $\lambda$, the remission rate.
+% \item Assumes $\mu_\text{NRA}$ and $\mu_\text{rem}$ use the same timescale.
+% \end{itemize}
+% \end{frame}
+
+% %----------------------------------------------------------------------
+% \begin{frame}{Model for all transitions}
+% \begin{minipage}[b]{0.49\textwidth}
+% \raggedright
+% \includegraphics[width=\textwidth,keepaspectratio]{NRA-death-ann}\\
+% \textbf{Cox-model:}
+% \begin{itemize}
+% \item Different timescales for transitions possible
+% \item \ldots only one per transition
+% \item No explicit representation of estimated rates.
+% \end{itemize}
+% \end{minipage}
+% \hfill
+% \begin{minipage}[b]{0.49\textwidth}
+% \raggedright
+% \textbf{Poisson-model:}
+% \begin{itemize}
+% \item Timescales can be different
+% \item Multiple timescales can be accomodated simultaneously
+% \item Explicit representation of all transition rates
+% \end{itemize}
+% \end{minipage}
+% \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}
-   \frametitle{Model for all transitions}
-\begin{minipage}[b]{0.49\textwidth}
-\raggedright
-\includegraphics[width=\textwidth,keepaspectratio]{NRA-death-ann}\\
-\textbf{Cox-model:}
-\begin{itemize}
-\item Different timescales for transitions possible
-\item \ldots only one per transition
-\item No explicit representation of estimated rates.
-\end{itemize}
-\end{minipage}
-\hfill
-\begin{minipage}[b]{0.49\textwidth}
-\raggedright
-\textbf{Poisson-model:}
-\begin{itemize}
-\item Timescales can be different
-\item Multiple timescales can be accomodated simultaneously
-\item Explicit representation of all transition rates
-\end{itemize}
-\end{minipage}
-\end{frame}
-
-%----------------------------------------------------------------------
-\begin{frame}
-   \frametitle{Calculating state probabilities}
+\begin{frame}{Calculating state probabilities}
 \ \\[-3em]
 \begin{eqnarray*}
  \lefteqn{ \ptxt{Remission \textbf{before} time $t$} } \\ & = &
- \int_0^t \lambda(u) \exp\left( -\!\! \int_0^u \lambda(s) + \mu_\text{NRA} \dif s
+ \int_0^t \lambda(u) \exp\left( -\!\! \int_0^u \lambda(s) + \mu_\text{NRA}(s) \dif s
           \right) \dif u\\[1em]
  \lefteqn{ \ptxt{Being in remission \textbf{at} time $t$} } \\ & = &
  \int_0^t \lambda(u) \exp\left( -\!\! \int_0^u \lambda(s) +

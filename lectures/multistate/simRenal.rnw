@@ -1,8 +1,12 @@
 \SweaveOpts{results=verbatim,keep.source=TRUE,include=FALSE,eps=FALSE}
 <<echo=FALSE>>=
-options( width=90,
-         SweaveHooks=list( fig=function()
-         par(mar=c(3,3,1,1),mgp=c(3,1,0)/1.6,las=1,bty="n") ) )
+options(width = 90,
+        SweaveHooks = list(fig=function()
+                      par(mar = c(3,3,1,1),
+                          mgp = c(3,1,0)/1.6,
+                          las = 1,
+                          bty = "n",
+                         lend = "butt")))
 @ %
 
 %----------------------------------------------------------------------
@@ -19,34 +23,43 @@ options( width=90,
 
 <<states-col,eval=TRUE,echo=FALSE,results=hide,fig=TRUE,height=4>>=
 # setwd("/home/bendix/teach/SPE/git/SPE/lectures/multistate")
-library( Epi )
-library( mgcv )
-library( foreign )
+library(Epi)
+library(mgcv)
+library(foreign)
 renal <- read.dta( "../../pracs/data/renal.dta" )
 renal <- read.dta("https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/renal.dta")
 
-renal$sex <- factor(renal$sex, labels = c("M", "F"))
-renal <- transform(renal, dob = ifelse(dob > 2000, dob - 100, dob))
-Lr <- Lexis( entry = list( per = doe,
-                           age = doe-dob,
-                           tfi = 0 ),
-              exit = list( per = dox ),
-       exit.status = factor( event>0, labels=c("NRA","ESRD") ),
-              data = renal )
+renal$sex <- factor(renal$sex,
+                    labels = c("M", "F"))
+renal <- transform(renal, dob = ifelse(dob > 2000,
+                                       dob - 100,
+                                       dob))
+Lr <- Lexis( entry = list(per = doe,
+                          age = doe-dob,
+                          tfi = 0),
+              exit = list(per = dox),
+       exit.status = factor(event > 0,
+                            labels=c("NRA","ESRD")),
+              data = renal)
 # plot(Lr)
 # subset(Lr, age < 0)
-Lc <- cutLexis( Lr, cut = Lr$dor, # where to cut follow up
-              timescale = "per",  # what timescale are we referring to
-              new.state = "Rem",  # name of the new state
-            split.state = TRUE,   # state subdivided by origin of transition
-       precursor.states = "NRA" ) # which states are less severe
-summary( Lc )
-clr <- c("forestgreen","orange")
-clr <- c(clr,adjustcolor(rev(clr),alpha=0.35))
-bw <- rep(c("white","black"),each=2)
-boxes(Lc, boxpos=list(x=c(15,85,15,85),y=c(85,85,15,15)),
-       scale.R=100, show.BE=TRUE, col.bg=clr[c(1,2,4,3)],
-       col.txt=bw, col.border=c(clr[1:2], rep("black",2)) )
+Lc <- cutLexis(Lr, cut = Lr$dor, # where to cut follow up
+             timescale = "per",  # what timescale are we referring to
+             new.state = "Rem",  # name of the new state
+           split.state = TRUE)   # which states are less severe
+summary(Lc)
+clr <- c("forestgreen", "orange")
+clr <- c(clr, adjustcolor(rev(clr), alpha = 0.35))
+bw <- rep(c("white", "black"), each=2)
+boxes(Lc,
+      boxpos = list(x = c(15,85,15,85),
+                    y = c(85,85,15,15)),
+     scale.R = 100,
+     show.BE = TRUE,
+      col.bg = clr[c(1,2,4,3)],
+     col.txt = bw,
+  col.border = c(clr[1:2],
+                 rep("black",2)))
 @ %
 
 %----------------------------------------------------------------------
@@ -57,14 +70,14 @@ boxes(Lc, boxpos=list(x=c(15,85,15,85),y=c(85,85,15,15)),
 %----------------------------------------------------------------------
 \begin{frame}[fragile]{Modeling rates in a multistate model}
 \pause
-Each transition modeled by a model for rates\\ (Cox-model,
-Poisson-model for split data, \texttt{glm} or \texttt{gam})
+Each transition modeled by a model for rates\\ (Cox-model or
+Poisson-model for split data: \texttt{glm} or \texttt{gam})
 
 Requires that follow-up is split in small intervals:
 <<>>=
 sLc <- splitLexis(Lc, "tfi", breaks = seq(0, 30, 1/12))
-summary(sLc)
-@
+summary(sLc, t = T)
+@ %
 \end{frame}
 
 %----------------------------------------------------------------------
@@ -77,7 +90,8 @@ mr <- gam(cbind(lex.Xst == "Rem", lex.dur)
             data = subset(sLc, lex.Cst == "NRA"))
 # ESRD-rates
 mx <- gam(cbind(lex.Xst %in% c("ESRD", "ESRD(Ren)"), lex.dur)
-          ~ s(tfi, k = 10) + sex + I((doe - dob - 40) / 10) + I(lex.Cst == "Rem"),
+          ~ s(tfi, k = 10) + sex + I((doe - dob - 40) / 10) +
+                                   I(lex.Cst == "Rem"),
           family = poisreg,
             data = subset(sLc, lex.Cst %in% c("NRA", "Rem")))
 @ %
@@ -96,12 +110,12 @@ mx <- gam.Lexis(sLc,
                             I((doe - dob - 40) / 10) + I(lex.Cst == "Rem"))
 @ %
 \vspace*{-1em}
-Default is to model all transitions to absorbing states
+Default is to model all transitions \textbf{to} absorbing states
 \end{frame}
 
 %----------------------------------------------------------------------
 \begin{frame}{State probabilities}
-   How do we get from rates (Poisson-models) to probabilities:
+   How do we get from rate-models (and origin) to state probabilities:
 \pause
    \begin{itemize}[<+->]
    \item[1] Analytic calculations:
@@ -208,7 +222,8 @@ Default is to model all transitions to absorbing states
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]{Transition objects are \texttt{glm}/\texttt{gam}}
+\begin{frame}[fragile]{Transition objects are fitted
+    \texttt{coxph}/\texttt{glm}/\texttt{gam} models}
 \vspace*{-1ex}
 \includegraphics[width=0.45\textwidth]{simRenal-states-col}
 \vspace*{-1ex}
@@ -239,7 +254,7 @@ Input required:
 Output produced:
 \pause
 \begin{itemize}
-\item A \texttt{Lexis} object with simulated event histories for may
+\item A \texttt{Lexis} object with simulated event histories for many
   persons
 \end{itemize}
 
@@ -262,37 +277,38 @@ init[1,"sex"] <- "M"
 init[1,"dob"] <- 1954
 init[1,"doe"] <- 1994
 init
-system.time(sim1 <- simLexis(Tr, init, N = 10000, t.range = 15))
+system.time(sim1 <- simLexis(Tr, init, N = 10000, t.range = 15.1))
 summary(sim1)
 @ %
 \pause
 This is a simulated cohort of 10,000 persons with NRA aged 40 in 1994.
+\pause
 \end{frame}
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile,allowframebreaks]{Using a simulated \texttt{Lexis} object --- \texttt{pState}}
-<<nw1,fig=TRUE,width=7>>=
+<<sP1,fig=TRUE,width=7>>=
 NN <- nState(sim1, at = seq(0, 15, 0.1),
                  from = 0,
            time.scale = "tfi")
 head(NN)
-nw1 <- pState(NN, perm = c(1, 2, 4, 3))
-head(nw1, 3)
-tail(nw1, 3)
+sP1 <- pState(NN, perm = c(1, 2, 4, 3))
+head(sP1, 3)
+tail(sP1, 3)
 par(mar = c(3, 3, 0.5, 2), mgp = c(3, 1, 0) / 1.6, las = 1)
-plot(nw1, col = clr[c(2, 1, 4, 3)] )
-lines(as.numeric(rownames(nw1)), nw1[,2], lwd = 2)
+plot(sP1, col = clr[c(2, 1, 4, 3)], xlim = c(0,15) )
+lines(as.numeric(rownames(sP1)), sP1[,2], lwd = 2)
 axis(side = 4, at = 0:5 / 5)
 axis(side = 4, at = 0:10 / 10, labels = NA)
 axis(side = 4, at = 0:20 / 20, labels = NA, tcl = -0.3)
 axis(side = 4, at = 0:100/100, labels = NA, tcl = -0.2)
 @ %
-<<nw2,fig=TRUE,width=7>>=
-nw2 <- pState( NN, perm = c(4,2,1,3) )
-head( nw2, 3 )
-tail( nw2, 3 )
+<<sP2,fig=TRUE,width=7>>=
+sP2 <- pState(NN, perm = c(4, 2, 1, 3))
+head(sP2, 3)
+tail(sP2, 3)
 par(mar = c(3, 3, 0.5, 2), mgp = c(3, 1, 0) / 1.6, las = 1)
-plot(nw2, col = clr[c(4, 1, 2, 3)])
+plot(sP2, col = clr[c(4, 1, 2, 3)])
 axis(side = 4, at = 0:5 / 5)
 axis(side = 4, at = 0:10 / 10, labels = NA)
 axis(side = 4, at = 0:20 / 20, labels = NA, tcl = -0.3)
@@ -302,12 +318,12 @@ axis(side = 4, at = 0:100/100, labels = NA, tcl = -0.2)
 
 %----------------------------------------------------------------------
 \begin{frame}{Simulated probabilities}
-\includegraphics[width=0.60\textwidth]{simRenal-nw1}
+\includegraphics[width=0.60\textwidth]{simRenal-sP1}
 \end{frame}
 
 %----------------------------------------------------------------------
 \begin{frame}{Simulated probabilities}
-\includegraphics[width=0.60\textwidth]{simRenal-nw2}
+\includegraphics[width=0.60\textwidth]{simRenal-sP2}
 \end{frame}
 
 %----------------------------------------------------------------------
@@ -322,7 +338,7 @@ axis(side = 4, at = 0:100/100, labels = NA, tcl = -0.2)
 \[
  \se\bigl(\log(\hat p)\bigr) = (1-p)/\sqrt{N p (1-p)}
 \]
-\item So c.i. of the form $p\td \erf$ where:
+\item So c.i. has the form $p\td \erf$ where:
 \[
  \erf = \exp\bigl( 1.96 \times (1-p)/\sqrt{N p (1-p)} \bigr)
 \]

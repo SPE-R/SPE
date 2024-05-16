@@ -21,14 +21,14 @@
 %----------------------------------------------------------------------
 \begin{frame}[fragile]{Modeling rates in a multistate model}
 \pause
-Each transition modeled by a model for rates\\ (Cox-model,
-Poisson-model for split data, \texttt{glm} or \texttt{gam})
+Each transition modeled by a model for rates\\ (Cox-model or
+Poisson-model for split data: \texttt{glm} or \texttt{gam})
 
 Requires that follow-up is split in small intervals:
 \begin{Schunk}
 \begin{Sinput}
 > sLc <- splitLexis(Lc, "tfi", breaks = seq(0, 30, 1/12))
-> summary(sLc)
+> summary(sLc, t = T)
 \end{Sinput}
 \begin{Soutput}
 Transitions:
@@ -37,6 +37,10 @@ From   NRA  Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
   NRA 9854   29   69         0      9952       98     824.77       122
   Rem    0 3139    0         8      3147        8     259.90        32
   Sum 9854 3168   69         8     13099      106    1084.67       125
+
+Timescales:
+per age tfi 
+ ""  ""  "" 
 \end{Soutput}
 \end{Schunk}
 \end{frame}
@@ -52,7 +56,8 @@ From   NRA  Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
 +             data = subset(sLc, lex.Cst == "NRA"))
 > # ESRD-rates
 > mx <- gam(cbind(lex.Xst %in% c("ESRD", "ESRD(Ren)"), lex.dur)
-+           ~ s(tfi, k = 10) + sex + I((doe - dob - 40) / 10) + I(lex.Cst == "Rem"),
++           ~ s(tfi, k = 10) + sex + I((doe - dob - 40) / 10) +
++                                    I(lex.Cst == "Rem"),
 +           family = poisreg,
 +             data = subset(sLc, lex.Cst %in% c("NRA", "Rem")))
 \end{Sinput}
@@ -87,12 +92,12 @@ Rem->ESRD(Rem)
 \end{Soutput}
 \end{Schunk}
 \vspace*{-1em}
-Default is to model all transitions to absorbing states
+Default is to model all transitions \textbf{to} absorbing states
 \end{frame}
 
 %----------------------------------------------------------------------
 \begin{frame}{State probabilities}
-   How do we get from rates (Poisson-models) to probabilities:
+   How do we get from rate-models (and origin) to state probabilities:
 \pause
    \begin{itemize}[<+->]
    \item[1] Analytic calculations:
@@ -199,7 +204,8 @@ Default is to model all transitions to absorbing states
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]{Transition objects are \texttt{glm}/\texttt{gam}}
+\begin{frame}[fragile]{Transition objects are fitted
+    \texttt{coxph}/\texttt{glm}/\texttt{gam} models}
 \vspace*{-1ex}
 \includegraphics[width=0.45\textwidth]{simRenal-states-col}
 \vspace*{-1ex}
@@ -232,7 +238,7 @@ Input required:
 Output produced:
 \pause
 \begin{itemize}
-\item A \texttt{Lexis} object with simulated event histories for may
+\item A \texttt{Lexis} object with simulated event histories for many
   persons
 \end{itemize}
 
@@ -262,11 +268,11 @@ scales must be initiated even if not used in models\\[-1ex]
  1994  40   0     NRA   M 1954 1994
 \end{Soutput}
 \begin{Sinput}
-> system.time(sim1 <- simLexis(Tr, init, N = 10000, t.range = 15))
+> system.time(sim1 <- simLexis(Tr, init, N = 10000, t.range = 15.1))
 \end{Sinput}
 \begin{Soutput}
-   user  system elapsed 
-  24.69    1.52   26.21 
+  bruger   system forløbet 
+   23.44     1.27    24.70 
 \end{Soutput}
 \begin{Sinput}
 > summary(sim1)
@@ -275,13 +281,14 @@ scales must be initiated even if not used in models\\[-1ex]
 Transitions:
      To
 From  NRA  Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-  NRA 969 1847 7184         0     10000     9031   72599.26     10000
-  Rem   0 1224    0       623      1847      623   15654.67      1847
-  Sum 969 3071 7184       623     11847     9654   88253.94     10000
+  NRA 882 1772 7346         0     10000     9118   71455.42     10000
+  Rem   0 1136    0       636      1772      636   15078.81      1772
+  Sum 882 2908 7346       636     11772     9754   86534.23     10000
 \end{Soutput}
 \end{Schunk}
 \pause
 This is a simulated cohort of 10,000 persons with NRA aged 40 in 1994.
+\pause
 \end{frame}
 
 %----------------------------------------------------------------------
@@ -297,37 +304,37 @@ This is a simulated cohort of 10,000 persons with NRA aged 40 in 1994.
      State
 when    NRA   Rem  ESRD ESRD(Rem)
   0   10000     0     0         0
-  0.1  9940    25    35         0
-  0.2  9888    61    51         0
-  0.3  9848    84    68         0
-  0.4  9789   114    97         0
-  0.5  9737   135   128         0
+  0.1  9961    18    21         0
+  0.2  9908    44    48         0
+  0.3  9866    63    71         0
+  0.4  9804    89   107         0
+  0.5  9756   117   127         0
 \end{Soutput}
 \begin{Sinput}
-> nw1 <- pState(NN, perm = c(1, 2, 4, 3))
-> head(nw1, 3)
+> sP1 <- pState(NN, perm = c(1, 2, 4, 3))
+> head(sP1, 3)
 \end{Sinput}
 \begin{Soutput}
      State
 when     NRA    Rem ESRD(Rem) ESRD
   0   1.0000 1.0000    1.0000    1
-  0.1 0.9940 0.9965    0.9965    1
-  0.2 0.9888 0.9949    0.9949    1
+  0.1 0.9961 0.9979    0.9979    1
+  0.2 0.9908 0.9952    0.9952    1
 \end{Soutput}
 \begin{Sinput}
-> tail(nw1, 3)
+> tail(sP1, 3)
 \end{Sinput}
 \begin{Soutput}
       State
-when      NRA        Rem ESRD(Rem) ESRD
-  14.8 0.1020 0.22450000 0.2859000    1
-  14.9 0.0992 0.22180000 0.2836000    1
-  15   0.0000 0.06970925 0.1439466    1
+when      NRA    Rem ESRD(Rem) ESRD
+  14.8 0.0945 0.2102    0.2711    1
+  14.9 0.0921 0.2074    0.2689    1
+  15   0.0901 0.2044    0.2671    1
 \end{Soutput}
 \begin{Sinput}
 > par(mar = c(3, 3, 0.5, 2), mgp = c(3, 1, 0) / 1.6, las = 1)
-> plot(nw1, col = clr[c(2, 1, 4, 3)] )
-> lines(as.numeric(rownames(nw1)), nw1[,2], lwd = 2)
+> plot(sP1, col = clr[c(2, 1, 4, 3)], xlim = c(0,15) )
+> lines(as.numeric(rownames(sP1)), sP1[,2], lwd = 2)
 > axis(side = 4, at = 0:5 / 5)
 > axis(side = 4, at = 0:10 / 10, labels = NA)
 > axis(side = 4, at = 0:20 / 20, labels = NA, tcl = -0.3)
@@ -336,29 +343,29 @@ when      NRA        Rem ESRD(Rem) ESRD
 \end{Schunk}
 \begin{Schunk}
 \begin{Sinput}
-> nw2 <- pState( NN, perm = c(4,2,1,3) )
-> head( nw2, 3 )
+> sP2 <- pState(NN, perm = c(4, 2, 1, 3))
+> head(sP2, 3)
 \end{Sinput}
 \begin{Soutput}
      State
 when  ESRD(Rem)    Rem    NRA ESRD
   0           0 0.0000 1.0000    1
-  0.1         0 0.0025 0.9965    1
-  0.2         0 0.0061 0.9949    1
+  0.1         0 0.0018 0.9979    1
+  0.2         0 0.0044 0.9952    1
 \end{Soutput}
 \begin{Sinput}
-> tail( nw2, 3 )
+> tail(sP2, 3)
 \end{Sinput}
 \begin{Soutput}
       State
-when    ESRD(Rem)       Rem       NRA ESRD
-  14.8 0.06140000 0.1839000 0.2859000    1
-  14.9 0.06180000 0.1844000 0.2836000    1
-  15   0.07423737 0.1439466 0.1439466    1
+when   ESRD(Rem)    Rem    NRA ESRD
+  14.8    0.0609 0.1766 0.2711    1
+  14.9    0.0615 0.1768 0.2689    1
+  15      0.0627 0.1770 0.2671    1
 \end{Soutput}
 \begin{Sinput}
 > par(mar = c(3, 3, 0.5, 2), mgp = c(3, 1, 0) / 1.6, las = 1)
-> plot(nw2, col = clr[c(4, 1, 2, 3)])
+> plot(sP2, col = clr[c(4, 1, 2, 3)])
 > axis(side = 4, at = 0:5 / 5)
 > axis(side = 4, at = 0:10 / 10, labels = NA)
 > axis(side = 4, at = 0:20 / 20, labels = NA, tcl = -0.3)
@@ -369,12 +376,12 @@ when    ESRD(Rem)       Rem       NRA ESRD
 
 %----------------------------------------------------------------------
 \begin{frame}{Simulated probabilities}
-\includegraphics[width=0.60\textwidth]{simRenal-nw1}
+\includegraphics[width=0.60\textwidth]{simRenal-sP1}
 \end{frame}
 
 %----------------------------------------------------------------------
 \begin{frame}{Simulated probabilities}
-\includegraphics[width=0.60\textwidth]{simRenal-nw2}
+\includegraphics[width=0.60\textwidth]{simRenal-sP2}
 \end{frame}
 
 %----------------------------------------------------------------------
@@ -389,7 +396,7 @@ when    ESRD(Rem)       Rem       NRA ESRD
 \[
  \se\bigl(\log(\hat p)\bigr) = (1-p)/\sqrt{N p (1-p)}
 \]
-\item So c.i. of the form $p\td \erf$ where:
+\item So c.i. has the form $p\td \erf$ where:
 \[
  \erf = \exp\bigl( 1.96 \times (1-p)/\sqrt{N p (1-p)} \bigr)
 \]

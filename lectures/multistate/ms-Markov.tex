@@ -3,12 +3,12 @@
 %----------------------------------------------------------------------
 \begin{frame}{Common assumptions in survival analysis}
     \begin{enumerate}
-      \item Subjects are \textbf{either} ``healthy'' \textbf{or} ``diseased'', with
-	no intermediate state.
-      \item The disease is \textbf{irreversible}, or requires intervention
-	to be cured.
-      \item The time of disease incidence is known \textbf{exactly}.
-      \item The disease is \textbf{accurately} diagnosed.
+    \item Subjects are \textbf{either} ``healthy'' \textbf{or}
+      ``diseased'', with no intermediate state.
+    \item The disease is \textbf{irreversible}, or requires
+      intervention to be cured.
+    \item The time of disease incidence is known \textbf{exactly}.
+    \item The disease is \textbf{accurately} diagnosed.
     \end{enumerate}
     \pause
     These assumptions are true for \alert{death} and many
@@ -40,6 +40,7 @@
 \begin{frame}{A model for cervical cancer}
   Invasive squamous cell cancer of the cervix is preceded by
   cervical intraepithelial neoplasia (CIN)\\[-1.5em]
+%\hspace*{-1em}
 \includegraphics<1-2|handout:0>[width=1.1\textwidth,keepaspectratio]{cervical2}
 \includegraphics<3|handout:0>[width=1.1\textwidth,keepaspectratio]{cervical3}
 \includegraphics<4-|handout:1>[width=1.1\textwidth,keepaspectratio]{cervical4}\\[-1.5em]
@@ -260,21 +261,22 @@ CIN --- status of persons obtained at screening dates
 %----------------------------------------------------------------------
 \begin{frame}{Likelihood for a multistate model}
   \begin{itemize}
-  \item The likelihood of the model depends on the probability of being in
-    state $j$ at time $t_1$, given that you were in state $i$ at time $t_0$.
-  \item Assume transition rates constant in small time intervals
-  \item $\Rightarrow$ each interval for a person contributes term(s) to
-    the likelihood
-
-
-    \item one term for each possible transition between states
-    \item the total likelihood for person $p$ in intervals $i$ is a
-      product of these terms,
-      \alert<6>{$d_{pi}\log(\lambda_{pi}) - \lambda_{pi}y_{pi}$}
-    \item $\Rightarrow$ each term has the form of the likelihood for a\\ Poisson
-      variate \alert<6>{$d$} with mean \alert<6>{$\lambda y$}
-
-
+  \item The likelihood of the model depends on the probability of
+    being in state \texttt{B} at time $t_1$, given that you were in
+    state \texttt{A} at time $t_0$.
+  \item Assume transition rates constant in small time intervals,
+    $\lambda^{\mathtt{A}\rightarrow\mathtt{B}}$
+  \item $\Rightarrow$ each interval for a person contributes term(s)
+    to the likelihood
+  \item one term for each possible transition to a subsequent state
+  \item the total log-likelihood for person $p$ in state \texttt{A}
+    during interval $i$ is a
+    sum of these terms:
+    \alert<6>{$\ell_p = \sum_{i,\mathtt{B}}d_{pi}\big(
+      \log(\lambda^{\mathtt{A}\rightarrow\mathtt{B}}_{pi})-
+           \lambda^{\mathtt{A}\rightarrow\mathtt{B}}_{pi}y_{pi}\big)$}
+  \item $\Rightarrow$ each term has the form of the likelihood for a\\
+    Poisson variate \alert<6>{$d$} with mean \alert<6>{$\lambda y$}
   \end{itemize}
 \end{frame}
 
@@ -294,10 +296,11 @@ CIN --- status of persons obtained at screening dates
 %----------------------------------------------------------------------
 \begin{frame}{Realms of multistate modeling}
   \begin{itemize}
-  \item intensities --- dimension \alert<4>{time$^{-1}$}
-  \item state probabilities --- dimensionless, \alert<4>{time$^{0}$}\\
+  \item intensities --- dimension \alert<4>{$\textrm{time}^{-1}$}\\
+    this is the scale of observation, $(d,y)$ (complete data)
+  \item state probabilities --- dimensionless, \alert<4>{$\textrm{time}^{0}$}\\
     \alert<4>{integral} of intensities w.r.t. to time
-  \item sojourn times --- dimension \alert<4>{time$^{1}$}\\ 
+  \item sojourn times --- dimension \alert<4>{$\textrm{time}^{1}$}\\ 
     \alert<4>{integral} of state probabilities w.r.t. to time
   \end{itemize}
 \end{frame}
@@ -307,14 +310,17 @@ CIN --- status of persons obtained at screening dates
   \begin{itemize}
   \item Markov model: transition between states depends \textbf{only}
     on current state $\Rightarrow$ transition rates are constant\\
-    \alert<5>{time-homogeneous Markov model}
+    \alert<5->{time-homogeneous Markov model}
   \item If transition rates depend on the \textbf{same timescale}
-    only we have a \alert<5>{time-\textbf{in}homogeneous Markov model}
+    only we have a \alert<5->{time-\textbf{in}homogeneous Markov model}
   \item If transition rates depend on the time since entry to the
-    current state we have a \alert<5>{\textbf{semi}-Markov model}
+    current state we have a \alert<5->{\textbf{semi}-Markov model}
   \item If transition rates depend on several timescales we have a
-    \alert<5>{general multistate model} (there is no name for this)
+    \alert<5->{general multistate model} (there is no formal name for this)
   \end{itemize}
+  \pause
+  \ldots it is common-place in the literature to use the term ``Markov
+  model'' for any type of multistate model.
 \end{frame}
 
 %----------------------------------------------------------------------
