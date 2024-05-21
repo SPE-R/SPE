@@ -9,7 +9,7 @@ SHELL = /bin/sh
 .SUFFIXES: .pdf
 
 ## The master file
-MAIN = SPE-2023-lectures-3x1
+MAIN = SPE-2024-lectures-3x1
 
 ## The rnw depencencies
 PDFINCLUDES = \

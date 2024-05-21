@@ -5,7 +5,7 @@
 ## this function will not overwrite the output file if not exists
 from_e_to_s_rmd <-
   function(file.in, file.out){
-    if(exists(file.out)) {
+    if(file.exists(file.out)) {
       warning(paste0(file.out, ' already exixsts and will not be updated.'))
     } else {
       cmd.in <- cmd.out <- readLines(file.in)
