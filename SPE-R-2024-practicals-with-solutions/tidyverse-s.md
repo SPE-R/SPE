@@ -795,12 +795,12 @@ age
 ## # A tibble: 6 × 2
 ##     pid   age
 ##   <int> <int>
-## 1     1    25
-## 2     2    20
-## 3     3    20
-## 4     4    17
+## 1     1    23
+## 2     2    22
+## 3     3    21
+## 4     4    25
 ## 5     5    24
-## 6     6    15
+## 6     6    18
 ```
 
 ```r
@@ -830,12 +830,12 @@ bind_rows(age, center)
 ## # A tibble: 11 × 3
 ##      pid   age center
 ##    <dbl> <int> <chr> 
-##  1     1    25 <NA>  
-##  2     2    20 <NA>  
-##  3     3    20 <NA>  
-##  4     4    17 <NA>  
+##  1     1    23 <NA>  
+##  2     2    22 <NA>  
+##  3     3    21 <NA>  
+##  4     4    25 <NA>  
 ##  5     5    24 <NA>  
-##  6     6    15 <NA>  
+##  6     6    18 <NA>  
 ##  7     1    NA A     
 ##  8     2    NA B     
 ##  9     3    NA A     
@@ -861,12 +861,12 @@ left_join(age, center, by = c("pid"))
 ## # A tibble: 6 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    25 A     
-## 2     2    20 B     
-## 3     3    20 A     
-## 4     4    17 B     
+## 1     1    23 A     
+## 2     2    22 B     
+## 3     3    21 A     
+## 4     4    25 B     
 ## 5     5    24 <NA>  
-## 6     6    15 <NA>
+## 6     6    18 <NA>
 ```
 
 ```r
@@ -878,12 +878,12 @@ full_join(age, center, by = c("pid"))
 ## # A tibble: 7 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    25 A     
-## 2     2    20 B     
-## 3     3    20 A     
-## 4     4    17 B     
+## 1     1    23 A     
+## 2     2    22 B     
+## 3     3    21 A     
+## 4     4    25 B     
 ## 5     5    24 <NA>  
-## 6     6    15 <NA>  
+## 6     6    18 <NA>  
 ## 7    10    NA C
 ```
 
@@ -896,10 +896,10 @@ inner_join(age, center, by = c("pid"))
 ## # A tibble: 4 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    25 A     
-## 2     2    20 B     
-## 3     3    20 A     
-## 4     4    17 B
+## 1     1    23 A     
+## 2     2    22 B     
+## 3     3    21 A     
+## 4     4    25 B
 ```
 Can you spot the differences between the commands above?
 As an exercise, you can try to compute the individuals' mean age per center.
@@ -917,8 +917,8 @@ inner_join(age, center, by = c("pid")) |>
 ## # A tibble: 2 × 2
 ##   center mean_age
 ##   <chr>     <dbl>
-## 1 A          22.5
-## 2 B          18.5
+## 1 A          22  
+## 2 B          23.5
 ```
 
 **Note:** the `by` argument indicates which column should be use to make the *join*. In some 
