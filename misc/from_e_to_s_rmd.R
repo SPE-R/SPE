@@ -10,18 +10,16 @@ from_e_to_s_rmd <-
     } else {
       cmd.in <- cmd.out <- readLines(file.in)
       ## detect the line where chunk options are set
-      opt.line.in <- which(str_detect(cmd.in, fixed('opts_chunk$set'))) |> head(1)
+      opt.line.in <- which(sringr::str_detect(cmd.in, sringr::fixed('opts_chunk$set'))) |> head(1)
       ## replace results = 'hide' by results = 'markup'
       cmd.out[opt.line.in] <- 
         cmd.in[opt.line.in] |> 
-        str_replace('results( {0,2})=( {0,2})\"hide\"', 'results = \"markup\"')
+        sringr::str_replace('results( {0,2})=( {0,2})\"hide\"', 'results = \"markup\"')
       ## save the new file
       writeLines(cmd.out, con = file.out)
     }
     file.out
   }
-
-library(tidyverse)
 
 files.in <- 
   c(
@@ -42,7 +40,7 @@ files.in <-
     "renal-e.rmd"
   )
 
-files.out <- str_replace(files.in, "-e.rmd", "-s.rmd")
+files.out <- sringr::str_replace(files.in, "-e.rmd", "-s.rmd")
 
 for(i in seq_along(files.in)){
   from_e_to_s_rmd(
