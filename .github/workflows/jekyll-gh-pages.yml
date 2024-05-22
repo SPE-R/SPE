@@ -33,7 +33,7 @@ concurrency:
 
 jobs:
   # Build job
-  build:
+  build-spe-r-extra-material:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -50,20 +50,22 @@ jobs:
       #   with:
       #     version: 2023
       - name: Setup TeX Live
-        uses: teatimeguest/setup-texlive-action@v3
+        uses: teatimeguest/setup-texlive-action@v2
         with:
+          version: 2024
           packages: ms
       # - name: Install tinytex
       #   uses: r-lib/actions/setup-tinytex@v2
-      # - name: Install latex libraries
-      #   run: |
-      #     sudo apt-get install texlive-extra-utils
-      #     git clone https://github.com/rrthomas/pdfjam-extras.git
-      #     sudo cp pdfjam-extras/bin/* /usr/bin
-      #     tlmgr install ae caption currfile datetime enumitem eso-pic fancyhdr floatflt fmtcount grfext grffile listings ms needspace nth oberdiek pdflscape pdfpages subfig pgf tikz-cd
-      #     echo 'Make the latex R style libs accessible'
-      #     cp -rf /usr/share/texmf/tex/latex/R/tex /home/runner/.TinyTeX/texmf-dist
-      #     texhash
+      - name: Install pdfjam and pdfjam-extra
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y texlive-extra-utils
+          git clone https://github.com/rrthomas/pdfjam-extras.git
+          sudo cp pdfjam-extras/bin/* /usr/bin
+          # tlmgr install ae caption currfile datetime enumitem eso-pic fancyhdr floatflt fmtcount grfext grffile listings ms needspace nth oberdiek pdflscape pdfpages subfig pgf tikz-cd
+          # echo 'Make the latex R style libs accessible'
+          # cp -rf /usr/share/texmf/tex/latex/R/tex /home/runner/.TinyTeX/texmf-dist
+          # texhash
       # - name: Install node
       #   uses: actions/setup-node@v4
       # - name: Install jquery
@@ -78,6 +80,8 @@ jobs:
       #   uses: mxschmitt/action-tmate@v3
       - name: Build SPE material
         run: |
+          mkdir build
+          mkdir build-lectures
           # echo 'Build an compile all the practicals pdf'
           # make -f pracs/Makefile
           # echo 'Build the practicals solutions R files'
@@ -85,18 +89,18 @@ jobs:
           echo 'Extract code chuncks from .rmd files'
           Rscript misc/extract_code_chunks_from_rmd.R
           echo 'Compile lectures handout'
-          # make -f lectures/Makefile
+          make -f lectures/Makefile
           echo 'Update the software and package requirement page'
-          Rscript -e 'rmarkdown::render("pracs-book/prerequest.Rmd", output_dir = "build")'
+          #Rscript -e 'rmarkdown::render("pracs-book/prerequest.Rmd", output_file = "build/prerequest.md")'
           echo 'keep only the outputs we are interested in'
           mkdir -p deploy
           mkdir -p deploy/Rsolutions
           # cp build/pracs.pdf deploy/
           # cp build/pracs-sol.pdf deploy/
           cp pracs-book/*-s.R deploy/Rsolutions
-          cp build/prerequest.md deploy/
+          #cp build/prerequest.md deploy/
           cp -r pracs-book/data  deploy/
-          # cp build-lectures/SPE-2024-lectures-3x1.pdf deploy/
+          cp build-lectures/SPE-2024-lectures-3x1.pdf deploy/
           mkdir deploy/lectures
           cp build-lectures/casecontrol/NCC-CC-studies.pdf deploy/lectures/
           cp build-lectures/causal/spe2023-CIlect-kf.pdf deploy/lectures/
