@@ -12,12 +12,14 @@ SHELL = /bin/sh
 MAIN = SPE-2024-lectures-3x1
 
 ## The rnw depencencies
+# removed lectures:
+#  - tidyverse/tidyverse-pres.pdf
+
 PDFINCLUDES = \
 	ecology/R-history-ecology.pdf \
-	tidyverse/tidyverse-pres.pdf \
 	poisson-logistic/SPE-Poisson-Logistic-Regression.pdf \
-	splines/splines.pdf \
 	linmodels/lm.pdf \
+	splines/splines.pdf \
 	causal/spe2023-CIlect-kf.pdf \
 	graphics_advanced/Graphics.pdf \
 	Survival_competing_risk/Survival_competing_risk.pdf \
