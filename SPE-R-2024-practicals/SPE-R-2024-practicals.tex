@@ -3511,8 +3511,8 @@ We start with simple estimation of effects of a binary, categorical or
 a numeric explanatory variable, the explanatory or exposure variable of interest.
 Then evaluation of potential modification and/or confounding by other variables
 is considered by stratification by and adjustment/control for these variables.
-Use of function \texttt{effx()} for such tasks is introduced together
-with functions \texttt{lm()} and \texttt{glm()} that can be used for more
+For such tasks we utilize functions \texttt{lm()} and \texttt{glm()}
+which can be used for more
 general linear and generalized linear models. Finally, more complex
 spline modelling for the effect of a numeric exposure variable is
 illustrated.
@@ -3590,14 +3590,14 @@ different aspects in estimating effects of various exposures on a metric respons
 \item
   Load the packages needed in this exercise and the data set, and look at its content
 \item
-  We perform similar housekeeping tasks as in the previous exercise.
+  We perform similar housekeeping tasks as in a previous exercise.
 \item
   Have a look at univariate summaries of the different
   variables in the data; especially
   the location and dispersion of the distribution of \texttt{bweight}.
 \end{itemize}
 
-\section{\texorpdfstring{Simple estimation with \texttt{effx()}, \texttt{lm()} and \texttt{glm()}}{Simple estimation with effx(), lm() and glm()}}\label{simple-estimation-with-effx-lm-and-glm}
+\section{\texorpdfstring{Simple estimation with \texttt{lm()} and \texttt{glm()}}{Simple estimation with lm() and glm()}}\label{simple-estimation-with-lm-and-glm}
 
 We are ready to analyze the effect of \texttt{sex} on \texttt{bweight}.
 A binary explanatory variable, like \texttt{sex}, leads to an elementary
@@ -3614,44 +3614,29 @@ means for a metric response.
 The \(P\)-value refers to the test
 of the null hypothesis that there is no effect of \texttt{sex} on birth weight
 (quite an uninteresting null hypothesis in itself!). However, \texttt{t.test()} does not provide
-the point estimate for the effect of sex; only the test result and a confidence interval.
-
-\begin{itemize}
-\item
-  The function \texttt{effx()} in \texttt{Epi}
-  is intended to introduce the estimation of effects in epidemiology, together with the related ideas of stratification and controlling, i.e.~adjustment for confounding,
-  without the need for familiarity with statistical modelling.
-  It is in fact a wrapper of function \texttt{glm()} that fits generalized linear models.
-\item
-  Now, let's do the same analysis with \texttt{effx()}
-\end{itemize}
-
-The estimated effect of sex on birth weight, measured as a difference
-in means between girls and boys,
+the point estimate for the effect of sex; only the test result and a confidence interval. -- The estimated effect of sex on birth weight,
+measured as a difference in means between girls and boys,
 is \(-197\) g.
-Either the output from \texttt{t.test()} above or the command
-
-\section{\texorpdfstring{confirms this (\(3032.8-3229.9=-197.1\)).}{confirms this (3032.8-3229.9=-197.1).}}\label{confirms-this-3032.8-3229.9-197.1.}
-
-The same task can easily be performed by \texttt{lm()} or by \texttt{glm()}. The main argument in both
-is the \emph{model formula}, the left hand side being the response variable and the right hand side
-after \(\sim\) defines the explanatory variables and their
-joint effects on the response. Here the only
-explanatory variable is the binary factor \texttt{sex}. With \texttt{glm()} one specifies the
-\texttt{family}, i.e.~the assumed distribution of the response variable, but in case you use
-\texttt{lm()}, this argument is not needed, because \texttt{lm()} fits only models for metric responses
-assuming Gaussian distribution.
-
-Note the amount of output that \texttt{summary()} method produces.
-The point estimate plus confidence limits can, though, be concisely obtained by function
-\texttt{ci.lin()} found in \texttt{Epi} package.
 
 \begin{itemize}
 \tightlist
 \item
-  Now, use \texttt{effx()} to find the effect of \texttt{hyp} (maternal hypertension)
-  on \texttt{bweight}.
+  The same task can easily be performed by \texttt{lm()} or by \texttt{glm()}.
+  The main argument in both
+  is the \emph{model formula}, the left hand side being the response variable
+  and the right hand side
+  after \(\sim\) defines the explanatory variables and their
+  joint effects on the response. Here the only
+  explanatory variable is the binary factor \texttt{sex}. With \texttt{glm()} one specifies the
+  \texttt{family}, i.e.~the assumed distribution of the response variable. However,
+  in case you use
+  \texttt{lm()}, this argument is not needed, because \texttt{lm()} fits only
+  models for metric responses assuming Gaussian distribution.
 \end{itemize}
+
+Note the amount of output that \texttt{summary()} method produces.
+The point estimate plus confidence limits can, though, be concisely obtained by function
+\texttt{ci.lin()} found in \texttt{Epi} package.
 
 \section{Factors on more than two levels}\label{factors-on-more-than-two-levels}
 
@@ -3662,6 +3647,7 @@ into 4 groups with left-closed and right-open boundaries {[}20,35) {[}35,37) {[}
 \tightlist
 \item
   We shall find the effects of \texttt{gest4} on the metric response \texttt{bweight}.
+  by \texttt{lm()} and find out how the coefficients are related to the group means
 \end{itemize}
 
 There are now 3 effect estimates:
@@ -3674,13 +3660,8 @@ There are now 3 effect estimates:
 
 The command
 
-confirms that the effect of \texttt{gest4} (level\textasciitilde2 vs level\textasciitilde1) is \(2590-1733=857\), etc.
-
-\begin{itemize}
-\tightlist
-\item
-  Compute these estimates by \texttt{lm()} and find out how the coefficients are related to the group means
-\end{itemize}
+confirms that e.g.~the effect of \texttt{gest4} (level\textasciitilde2 vs level\textasciitilde1) is
+\(2590-1733=857\), etc.
 
 \section{Stratified effects, and interaction or effect-measure modification}\label{stratified-effects-and-interaction-or-effect-measure-modification}
 
@@ -3705,11 +3686,13 @@ mothers is related to gestational age.
 \tightlist
 \item
   Let us get numerical values for the mean differences
-  in the different \texttt{gest4} categories:
+  in the different \texttt{gest4} categories.
+  Stratified estimation of effects can be done by \texttt{lm()} as follows:
 \end{itemize}
 
 The estimated effects of \texttt{hyp} in the different strata defined by \texttt{gest4} thus
-range from about \(-100\) g among those with \(\geq 39\) weeks of gestation to about \(-700\) g among those
+range from about \(-100\) g among those with \(\geq 39\) weeks of
+gestation to about \(-700\) g among those
 with \(< 35\) weeks of gestation. The error margin especially
 around the latter estimate is quite wide, though.
 The \(P\)-value 0.055 from the test for
@@ -3717,15 +3700,13 @@ The \(P\)-value 0.055 from the test for
 against the null hypothesis of \emph{no interaction between \texttt{hyp} and \texttt{gest4}}.
 On the other hand, this test may well be not very sensitive given
 the small number of preterm babies in these data.
-- Stratified estimation of effects can also be done by \texttt{lm()},
-and you should get the same results:
 
 \begin{itemize}
 \tightlist
 \item
   An equivalent model with an explicit \emph{product term} or
   \emph{interaction term} between \texttt{gest4} and \texttt{hyp} is
-  fitted as follows
+  fitted as follows:
 \end{itemize}
 
 From this output you would find a familiar estimate \(-673\) g for those \(< 35\) gestational weeks.
@@ -3773,27 +3754,19 @@ result from this test, the possibility
 of a real effect-measure modification
 should not be ignored in this case.
 
-\begin{itemize}
-\tightlist
-\item
-  Now, use \texttt{effx()} to stratify (i) the effect of \texttt{hyp} on \texttt{bweight} by \texttt{sex}
-  and then (ii) perform the stratified analysis using the two ways of fitting an interaction model
-  with \texttt{lm}.
-\end{itemize}
-
-Look at the results. Is there evidence for the effect of \texttt{hyp} being modified by \texttt{sex}?
-
 \section{Controlling or adjusting for the effect of hyp for sex}\label{controlling-or-adjusting-for-the-effect-of-hyp-for-sex}
 
 The effect of \texttt{hyp} is \emph{controlled for} -- or \emph{adjusted for} -- \texttt{sex}
-by first looking at the estimated effects of \texttt{hyp} in the two stata defined by \texttt{sex}, and then combining these effects if they seem sufficiently similar. In this case the estimated effects were \(-496\) and \(-380\) which look quite similar (and the \(P\)-value against \emph{no interaction} was quite large, too),
+by first looking at the estimated effects of \texttt{hyp} in the two stata defined
+by \texttt{sex}, and then combining these effects if they seem sufficiently similar.
+In this case the estimated effects were \(-496\) and \(-380\) which look quite
+similar (and the \(P\)-value against \emph{no interaction} was quite large, too),
 so we can perhaps combine them, and control for \texttt{sex}.
 
 \begin{itemize}
+\tightlist
 \item
-  The combining is done by declaring \texttt{sex} as a control variable:
-\item
-  The same is done with \texttt{lm()} as follows:
+  The combining is done by adding \texttt{sex} to the model formula:
 \end{itemize}
 
 The estimated effect of \texttt{hyp} on \texttt{bweight}
@@ -3803,7 +3776,7 @@ There can be more than one control variable, e.g
 
 Many people go straight ahead and control for variables which are likely to confound the effect of exposure without bothering to stratify first, but usually it is useful to stratify first.
 
-\section{Numeric exposures}\label{numeric-exposures}
+\section{Numeric exposure, simple linear regression and checking assumptions}\label{numeric-exposure-simple-linear-regression-and-checking-assumptions}
 
 If we wished to study the effect of gestation time on the baby's birth
 weight then \texttt{gestwks} is a numeric exposure variable.
@@ -3815,8 +3788,7 @@ weight then \texttt{gestwks} is a numeric exposure variable.
   of the response with \texttt{gestwks} is roughly linear
   (for a continuous response),
   \% or log-linear (for a binary or failure rate response)
-  we can estimate the linear effect of \texttt{gestwks},
-  both with \texttt{effx()} and with \texttt{lm()} as follows:
+  we can estimate the linear effect of \texttt{gestwks} with \texttt{lm()} as follows:
 \end{itemize}
 
 We have fitted a simple linear regression model and
@@ -3824,24 +3796,6 @@ obtained estimates of the
 two regression coefficient: \texttt{intercept} and \texttt{slope}.
 The linear effect of \texttt{gestwks} is thus estimated by the
 slope coefficient, which is 197 g per each additional week of gestation.
-
-\begin{quote}
-The linear effect of \texttt{gestwks} on the log-odds of \texttt{lowbw} can be estimated similarly:
-\end{quote}
-
-The linear effect of \texttt{gestwks} on the log-odds of \texttt{lowbw} is manifested as a reduction by a factor of 0.408 per extra week of gestation, i.e.~the odds of a baby having a low birth weight is reduced by a factor of 0.408 per one week increase in gestation.
-
-\begin{itemize}
-\tightlist
-\item
-  You cannot stratify by a numeric variable,
-  but you can study the effects of a
-  numeric exposure stratified by (say) \texttt{maged} with
-\end{itemize}
-
-You can control/adjust for a numeric variable by putting it in the control list.
-
-\section{Checking the assumptions of the linear model}\label{checking-the-assumptions-of-the-linear-model}
 
 At this stage it will be best to make some visual check concerning
 our model assumptions using \texttt{plot()}. In particular, when the main argument
@@ -3864,7 +3818,7 @@ homoskedasticity and normality of the error terms?
 
 We shall now continue the analysis such that the apparently curved effect
 of \texttt{gestwks} is modelled by a \emph{penalized spline},
-based on the recommendations of Martyn in his lecture of this morning.
+based on the recommendations of Martyn in his lecture today.
 
 You cannot fit a penalized spline model with \texttt{lm()} or
 \texttt{glm()}, Instead, function \texttt{gam()} in package
@@ -3942,8 +3896,7 @@ or about three times as high as that for normotensive mothers
 \tightlist
 \item
   The three comparative measures of prevalences can be
-  estimated by \texttt{glm()} with different link functions, whereas
-  \texttt{effx()} gives only odds ratio:
+  estimated by \texttt{glm()} with different link functions:
 \end{itemize}
 
 Check that these results were quite compatible with the
@@ -4055,12 +4008,11 @@ Computation and tabulation of incidence rates
 \item
   Tabulate numbers of cases and person-years, and compute the
   incidence rates (per 100,000 y) in each 5 y \(\times\) 5 y cell using
-  \texttt{stat.table()}
+  \texttt{stat.table()}. Take a look at the structure of the thus created object
 \end{itemize}
 
-Look at the incidence rates in the column margin and in the row
-margin. In which age group is the marginal age-specific rate highest?
-Do the period-specific marginal rates have any trend over time?
+The table is too wide to be readable as such. A graphical
+presentation is morew informative.
 
 \begin{itemize}
 \tightlist
@@ -4073,6 +4025,8 @@ Do the period-specific marginal rates have any trend over time?
   \texttt{rateplot})
 \end{itemize}
 
+Whan can you conclude about the trend in age-specific incidence rates
+over calendar time? What about the effect of age?
 Is there any common pattern in the age-incidence curves across the periods?
 
 \section{Age and period as categorical factors}\label{age-and-period-as-categorical-factors}
@@ -4102,7 +4056,7 @@ What do the estimated rate ratios tell about the age and period effects?
   middle period 1968-72.
 \end{itemize}
 
-We shall plot just the point estimates from the latter model
+Let us also plot estimates from the latter model, too.
 
 \section{Generalized additive model with penalized splines}\label{generalized-additive-model-with-penalized-splines}
 
@@ -9115,7 +9069,7 @@ occurrence rate of remission itself.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{   user  system elapsed }
-\NormalTok{  2.567   3.126   1.972 }
+\NormalTok{  2.652   3.080   2.018 }
 \end{Highlighting}
 \end{Shaded}
 

@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 
 
 
@@ -38,11 +43,10 @@ Computation and tabulation of incidence rates
 
 -  Tabulate numbers of cases and person-years, and compute the
   incidence rates (per 100,000 y) in each 5 y $\times$ 5 y cell using
-  `stat.table()`
+  `stat.table()`. Take a look at the structure of the thus created object
 
-Look at the incidence rates in the column margin and in the row
-margin.  In which age group is the marginal age-specific rate highest?
-Do the period-specific marginal rates have any trend over time?
+The table is too wide to be readable as such. A graphical
+presentation is morew informative.
 
 -  From the saved table object `tab` you can plot an
   age-incidence curve for each period separately, after you have
@@ -52,7 +56,8 @@ Do the period-specific marginal rates have any trend over time?
  `rateplot`)
  
 
-
+Whan can you conclude about the trend in age-specific incidence rates 
+over calendar time? What about the effect of age?
 Is there any common pattern in the age-incidence curves across the periods?
 
 ## Age and period as categorical factors
@@ -80,7 +85,7 @@ What do the estimated rate ratios tell about the age and period effects?
   level of the period factor. For the latter one could choose the
   middle period 1968-72.
 
-We shall plot just the point estimates from the latter model
+Let us also plot estimates from the latter model, too. 
 
 
 
