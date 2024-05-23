@@ -19,7 +19,7 @@ Before proceeding with this tutorial, ensure that you have `R` and [RStudio inst
 
 4. Select `New Project` and click `Next`.
 
-5. Choose a directory location for your project and provide a name for the project (e.g. SPE-R_2023).
+5. Choose a directory location for your project and provide a name for the project (e.g. SPE-R_2024).
 
 6. Click `Create Project` to create the `R` project.
 
