@@ -52,7 +52,7 @@
 |15:30 - 16:00 | Coffee break. |
 |16:00 - 18:00 | [Practical: Graphics meccano](https://spe-r.github.io/SPE/SPE-R-2024-practicals/graphics-meccano.html) |
 
-## Wednesday 5 June -- Day 3**
+## Wednesday 5 June -- Day 3
 
 |              |                                 |
 |--------------|----------------------------------------------------------------------------------------|
@@ -65,7 +65,7 @@
 |14:30 - 15:30 | [Dates in R; follow-up representation in `Lexis` objects, time-splitting,  and SMR](https://github.com/SPE-R/SPE/blob/gh-spe-material/lectures/time-rep.pdf) (BxC)|
 |15:30 - 16:00 | Tea break. |
 |16:00 - 18:00 | [Practical: Time-splitting, time-scales and SMR](https://spe-r.github.io/SPE/SPE-R-2024-practicals/time-splitting-time-scales-and-smr.html)|
-|19:00 - 22:00 | Course dinner |
+|19:00 - 22:00 | Course dinner  the [Salons d’Anthouard](https://anthouard.fr/salons/restaurant/), [249 Rue Marcel Mérieux, Lyon](https://maps.app.goo.gl/iYktTYTmMRWhHiJt7)  Departure from IARC reception at 18:30   |
 
 ## Thursday 6 June -- Day 4
 
