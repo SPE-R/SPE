@@ -24,8 +24,7 @@ tdk$Age <- cut(tdk$A, br = 5 * (3:16), include.lowest = TRUE, right = FALSE)
 nAge <- length(levels(tdk$Age))
 tdk$Per <- cut(tdk$P,
   br = seq(1943, 1998, by = 5),
-  include.lowest = TRUE, right = FALSE
-)
+  include.lowest = TRUE, right = FALSE)
 nPer <- length(levels(tdk$Per))
 
 
@@ -40,7 +39,7 @@ tab <- stat.table(
   margins = TRUE,
   data = tdk
 )
-print(tab, digits = c(sum = 0, ratio = 1))
+str(tab)
 
 
 ## ----plot-rates, fig=FALSE----------------------------------------------------
@@ -56,8 +55,7 @@ rateplot(
 ## ----mCat---------------------------------------------------------------------
 tdk$Y <- tdk$Y / 100000
 mCat <- glm(cbind(D, Y) ~ Age + Per,
-  family = poisreg(link = log), data = tdk
-)
+  family = poisreg(link = log), data = tdk )
 round(ci.exp(mCat), 2)
 
 
@@ -65,51 +63,29 @@ round(ci.exp(mCat), 2)
 aMid <- seq(17.5, 77.5, by = 5)
 pMid <- seq(1945, 1995, by = 5)
 par(mfrow = c(1, 2))
-plot(c(15, 80), c(0.6, 6),
-  type = "n", log = "y",
-  cex.lab = 1.5, cex.axis = 1.5,
-  xlab = "Age (years)", ylab = "Rate ratio"
-)
-lines(aMid, c(1, ci.exp(mCat)[2:13, 1]), type = "o", pch = 16)
-segments(
-  aMid[-1], ci.exp(mCat)[2:13, 2],
-  aMid[-1], ci.exp(mCat)[2:13, 3]
-)
-plot(c(1943, 1998), c(0.6, 6),
-  type = "n", log = "y",
-  cex.lab = 1.5, cex.axis = 1.5,
-  xlab = "Calendar year - 1900", ylab = "Rate ratio"
-)
-lines(pMid, c(1, ci.exp(mCat)[14:23, 1]), type = "o", pch = 16)
-segments(
-  pMid[-1], ci.exp(mCat)[14:23, 2],
-  pMid[-1], ci.exp(mCat)[14:23, 3]
-)
+matplot(aMid, rbind(c(1,1,1), ci.exp(mCat)[2:13, ]), type = "o", pch = 16,     
+   log = "y", cex.lab = 1.5, cex.axis = 1.5,
+  xlab = "Age (years)", ylab = "Rate ratio" )
+matplot(pMid, rbind(c(1,1,1), ci.exp(mCat)[14:23, ]), type = "o", pch = 16,
+  log = "y", cex.lab = 1.5, cex.axis = 1.5,
+  xlab = "Calendar year - 1900", ylab = "Rate ratio" )
 
 
 ## ----mCat2-new-ref------------------------------------------------------------
 tdk$Per70 <- Relevel(tdk$Per, ref = 6)
 mCat2 <- glm(cbind(D, Y) ~ -1 + Age + Per70,
-  family = poisreg(link = log), data = tdk
-)
+  family = poisreg(link = log), data = tdk )
 round(ci.exp(mCat2), 2)
 
 
 ## ----mCat2-plot, fig =FALSE---------------------------------------------------
 par(mfrow = c(1, 2))
-plot(c(15, 80), c(2, 20),
-  type = "n", log = "y", cex.lab = 1.5, cex.axis = 1.5,
-  xlab = "Age (years)", ylab = "Incidence rate (per 100000 y)"
-)
-lines(aMid, c(ci.exp(mCat2)[1:13, 1]), type = "o", pch = 16)
-plot(c(1943, 1998), c(0.4, 2),
-  type = "n", log = "y",
-  cex.lab = 1.5, cex.axis = 1.5,
-  xlab = "Calendar year", ylab = "Rate ratio"
-)
-lines(pMid, c(ci.exp(mCat2)[14:18, 1], 1, ci.exp(mCat2)[19:23, 1]),
-  type = "o", pch = 16
-)
+matplot(aMid, rbind(c(1,1,1), ci.exp(mCat2)[2:13, ]), type = "o", pch = 16,     
+   log = "y", cex.lab = 1.5, cex.axis = 1.5,
+  xlab = "Age (years)", ylab = "Rate ratio" )
+matplot(pMid, rbind(ci.exp(mCat2)[14:18, ], c(1,1,1), ci.exp(mCat2)[19:23, ]),
+        type = "o", pch = 16, log = "y", cex.lab = 1.5, cex.axis = 1.5,
+  xlab = "Calendar year - 1900", ylab = "Rate ratio" )
 abline(h = 1, col = "gray")
 
 

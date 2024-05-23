@@ -9,13 +9,12 @@ data(births)
 str(births)
 
 
-## -----------------------------------------------------------------------------
+## ----housekeeping-------------------------------------------------------------
 births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
 births$sex <- factor(births$sex, labels = c("M", "F"))
 births$maged <- cut(births$matage, breaks = c(22, 35, 44), right = FALSE)
 births$gest4 <- cut(births$gestwks,
-  breaks = c(20, 35, 37, 39, 45), right = FALSE
-)
+  breaks = c(20, 35, 37, 39, 45), right = FALSE)
 
 
 ## ----summary------------------------------------------------------------------
@@ -27,14 +26,6 @@ with(births, sd(bweight))
 with(births, t.test(bweight ~ sex, var.equal = TRUE))
 
 
-## ----Effects of sex on bweight------------------------------------------------
-effx(response = bweight, type = "metric", exposure = sex, data = births)
-
-
-## ----Table of mean birth weight by sex----------------------------------------
-stat.table(sex, mean(bweight), data = births)
-
-
 ## ----lm of bweight by sex-----------------------------------------------------
 m1 <- glm(bweight ~ sex, family = gaussian, data = births)
 summary(m1)
@@ -44,30 +35,18 @@ summary(m1)
 round(ci.lin(m1)[, c(1, 5, 6)], 1)
 
 
-## ----Effects of hyp on bweight, echo=FALSE------------------------------------
-effx(response = bweight, type = "metric", exposure = hyp, data = births)
-
-
-## ----Effects of gest4 (four levels) on bweight--------------------------------
-effx(response = bweight, typ = "metric", exposure = gest4, data = births)
+## ----lm of gest4 on bweight---------------------------------------------------
+m2 <- lm(bweight ~ gest4, data = births)
+round(ci.lin(m2)[, c(1, 5, 6)], 1)
 
 
 ## ----Table of mean bweight by gest4-------------------------------------------
 stat.table(gest4, mean(bweight), data = births)
 
 
-## ----lm of gest4 on bweight---------------------------------------------------
-m2 <- lm(bweight ~ gest4, data = births)
-round(ci.lin(m2)[, c(1, 5, 6)], 1)
-
-
 ## ----bweight-by-hyp-gest4, fig = FALSE----------------------------------------
 par(mfrow = c(1, 1))
 with(births, interaction.plot(gest4, hyp, bweight))
-
-
-## ----Effect of hyp on bweight stratified by gest4-----------------------------
-effx(bweight, type = "metric", exposure = hyp, strata = gest4, data = births)
 
 
 ## ----lm for hyp on bweight stratified by gest4--------------------------------
@@ -95,38 +74,14 @@ round(ci.lin(m3M)[, c(1, 5, 6)], 1)
 anova(m3I, m3M)
 
 
-## ----Effects of hyp on lowbw stratified by sex, echo=F------------------------
-effx(bweight, type = "metric", exposure = hyp, strata = sex, data = births)
-m4S <- lm(bweight ~ sex / hyp, data = births)
-round(ci.lin(m4S)[, c(1, 5, 6)], 1)
-m4I <- lm(bweight ~ sex + hyp + sex:hyp, data = births)
-round(ci.lin(m4I)[, c(1, 5, 6)], 1)
-
-
-## ----Effect of hyp on bweight controlled for sex------------------------------
-effx(bweight, type = "metric", exposure = hyp, control = sex, data = births)
-
-
 ## ----lm for hyp on bweight controlled for sex---------------------------------
 m4 <- lm(bweight ~ sex + hyp, data = births)
 ci.lin(m4)[, c(1, 5, 6)]
 
 
 ## ----Linear effect of gestwks on bweight--------------------------------------
-effx(response = bweight, type = "metric", exposure = gestwks, data = births)
 m5 <- lm(bweight ~ gestwks, data = births)
 ci.lin(m5)[, c(1, 5, 6)]
-
-
-## ----Linear effect of gestwks on lowbw----------------------------------------
-effx(response = lowbw, type = "binary", exposure = gestwks, data = births)
-
-
-## ----Linear effect of gestwks on bweight stratified by maged------------------
-effx(bweight,
-  type = "metric", exposure = gestwks, strata = maged,
-  data = births
-)
 
 
 ## ----Plot-bweight-by-gestwks, fig = FALSE-------------------------------------
@@ -195,7 +150,6 @@ binRR <- glm(lowbw ~ hyp, family = binomial(link = "log"), data = births)
 round(ci.lin(binRR, Exp = TRUE)[, c(1, 2, 5:7)], 3)
 binOR <- glm(lowbw ~ hyp, family = binomial(link = "logit"), data = births)
 round(ci.lin(binOR, Exp = TRUE)[, c(1, 2, 5:7)], 3)
-effx(response = lowbw, type = "binary", exposure = hyp, data = births)
 
 
 ## ----lowbw-gestwks-table------------------------------------------------------
