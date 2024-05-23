@@ -10,8 +10,8 @@ We start with simple estimation of effects of a binary, categorical or
 a numeric explanatory variable, the explanatory or exposure variable of interest. 
 Then evaluation of potential  modification and/or confounding by other variables
 is considered by stratification by and adjustment/control for these variables.
-Use of function `effx()` for such tasks is introduced together
-with functions `lm()` and `glm()` that can be used for more
+For such tasks we utilize functions `lm()` and `glm()`
+which can be used for more
 general linear and generalized linear models.  Finally, more complex 
 spline modelling for the effect of a numeric exposure variable is
 illustrated.
@@ -85,18 +85,17 @@ data(births)
 str(births)
 ```
 - 
-We perform similar housekeeping tasks as in the previous exercise. 
+We perform similar housekeeping tasks as in a previous exercise. 
 <!-- %% Two of them are directly converted into factors. -->
 <!-- %% Categorical versions of two continuous variables are  -->
 <!-- %% created by function `cut()`. -->
 <!-- %% Also, express birth weights in kilograms -->
-```{r }
+```{r housekeeping}
 births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
 births$sex <- factor(births$sex, labels = c("M", "F"))
 births$maged <- cut(births$matage, breaks = c(22, 35, 44), right = FALSE)
 births$gest4 <- cut(births$gestwks,
-  breaks = c(20, 35, 37, 39, 45), right = FALSE
-)
+  breaks = c(20, 35, 37, 39, 45), right = FALSE)
 ```
 - Have a look at univariate summaries of the different 
 variables in the data; especially
@@ -106,8 +105,7 @@ summary(births)
 with(births, sd(bweight))
 ```
 
-
-## Simple estimation with  `effx()`, `lm()` and `glm()` 
+## Simple estimation with `lm()` and `glm()` 
 
 We are ready to analyze the effect of `sex` on `bweight`.
 A binary explanatory variable, like `sex`, leads to an elementary
@@ -122,34 +120,21 @@ with(births, t.test(bweight ~ sex, var.equal = TRUE))
 The $P$-value refers to the test
 of the  null hypothesis that there is no effect of `sex` on birth weight
  (quite an uninteresting null hypothesis in itself!). However, `t.test()` does not provide
-the point estimate for the effect of sex; only the test result and a confidence interval.
-
-- The function `effx()` in `Epi`
-is intended to introduce the estimation of effects in epidemiology, together with the related ideas of stratification and controlling, i.e. adjustment for confounding, 
-without the need for familiarity with statistical modelling.
-It is in fact a wrapper of function `glm()` that fits generalized linear models. 
-
-- Now, let's do the same analysis with `effx()`
-```{r Effects of sex on bweight}
-effx(response = bweight, type = "metric", exposure = sex, data = births)
-```
-The estimated effect of sex on birth weight, measured as a difference 
-in means between girls and boys, 
+the point estimate for the effect of sex; only the test result and a confidence interval. -- The estimated effect of sex on birth weight, 
+measured as a difference in means between girls and boys, 
 is $-197$ g.
-Either the output from `t.test()` above or the command
-```{r Table of mean birth weight by sex}
-stat.table(sex, mean(bweight), data = births)
-```
-confirms this ($3032.8-3229.9=-197.1$). 
-- 
-The same task can easily be performed by `lm()` or by `glm()`. The main argument in both 
-is the *model formula*, the left hand side being the response variable and the right hand side
+
+- The same task can easily be performed by `lm()` or by `glm()`. 
+The main argument in both 
+is the *model formula*, the left hand side being the response variable 
+and the right hand side
 after $\sim$ defines the explanatory variables and their 
 joint effects on the response. Here the only
 explanatory variable is the binary factor `sex`. With `glm()` one specifies the
-`family`, i.e. the assumed distribution of the response variable, but in case you use
-`lm()`, this argument is not needed, because `lm()` fits only models for metric responses
-assuming Gaussian distribution.
+`family`, i.e. the assumed distribution of the response variable. However,
+in case you use
+`lm()`, this argument is not needed, because `lm()` fits only 
+models for metric responses assuming Gaussian distribution.
 ```{r lm of bweight by sex}
 m1 <- glm(bweight ~ sex, family = gaussian, data = births)
 summary(m1)
@@ -160,13 +145,6 @@ The point estimate plus confidence limits can, though, be concisely obtained by 
 ```{r ci.lin of bweight by sex}
 round(ci.lin(m1)[, c(1, 5, 6)], 1)
 ```
-- 
-Now, use `effx()` to find the effect of `hyp` (maternal hypertension)
- on `bweight`.
-```{r Effects of hyp on bweight, echo=FALSE}
-effx(response = bweight, type = "metric", exposure = hyp, data = births)
-```
-
 
 ## Factors on more than two levels
 
@@ -174,9 +152,12 @@ The variable `gest4` became as the result of cutting `gestwks`
  into 4 groups with left-closed and right-open boundaries  [20,35) [35,37) [37,39) [39,45).
 
 - We shall find the effects of `gest4` on the metric response `bweight`.
-```{r Effects of gest4 (four levels) on bweight }
-effx(response = bweight, typ = "metric", exposure = gest4, data = births)
+  by `lm()` and find out how the coefficients are related to the group means
+```{r lm of gest4 on bweight}
+m2 <- lm(bweight ~ gest4, data = births)
+round(ci.lin(m2)[, c(1, 5, 6)], 1)
 ```
+
 There are now 3 effect estimates:
 ```
 [35,37) vs [20,35)  857
@@ -187,13 +168,8 @@ The command
 ```{r Table of mean bweight by gest4 }
 stat.table(gest4, mean(bweight), data = births)
 ```
-confirms that the effect of `gest4` (level~2 vs level~1) is $2590-1733=857$, etc.
-
-- Compute these estimates by `lm()` and find out how the coefficients are related to the group means
-```{r lm of gest4 on bweight}
-m2 <- lm(bweight ~ gest4, data = births)
-round(ci.lin(m2)[, c(1, 5, 6)], 1)
-```
+confirms that e.g. the effect of `gest4` (level~2 vs level~1) is
+$2590-1733=857$, etc.
 
 
 ## Stratified effects, and interaction or effect-measure modification
@@ -215,12 +191,15 @@ hypertensive and normotensive
 mothers is related to gestational age.
 
 - Let us get numerical values for the mean differences
-in the different `gest4` categories:
-```{r Effect of hyp on bweight stratified by gest4 }
-effx(bweight, type = "metric", exposure = hyp, strata = gest4, data = births)
+in the different `gest4` categories. 
+Stratified estimation of effects can be done by `lm()` as follows:
+```{r lm for hyp on bweight stratified by gest4 }
+m3 <- lm(bweight ~ gest4 / hyp, data = births)
+round(ci.lin(m3)[, c(1, 5, 6)], 1)
 ```
 The estimated effects of `hyp` in the different strata defined by `gest4` thus
-range from about $-100$ g among those with $\geq 39$ weeks of gestation to about $-700$ g among those
+range from about $-100$ g among those with $\geq 39$ weeks of 
+gestation to about $-700$ g among those
 with $< 35$ weeks of gestation. The error margin especially 
 around the latter estimate is quite wide, though.
 The $P$-value 0.055  from the test for 
@@ -228,15 +207,10 @@ The $P$-value 0.055  from the test for
 against the null hypothesis of *no interaction between `hyp` and `gest4`*.
 On the other hand, this test may well be not very sensitive given
  the small number of preterm babies in these data. 
-- Stratified estimation of effects can also be done by `lm()`,
- and you should get the same results:
-```{r lm for hyp on bweight stratified by gest4 }
-m3 <- lm(bweight ~ gest4 / hyp, data = births)
-round(ci.lin(m3)[, c(1, 5, 6)], 1)
-```
+
 - An equivalent model with an explicit *product term* or
 *interaction term* between `gest4` and `hyp` is
-fitted as follows
+fitted as follows:
 ```{r lmIa for hyp on bweight stratified by gest4 }
 m3I <- lm(bweight ~ gest4 + hyp + gest4:hyp, data = births)
 round(ci.lin(m3I)[, c(1, 5, 6)], 1)
@@ -290,31 +264,17 @@ result from this test, the possibility
 of a real effect-measure modification
 should not be ignored in this case.
 
-- Now, use `effx()` to stratify (i) the effect of `hyp` on `bweight` by `sex`
- and then (ii) perform the stratified analysis using the two ways of fitting an interaction model 
-with `lm`.
-```{r Effects of hyp on lowbw stratified by sex, echo=F}
-effx(bweight, type = "metric", exposure = hyp, strata = sex, data = births)
-m4S <- lm(bweight ~ sex / hyp, data = births)
-round(ci.lin(m4S)[, c(1, 5, 6)], 1)
-m4I <- lm(bweight ~ sex + hyp + sex:hyp, data = births)
-round(ci.lin(m4I)[, c(1, 5, 6)], 1)
-```
-
- Look at the results. Is there evidence for the effect of `hyp` being modified by `sex`?
-
 
 ## Controlling or adjusting for the effect of hyp for sex 
 
 The effect of `hyp` is *controlled for* -- or *adjusted for* -- `sex`
-by first looking at the estimated effects of `hyp` in the two stata defined by `sex`, and then combining these effects if they seem sufficiently similar. In this case the estimated effects were $-496$ and $-380$ which look quite similar (and the $P$-value against *no interaction* was quite large, too),
+by first looking at the estimated effects of `hyp` in the two stata defined 
+by `sex`, and then combining these effects if they seem sufficiently similar. 
+In this case the estimated effects were $-496$ and $-380$ which look quite
+similar (and the $P$-value against *no interaction* was quite large, too),
  so we can perhaps combine them, and control for `sex`.
 
-- The combining is done by declaring `sex` as a control variable:
-```{r Effect of hyp on bweight controlled for sex }
-effx(bweight, type = "metric", exposure = hyp, control = sex, data = births)
-```
-- The same is done with `lm()` as follows: 
+- The combining is done by adding `sex` to the model formula:
 ```{r lm for hyp on bweight controlled for sex }
 m4 <- lm(bweight ~ sex + hyp, data = births)
 ci.lin(m4)[, c(1, 5, 6)]
@@ -327,7 +287,7 @@ controlled for `sex` is thus $-448$ g.
 Many people go straight ahead and control for variables which are likely to confound the effect of exposure without bothering to stratify first, but usually it is useful to stratify first.
 
 
-## Numeric exposures  
+## Numeric exposure, simple linear regression and checking assumptions  
 
 If we wished to study the effect of gestation time on the baby's birth 
 weight then  `gestwks` is a numeric exposure variable.  
@@ -336,10 +296,8 @@ weight then  `gestwks` is a numeric exposure variable.
 of the response with `gestwks` is roughly linear 
 (for a continuous response), 
 % or log-linear (for a binary or failure rate response) 
-we can estimate the linear effect of `gestwks`, 
-both with `effx()` and with `lm()` as follows:
+we can estimate the linear effect of `gestwks` with `lm()` as follows:
 ```{r Linear effect of gestwks on bweight }
-effx(response = bweight, type = "metric", exposure = gestwks, data = births)
 m5 <- lm(bweight ~ gestwks, data = births)
 ci.lin(m5)[, c(1, 5, 6)]
 ```
@@ -348,27 +306,6 @@ obtained estimates of the
 two regression coefficient: `intercept` and `slope`.
 The linear effect of `gestwks` is thus estimated by the
 slope coefficient, which is 197 g per each additional week of gestation.
-
-
->The linear effect of `gestwks` on the log-odds of `lowbw` can be estimated similarly:
-```{r Linear effect of gestwks on lowbw }
-effx(response = lowbw, type = "binary", exposure = gestwks, data = births)
-```
-The linear effect of `gestwks` on the log-odds of `lowbw` is manifested as a reduction by a factor of 0.408 per extra week of gestation, i.e. the odds of a baby having a low birth weight is reduced by a factor of 0.408 per one week increase in gestation.
-
-- You cannot stratify by a numeric variable, 
-but you can study the effects of a 
-numeric exposure stratified by (say) `maged` with
-```{r Linear effect of gestwks on bweight stratified by maged }
-effx(bweight,
-  type = "metric", exposure = gestwks, strata = maged,
-  data = births
-)
-```
-You can control/adjust for a numeric variable by putting it in the control list.
-
-
-## Checking the assumptions of the linear model  
 
 At this stage it will be best to make some visual check concerning
 our model assumptions using `plot()`. In particular, when the main argument
@@ -391,12 +328,11 @@ like linearity of the systematic dependence,
 homoskedasticity and normality of the error terms? 
 
 
-
 ## Penalized spline model
 
 We shall now continue the analysis such that the apparently curved effect
 of `gestwks` is modelled by a *penalized spline*,
-based on the recommendations of Martyn in his lecture of this morning. 
+based on the recommendations of Martyn in his lecture today. 
 
 You cannot fit a penalized spline model with `lm()` or
 `glm()`, Instead, function `gam()` in package
@@ -502,8 +438,7 @@ is about 18 percent points higher,
 or about three times as high as that for normotensive mothers
 
 - The three comparative measures of prevalences can be 
-estimated by `glm()` with different link functions, whereas
-`effx()` gives only odds ratio:
+estimated by `glm()` with different link functions:
 ```{r lowbw-hyp-comp}
 binRD <- glm(lowbw ~ hyp, family = binomial(link = "identity"), data = births)
 round(ci.lin(binRD)[, c(1, 2, 5:6)], 3)
@@ -511,7 +446,6 @@ binRR <- glm(lowbw ~ hyp, family = binomial(link = "log"), data = births)
 round(ci.lin(binRR, Exp = TRUE)[, c(1, 2, 5:7)], 3)
 binOR <- glm(lowbw ~ hyp, family = binomial(link = "logit"), data = births)
 round(ci.lin(binOR, Exp = TRUE)[, c(1, 2, 5:7)], 3)
-effx(response = lowbw, type = "binary", exposure = hyp, data = births)
 ```
 Check that these results were quite compatible with the
 *about* estimates given in the previous item.
