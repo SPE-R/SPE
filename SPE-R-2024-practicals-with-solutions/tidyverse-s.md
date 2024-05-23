@@ -796,11 +796,11 @@ age
 ##     pid   age
 ##   <int> <int>
 ## 1     1    20
-## 2     2    16
-## 3     3    25
-## 4     4    19
-## 5     5    20
-## 6     6    20
+## 2     2    25
+## 3     3    17
+## 4     4    15
+## 5     5    19
+## 6     6    15
 ```
 
 ```r
@@ -831,11 +831,11 @@ bind_rows(age, center)
 ##      pid   age center
 ##    <dbl> <int> <chr> 
 ##  1     1    20 <NA>  
-##  2     2    16 <NA>  
-##  3     3    25 <NA>  
-##  4     4    19 <NA>  
-##  5     5    20 <NA>  
-##  6     6    20 <NA>  
+##  2     2    25 <NA>  
+##  3     3    17 <NA>  
+##  4     4    15 <NA>  
+##  5     5    19 <NA>  
+##  6     6    15 <NA>  
 ##  7     1    NA A     
 ##  8     2    NA B     
 ##  9     3    NA A     
@@ -862,11 +862,11 @@ left_join(age, center, by = c("pid"))
 ##     pid   age center
 ##   <dbl> <int> <chr> 
 ## 1     1    20 A     
-## 2     2    16 B     
-## 3     3    25 A     
-## 4     4    19 B     
-## 5     5    20 <NA>  
-## 6     6    20 <NA>
+## 2     2    25 B     
+## 3     3    17 A     
+## 4     4    15 B     
+## 5     5    19 <NA>  
+## 6     6    15 <NA>
 ```
 
 ```r
@@ -879,11 +879,11 @@ full_join(age, center, by = c("pid"))
 ##     pid   age center
 ##   <dbl> <int> <chr> 
 ## 1     1    20 A     
-## 2     2    16 B     
-## 3     3    25 A     
-## 4     4    19 B     
-## 5     5    20 <NA>  
-## 6     6    20 <NA>  
+## 2     2    25 B     
+## 3     3    17 A     
+## 4     4    15 B     
+## 5     5    19 <NA>  
+## 6     6    15 <NA>  
 ## 7    10    NA C
 ```
 
@@ -897,9 +897,9 @@ inner_join(age, center, by = c("pid"))
 ##     pid   age center
 ##   <dbl> <int> <chr> 
 ## 1     1    20 A     
-## 2     2    16 B     
-## 3     3    25 A     
-## 4     4    19 B
+## 2     2    25 B     
+## 3     3    17 A     
+## 4     4    15 B
 ```
 Can you spot the differences between the commands above?
 As an exercise, you can try to compute the individuals' mean age per center.
@@ -917,8 +917,8 @@ inner_join(age, center, by = c("pid")) |>
 ## # A tibble: 2 × 2
 ##   center mean_age
 ##   <chr>     <dbl>
-## 1 A          22.5
-## 2 B          17.5
+## 1 A          18.5
+## 2 B          20
 ```
 
 **Note:** the `by` argument indicates which column should be use to make the *join*. In some 
