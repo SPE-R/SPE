@@ -1005,7 +1005,7 @@ Problems with id \& log in keeping predicted $\widehat\pi(\cdot)$ between $0$ an
 \ei
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{\large Modern approach: Causal contrasts by g-formula}
 
 \bi
@@ -1017,6 +1017,14 @@ which may even contain product terms allowing modification
 $ \text{logit}(\pi_i) = \log[\pi_i/(1-\pi_i)] = 
 \alpha + \beta x_i + \gamma^{\small\text{T}} z_i + \delta^{\small\text{T}} (x_i z_i), \quad i=1, \dots, n. $
 \end{center}
+\medskip
+\item
+In R, for instance, with two covariates
+{\small \color{blue}
+\begin{verbatim}
+> mY <- glm(y ~ x + z1 + z2 + x:z1 + x:z2, family=binomial,data=dd)
+\end{verbatim}
+}
 \pause
 \medskip
 \item
@@ -1025,24 +1033,51 @@ for both possibilities of exposure: $X_i=1$ and $X_i=0$, but keeping $Z_i=z_i$ a
 \begin{center}
 $ \widetilde{\pi}_i^{X_i=x} = \text{expit}\{ \widehat\alpha + \widehat\beta x + 
    \widehat\gamma^{\small\text{T}} z_i + \widehat\delta^{\small\text{T}} (x z_i)\}, \quad x=0,1 .  $
-\end{center}	
-\pause
-\medskip
+\end{center}
+{\small \color{blue}
+\begin{verbatim}
+> dd$ypred1 <- predict( mY, type="response",   #  set x=1
+              newdata=data.frame(x=rep(1,n), dd[ , c("z1", "z2")] ) )
+> dd$ypred0 <- predict( mY, type="response",   #  set x=0
+              newdata=data.frame(x=rep(0,n), dd[ , c("z1", "z2")] ) )          
+\end{verbatim}
+}
+\ei
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{\large Modern approach: Causal contrasts by g-formula (cont'd)}
+\bi
 \item
-Marginal counterfactual risks for $x=1,0$ are estimated applying {\bf g-formula}:
+Marginal counterfactual risks for $x=1,0$ are estimated applying
+the principle of {\bf standardization} or {\bf g-formula}:
 $$ \widehat{\pi}^{X=x} = \widehat{E}_Z[E(Y|X=x, Z)]  = \frac{1}{n} \sum_{i=1}^n \widetilde{E}(Y_i|X_i=x, Z=z_i) 
 = \frac{1}{n} \sum_{i=1}^n \widetilde{\pi}_i^{X_i=x}
 $$
 as the data provide a non-parametric estimate of the joint distribution of $Z$.
 \pause
+{\small\color{blue}
+\begin{verbatim}
+> probY.1 <- mean(dd$ypred1)
+> probY.0 <- mean(dd$ypred0)
+\end{verbatim}
+}
 \medskip
 \item
-\textbf{Estimators marginal causal contrasts} of risks are now, e.g.
-\begin{align*}
- \widehat\tau^c = \widehat{\pi}^{X=1} - \widehat{\pi}^{X=0}, \qquad 
+\textbf{Marginal causal contrasts} of risks are now estimated, e.g.
+\begin{center}
+$ \widehat\tau^c = \widehat{\pi}^{X=1} - \widehat{\pi}^{X=0}, \qquad 
 %   \widehat\phi^c = \widehat{\pi}^{X=1} / \widehat{\pi}^{X=0}, \\
-	 \widehat\psi^c = [ \widehat{\pi}^{1}/(1-  \widehat{\pi}^{1})]/ [ \widehat{\pi}^{0}/(1-  \widehat{\pi}^{0})]
-\end{align*}	
+	 \widehat\psi^c = [ \widehat{\pi}^{1}/(1-  \widehat{\pi}^{1})]/ [ \widehat{\pi}^{0}/(1- \widehat{\pi}^{0})] $
+\end{center}
+\medskip
+{\small\color{blue}
+\begin{verbatim}
+> tau.c <- probY.1 - probY.0
+> phi.c <- probY.1 / probY.0
+> psi.c <- ( probY.1/(1-probY.1) ) / ( probY.0/(1-probY.0) )  
+\end{verbatim}
+}
 %% {\bf NB.} The latter estimates marginal OR $\psi^c$ -- not $z$-conditional OR $\psi_z^c$. 
 %% the estimate $\text{expit}({\widehat\beta})$ of 
 % $z$-conditional odds ratio $\psi_z^c$.
@@ -1052,8 +1087,9 @@ as the data provide a non-parametric estimate of the joint distribution of $Z$.
 \ei
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{\large Exposure modelling, propensity scores and weighting}
+
 Let $X$ be a binary exposure variable. Assume again that $Z$ is a sufficient set 
 \pause
 \bi
@@ -1065,6 +1101,12 @@ $
 $
 \end{center} 
 \pause
+{\small \color{blue}
+\begin{verbatim}
+> mX <- glm(x ~ z1 + z2 + z1:z2, family=binomial, data=dd)
+\end{verbatim}
+}
+\pause
 \medskip
 \item
 {\bf Propensity scores} PS$_i$, or fitted  
@@ -1073,43 +1115,56 @@ probabilities of exposure are obtained
 $ \text{PS}_i = \widehat{P}\{X_i=1|Z=z_i\} = \text{expit}(\widehat\alpha^* + z_i^{\small\text{T}}\widehat\gamma^* ). $
 \end{center}
 \pause
-\medskip
-\item
-Individual {\bf weights} $W_i = w(\text{PS}_i, X_i)$ are computed 
-(see next slide).
+{\small \color{blue}
+\begin{verbatim}
+> dd$PS <- predict(mX, type="response")
+\end{verbatim}
+} 
 \pause
 \medskip
 \item
-Counterfactual risks are estimated as weighted averages of the outcome in the two exposure groups
+% Individual {\bf weights} $W_i = w(\text{PS}_i, X_i)$ are computed. 
+Compute {\bf inverse probability weights} (IPW), 
+i.e.  inverses of fitted probabilities of belonging to the realized exposure group. 
+$$ W_i = w(\text{PS}_i, X_i) = \frac{ {\mathbf 1}_{ \{X_i=1\} } }{\text{PS}_i} +
+                    \frac{ {\mathbf 1}_{ \{X_i=0\} } }{1 - \text{PS}_i}.
+  \quad i=1, \dots, n ,
+$$
+{\small \color{blue}
+\begin{verbatim}
+> dd$w <- 1*(dd$x==1)/dd$PS + 1*(dd$x==0)/(1-dd$PS))
+\end{verbatim}
+}
+\ei
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{\large Exposure modelling, propensity scores and weighting (cont'd)}
+
+\bi
+\item
+With IPW, counterfactual risks in the whole population 
+are estimated as weighted averages of the outcome in the two exposure groups
 $$
  \widehat\pi^{X=x} = \frac{\sum_{i=1}^n {\mathbf 1}_{ \{X_i=x\} } W_i Y_i}{\sum_{i=1}^n {\mathbf 1}_{\{X_i=x\}}W_i } 
  = \frac{\sum_{X_i=x} W_i Y_i}{\sum_{X_i=x} W_i }, \quad x=0,1 
 $$
-\item
-From these, marginal causal contrasts are estimated as before.
-
-\ei
-
-\end{frame}
-
-\begin{frame}
-\frametitle{\large Exposure modelling, propensity scores and weighting (cont'd)}
-
-\begin{itemize}
-\item
-\textbf{Inverse probability weights} (IPW) are used 
-to estimate marginal causal contrasts (like ATE) in the
-whole population. They are based on inverses of the fitted probabilities of belonging
-to the realized exposure group:
-$$ W_i = w(\text{PS}_i, X_i) = \frac{ {\mathbf 1}_{ \{X_i=1\} } }{\text{PS}_i} +
-                    \frac{ {\mathbf 1}_{ \{X_i=0\} } }{1 - \text{PS}_i},
-  \quad i=1, \dots, n .
-$$
+{\small\color{blue}
+\begin{verbatim}
+> probY.1 <- sum( 1*(dd$x==1)*dd$w*dd$y ) / sum( 1*(dd$x==1)*dd$w )
+> probY.0 <- sum( 1*(dd$x==0)*dd$w*dd$y ) / sum( 1*(dd$x==0)*dd$w )
+\end{verbatim}
+}
+and from these, marginal causal contrasts are estimated as before.
+\medskip
 \pause
 \item
-If the interest is on causal contrasts {among the treated} (like ATT),
-the \textbf{treated weights} are used: \\ $W_i = 1$ for $X_i=1$, and $W_i = \text{PS}_i/(1-\text{PS}_i)$
+For causal contrasts {\bf among the treated} (ATT), use
+ \textbf{treated weights}:
+\begin{center} 
+   $W_i = 1$ for $X_i=1$, and $W_i = \text{PS}_i/(1-\text{PS}_i)$
 for $X_i=0$. 
+\end{center}
 \pause
 \medskip
 \item 
@@ -1398,21 +1453,24 @@ Thus, letting $\rho(t)$ to vary by $t$ in modelling is often adviced.
 \includegraphics[height=1.1\textheight]{Manson-table2}
 \end{minipage}
 \hfill
-\begin{minipage} {0.35\linewidth}
+\begin{minipage} {0.44\linewidth}
 {\small\raggedright
 \bi
 \item
-Women, 50-79 y, \\
- MHT: $N_1$ = 8506, \\ placebo: $N_0$ = 8102
+Women, 50-79 y;  
+ MHT: $N_1=8506$, placebo: $N_0=8102$
 \item 
-Followed-up for \\ max 8.6 y, mean 5.6 y.
+Follow-up max 8.6 y, mean 5.6 y.
 \item
 Cases \& rates/10$^4$ y \\
 $D_1$ = 188, $I_1$ = 39, \\
 $D_0$ = 147, $I_0$ = 33.
 \item
 Crude IR = 1.20, \\
-adjusted 1.24 \\ (1.00--1.54)
+adjusted 1.24 (1.00--1.54)
+\item
+Effect of MHT? Increases the risk at start, but after 6 years
+reduces the risk? Overall effect still harmful?
 \ei
 }
 
@@ -1433,16 +1491,19 @@ adjusted 1.24 \\ (1.00--1.54)
 \bi
 \item
 Curves of cumulative hazard approximate
-the development of
-cumulative risks $\pi_x(t)$ over time.
+the cumulative risks over time.
 \item
 In early years,
-the curve of MHT runs on top, reflecting
-higher hazard in that period.
+the curve for MHT runs on top, reflecting
+higher hazard then in that group.
 \item
-By 6-7 year, 
-cumulative risks appear
-to have reached same level.
+After some years there are less frail
+subjects on MHT than on placebo
+in the risk set.
+\item
+Increased hazard after 6 y in the remaining
+placebo group has lifted its cumulative risk
+curve to the same level as in MHT group.
 \ei
 }
 \end{minipage}
