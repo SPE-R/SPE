@@ -40,7 +40,7 @@ par(mfrow = c(1, 1))
 with(births, interaction.plot(sex, hyp, bweight))
 
 
-## ----lm for hyp on bweight stratified by gest4--------------------------------
+## ----lm for hyp on bweight stratified by sex----------------------------------
 m3 <- lm(bweight ~ sex / hyp, data = births)
 round(ci.lin(m3)[, c(1, 5, 6)], 1)
 
