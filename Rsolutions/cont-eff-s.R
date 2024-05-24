@@ -1,5 +1,5 @@
 ## ----include=FALSE------------------------------------------------------------
-knitr::opts_chunk$set(results = "markup", keep.source = TRUE, include = FALSE, eps = FALSE, prefix.string = "./graph/cont-eff")
+knitr::opts_chunk$set(results = "markup", keep.source = TRUE, include = TRUE, eps = FALSE, prefix.string = "./graph/cont-eff")
 
 
 ## ----echo=FALSE---------------------------------------------------------------
@@ -64,10 +64,10 @@ aMid <- seq(17.5, 77.5, by = 5)
 pMid <- seq(1945, 1995, by = 5)
 par(mfrow = c(1, 2))
 matplot(aMid, rbind(c(1,1,1), ci.exp(mCat)[2:13, ]), type = "o", pch = 16,     
-   log = "y", cex.lab = 1.5, cex.axis = 1.5,
+   log = "y", cex.lab = 1.5, cex.axis = 1.5, col=c("black", "blue", "blue"),
   xlab = "Age (years)", ylab = "Rate ratio" )
 matplot(pMid, rbind(c(1,1,1), ci.exp(mCat)[14:23, ]), type = "o", pch = 16,
-  log = "y", cex.lab = 1.5, cex.axis = 1.5,
+  log = "y", cex.lab = 1.5, cex.axis = 1.5, col=c("black", "blue", "blue"),
   xlab = "Calendar year - 1900", ylab = "Rate ratio" )
 
 
@@ -81,10 +81,11 @@ round(ci.exp(mCat2), 2)
 ## ----mCat2-plot, fig =FALSE---------------------------------------------------
 par(mfrow = c(1, 2))
 matplot(aMid, rbind(c(1,1,1), ci.exp(mCat2)[2:13, ]), type = "o", pch = 16,     
-   log = "y", cex.lab = 1.5, cex.axis = 1.5,
+   log = "y", cex.lab = 1.5, cex.axis = 1.5, col=c("black", "blue", "blue"),
   xlab = "Age (years)", ylab = "Rate ratio" )
 matplot(pMid, rbind(ci.exp(mCat2)[14:18, ], c(1,1,1), ci.exp(mCat2)[19:23, ]),
         type = "o", pch = 16, log = "y", cex.lab = 1.5, cex.axis = 1.5,
+        col=c("black", "blue", "blue"),
   xlab = "Calendar year - 1900", ylab = "Rate ratio" )
 abline(h = 1, col = "gray")
 
