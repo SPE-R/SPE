@@ -18,7 +18,7 @@
 %Beamer automatically puts the title up quite high where it appears
 %over the background image of IARC: Keep adding empty lines until
 %it appears in the right position
-\title{Everything you ever wanted to know about splines but were too afraid to ask}
+\title{Splines: flexible models for nonlinear effects}
 
 \author{Martyn Plummer}
 % - Use the \inst{?} command only if the authors have different
@@ -66,7 +66,7 @@
 
   \begin{itemize}
   \item Splines are a flexible class of models that can be helpful for
-    representing dose-response relationships in epidemiology
+    representing dose-response relationships in epidemiology.
   \item In this course we will be using spline models extensively.
   \item However, spline models are widely misunderstood.
   \item The purpose of this lecture is to give a conceptual background
@@ -75,25 +75,82 @@
   
 \end{frame}
 
-\section{Categorization and its discontents}
+\section{Categorization}
 
 \begin{frame}
-  \frametitle{Rinaldi et al, JNCI. 2014 Jun;106(6):dju097}
+  \frametitle{A linear model for the births data}
 
-  \begin{center}
-  \includegraphics[scale=0.09]{figures/thyroid.jpeg}
-  \end{center}
-  
+
 \end{frame}
 
 \begin{frame}
-  \frametitle{Rinaldi et al, JNCI. 2014 Jun;106(6):dju097}
+  \frametitle{A cubit model for the births data}
 
-  \begin{center}
-  \includegraphics[scale=0.20]{figures/thyroid-zoom.jpeg}
-  \end{center}
-  
 \end{frame}
+
+\begin{frame}
+  \frametitle{Categories}
+
+  Medical doctors like to think in terms of categories
+  \begin{itemize}
+  \item[preterm] $<37$ weeks
+  \item[early term] 37-39 weeks
+  \item[full term] 39-41 weeks
+  \item[late term] 41-42 weeks
+  \item[post term] $\geq 42$ weeks
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Fitting a categorical model}
+
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plotting a categorical model}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{More categories}
+
+  The poor fit for the category ``preterm'' can be improved by adding
+  more categories:
+
+  \beging{itemize]
+  \item[extremely preterm] $<28$ weeks
+  \item[very preterm]  28-32 weeks
+  \item[moderate to late preterm] 32-37
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Plotting a more detailed categorical model}
+
+\end{frame}
+
+%\begin{frame}%
+
+%    \begin{columns}
+%    \begin{column}{6cm}
+%      \includegraphics[width=6cm]{figures/births-linear.pdf}
+%    \end{column}
+%    \begin{column}{6cm}
+%      \begin{itemize}
+%      \item Suppose %
+
+%      \item<2-> We can fill in the gaps (interpolate) by drawing a straight
+%        (linear) line between adjacent points
+%      \item<3-> This creates a mathematical function $f()$ which gives
+%        a response value $f(x)$ for every dose value $x$.
+%      \end{itemize}
+%    \end{column}
+%  \end{columns}
+
+
 
 \begin{frame}
   \frametitle{Statisticians against categorization}
@@ -124,126 +181,45 @@
   \end{itemize}
 
 \end{frame}
- 
-\section{Join the dots}
+
+\section{Interpolating splines}
 
 \begin{frame}
   \frametitle{Join the dots}
 
-  \begin{center}
-    \includegraphics<1>[height=6cm]{figures/join-the-dots.png}
-    \includegraphics<2>[height=7cm]{figures/join-the-dots-solved.png}
-  \end{center}
-  
-\end{frame}
-
-\begin{frame}
-  \frametitle{Linear interpolation}
-
-  \begin{columns}
-    \begin{column}{6cm}
-      \includegraphics<1>[scale=0.4]{figures/dose-response-points.png}
-      \includegraphics<2->[scale=0.4]{figures/dose-response-linear.png}
-    \end{column}
-    \begin{column}{6cm}
-      \begin{itemize}
-      \item Suppose a dose response curve is known exactly at certain
-        points
-      \item<2-> We can fill in the gaps (interpolate) by drawing a straight
-        (linear) line between adjacent points
-      \item<3-> This creates a mathematical function $f()$ which gives
-        a response value $f(x)$ for every dose value $x$.
-      \end{itemize}
-    \end{column}
-  \end{columns}
-    
-\end{frame}
-
-\begin{frame}
-  \frametitle{Why linear interpolation?}
-
-  Out of all possible curves that go through the observed points,
-  linear interpolation is the one that minimizes the penalty function
-  \[
-  \int \left( \frac{\partial f}{\partial x} \right)^2 dx
-  \]
-
-\end{frame}
-
-\begin{frame}
-  \frametitle{What does the penalty mean?}
-
-  \begin{columns}
-    \begin{column}{5cm}
-      \includegraphics[scale=0.4]{figures/penalty1.png}
-    \end{column}
-    \begin{column}{4cm}
-      \begin{itemize}
-      \item The contribution to the penalty at each point depends on the
-        steepness of the curve (represented by a colour gradient)
-      \item  Any deviation from a straight line between the two fixed
-        points will incur a higher penalty overall.
-      \end{itemize}
-    \end{column}
-  \end{columns}
-  
-\end{frame}
-
-\begin{frame}
-  \frametitle{Extrapolation}
-
     \begin{columns}
-    \begin{column}{5cm}
-      \includegraphics<1>[scale=0.4]{figures/extrap1.png}
-      \includegraphics<2>[scale=0.4]{figures/extrap2.png}
-      \includegraphics<3>[scale=0.4]{figures/extrap3.png}
-      \includegraphics<4>[scale=0.4]{figures/extrap4.png}
+    \begin{column}{6cm}
+      \includegraphics[scale=0.4]{figures/dose-response-points.png}
     \end{column}
-    \begin{column}{4cm}
+    \begin{column}{6cm}
       \begin{itemize}
-      \item Linear interpolation fits a linear dose-response curve exactly.
-      \item<3-> But it breaks down when we extrapolate.
+      \item Suppose that we have a set of $(x,y)$ points that we think
+        come from an underlying smooth relationship between $x$ and
+        $y$.
+      \item We want to join the dots in a way that is as smooth as
+        possible.
+      \item This turns out to be a mathematically well defined problem
+        with a unique solution.
       \end{itemize}
     \end{column}
   \end{columns}
 
 \end{frame}
 
-\begin{frame}
-  \frametitle{Why does linear interpolation break down?}
-
-    \begin{itemize}
-    \item The penalty function
-      \[
-      \int \left( \frac{\partial f}{\partial x} \right)^2 dx
-      \]
-      penalizes the steepness of the curve
-    \item Minimizing the penalty function gives us gives us the ``flattest''
-      curve that goes through the points.
-      \begin{itemize}
-      \item In between two observations the flattest curve is a
-        straight line.
-      \item Outside the range of the observations the flattest curve
-        is completely flat.
-      \end{itemize}
-    \end{itemize}
-
-\end{frame}
 
 \begin{frame}
   \frametitle{A roughness penalty}
 
   \begin{itemize}
-  \item If we want a fitted curve that extrapolates
-    a linear trend then we want to minimize the \alert<2>{curvature}.
+  \item Suppose $y = f(x)$ for some function $f(.)$.
+  \item The {\em roughness} of the curve in the interval $[a,b]$ is
+    meausured by the integral
     \[
-    \int \left(
-    \frac{\partial\alert<2>{^2} f}{\partial x\alert<2>{^2}}
-    \right)^2 dx
+      \int_a^b \left(
+        \frac{\partial\alert<2>{^2} f}{\partial x\alert<2>{^2}}
+      \right)^2 dx
     \]
-  \item Like the first penalty function but uses the \alert<2>{second
-    derivative} of $f$ (i.e. the curvature).
-  \item This is a roughness penalty.
+  \item We want the roughness of $f$ to be as small as possible.
   \end{itemize}
 \end{frame}
 
@@ -276,8 +252,8 @@
     \end{column}
     \begin{column}{6cm}
       \begin{itemize}
-        \item The smoothest curve that goes through the observed
-          points is a cubic spline.
+      \item The smoothest curve that goes through the observed
+        points is a cubic spline.
       \end{itemize}
     \end{column}
   \end{columns}

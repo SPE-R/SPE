@@ -33,7 +33,9 @@ zz2 <- seq(2, 4, length=101)
 zz2 <- zz2[-1]
 
 png("spline-constraint1.png")
-plot(x, y, type="n", xaxt="n", yaxt="n", xlab="Dose x", ylab="Response f(x)", pch=16,
+plot(x, y, type="n",
+     xaxt="n", yaxt="n",
+     xlab="Dose x", ylab="Response f(x)", pch=16,
      cex.lab=1.5, xlim=c(0,4), ylim=c(0, 0.6))
 title("No jumps")
 points(xx[c(1,3)], yy[c(1,3)], pch=16)
@@ -41,10 +43,13 @@ sp <- interpSpline(xx, yy)
 sp$coefficients[3,1] <- sp$coefficients[3,1] + 0.1
 lines(predict(sp, zz1))
 lines(predict(sp, zz2))
+text(x=2.2, y=0.3, labels="X", col="red", cex=3)
 dev.off()
 
 png("spline-constraint2.png")
-plot(x, y, type="n", xaxt="n", yaxt="n", xlab="Dose x", ylab="Response f(x)", pch=16,
+plot(x, y, type="n",
+     xaxt="n", yaxt="n",
+     xlab="Dose x", ylab="Response f(x)", pch=16,
      cex.lab=1.5, xlim=c(0,4), ylim=c(0, 0.6))
 title("No corners")
 points(xx[c(1,3)], yy[c(1,3)], pch=16)
@@ -52,10 +57,13 @@ sp <- interpSpline(xx, yy)
 sp$coefficients[3,2] <- sp$coefficients[3,2] - 0.3
 lines(predict(sp, zz1))
 lines(predict(sp, zz2))
+text(x=2, y=0.3, labels="X", col="red", cex=3)
 dev.off()
 
 png("spline-constraint3.png")
-plot(x, y, type="n", xaxt="n", yaxt="n", xlab="Dose x", ylab="Response f(x)", pch=16,
+plot(x, y,
+     type="n", xaxt="n",
+     yaxt="n", xlab="Dose x", ylab="Response f(x)", pch=16,
      cex.lab=1.5, xlim=c(0,4), ylim=c(0, 0.6))
 title("No sudden changes in curvature")
 points(xx[c(1,3)], yy[c(1,3)], pch=16)
@@ -63,4 +71,5 @@ sp <- interpSpline(xx, yy)
 sp$coefficients[3,3] <- sp$coefficients[3,3] - 0.5
 lines(predict(sp, zz1))
 lines(predict(sp, zz2))
+text(x=2.2, y=0.3, labels="X", col="red", cex=3)
 dev.off()
