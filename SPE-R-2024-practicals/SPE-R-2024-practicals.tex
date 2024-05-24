@@ -3599,8 +3599,8 @@ different aspects in estimating effects of various exposures on a metric respons
 
 \section{\texorpdfstring{Simple estimation with \texttt{lm()} and \texttt{glm()}}{Simple estimation with lm() and glm()}}\label{simple-estimation-with-lm-and-glm}
 
-We are ready to analyze the effect of \texttt{sex} on \texttt{bweight}.
-A binary explanatory variable, like \texttt{sex}, leads to an elementary
+We are ready to analyze the effect of maternal hypertension \texttt{hyp} on \texttt{bweight}.
+A binary explanatory variable, like \texttt{hyp}, leads to an elementary
 two-group comparison of group
 means for a metric response.
 
@@ -3612,11 +3612,13 @@ means for a metric response.
 \end{itemize}
 
 The \(P\)-value refers to the test
-of the null hypothesis that there is no effect of \texttt{sex} on birth weight
-(quite an uninteresting null hypothesis in itself!). However, \texttt{t.test()} does not provide
-the point estimate for the effect of sex; only the test result and a confidence interval. -- The estimated effect of sex on birth weight,
-measured as a difference in means between girls and boys,
-is \(-197\) g.
+of the null hypothesis that there is no effect of \texttt{shyp} on birth weight
+(somewhat implausible null hypothesis in itself!).
+However, \texttt{t.test()} does not provide
+the point estimate for the effect of \texttt{hyp}; only the test result and a confidence interval. -- The estimated effect of \texttt{hyp} on birth weight,
+measured as a difference in means between hypertensive and normotensive
+mothers,
+is \(3199-2768 = 431\) g.
 
 \begin{itemize}
 \tightlist
@@ -3627,7 +3629,7 @@ is \(-197\) g.
   and the right hand side
   after \(\sim\) defines the explanatory variables and their
   joint effects on the response. Here the only
-  explanatory variable is the binary factor \texttt{sex}. With \texttt{glm()} one specifies the
+  explanatory variable is the binary factor \texttt{hyp}. With \texttt{glm()} one specifies the
   \texttt{family}, i.e.~the assumed distribution of the response variable. However,
   in case you use
   \texttt{lm()}, this argument is not needed, because \texttt{lm()} fits only
@@ -3638,37 +3640,12 @@ Note the amount of output that \texttt{summary()} method produces.
 The point estimate plus confidence limits can, though, be concisely obtained by function
 \texttt{ci.lin()} found in \texttt{Epi} package.
 
-\section{Factors on more than two levels}\label{factors-on-more-than-two-levels}
-
-The variable \texttt{gest4} became as the result of cutting \texttt{gestwks}
-into 4 groups with left-closed and right-open boundaries {[}20,35) {[}35,37) {[}37,39) {[}39,45).
-
-\begin{itemize}
-\tightlist
-\item
-  We shall find the effects of \texttt{gest4} on the metric response \texttt{bweight}.
-  by \texttt{lm()} and find out how the coefficients are related to the group means
-\end{itemize}
-
-There are now 3 effect estimates:
-
-\begin{verbatim}
-[35,37) vs [20,35)  857
-[37,39) vs [20,35) 1360
-[39,45) vs [20,35) 1668
-\end{verbatim}
-
-The command
-
-confirms that e.g.~the effect of \texttt{gest4} (level\textasciitilde2 vs level\textasciitilde1) is
-\(2590-1733=857\), etc.
-
 \section{Stratified effects, and interaction or effect-measure modification}\label{stratified-effects-and-interaction-or-effect-measure-modification}
 
 We shall now examine whether and to what extent the
 \emph{effect} of \texttt{hyp} on \texttt{bweight}, i.e.~the
 mean difference between hypertensive and normotensive mothers,
-varies by \texttt{gest4} without assigning
+varies by \texttt{sex} without assigning
 causal interpretation to the estimated contrasts.
 
 \begin{itemize}
@@ -3678,103 +3655,78 @@ causal interpretation to the estimated contrasts.
   shows how the mean \texttt{bweight} depends jointly on \texttt{hyp} and \texttt{gest4}
 \end{itemize}
 
-It appears that the mean difference in \texttt{bweight} between
+At face value it appears that the mean difference in \texttt{bweight} between
 hypertensive and normotensive
-mothers is related to gestational age.
+mothers is somewhat bigger in boys than in girls.
 
 \begin{itemize}
 \tightlist
 \item
   Let us get numerical values for the mean differences
-  in the different \texttt{gest4} categories.
+  in the two levels of \texttt{sex}.
   Stratified estimation of effects can be done by \texttt{lm()} as follows:
 \end{itemize}
 
-The estimated effects of \texttt{hyp} in the different strata defined by \texttt{gest4} thus
-range from about \(-100\) g among those with \(\geq 39\) weeks of
-gestation to about \(-700\) g among those
-with \(< 35\) weeks of gestation. The error margin especially
-around the latter estimate is quite wide, though.
-The \(P\)-value 0.055 from the test for
-\emph{effect(-measure) modification} indicates weak evidence
-against the null hypothesis of \emph{no interaction between \texttt{hyp} and \texttt{gest4}}.
-On the other hand, this test may well be not very sensitive given
-the small number of preterm babies in these data.
+The estimated effects of \texttt{hyp} in the two strata defined by \texttt{sex} thus
+are \(-496\) g in boys and \(-380\) g among girls.
+The error margins of the two estimates are quite wide, though.
 
 \begin{itemize}
 \tightlist
 \item
   An equivalent model with an explicit \emph{product term} or
-  \emph{interaction term} between \texttt{gest4} and \texttt{hyp} is
+  \emph{interaction term} between \texttt{sex} and \texttt{hyp} is
   fitted as follows:
 \end{itemize}
 
-From this output you would find a familiar estimate \(-673\) g for those \(< 35\) gestational weeks.
-The remaining coefficients are estimates of the interaction effects such that e.g.~\(515 = -158 - (-673)\) g
+From this output you would find a familiar estimate \(-231\) g for girls
+vs.~boys among normotensive mothers and the estimate \(-496\) g
+contrasting hypertensive and normotensive mothers in the
+reference class of \texttt{sex}, i.e.~among boys.
+The remaining coefficient is the estimate of the interaction
+effect such that \(116.6 = -496.4 - 379.8\) g
 describes the contrast in the effect of \texttt{hyp} on \texttt{bweight}
-between those 35 to \(< 37\) weeks and those \(< 35\) weeks of gestation.
+between girls and boys.
+
+The \(P\)-value \(0.46\) as well
+as the wide confidence interval about zero of this interaction
+parameter suggest good compatibility of the data with
+the null hypothesis of
+\emph{no interaction between \texttt{hyp} and \texttt{sex}}. Thus,
+there is insufficient evidence against
+the possibility of \emph{effect(-measure) modification} by
+\texttt{sex} on the effect of \texttt{hyp}.
+On the other hand, this test is not very sensitive given
+the small sample size. Thus, in spite of obtaining a \emph{non-significant}
+result, the possibility of a real effect-measure modification
+cannot be ignored based on these data only.
+
+\section{\texorpdfstring{Controlling or adjusting for the effect of \texttt{hyp} for \texttt{sex}}{Controlling or adjusting for the effect of hyp for sex}}\label{controlling-or-adjusting-for-the-effect-of-hyp-for-sex}
+
+The estimated effects of \texttt{hyp}:
+\(-496\) in boys and \(-380\) in girls, look quite
+similar (and the \(P\)-value against \emph{no interaction} was quite large, too).
+Therefore, we may now proceed to estimate the overall effect of \texttt{hyp}
+\emph{controlling for} -- or \emph{adjusting for} -- \texttt{sex}.
 
 \begin{itemize}
 \tightlist
 \item
-  Perhaps a more appropriate reference level for the categorized gestational age would be the highest one.
-  Changing the reference level, here to be the 4th category,
-  can be done by \texttt{Relevel()} function in the \texttt{Epi} package,
-  after which an equivalent interaction model is fitted, now using a shorter
-  expression for it in the model formula:
-\end{itemize}
-
-Notice now the coefficient \(-91.6\) for \texttt{hyp}.
-It estimates the contrast \texttt{"hyper"} vs.~\texttt{"normal"} on
-\texttt{bweight} among those with \(\geq 39\) weeks of gestation.
-The estimate \(-88.5\) g = \(-180.1 -(-91.6)\) g describes the additional
-effect of \texttt{hyp} in the category 37 to 38 weeks of gestation upon
-that in the reference class.
-
-\begin{itemize}
-\tightlist
-\item
-  At this stage it is interesting to compare the results from the
-  interaction models to those from the corresponding\\
-  \emph{main effects} model, in which the effect of \texttt{hyp}
-  is assumed not to be modified by \texttt{gest4}:
-\end{itemize}
-
-The estimate \(-201\) g describing the overall contrast
-between hypertensive and normotensive mothers is obtained
-as a weighted average of the stratum-specific estimates
-that were got by \texttt{effx()} above.
-This assumption or the
-\emph{no interaction} null hypothesis can formally be tested by a common deviance test.
-
-The \(P\)-value is practically the same as before,
-when the interaction was tested in \texttt{effx()}.
-However, in spite of obtaining a \emph{non-significant}
-result from this test, the possibility
-of a real effect-measure modification
-should not be ignored in this case.
-
-\section{Controlling or adjusting for the effect of hyp for sex}\label{controlling-or-adjusting-for-the-effect-of-hyp-for-sex}
-
-The effect of \texttt{hyp} is \emph{controlled for} -- or \emph{adjusted for} -- \texttt{sex}
-by first looking at the estimated effects of \texttt{hyp} in the two stata defined
-by \texttt{sex}, and then combining these effects if they seem sufficiently similar.
-In this case the estimated effects were \(-496\) and \(-380\) which look quite
-similar (and the \(P\)-value against \emph{no interaction} was quite large, too),
-so we can perhaps combine them, and control for \texttt{sex}.
-
-\begin{itemize}
-\tightlist
-\item
-  The combining is done by adding \texttt{sex} to the model formula:
+  Adjustment is done by adding \texttt{sex} to the model formula:
 \end{itemize}
 
 The estimated effect of \texttt{hyp} on \texttt{bweight}
-controlled for \texttt{sex} is thus \(-448\) g.
-There can be more than one control variable, e.g
-\texttt{control=list(sex,maged)}.
+controlled for \texttt{sex} is thus \(-448\) g,
+which is a weighted average of the sex-specific estimates.
+It is slightly different from the unadjusted estimate \(-431\) g, indicating
+that there was no essential confounding by \texttt{sex}.
+Note also, that the model that was fitted makes the assumption that
+the estimated effect is the same for boys and girls.
 
-Many people go straight ahead and control for variables which are likely to confound the effect of exposure without bothering to stratify first, but usually it is useful to stratify first.
+Many people go straight ahead and control for variables which are likely to
+confound the effect of exposure without bothering to stratify first,
+but often it is useful to examine the possibility of effect-measure
+modification before that.
 
 \section{Numeric exposure, simple linear regression and checking assumptions}\label{numeric-exposure-simple-linear-regression-and-checking-assumptions}
 
@@ -3795,7 +3747,7 @@ We have fitted a simple linear regression model and
 obtained estimates of the
 two regression coefficient: \texttt{intercept} and \texttt{slope}.
 The linear effect of \texttt{gestwks} is thus estimated by the
-slope coefficient, which is 197 g per each additional week of gestation.
+slope coefficient, which is \(197\) g per each additional week of gestation.
 
 At this stage it will be best to make some visual check concerning
 our model assumptions using \texttt{plot()}. In particular, when the main argument
@@ -3838,7 +3790,7 @@ estimated intercept is equal to the overall mean birth
 weight in the data. The estimated residual variance is given by
 \emph{Scale est.} or from subobject \texttt{sig2} of the fitted
 \texttt{gam} object. Taking square root you will obtain the estimated
-residual standard deviation: 445.2 g.
+residual standard deviation: \(445.2\) g.
 
 The degrees of freedom in this model are not computed as simply as in previous
 models, and they typically are not integer-valued. However,
@@ -3935,35 +3887,6 @@ in which we utilize the previously created data frame \texttt{nd}
   the outcome probability scale with a relatively
   steep slope between about 33 to 37 weeks.
 \end{itemize}
-
-As with numeric birth weight, it may be of interest,
-whether the effect of \texttt{gestwks} is modified
-by maternal hypertension, so let's fit
-an interaction model and view the results
-
-How would you interpret the coefficients and their antilogarithms here?
-
-\begin{itemize}
-\tightlist
-\item
-  Even though there seems to be no sufficient evidence
-  for effect-measure modification, it can be of interest
-  to compare both the fitted lines on the logit scale
-  and the fitted curves on the probability scale between
-  the two groups. Function \texttt{qlogis()} returns the
-  value of the logit transformation of the given argument.
-\end{itemize}
-
-The logit-line starts from a higher level and its slope is steeper
-for the hypertensive mothers, which sounds reasonable.
-However, the two lines
-appear to cross at about 38 weeks. On the other hand, the vertical difference
-of the two probability curves appears discernible only in the area
-from about 32 to 38 weeks of gestation
-
-When interpreting these findings, one needs to keep in mind that
-the precision of these curves is very low, because of
-the small number of outcome cases overall.
 
 \chapter{Poisson regression \& analysis of curved effects}\label{poisson-regression-analysis-of-curved-effects}
 
@@ -9240,7 +9163,7 @@ occurrence rate of remission itself.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{   user  system elapsed }
-\NormalTok{  2.503   3.154   1.987 }
+\NormalTok{  2.644   3.202   2.057 }
 \end{Highlighting}
 \end{Shaded}
 

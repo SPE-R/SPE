@@ -3114,10 +3114,10 @@ Another nice feature of \texttt{dplyr} is tables binding and joining. To practic
 ##   <int> <int>
 ## 1     1    22
 ## 2     2    21
-## 3     3    25
-## 4     4    21
-## 5     5    16
-## 6     6    21
+## 3     3    22
+## 4     4    25
+## 5     5    21
+## 6     6    25
 \end{verbatim}
 
 \begin{Shaded}
@@ -3153,10 +3153,10 @@ First of all let's have a look to \texttt{bind\_rows} function.
 ##    <dbl> <int> <chr> 
 ##  1     1    22 <NA>  
 ##  2     2    21 <NA>  
-##  3     3    25 <NA>  
-##  4     4    21 <NA>  
-##  5     5    16 <NA>  
-##  6     6    21 <NA>  
+##  3     3    22 <NA>  
+##  4     4    25 <NA>  
+##  5     5    21 <NA>  
+##  6     6    25 <NA>  
 ##  7     1    NA A     
 ##  8     2    NA B     
 ##  9     3    NA A     
@@ -3186,10 +3186,10 @@ between \texttt{left\_join}, \texttt{full\_join} and \texttt{inner\_join}.
 ##   <dbl> <int> <chr> 
 ## 1     1    22 A     
 ## 2     2    21 B     
-## 3     3    25 A     
-## 4     4    21 B     
-## 5     5    16 <NA>  
-## 6     6    21 <NA>
+## 3     3    22 A     
+## 4     4    25 B     
+## 5     5    21 <NA>  
+## 6     6    25 <NA>
 \end{verbatim}
 
 \begin{Shaded}
@@ -3205,10 +3205,10 @@ between \texttt{left\_join}, \texttt{full\_join} and \texttt{inner\_join}.
 ##   <dbl> <int> <chr> 
 ## 1     1    22 A     
 ## 2     2    21 B     
-## 3     3    25 A     
-## 4     4    21 B     
-## 5     5    16 <NA>  
-## 6     6    21 <NA>  
+## 3     3    22 A     
+## 4     4    25 B     
+## 5     5    21 <NA>  
+## 6     6    25 <NA>  
 ## 7    10    NA C
 \end{verbatim}
 
@@ -3225,8 +3225,8 @@ between \texttt{left\_join}, \texttt{full\_join} and \texttt{inner\_join}.
 ##   <dbl> <int> <chr> 
 ## 1     1    22 A     
 ## 2     2    21 B     
-## 3     3    25 A     
-## 4     4    21 B
+## 3     3    22 A     
+## 4     4    25 B
 \end{verbatim}
 
 Can you spot the differences between the commands above?
@@ -3246,8 +3246,8 @@ As an exercise, you can try to compute the individuals' mean age per center.
 ## # A tibble: 2 x 2
 ##   center mean_age
 ##   <chr>     <dbl>
-## 1 A          23.5
-## 2 B          21
+## 1 A            22
+## 2 B            23
 \end{verbatim}
 
 \textbf{Note:} the \texttt{by} argument indicates which column should be use to make the \emph{join}. In some
@@ -7057,8 +7057,8 @@ different aspects in estimating effects of various exposures on a metric respons
 
 \section{\texorpdfstring{Simple estimation with \texttt{lm()} and \texttt{glm()}}{Simple estimation with lm() and glm()}}\label{simple-estimation-with-lm-and-glm}
 
-We are ready to analyze the effect of \texttt{sex} on \texttt{bweight}.
-A binary explanatory variable, like \texttt{sex}, leads to an elementary
+We are ready to analyze the effect of maternal hypertension \texttt{hyp} on \texttt{bweight}.
+A binary explanatory variable, like \texttt{hyp}, leads to an elementary
 two-group comparison of group
 means for a metric response.
 
@@ -7071,7 +7071,7 @@ means for a metric response.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{with}\NormalTok{(births, }\FunctionTok{t.test}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sex, }\AttributeTok{var.equal =} \ConstantTok{TRUE}\NormalTok{))}
+\FunctionTok{with}\NormalTok{(births, }\FunctionTok{t.test}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ hyp, }\AttributeTok{var.equal =} \ConstantTok{TRUE}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -7079,22 +7079,24 @@ means for a metric response.
 ## 
 ##  Two Sample t-test
 ## 
-## data:  bweight by sex
-## t = 3.4895, df = 498, p-value = 0.0005269
-## alternative hypothesis: true difference in means between group M and group F is not equal to 0
+## data:  bweight by hyp
+## t = 5.455, df = 498, p-value = 7.729e-08
+## alternative hypothesis: true difference in means between group normal and group hyper is not equal to 0
 ## 95 percent confidence interval:
-##   86.11032 308.03170
+##  275.5707 585.8210
 ## sample estimates:
-## mean in group M mean in group F 
-##        3229.902        3032.831
+## mean in group normal  mean in group hyper 
+##             3198.904             2768.208
 \end{verbatim}
 
 The \(P\)-value refers to the test
-of the null hypothesis that there is no effect of \texttt{sex} on birth weight
-(quite an uninteresting null hypothesis in itself!). However, \texttt{t.test()} does not provide
-the point estimate for the effect of sex; only the test result and a confidence interval. -- The estimated effect of sex on birth weight,
-measured as a difference in means between girls and boys,
-is \(-197\) g.
+of the null hypothesis that there is no effect of \texttt{shyp} on birth weight
+(somewhat implausible null hypothesis in itself!).
+However, \texttt{t.test()} does not provide
+the point estimate for the effect of \texttt{hyp}; only the test result and a confidence interval. -- The estimated effect of \texttt{hyp} on birth weight,
+measured as a difference in means between hypertensive and normotensive
+mothers,
+is \(3199-2768 = 431\) g.
 
 \begin{itemize}
 \tightlist
@@ -7105,7 +7107,7 @@ is \(-197\) g.
   and the right hand side
   after \(\sim\) defines the explanatory variables and their
   joint effects on the response. Here the only
-  explanatory variable is the binary factor \texttt{sex}. With \texttt{glm()} one specifies the
+  explanatory variable is the binary factor \texttt{hyp}. With \texttt{glm()} one specifies the
   \texttt{family}, i.e.~the assumed distribution of the response variable. However,
   in case you use
   \texttt{lm()}, this argument is not needed, because \texttt{lm()} fits only
@@ -7114,7 +7116,7 @@ is \(-197\) g.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{m1 }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sex, }\AttributeTok{family =}\NormalTok{ gaussian, }\AttributeTok{data =}\NormalTok{ births)}
+\NormalTok{m1 }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ hyp, }\AttributeTok{family =}\NormalTok{ gaussian, }\AttributeTok{data =}\NormalTok{ births)}
 \FunctionTok{summary}\NormalTok{(m1)}
 \end{Highlighting}
 \end{Shaded}
@@ -7122,20 +7124,20 @@ is \(-197\) g.
 \begin{verbatim}
 ## 
 ## Call:
-## glm(formula = bweight ~ sex, family = gaussian, data = births)
+## glm(formula = bweight ~ hyp, family = gaussian, data = births)
 ## 
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)  3229.90      38.80  83.244  < 2e-16 ***
-## sexF         -197.07      56.48  -3.489 0.000527 ***
+## (Intercept)  3198.90      29.96 106.768  < 2e-16 ***
+## hyphyper     -430.70      78.95  -5.455 7.73e-08 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## (Dispersion parameter for gaussian family taken to be 397442.7)
+## (Dispersion parameter for gaussian family taken to be 384203.2)
 ## 
 ##     Null deviance: 202765853  on 499  degrees of freedom
-## Residual deviance: 197926455  on 498  degrees of freedom
-## AIC: 7869.3
+## Residual deviance: 191333183  on 498  degrees of freedom
+## AIC: 7852.4
 ## 
 ## Number of Fisher Scoring iterations: 2
 \end{verbatim}
@@ -7152,73 +7154,16 @@ The point estimate plus confidence limits can, though, be concisely obtained by 
 
 \begin{verbatim}
 ##             Estimate   2.5%  97.5%
-## (Intercept)   3229.9 3153.9 3305.9
-## sexF          -197.1 -307.8  -86.4
+## (Intercept)   3198.9 3140.2 3257.6
+## hyphyper      -430.7 -585.4 -275.9
 \end{verbatim}
-
-\section{Factors on more than two levels}\label{factors-on-more-than-two-levels}
-
-The variable \texttt{gest4} became as the result of cutting \texttt{gestwks}
-into 4 groups with left-closed and right-open boundaries {[}20,35) {[}35,37) {[}37,39) {[}39,45).
-
-\begin{itemize}
-\tightlist
-\item
-  We shall find the effects of \texttt{gest4} on the metric response \texttt{bweight}.
-  by \texttt{lm()} and find out how the coefficients are related to the group means
-\end{itemize}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{m2 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ gest4, }\AttributeTok{data =}\NormalTok{ births)}
-\FunctionTok{round}\NormalTok{(}\FunctionTok{ci.lin}\NormalTok{(m2)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{)], }\DecValTok{1}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##              Estimate   2.5%  97.5%
-## (Intercept)    1733.7 1565.3 1902.1
-## gest4[35,37)    856.6  620.3 1092.9
-## gest4[37,39)   1360.0 1176.7 1543.4
-## gest4[39,45)   1667.5 1489.4 1845.7
-\end{verbatim}
-
-There are now 3 effect estimates:
-
-\begin{verbatim}
-[35,37) vs [20,35)  857
-[37,39) vs [20,35) 1360
-[39,45) vs [20,35) 1668
-\end{verbatim}
-
-The command
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{stat.table}\NormalTok{(gest4, }\FunctionTok{mean}\NormalTok{(bweight), }\AttributeTok{data =}\NormalTok{ births)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##  ------------------------ 
-##  gest4     mean(bweight)  
-##  ------------------------ 
-##  [20,35)         1733.74  
-##  [35,37)         2590.31  
-##  [37,39)         3093.77  
-##  [39,45)         3401.26  
-##  ------------------------
-\end{verbatim}
-
-confirms that e.g.~the effect of \texttt{gest4} (level\textasciitilde2 vs level\textasciitilde1) is
-\(2590-1733=857\), etc.
 
 \section{Stratified effects, and interaction or effect-measure modification}\label{stratified-effects-and-interaction-or-effect-measure-modification}
 
 We shall now examine whether and to what extent the
 \emph{effect} of \texttt{hyp} on \texttt{bweight}, i.e.~the
 mean difference between hypertensive and normotensive mothers,
-varies by \texttt{gest4} without assigning
+varies by \texttt{sex} without assigning
 causal interpretation to the estimated contrasts.
 
 \begin{itemize}
@@ -7231,192 +7176,99 @@ causal interpretation to the estimated contrasts.
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
-\FunctionTok{with}\NormalTok{(births, }\FunctionTok{interaction.plot}\NormalTok{(gest4, hyp, bweight))}
+\FunctionTok{with}\NormalTok{(births, }\FunctionTok{interaction.plot}\NormalTok{(sex, hyp, bweight))}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{effects-s_files/figure-latex/bweight-by-hyp-gest4-1.pdf}
-It appears that the mean difference in \texttt{bweight} between
+\includegraphics{effects-s_files/figure-latex/bweight-by-hyp-sex-1.pdf}
+At face value it appears that the mean difference in \texttt{bweight} between
 hypertensive and normotensive
-mothers is related to gestational age.
+mothers is somewhat bigger in boys than in girls.
 
 \begin{itemize}
 \tightlist
 \item
   Let us get numerical values for the mean differences
-  in the different \texttt{gest4} categories.
+  in the two levels of \texttt{sex}.
   Stratified estimation of effects can be done by \texttt{lm()} as follows:
 \end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{m3 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ gest4 }\SpecialCharTok{/}\NormalTok{ hyp, }\AttributeTok{data =}\NormalTok{ births)}
+\NormalTok{m3 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sex }\SpecialCharTok{/}\NormalTok{ hyp, }\AttributeTok{data =}\NormalTok{ births)}
 \FunctionTok{round}\NormalTok{(}\FunctionTok{ci.lin}\NormalTok{(m3)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{)], }\DecValTok{1}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-##                       Estimate    2.5%  97.5%
-## (Intercept)             1929.1  1732.1 2126.2
-## gest4[35,37)             710.5   431.9  989.2
-## gest4[37,39)            1197.0   984.7 1409.3
-## gest4[39,45)            1479.9  1273.9 1685.8
-## gest4[20,35):hyphyper   -673.0 -1038.8 -307.3
-## gest4[35,37):hyphyper   -158.0  -510.5  194.5
-## gest4[37,39):hyphyper   -180.1  -366.4    6.2
-## gest4[39,45):hyphyper    -91.6  -297.5  114.4
+##               Estimate   2.5%  97.5%
+## (Intercept)     3310.7 3230.1 3391.4
+## sexF            -231.2 -347.2 -115.3
+## sexM:hyphyper   -496.4 -696.1 -296.6
+## sexF:hyphyper   -379.8 -617.4 -142.2
 \end{verbatim}
 
-The estimated effects of \texttt{hyp} in the different strata defined by \texttt{gest4} thus
-range from about \(-100\) g among those with \(\geq 39\) weeks of
-gestation to about \(-700\) g among those
-with \(< 35\) weeks of gestation. The error margin especially
-around the latter estimate is quite wide, though.
-The \(P\)-value 0.055 from the test for
-\emph{effect(-measure) modification} indicates weak evidence
-against the null hypothesis of \emph{no interaction between \texttt{hyp} and \texttt{gest4}}.
-On the other hand, this test may well be not very sensitive given
-the small number of preterm babies in these data.
+The estimated effects of \texttt{hyp} in the two strata defined by \texttt{sex} thus
+are \(-496\) g in boys and \(-380\) g among girls.
+The error margins of the two estimates are quite wide, though.
 
 \begin{itemize}
 \tightlist
 \item
   An equivalent model with an explicit \emph{product term} or
-  \emph{interaction term} between \texttt{gest4} and \texttt{hyp} is
+  \emph{interaction term} between \texttt{sex} and \texttt{hyp} is
   fitted as follows:
 \end{itemize}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{m3I }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ gest4 }\SpecialCharTok{+}\NormalTok{ hyp }\SpecialCharTok{+}\NormalTok{ gest4}\SpecialCharTok{:}\NormalTok{hyp, }\AttributeTok{data =}\NormalTok{ births)}
-\FunctionTok{round}\NormalTok{(}\FunctionTok{ci.lin}\NormalTok{(m3I)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{)], }\DecValTok{1}\NormalTok{)}
+\NormalTok{m3I }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sex }\SpecialCharTok{+}\NormalTok{ hyp }\SpecialCharTok{+}\NormalTok{ sex}\SpecialCharTok{:}\NormalTok{hyp, }\AttributeTok{data =}\NormalTok{ births)}
+\FunctionTok{round}\NormalTok{(}\FunctionTok{ci.lin}\NormalTok{(m3I)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{)], }\DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-##                       Estimate    2.5%  97.5%
-## (Intercept)             1929.1  1732.1 2126.2
-## gest4[35,37)             710.5   431.9  989.2
-## gest4[37,39)            1197.0   984.7 1409.3
-## gest4[39,45)            1479.9  1273.9 1685.8
-## hyphyper                -673.0 -1038.8 -307.3
-## gest4[35,37):hyphyper    515.0     7.1 1023.0
-## gest4[37,39):hyphyper    492.9    82.5  903.4
-## gest4[39,45):hyphyper    581.5   161.7 1001.2
+##               Estimate    P    2.5%   97.5%
+## (Intercept)    3310.75 0.00 3230.14 3391.35
+## sexF           -231.25 0.00 -347.15 -115.35
+## hyphyper       -496.35 0.00 -696.07 -296.63
+## sexF:hyphyper   116.58 0.46 -193.80  426.96
 \end{verbatim}
 
-From this output you would find a familiar estimate \(-673\) g for those \(< 35\) gestational weeks.
-The remaining coefficients are estimates of the interaction effects such that e.g.~\(515 = -158 - (-673)\) g
+From this output you would find a familiar estimate \(-231\) g for girls
+vs.~boys among normotensive mothers and the estimate \(-496\) g
+contrasting hypertensive and normotensive mothers in the
+reference class of \texttt{sex}, i.e.~among boys.
+The remaining coefficient is the estimate of the interaction
+effect such that \(116.6 = -496.4 - 379.8\) g
 describes the contrast in the effect of \texttt{hyp} on \texttt{bweight}
-between those 35 to \(< 37\) weeks and those \(< 35\) weeks of gestation.
+between girls and boys.
+
+The \(P\)-value \(0.46\) as well
+as the wide confidence interval about zero of this interaction
+parameter suggest good compatibility of the data with
+the null hypothesis of
+\emph{no interaction between \texttt{hyp} and \texttt{sex}}. Thus,
+there is insufficient evidence against
+the possibility of \emph{effect(-measure) modification} by
+\texttt{sex} on the effect of \texttt{hyp}.
+On the other hand, this test is not very sensitive given
+the small sample size. Thus, in spite of obtaining a \emph{non-significant}
+result, the possibility of a real effect-measure modification
+cannot be ignored based on these data only.
+
+\section{\texorpdfstring{Controlling or adjusting for the effect of \texttt{hyp} for \texttt{sex}}{Controlling or adjusting for the effect of hyp for sex}}\label{controlling-or-adjusting-for-the-effect-of-hyp-for-sex}
+
+The estimated effects of \texttt{hyp}:
+\(-496\) in boys and \(-380\) in girls, look quite
+similar (and the \(P\)-value against \emph{no interaction} was quite large, too).
+Therefore, we may now proceed to estimate the overall effect of \texttt{hyp}
+\emph{controlling for} -- or \emph{adjusting for} -- \texttt{sex}.
 
 \begin{itemize}
 \tightlist
 \item
-  Perhaps a more appropriate reference level for the categorized gestational age would be the highest one.
-  Changing the reference level, here to be the 4th category,
-  can be done by \texttt{Relevel()} function in the \texttt{Epi} package,
-  after which an equivalent interaction model is fitted, now using a shorter
-  expression for it in the model formula:
-\end{itemize}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{births}\SpecialCharTok{$}\NormalTok{gest4b }\OtherTok{\textless{}{-}} \FunctionTok{Relevel}\NormalTok{(births}\SpecialCharTok{$}\NormalTok{gest4, }\AttributeTok{ref =} \DecValTok{4}\NormalTok{)}
-\NormalTok{m3Ib }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ gest4b }\SpecialCharTok{*}\NormalTok{ hyp, }\AttributeTok{data =}\NormalTok{ births)}
-\FunctionTok{round}\NormalTok{(}\FunctionTok{ci.lin}\NormalTok{(m3Ib)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{)], }\DecValTok{1}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##                        Estimate    2.5%   97.5%
-## (Intercept)              3409.0  3349.1  3468.9
-## gest4b[20,35)           -1479.9 -1685.8 -1273.9
-## gest4b[35,37)            -769.3  -975.3  -563.4
-## gest4b[37,39)            -282.9  -382.0  -183.8
-## hyphyper                  -91.6  -297.5   114.4
-## gest4b[20,35):hyphyper   -581.5 -1001.2  -161.7
-## gest4b[35,37):hyphyper    -66.4  -474.7   341.8
-## gest4b[37,39):hyphyper    -88.5  -366.3   189.2
-\end{verbatim}
-
-Notice now the coefficient \(-91.6\) for \texttt{hyp}.
-It estimates the contrast \texttt{"hyper"} vs.~\texttt{"normal"} on
-\texttt{bweight} among those with \(\geq 39\) weeks of gestation.
-The estimate \(-88.5\) g = \(-180.1 -(-91.6)\) g describes the additional
-effect of \texttt{hyp} in the category 37 to 38 weeks of gestation upon
-that in the reference class.
-
-\begin{itemize}
-\tightlist
-\item
-  At this stage it is interesting to compare the results from the
-  interaction models to those from the corresponding\\
-  \emph{main effects} model, in which the effect of \texttt{hyp}
-  is assumed not to be modified by \texttt{gest4}:
-\end{itemize}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{m3M }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ gest4 }\SpecialCharTok{+}\NormalTok{ hyp, }\AttributeTok{data =}\NormalTok{ births)}
-\FunctionTok{round}\NormalTok{(}\FunctionTok{ci.lin}\NormalTok{(m3M)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{)], }\DecValTok{1}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##              Estimate   2.5%  97.5%
-## (Intercept)    1792.1 1621.6 1962.6
-## gest4[35,37)    861.0  627.0 1095.1
-## gest4[37,39)   1337.8 1155.7 1519.9
-## gest4[39,45)   1626.2 1447.9 1804.4
-## hyphyper       -201.0 -322.9  -79.1
-\end{verbatim}
-
-The estimate \(-201\) g describing the overall contrast
-between hypertensive and normotensive mothers is obtained
-as a weighted average of the stratum-specific estimates
-that were got by \texttt{effx()} above.
-This assumption or the
-\emph{no interaction} null hypothesis can formally be tested by a common deviance test.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{anova}\NormalTok{(m3I, m3M)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## Analysis of Variance Table
-## 
-## Model 1: bweight ~ gest4 + hyp + gest4:hyp
-## Model 2: bweight ~ gest4 + hyp
-##   Res.Df       RSS Df Sum of Sq      F  Pr(>F)  
-## 1    482 107195493                              
-## 2    485 108883306 -3  -1687813 2.5297 0.05659 .
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-\end{verbatim}
-
-The \(P\)-value is practically the same as before,
-when the interaction was tested in \texttt{effx()}.
-However, in spite of obtaining a \emph{non-significant}
-result from this test, the possibility
-of a real effect-measure modification
-should not be ignored in this case.
-
-\section{Controlling or adjusting for the effect of hyp for sex}\label{controlling-or-adjusting-for-the-effect-of-hyp-for-sex}
-
-The effect of \texttt{hyp} is \emph{controlled for} -- or \emph{adjusted for} -- \texttt{sex}
-by first looking at the estimated effects of \texttt{hyp} in the two stata defined
-by \texttt{sex}, and then combining these effects if they seem sufficiently similar.
-In this case the estimated effects were \(-496\) and \(-380\) which look quite
-similar (and the \(P\)-value against \emph{no interaction} was quite large, too),
-so we can perhaps combine them, and control for \texttt{sex}.
-
-\begin{itemize}
-\tightlist
-\item
-  The combining is done by adding \texttt{sex} to the model formula:
+  Adjustment is done by adding \texttt{sex} to the model formula:
 \end{itemize}
 
 \begin{Shaded}
@@ -7434,11 +7286,17 @@ so we can perhaps combine them, and control for \texttt{sex}.
 \end{verbatim}
 
 The estimated effect of \texttt{hyp} on \texttt{bweight}
-controlled for \texttt{sex} is thus \(-448\) g.
-There can be more than one control variable, e.g
-\texttt{control=list(sex,maged)}.
+controlled for \texttt{sex} is thus \(-448\) g,
+which is a weighted average of the sex-specific estimates.
+It is slightly different from the unadjusted estimate \(-431\) g, indicating
+that there was no essential confounding by \texttt{sex}.
+Note also, that the model that was fitted makes the assumption that
+the estimated effect is the same for boys and girls.
 
-Many people go straight ahead and control for variables which are likely to confound the effect of exposure without bothering to stratify first, but usually it is useful to stratify first.
+Many people go straight ahead and control for variables which are likely to
+confound the effect of exposure without bothering to stratify first,
+but often it is useful to examine the possibility of effect-measure
+modification before that.
 
 \section{Numeric exposure, simple linear regression and checking assumptions}\label{numeric-exposure-simple-linear-regression-and-checking-assumptions}
 
@@ -7472,7 +7330,7 @@ We have fitted a simple linear regression model and
 obtained estimates of the
 two regression coefficient: \texttt{intercept} and \texttt{slope}.
 The linear effect of \texttt{gestwks} is thus estimated by the
-slope coefficient, which is 197 g per each additional week of gestation.
+slope coefficient, which is \(197\) g per each additional week of gestation.
 
 At this stage it will be best to make some visual check concerning
 our model assumptions using \texttt{plot()}. In particular, when the main argument
@@ -7563,7 +7421,7 @@ estimated intercept is equal to the overall mean birth
 weight in the data. The estimated residual variance is given by
 \emph{Scale est.} or from subobject \texttt{sig2} of the fitted
 \texttt{gam} object. Taking square root you will obtain the estimated
-residual standard deviation: 445.2 g.
+residual standard deviation: \(445.2\) g.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7607,8 +7465,8 @@ as an 3rd degree polynomial model would take.
 \NormalTok{plotFitPredInt }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(xval, fit, pred, ...) \{}
   \FunctionTok{matshade}\NormalTok{(xval, fit, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.2}\NormalTok{)}
   \FunctionTok{matshade}\NormalTok{(xval, pred, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.2}\NormalTok{)}
-  \FunctionTok{matlines}\NormalTok{(xval, fit, }\AttributeTok{lty =} \DecValTok{1}\NormalTok{, }\AttributeTok{lwd =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{), }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"red"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{))}
-  \FunctionTok{matlines}\NormalTok{(xval, pred, }\AttributeTok{lty =} \DecValTok{1}\NormalTok{, }\AttributeTok{lwd =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{), }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"red"}\NormalTok{, }\StringTok{"green"}\NormalTok{, }\StringTok{"green"}\NormalTok{))}
+  \FunctionTok{matlines}\NormalTok{(xval, fit, }\AttributeTok{lty =} \DecValTok{1}\NormalTok{, }\AttributeTok{lwd =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{), }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{))}
+  \FunctionTok{matlines}\NormalTok{(xval, pred, }\AttributeTok{lty =} \DecValTok{1}\NormalTok{, }\AttributeTok{lwd =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{), }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"brown"}\NormalTok{, }\StringTok{"brown"}\NormalTok{))}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
@@ -7895,67 +7753,6 @@ in which we utilize the previously created data frame \texttt{nd}
 - The curve seems to cover practically the whole range of
 the outcome probability scale with a relatively
 steep slope between about 33 to 37 weeks.
-
-As with numeric birth weight, it may be of interest,
-whether the effect of \texttt{gestwks} is modified
-by maternal hypertension, so let's fit
-an interaction model and view the results
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{binm3 }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(lowbw }\SpecialCharTok{\textasciitilde{}}\NormalTok{ hyp }\SpecialCharTok{*} \FunctionTok{I}\NormalTok{(gestwks }\SpecialCharTok{{-}} \DecValTok{40}\NormalTok{), }\AttributeTok{family =}\NormalTok{ binomial, }\AttributeTok{data =}\NormalTok{ births)}
-\FunctionTok{round}\NormalTok{(}\FunctionTok{ci.lin}\NormalTok{(binm3, }\AttributeTok{Exp =} \ConstantTok{TRUE}\NormalTok{)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{5}\SpecialCharTok{:}\DecValTok{7}\NormalTok{)], }\DecValTok{3}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##                          Estimate StdErr exp(Est.)  2.5% 97.5%
-## (Intercept)                -4.019  0.364     0.018 0.009 0.037
-## hyphyper                   -0.449  1.173     0.638 0.064 6.355
-## I(gestwks - 40)            -0.836  0.113     0.433 0.347 0.541
-## hyphyper:I(gestwks - 40)   -0.439  0.402     0.645 0.293 1.417
-\end{verbatim}
-
-How would you interpret the coefficients and their antilogarithms here?
-
-\begin{itemize}
-\tightlist
-\item
-  Even though there seems to be no sufficient evidence
-  for effect-measure modification, it can be of interest
-  to compare both the fitted lines on the logit scale
-  and the fitted curves on the probability scale between
-  the two groups. Function \texttt{qlogis()} returns the
-  value of the logit transformation of the given argument.
-\end{itemize}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{predm3hyp }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(binm3,}
-  \AttributeTok{newdata =} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{hyp =} \StringTok{"hyper"}\NormalTok{, nd), }\AttributeTok{type =} \StringTok{"response"}
-\NormalTok{)}
-\NormalTok{predm3nor }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(binm3,}
-  \AttributeTok{newdata =} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{hyp =} \StringTok{"normal"}\NormalTok{, nd), }\AttributeTok{type =} \StringTok{"response"}
-\NormalTok{)}
-\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
-\FunctionTok{plot}\NormalTok{(nd}\SpecialCharTok{$}\NormalTok{gestwks, }\FunctionTok{qlogis}\NormalTok{(predm3hyp), }\AttributeTok{type =} \StringTok{"l"}\NormalTok{)}
-\FunctionTok{lines}\NormalTok{(nd}\SpecialCharTok{$}\NormalTok{gestwks, }\FunctionTok{qlogis}\NormalTok{(predm3nor), }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
-\FunctionTok{plot}\NormalTok{(nd}\SpecialCharTok{$}\NormalTok{gestwks, predm3hyp, }\AttributeTok{type =} \StringTok{"l"}\NormalTok{)}
-\FunctionTok{lines}\NormalTok{(nd}\SpecialCharTok{$}\NormalTok{gestwks, predm3nor, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{effects-s_files/figure-latex/lowbw-gestwks-hyp-pred-1.pdf}
-The logit-line starts from a higher level and its slope is steeper
-for the hypertensive mothers, which sounds reasonable.
-However, the two lines
-appear to cross at about 38 weeks. On the other hand, the vertical difference
-of the two probability curves appears discernible only in the area
-from about 32 to 38 weeks of gestation
-
-When interpreting these findings, one needs to keep in mind that
-the precision of these curves is very low, because of
-the small number of outcome cases overall.
 
 \chapter{Poisson regression \& analysis of curved effects}\label{poisson-regression-analysis-of-curved-effects}
 
@@ -8403,9 +8200,9 @@ hand the period effect takes just about 3 df.
 ## Basis dimension (k) checking results. Low p-value (k-index<1) may
 ## indicate that k is too low, especially if edf is close to k'.
 ## 
-##        k'  edf k-index p-value    
-## s(A) 9.00 8.14    0.93  <2e-16 ***
-## s(P) 9.00 3.05    0.95   0.095 .  
+##        k'  edf k-index p-value   
+## s(A) 9.00 8.14    0.93   0.005 **
+## s(P) 9.00 3.05    0.95   0.105   
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 \end{verbatim}
@@ -8477,8 +8274,8 @@ given in the printed output about the value of \texttt{k}.
 ## indicate that k is too low, especially if edf is close to k'.
 ## 
 ##         k'   edf k-index p-value   
-## s(A) 19.00 11.13    0.93   0.010 **
-## s(P)  9.00  3.05    0.95   0.065 . 
+## s(A) 19.00 11.13    0.93    0.01 **
+## s(P)  9.00  3.05    0.95    0.10 . 
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 \end{verbatim}
@@ -13861,32 +13658,33 @@ Classes 'Lexis' and 'data.frame':   2 obs. of  11 variables:
 
 \begin{verbatim}
  lex.id     per   age  tfi lex.dur lex.Cst   lex.Xst id sex  dob  doe cens
-      1 2000.00 50.00 0.00    8.09     NRA      ESRD NA   M 1950 2000 2020
-      2 2000.00 50.00 0.00    4.58     NRA      ESRD NA   M 1950 2000 2020
-      3 2000.00 50.00 0.00    3.77     NRA      ESRD NA   M 1950 2000 2020
-      4 2000.00 50.00 0.00    1.60     NRA      ESRD NA   M 1950 2000 2020
-      5 2000.00 50.00 0.00    4.87     NRA      ESRD NA   M 1950 2000 2020
-      6 2000.00 50.00 0.00    8.45     NRA       Rem NA   M 1950 2000 2020
-      6 2008.45 58.45 8.45   11.55     Rem       Rem NA   M 1950 2000 2020
-      7 2000.00 50.00 0.00    5.27     NRA      ESRD NA   M 1950 2000 2020
-      8 2000.00 50.00 0.00   15.46     NRA      ESRD NA   M 1950 2000 2020
-      9 2000.00 50.00 0.00    0.04     NRA      ESRD NA   M 1950 2000 2020
-     10 2000.00 50.00 0.00    5.20     NRA      ESRD NA   M 1950 2000 2020
-     11 2000.00 50.00 0.00    5.30     NRA       Rem NA   F 1950 2000 2020
-     11 2005.30 55.30 5.30    0.60     Rem ESRD(Rem) NA   F 1950 2000 2020
-     12 2000.00 50.00 0.00    1.76     NRA      ESRD NA   F 1950 2000 2020
-     13 2000.00 50.00 0.00    2.73     NRA       Rem NA   F 1950 2000 2020
-     13 2002.73 52.73 2.73   14.98     Rem ESRD(Rem) NA   F 1950 2000 2020
-     14 2000.00 50.00 0.00    1.22     NRA       Rem NA   F 1950 2000 2020
-     14 2001.22 51.22 1.22   18.78     Rem       Rem NA   F 1950 2000 2020
-     15 2000.00 50.00 0.00    8.56     NRA      ESRD NA   F 1950 2000 2020
-     16 2000.00 50.00 0.00    0.97     NRA      ESRD NA   F 1950 2000 2020
-     17 2000.00 50.00 0.00    0.12     NRA       Rem NA   F 1950 2000 2020
-     17 2000.12 50.12 0.12   11.28     Rem ESRD(Rem) NA   F 1950 2000 2020
-     18 2000.00 50.00 0.00    6.34     NRA      ESRD NA   F 1950 2000 2020
-     19 2000.00 50.00 0.00    2.97     NRA       Rem NA   F 1950 2000 2020
-     19 2002.97 52.97 2.97   11.18     Rem ESRD(Rem) NA   F 1950 2000 2020
-     20 2000.00 50.00 0.00    1.94     NRA      ESRD NA   F 1950 2000 2020
+      1 2000.00 50.00 0.00    4.52     NRA       Rem NA   M 1950 2000 2020
+      1 2004.52 54.52 4.52    0.34     Rem ESRD(Rem) NA   M 1950 2000 2020
+      2 2000.00 50.00 0.00    4.16     NRA      ESRD NA   M 1950 2000 2020
+      3 2000.00 50.00 0.00    4.36     NRA      ESRD NA   M 1950 2000 2020
+      4 2000.00 50.00 0.00    0.66     NRA      ESRD NA   M 1950 2000 2020
+      5 2000.00 50.00 0.00    2.26     NRA       Rem NA   M 1950 2000 2020
+      5 2002.26 52.26 2.26    2.66     Rem ESRD(Rem) NA   M 1950 2000 2020
+      6 2000.00 50.00 0.00    1.35     NRA      ESRD NA   M 1950 2000 2020
+      7 2000.00 50.00 0.00   11.44     NRA      ESRD NA   M 1950 2000 2020
+      8 2000.00 50.00 0.00    3.85     NRA      ESRD NA   M 1950 2000 2020
+      9 2000.00 50.00 0.00   11.27     NRA      ESRD NA   M 1950 2000 2020
+     10 2000.00 50.00 0.00    7.31     NRA      ESRD NA   M 1950 2000 2020
+     11 2000.00 50.00 0.00    1.99     NRA      ESRD NA   F 1950 2000 2020
+     12 2000.00 50.00 0.00    1.13     NRA       Rem NA   F 1950 2000 2020
+     12 2001.13 51.13 1.13   14.74     Rem ESRD(Rem) NA   F 1950 2000 2020
+     13 2000.00 50.00 0.00    5.04     NRA      ESRD NA   F 1950 2000 2020
+     14 2000.00 50.00 0.00    0.67     NRA       Rem NA   F 1950 2000 2020
+     14 2000.67 50.67 0.67   16.38     Rem ESRD(Rem) NA   F 1950 2000 2020
+     15 2000.00 50.00 0.00    8.72     NRA      ESRD NA   F 1950 2000 2020
+     16 2000.00 50.00 0.00    4.46     NRA      ESRD NA   F 1950 2000 2020
+     17 2000.00 50.00 0.00    3.01     NRA       Rem NA   F 1950 2000 2020
+     17 2003.01 53.01 3.01   16.99     Rem       Rem NA   F 1950 2000 2020
+     18 2000.00 50.00 0.00    1.97     NRA       Rem NA   F 1950 2000 2020
+     18 2001.97 51.97 1.97   10.04     Rem ESRD(Rem) NA   F 1950 2000 2020
+     19 2000.00 50.00 0.00    7.33     NRA      ESRD NA   F 1950 2000 2020
+     20 2000.00 50.00 0.00    2.61     NRA       Rem NA   F 1950 2000 2020
+     20 2002.61 52.61 2.61    7.36     Rem ESRD(Rem) NA   F 1950 2000 2020
 \end{verbatim}
 
 \begin{Shaded}
@@ -13901,18 +13699,18 @@ $M
 Transitions:
      To
 From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-  NRA   0   1    9         0        10       10      57.33        10
-  Rem   0   1    0         0         1        0      11.55         1
-  Sum   0   2    9         0        11       10      68.88        10
+  NRA   0   2    8         0        10       10      51.18        10
+  Rem   0   0    0         2         2        2       3.00         2
+  Sum   0   2    8         2        12       12      54.18        10
 
 $F
 
 Transitions:
      To
 From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-  NRA   0   5    5         0        10       10      31.92        10
-  Rem   0   1    0         4         5        4      56.83         5
-  Sum   0   6    5         4        15       14      88.75        10
+  NRA   0   5    5         0        10       10      36.94        10
+  Rem   0   1    0         4         5        4      65.50         5
+  Sum   0   6    5         4        15       14     102.44        10
 \end{verbatim}
 
   What type of object have you got as \texttt{iL}?
@@ -13929,7 +13727,7 @@ From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
 
 \begin{verbatim}
    user  system elapsed 
-  2.634   3.164   1.992 
+  2.767   3.470   2.146 
 \end{verbatim}
 
 \begin{Shaded}
@@ -13944,18 +13742,18 @@ $M
 Transitions:
      To
 From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-  NRA  39  55  406         0       500      461    2800.57       500
-  Rem   0  32    0        23        55       23     359.69        55
-  Sum  39  87  406        23       555      484    3160.26       500
+  NRA  41  68  391         0       500      459    2787.97       500
+  Rem   0  43    0        25        68       25     443.25        68
+  Sum  41 111  391        25       568      484    3231.22       500
 
 $F
 
 Transitions:
      To
 From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-  NRA  38 148  314         0       500      462    2458.28       500
-  Rem   0  89    0        59       148       59    1073.27       148
-  Sum  38 237  314        59       648      521    3531.55       500
+  NRA  29 160  311         0       500      471    2465.33       500
+  Rem   0  90    0        70       160       70    1045.44       160
+  Sum  29 250  311        70       660      541    3510.77       500
 \end{verbatim}
 
   Why are there so many ESRD-events in the resulting data set?
@@ -13980,20 +13778,20 @@ From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
       State
 when   NRA Rem ESRD ESRD(Rem)
   50   500   0    0         0
-  50.1 497   2    1         0
-  50.2 492   4    4         0
-  50.3 481   8   11         0
-  50.4 474  14   12         0
-  50.5 464  21   15         0
-  50.6 461  24   15         0
-  50.7 455  26   19         0
-  50.8 452  27   21         0
-  50.9 447  32   21         0
-  51   438  38   24         0
-  51.1 434  41   25         0
-  51.2 427  46   27         0
-  51.3 422  46   32         0
-  51.4 417  49   34         0
+  50.1 495   1    4         0
+  50.2 488   7    5         0
+  50.3 480  10   10         0
+  50.4 472  15   13         0
+  50.5 469  16   15         0
+  50.6 465  17   18         0
+  50.7 460  22   18         0
+  50.8 454  24   22         0
+  50.9 446  27   27         0
+  51   443  29   28         0
+  51.1 439  30   31         0
+  51.2 435  32   33         0
+  51.3 429  33   38         0
+  51.4 419  36   45         0
 \end{verbatim}
 
   What is in the object \texttt{nStf}?
@@ -14014,11 +13812,11 @@ when   NRA Rem ESRD ESRD(Rem)
       State
 when     Rem   NRA ESRD ESRD(Rem)
   50   0.000 1.000    1         1
-  50.1 0.004 0.998    1         1
-  50.2 0.008 0.992    1         1
-  50.3 0.016 0.978    1         1
-  50.4 0.028 0.976    1         1
-  50.5 0.042 0.970    1         1
+  50.1 0.002 0.992    1         1
+  50.2 0.014 0.990    1         1
+  50.3 0.020 0.980    1         1
+  50.4 0.030 0.974    1         1
+  50.5 0.032 0.970    1         1
 \end{verbatim}
 
 \begin{Shaded}
@@ -14030,12 +13828,12 @@ when     Rem   NRA ESRD ESRD(Rem)
 \begin{verbatim}
       State
 when     Rem   NRA  ESRD ESRD(Rem)
-  59.5 0.214 0.340 0.926         1
-  59.6 0.214 0.338 0.926         1
-  59.7 0.214 0.336 0.926         1
-  59.8 0.210 0.330 0.922         1
-  59.9 0.208 0.328 0.920         1
-  60   0.206 0.324 0.918         1
+  59.5 0.210 0.334 0.900         1
+  59.6 0.210 0.332 0.900         1
+  59.7 0.212 0.330 0.900         1
+  59.8 0.210 0.324 0.896         1
+  59.9 0.208 0.320 0.894         1
+  60   0.202 0.312 0.888         1
 \end{verbatim}
 
   What do the entries in \texttt{ppf} represent?
