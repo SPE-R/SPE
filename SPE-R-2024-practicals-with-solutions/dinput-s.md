@@ -264,19 +264,19 @@ head(fem2)
 ## 5  4  30 99       2       2     2   1    1  -1.18
 ## 6  5  35 94       2       1     1   1    2  -0.14
 ```
-and compare the resulting data frame with `fem`. What are
-the names of the variables in the data frame? What is the class
-of the variables?
+and compare the resulting data frame with `fem`. 
+ - What are the names of the variables in the data frame? 
+ - What is the class of the variables?
 
 
 >  **Explanation:** Remember that `read.table()` tries to guess
   the mode of the variables in the text file. Without the
-  `header=TRUE` option it reads the first row, containing the
+  `header = TRUE` option it reads the first row, containing the
   variable names, as data, and guesses that all the variables are
   character, not numeric. By default, all character variables are
   coerced to factors by `read.table`. The result is a data frame
   consisting entirely of factors. (You can prevent the conversion of
-  character variables to factors with the argument `as.is=TRUE`).
+  character variables to factors with the argument `as.is = TRUE`).
 
 If the variable names are not specified in the file, then they are
 given default names `V1`, `V2`, ... . You will soon realise this
@@ -292,7 +292,7 @@ fem2$IQ
 ```
 as the variable will not exist
 
-There is one case where omitting the `header=TRUE` option is
+There is one case where omitting the `header = TRUE` option is
 harmless (apart from the situation where there is no header line,
 obviously).  When the first row of the file contains **one less**
 value than subsequent lines, `read.table()` infers that the first
@@ -316,8 +316,8 @@ str(fem3)
 ## 'data.frame':	119 obs. of  1 variable:
 ##  $ V1: chr  "ID AGE IQ ANXIETY DEPRESS SLEEP SEX LIFE WEIGHT" "1 39 94 2 2 2 1 1 2.23" "2 41 89 2 2 2 1 1 1" "3 42 83 3 3 2 1 1 1.82" ...
 ```
-How many variables are there in the data set?
 
+- How many variables are there in the data set?
 
 > **Explanation:** If you mis-specify the separator,
 > `read.table()` reads the whole line as a single character
@@ -461,7 +461,7 @@ str(fem6)
 On Microsoft Windows, you can copy values directly from an open Excel
 spreadsheet using the clipboard. Highlight the cells you want to copy
 in the spread sheet and select copy from the pull-down edit menu. Then
-type `read.table(file="clipboard")` to read the data in.
+type `read.table(file = "clipboard")` to read the data in.
 
 There are two reasons why this is a bad idea
 

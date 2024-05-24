@@ -336,42 +336,40 @@ You can learn more about functions by typing `?` followed by the
 function name. For example `?seq` gives information about the
 syntax and usage of the function `seq()`.
 
----
 
--  Create a vector `w` with components 1, -1, 2, -2
+1.  Create a vector `w` with components 1, -1, 2, -2
+  
+2.  Display this vector
+  
+  ```
+  ## [1]  1 -1  2 -2
+  ```
+3.  Obtain a description of `w` using `str()`
+  
+  ```
+  ##  num [1:4] 1 -1 2 -2
+  ```
+4.  Create the vector `w+1`, and display it.
+  
+  ```
+  ## [1]  2  0  3 -1
+  ```
+5.  Create the vector `v` with components (5, 10, 15, ... , 75) using seq().
+  
+  ```
+  ##  [1]  5 10 15 20 25 30 35 40 45 50 55 60 65 70 75
+  ```
+6.  Now add the components 0 and 1 to the beginning of `v` using c().
+  
+  ```
+  ##  [1]  0  1  5 10 15 20 25 30 35 40 45 50 55 60 65 70 75
+  ```
+7.  Find the length of this vector.
+  
+  ```
+  ## [1] 17
+  ```
 
--  Display this vector
-
-```
-## [1]  1 -1  2 -2
-```
--  Obtain a description of `w` using `str()`
-
-```
-##  num [1:4] 1 -1 2 -2
-```
--  Create the vector `w+1`, and display it.
-
-```
-## [1]  2  0  3 -1
-```
--  Create the vector `v` with components (5, 10, 15, ... , 75) using seq().
-
-```
-##  [1]  5 10 15 20 25 30 35 40 45 50 55 60 65 70 75
-```
--  Now add the components 0 and 1 to the beginning of `v` using c().
-
-```
-##  [1]  0  1  5 10 15 20 25 30 35 40 45 50 55 60 65 70 75
-```
--  Find the length of this vector.
-
-```
-## [1] 17
-```
-
----
 
 ## Displaying and changing parts of a vector (indexing)
 
@@ -577,11 +575,12 @@ ifelse(x %% 2 == 0, "even", "odd")
 ## [11] "even" "even"
 ```
 
+
 Now try the following:
 
--  Display elements that are less than 10, but greater than 4
--  Modify the vector x, replacing by 10 all values that are greater than 10
--  Modify the vector x, multiplying by 2 all elements that are smaller than 5 (Remember you can do this in steps).
+1.  Display elements that are less than 10, but greater than 4
+2.  Modify the vector x, replacing by 10 all values that are greater than 10
+3.  Modify the vector x, multiplying by 2 all elements that are smaller than 5 (Remember you can do this in steps).
 
 
 ## Lists
@@ -702,7 +701,8 @@ along with their age in years, their sex (coded 1 or 2) and their height in cm.
 ```r
 mydata <- data.frame(
   name = c("Joe", "Ann", "Jack", "Tom"),
-  age = c(34, 50, 27, 42), sex = c(1, 2, 1, 1),
+  age = c(34, 50, 27, 42), 
+  sex = c(1, 2, 1, 1),
   height = c(185, 170, 175, 182)
 )
 ```
@@ -831,7 +831,7 @@ have no recorded age, height, or sex these are missing values.
 We shall use the births data which concern 500 mothers who had
 singleton births (i.e. no twins) in a large London hospital. The
 outcome of interest is the birth weight of the baby, also dichotomised
-as normal or low birth weight. These data are available in the Epi
+as normal or low birth weight. These data are available in the [Epi](https://cran.r-project.org/web/packages/Epi/index.html)
 package:
 
 
@@ -853,27 +853,29 @@ find out a bit more about `births` try
 help(births)
 ```
 
----
-
--  The dataframe `"diet"` in the Epi package contains data from a follow-up study with
-  coronary heart disease as the end-point.  Load these data with
-
-```r
-data(diet)
-```
-and print the contents of the data frame to the screen..
--  Check that you now have two objects, `births`, and `diet` in your workspace.
--  Get help on the object `diet`.
--  Remove the object `diet` with the command
 
 
-```r
-remove(diet)
-```
+The dataframe `"diet"` in the Epi package contains data from a follow-up study with
+coronary heart disease as the end-point.  
 
-Check that the object `diet` is no longer in your workspace.
 
----
+1. Load these data with
+  
+  ```r
+  data(diet)
+  ```
+  and print the contents of the data frame to the screen..
+2. Check that you now have two objects, `births`, and `diet` in your workspace.
+3. Get help on the object `diet`.
+4. Remove the object `diet` with the command
+
+  
+  ```r
+  remove(diet)
+  ```
+
+5. Check that the object `diet` is no longer in your workspace.
+
 
 ## Referencing parts of the data frame (indexing)
 
@@ -1081,14 +1083,11 @@ This takes the original numeric codes (0, 1) and replaces them with
 informative labels *normal'' and ``hyper* for normal blood pressure
 and hypertension, respectively. 
 
----
 
--  Convert the variable `sex` into a factor
+1.  Convert the variable `sex` into a factor
 with labels `"M"` and `"F"` for values 1 and 2, respectively
+  
 
-
-
----
 
 ## Frequency tables
 When starting to look at any new data frame the first step is to check
@@ -1125,45 +1124,41 @@ table(births$hyp)
 For simple expressions the choice is a matter of taste, but `with`
 is shorter for more complicated expressions.
 
----
 
--  Find the frequency distribution of `sex`.
+1. Find the frequency distribution of `sex`.
+  
+  ```
+  ## 
+  ##   M   F 
+  ## 264 236
+  ```
+  
+  ```
+  ## sex
+  ##   M   F 
+  ## 264 236
+  ```
 
-
-```
-## 
-##   M   F 
-## 264 236
-```
-
-```
-## sex
-##   M   F 
-## 264 236
-```
-
--  If you give two or more arguments to the `table` function
+2.  If you give two or more arguments to the `table` function
   then it produces cross-tabulations.  Find the two-way frequency
   distribution of `sex` and `hyp`.
   
+  ```
+  ##    hyp
+  ## sex normal hyper
+  ##   M    221    43
+  ##   F    207    29
+  ```
 
-```
-##    hyp
-## sex normal hyper
-##   M    221    43
-##   F    207    29
-```
--  Create a logical variable called `early`
-according to whether `gestwks` is less than 30 or not. Make a frequency table of `early`.
+3.  Create a logical variable called `early` according to whether `gestwks` 
+  is less than 30 or not. Make a frequency table of `early`.
+  
+  ```
+  ## early
+  ## FALSE  TRUE 
+  ##   485     5
+  ```
 
-
-```
-## early
-## FALSE  TRUE 
-##   485     5
-```
-
----
 
 ## Grouping the values of a numeric variable
 
@@ -1203,23 +1198,19 @@ is important that the first element in `breaks` is smaller than the
 smallest value in your data, and the last element is larger than the
 largest value.
 
----
 
--  Summarize the numeric variable `gestwks`, which records the
+1. Summarize the numeric variable `gestwks`, which records the
   length of gestation for the baby, and make a note of the range of
   values.
   
+  ```
+  ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+  ##   24.69   37.94   39.12   38.72   40.09   43.16      10
+  ```
 
-```
-##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
-##   24.69   37.94   39.12   38.72   40.09   43.16      10
-```
-
--  Create a new factor `gest4` which cuts `gestwks` at 20,
+2. Create a new factor `gest4` which cuts `gestwks` at 20,
   35, 37, 39, and  45 weeks, including the left hand end, but not the
   right hand. Make a table of the frequencies for the four levels of `gest4`.
-  
 
 
----
 
