@@ -9,7 +9,7 @@ data(births)
 str(births)
 
 
-## ----housekeeping-------------------------------------------------------------
+## ----housekeeping of births---------------------------------------------------
 births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
 births$sex <- factor(births$sex, labels = c("M", "F"))
 births$maged <- cut(births$matage, breaks = c(22, 35, 44), right = FALSE)
@@ -17,7 +17,7 @@ births$gest4 <- cut(births$gestwks,
   breaks = c(20, 35, 37, 39, 45), right = FALSE)
 
 
-## ----summary------------------------------------------------------------------
+## ----summary of births--------------------------------------------------------
 summary(births)
 with(births, sd(bweight))
 
