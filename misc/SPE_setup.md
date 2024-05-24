@@ -21,7 +21,9 @@ Before proceeding with this tutorial, ensure that you have `R` and [RStudio inst
 
 5. Choose a directory location for your project and provide a name for the project (e.g. SPE-R_2024).
 
-6. Click `Create Project` to create the `R` project.
+6. Check the box `Use renv with this project`
+
+7. Click `Create Project` to create the `R` project.
 
 ## Step 2: Configuring renv for the Project
 
