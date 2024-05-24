@@ -3984,6 +3984,17 @@ but finally, a penalized spline model is fitted.
 
 Load the packages and the data set, and inspect its structure:
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(Epi)}
+\FunctionTok{library}\NormalTok{(mgcv)}
+\FunctionTok{data}\NormalTok{(testisDK)}
+\FunctionTok{str}\NormalTok{(testisDK)}
+\FunctionTok{summary}\NormalTok{(testisDK)}
+\FunctionTok{head}\NormalTok{(testisDK)}
+\end{Highlighting}
+\end{Shaded}
+
 \begin{itemize}
 \tightlist
 \item
@@ -3999,6 +4010,18 @@ Load the packages and the data set, and inspect its structure:
   \end{itemize}
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tdk }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(testisDK, A }\SpecialCharTok{\textgreater{}} \DecValTok{14} \SpecialCharTok{\&}\NormalTok{ A }\SpecialCharTok{\textless{}} \DecValTok{80}\NormalTok{)}
+\NormalTok{tdk}\SpecialCharTok{$}\NormalTok{Age }\OtherTok{\textless{}{-}} \FunctionTok{cut}\NormalTok{(tdk}\SpecialCharTok{$}\NormalTok{A, }\AttributeTok{br =} \DecValTok{5} \SpecialCharTok{*}\NormalTok{ (}\DecValTok{3}\SpecialCharTok{:}\DecValTok{16}\NormalTok{), }\AttributeTok{include.lowest =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{right =} \ConstantTok{FALSE}\NormalTok{)}
+\NormalTok{nAge }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(}\FunctionTok{levels}\NormalTok{(tdk}\SpecialCharTok{$}\NormalTok{Age))}
+\NormalTok{tdk}\SpecialCharTok{$}\NormalTok{Per }\OtherTok{\textless{}{-}} \FunctionTok{cut}\NormalTok{(tdk}\SpecialCharTok{$}\NormalTok{P,}
+  \AttributeTok{br =} \FunctionTok{seq}\NormalTok{(}\DecValTok{1943}\NormalTok{, }\DecValTok{1998}\NormalTok{, }\AttributeTok{by =} \DecValTok{5}\NormalTok{),}
+  \AttributeTok{include.lowest =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{right =} \ConstantTok{FALSE}\NormalTok{)}
+\NormalTok{nPer }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(}\FunctionTok{levels}\NormalTok{(tdk}\SpecialCharTok{$}\NormalTok{Per))}
+\end{Highlighting}
+\end{Shaded}
+
 \section{Some descriptive analysis}\label{some-descriptive-analysis}
 
 Computation and tabulation of incidence rates
@@ -4010,6 +4033,22 @@ Computation and tabulation of incidence rates
   incidence rates (per 100,000 y) in each 5 y \(\times\) 5 y cell using
   \texttt{stat.table()}. Take a look at the structure of the thus created object
 \end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tab }\OtherTok{\textless{}{-}} \FunctionTok{stat.table}\NormalTok{(}
+  \AttributeTok{index =} \FunctionTok{list}\NormalTok{(Age, Per),}
+  \AttributeTok{contents =} \FunctionTok{list}\NormalTok{(}
+    \AttributeTok{D =} \FunctionTok{sum}\NormalTok{(D),}
+    \AttributeTok{Y =} \FunctionTok{sum}\NormalTok{(Y }\SpecialCharTok{/} \DecValTok{1000}\NormalTok{),}
+    \AttributeTok{rate =} \FunctionTok{ratio}\NormalTok{(D, Y, }\DecValTok{10}\SpecialCharTok{\^{}}\DecValTok{5}\NormalTok{)}
+\NormalTok{  ),}
+  \AttributeTok{margins =} \ConstantTok{TRUE}\NormalTok{,}
+  \AttributeTok{data =}\NormalTok{ tdk}
+\NormalTok{)}
+\FunctionTok{str}\NormalTok{(tab)}
+\end{Highlighting}
+\end{Shaded}
 
 The table is too wide to be readable as such. A graphical
 presentation is morew informative.
@@ -4025,6 +4064,19 @@ presentation is morew informative.
   \texttt{rateplot})
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{str}\NormalTok{(tab)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\FunctionTok{rateplot}\NormalTok{(}
+  \AttributeTok{rates =}\NormalTok{ tab[}\DecValTok{3}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\NormalTok{nAge, }\DecValTok{1}\SpecialCharTok{:}\NormalTok{nPer], }\AttributeTok{which =} \StringTok{"ap"}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{30}\NormalTok{),}
+  \AttributeTok{age =} \FunctionTok{seq}\NormalTok{(}\DecValTok{15}\NormalTok{, }\DecValTok{75}\NormalTok{, }\DecValTok{5}\NormalTok{), }\AttributeTok{per =} \FunctionTok{seq}\NormalTok{(}\DecValTok{1943}\NormalTok{, }\DecValTok{1993}\NormalTok{, }\DecValTok{5}\NormalTok{),}
+  \AttributeTok{col =} \FunctionTok{heat.colors}\NormalTok{(}\DecValTok{16}\NormalTok{), }\AttributeTok{ann =} \ConstantTok{TRUE}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{SPE-R-2024-practicals_files/figure-latex/plot-rates-1.pdf}
 Whan can you conclude about the trend in age-specific incidence rates
 over calendar time? What about the effect of age?
 Is there any common pattern in the age-incidence curves across the periods?
@@ -4039,24 +4091,74 @@ It is useful to scale the person-years to be expressed in \(10^5\) y.
 In fitting the model we utilize the \texttt{poisreg} family object
 found in package \texttt{Epi}.
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tdk}\SpecialCharTok{$}\NormalTok{Y }\OtherTok{\textless{}{-}}\NormalTok{ tdk}\SpecialCharTok{$}\NormalTok{Y }\SpecialCharTok{/} \DecValTok{100000}
+\NormalTok{mCat }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(D, Y) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Age }\SpecialCharTok{+}\NormalTok{ Per,}
+  \AttributeTok{family =} \FunctionTok{poisreg}\NormalTok{(}\AttributeTok{link =}\NormalTok{ log), }\AttributeTok{data =}\NormalTok{ tdk )}
+\FunctionTok{round}\NormalTok{(}\FunctionTok{ci.exp}\NormalTok{(mCat), }\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
 What do the estimated rate ratios tell about the age and period effects?
 
 \begin{itemize}
+\tightlist
 \item
   A graphical inspection of point estimates and confidence
   intervals can be obtained as follows. In the beginning it is useful
   to define shorthands for the pertinent mid-age and mid-period values
   of the different intervals
-\item
-  In the fitted model the reference category for each factor was
-  the first one. As age is the dominating factor, it may be more
-  informative to remove the intercept from the model. As a
-  consequence the age effects describe fitted rates at the reference
-  level of the period factor. For the latter one could choose the
-  middle period 1968-72.
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{aMid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\FloatTok{17.5}\NormalTok{, }\FloatTok{77.5}\NormalTok{, }\AttributeTok{by =} \DecValTok{5}\NormalTok{)}
+\NormalTok{pMid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\DecValTok{1945}\NormalTok{, }\DecValTok{1995}\NormalTok{, }\AttributeTok{by =} \DecValTok{5}\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{matplot}\NormalTok{(aMid, }\FunctionTok{rbind}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\FunctionTok{ci.exp}\NormalTok{(mCat)[}\DecValTok{2}\SpecialCharTok{:}\DecValTok{13}\NormalTok{, ]), }\AttributeTok{type =} \StringTok{"o"}\NormalTok{, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{,     }
+   \AttributeTok{log =} \StringTok{"y"}\NormalTok{, }\AttributeTok{cex.lab =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{cex.axis =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{col=}\FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{),}
+  \AttributeTok{xlab =} \StringTok{"Age (years)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Rate ratio"}\NormalTok{ )}
+\FunctionTok{matplot}\NormalTok{(pMid, }\FunctionTok{rbind}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\FunctionTok{ci.exp}\NormalTok{(mCat)[}\DecValTok{14}\SpecialCharTok{:}\DecValTok{23}\NormalTok{, ]), }\AttributeTok{type =} \StringTok{"o"}\NormalTok{, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{,}
+  \AttributeTok{log =} \StringTok{"y"}\NormalTok{, }\AttributeTok{cex.lab =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{cex.axis =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{col=}\FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{),}
+  \AttributeTok{xlab =} \StringTok{"Calendar year {-} 1900"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Rate ratio"}\NormalTok{ )}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{SPE-R-2024-practicals_files/figure-latex/mCat-est-1.pdf}
+- In the fitted model the reference category for each factor was
+the first one. As age is the dominating factor, it may be more
+informative to remove the intercept from the model. As a
+consequence the age effects describe fitted rates at the reference
+level of the period factor. For the latter one could choose the
+middle period 1968-72.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tdk}\SpecialCharTok{$}\NormalTok{Per70 }\OtherTok{\textless{}{-}} \FunctionTok{Relevel}\NormalTok{(tdk}\SpecialCharTok{$}\NormalTok{Per, }\AttributeTok{ref =} \DecValTok{6}\NormalTok{)}
+\NormalTok{mCat2 }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(D, Y) }\SpecialCharTok{\textasciitilde{}} \SpecialCharTok{{-}}\DecValTok{1} \SpecialCharTok{+}\NormalTok{ Age }\SpecialCharTok{+}\NormalTok{ Per70,}
+  \AttributeTok{family =} \FunctionTok{poisreg}\NormalTok{(}\AttributeTok{link =}\NormalTok{ log), }\AttributeTok{data =}\NormalTok{ tdk )}
+\FunctionTok{round}\NormalTok{(}\FunctionTok{ci.exp}\NormalTok{(mCat2), }\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
 Let us also plot estimates from the latter model, too.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{matplot}\NormalTok{(aMid, }\FunctionTok{rbind}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\FunctionTok{ci.exp}\NormalTok{(mCat2)[}\DecValTok{2}\SpecialCharTok{:}\DecValTok{13}\NormalTok{, ]), }\AttributeTok{type =} \StringTok{"o"}\NormalTok{, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{,     }
+   \AttributeTok{log =} \StringTok{"y"}\NormalTok{, }\AttributeTok{cex.lab =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{cex.axis =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{col=}\FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{),}
+  \AttributeTok{xlab =} \StringTok{"Age (years)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Rate ratio"}\NormalTok{ )}
+\FunctionTok{matplot}\NormalTok{(pMid, }\FunctionTok{rbind}\NormalTok{(}\FunctionTok{ci.exp}\NormalTok{(mCat2)[}\DecValTok{14}\SpecialCharTok{:}\DecValTok{18}\NormalTok{, ], }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\FunctionTok{ci.exp}\NormalTok{(mCat2)[}\DecValTok{19}\SpecialCharTok{:}\DecValTok{23}\NormalTok{, ]),}
+        \AttributeTok{type =} \StringTok{"o"}\NormalTok{, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{log =} \StringTok{"y"}\NormalTok{, }\AttributeTok{cex.lab =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{cex.axis =} \FloatTok{1.5}\NormalTok{,}
+        \AttributeTok{col=}\FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{),}
+  \AttributeTok{xlab =} \StringTok{"Calendar year {-} 1900"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Rate ratio"}\NormalTok{ )}
+\FunctionTok{abline}\NormalTok{(}\AttributeTok{h =} \DecValTok{1}\NormalTok{, }\AttributeTok{col =} \StringTok{"gray"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{SPE-R-2024-practicals_files/figure-latex/mCat2-plot-1.pdf}
 
 \section{Generalized additive model with penalized splines}\label{generalized-additive-model-with-penalized-splines}
 
@@ -4075,6 +4177,16 @@ try fitting smooth continuous functions for both time scales.
   parameter is chosen based on an AIC-like criterion known as UBRE.
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(mgcv)}
+\NormalTok{mPen }\OtherTok{\textless{}{-}}\NormalTok{ mgcv}\SpecialCharTok{::}\FunctionTok{gam}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(D, Y) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A) }\SpecialCharTok{+} \FunctionTok{s}\NormalTok{(P),}
+  \AttributeTok{family =} \FunctionTok{poisreg}\NormalTok{(}\AttributeTok{link =}\NormalTok{ log), }\AttributeTok{data =}\NormalTok{ tdk}
+\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(mPen)}
+\end{Highlighting}
+\end{Shaded}
+
 The summary is quite brief, and the only estimated coefficient is the
 intercept, which sets the baseline level for the log-rates, against
 which the relative age effects and period effects will be contrasted.
@@ -4089,6 +4201,14 @@ On the rate scale the baseline level 5.53 per 100000 y is obtained by
   contrasts to the baseline level on the log-rate scale.
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(mPen, }\AttributeTok{seWithMean =} \ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{SPE-R-2024-practicals_files/figure-latex/mPen-plot-1.pdf}
 The dashed lines describe the 95\% confidence band for the pertinent
 curve. One could get the impression that year 1968 would be some kind
 of reference value for the period effect, like period 1968-72
@@ -4115,6 +4235,14 @@ hand the period effect takes just about 3 df.
   model
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{gam.check}\NormalTok{(mPen)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{SPE-R-2024-practicals_files/figure-latex/mPen-check-1.pdf}
 The four diagnostic plots are analogous to some of those used in
 the context of linear models for Gaussian responses, but not all of them
 may be as easy to interpret. - Pay attention to the note
@@ -4126,10 +4254,31 @@ given in the printed output about the value of \texttt{k}.
   Let us refit the model but now with an increased \texttt{k} for age:
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mPen2 }\OtherTok{\textless{}{-}}\NormalTok{ mgcv}\SpecialCharTok{::}\FunctionTok{gam}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(D, Y) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{k =} \DecValTok{20}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{s}\NormalTok{(P),}
+  \AttributeTok{family =} \FunctionTok{poisreg}\NormalTok{(}\AttributeTok{link =}\NormalTok{ log), }\AttributeTok{data =}\NormalTok{ tdk}
+\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(mPen2)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{gam.check}\NormalTok{(mPen2)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{SPE-R-2024-practicals_files/figure-latex/mPen2-1.pdf}
 With this choice of \texttt{k} the df value for age became about 11,
 which is well below \(k-1 = 19\). Let us plot the fitted curves from
 this fitting, too
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(mPen2, }\AttributeTok{seWithMean =} \ConstantTok{TRUE}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\AttributeTok{v =} \DecValTok{1968}\NormalTok{, }\AttributeTok{h =} \DecValTok{0}\NormalTok{, }\AttributeTok{lty =} \DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{SPE-R-2024-practicals_files/figure-latex/mPen2-plot-1.pdf}
 There does not seem to have happened any essential changes from the
 previously fitted curves, so maybe 8 df could, after all, be quite
 enough for the age effect.
@@ -4150,6 +4299,28 @@ enough for the age effect.
   relative indidence rates in relation to the fitted baseline rate,
   as determined by the model intercept.
 \end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\NormalTok{icpt }\OtherTok{\textless{}{-}} \FunctionTok{coef}\NormalTok{(mPen2)[}\DecValTok{1}\NormalTok{] }\CommentTok{\#  estimated intecept}
+\FunctionTok{plot}\NormalTok{(mPen2,}
+  \AttributeTok{seWithMean =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{select =} \DecValTok{1}\NormalTok{, }\AttributeTok{rug =} \ConstantTok{FALSE}\NormalTok{,}
+  \AttributeTok{yaxt =} \StringTok{"n"}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\FunctionTok{log}\NormalTok{(}\DecValTok{1}\NormalTok{), }\FunctionTok{log}\NormalTok{(}\DecValTok{20}\NormalTok{)) }\SpecialCharTok{{-}}\NormalTok{ icpt,}
+  \AttributeTok{xlab =} \StringTok{"Age (y)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean rate (/100000 y)"}
+\NormalTok{)}
+\FunctionTok{axis}\NormalTok{(}\DecValTok{2}\NormalTok{, }\AttributeTok{at =} \FunctionTok{log}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{10}\NormalTok{, }\DecValTok{20}\NormalTok{)) }\SpecialCharTok{{-}}\NormalTok{ icpt, }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{10}\NormalTok{, }\DecValTok{20}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(mPen2,}
+  \AttributeTok{seWithMean =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{select =} \DecValTok{2}\NormalTok{, }\AttributeTok{rug =} \ConstantTok{FALSE}\NormalTok{,}
+  \AttributeTok{yaxt =} \StringTok{"n"}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\FunctionTok{log}\NormalTok{(}\FloatTok{0.4}\NormalTok{), }\FunctionTok{log}\NormalTok{(}\DecValTok{2}\NormalTok{)),}
+  \AttributeTok{xlab =} \StringTok{"Calendat year"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Relative rate"}
+\NormalTok{)}
+\FunctionTok{axis}\NormalTok{(}\DecValTok{2}\NormalTok{, }\AttributeTok{at =} \FunctionTok{log}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\FloatTok{0.5}\NormalTok{, }\FloatTok{0.75}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{1.5}\NormalTok{, }\DecValTok{2}\NormalTok{)), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.5}\NormalTok{, }\FloatTok{0.75}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{1.5}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{abline}\NormalTok{(}\AttributeTok{v =} \DecValTok{1968}\NormalTok{, }\AttributeTok{h =} \DecValTok{0}\NormalTok{, }\AttributeTok{lty =} \DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{SPE-R-2024-practicals_files/figure-latex/mPen2-newplot-1.pdf}
 
 \textbf{Homework}
 You could continue the analysis of these data by fitting an age-cohort
@@ -9069,7 +9240,7 @@ occurrence rate of remission itself.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{   user  system elapsed }
-\NormalTok{  2.575   3.115   2.007 }
+\NormalTok{  2.503   3.154   1.987 }
 \end{Highlighting}
 \end{Shaded}
 
