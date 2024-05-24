@@ -3137,11 +3137,11 @@ Another nice feature of \texttt{dplyr} is tables binding and joining. To practic
 ## # A tibble: 6 x 2
 ##     pid   age
 ##   <int> <int>
-## 1     1    16
-## 2     2    15
-## 3     3    23
-## 4     4    16
-## 5     5    19
+## 1     1    22
+## 2     2    24
+## 3     3    16
+## 4     4    15
+## 5     5    22
 ## 6     6    17
 \end{verbatim}
 
@@ -3176,11 +3176,11 @@ First of all let's have a look to \texttt{bind\_rows} function.
 ## # A tibble: 11 x 3
 ##      pid   age center
 ##    <dbl> <int> <chr> 
-##  1     1    16 <NA>  
-##  2     2    15 <NA>  
-##  3     3    23 <NA>  
-##  4     4    16 <NA>  
-##  5     5    19 <NA>  
+##  1     1    22 <NA>  
+##  2     2    24 <NA>  
+##  3     3    16 <NA>  
+##  4     4    15 <NA>  
+##  5     5    22 <NA>  
 ##  6     6    17 <NA>  
 ##  7     1    NA A     
 ##  8     2    NA B     
@@ -3209,11 +3209,11 @@ between \texttt{left\_join}, \texttt{full\_join} and \texttt{inner\_join}.
 ## # A tibble: 6 x 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    16 A     
-## 2     2    15 B     
-## 3     3    23 A     
-## 4     4    16 B     
-## 5     5    19 <NA>  
+## 1     1    22 A     
+## 2     2    24 B     
+## 3     3    16 A     
+## 4     4    15 B     
+## 5     5    22 <NA>  
 ## 6     6    17 <NA>
 \end{verbatim}
 
@@ -3228,11 +3228,11 @@ between \texttt{left\_join}, \texttt{full\_join} and \texttt{inner\_join}.
 ## # A tibble: 7 x 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    16 A     
-## 2     2    15 B     
-## 3     3    23 A     
-## 4     4    16 B     
-## 5     5    19 <NA>  
+## 1     1    22 A     
+## 2     2    24 B     
+## 3     3    16 A     
+## 4     4    15 B     
+## 5     5    22 <NA>  
 ## 6     6    17 <NA>  
 ## 7    10    NA C
 \end{verbatim}
@@ -3248,10 +3248,10 @@ between \texttt{left\_join}, \texttt{full\_join} and \texttt{inner\_join}.
 ## # A tibble: 4 x 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    16 A     
-## 2     2    15 B     
-## 3     3    23 A     
-## 4     4    16 B
+## 1     1    22 A     
+## 2     2    24 B     
+## 3     3    16 A     
+## 4     4    15 B
 \end{verbatim}
 
 Can you spot the differences between the commands above?
@@ -3271,8 +3271,8 @@ As an exercise, you can try to compute the individuals' mean age per center.
 ## # A tibble: 2 x 2
 ##   center mean_age
 ##   <chr>     <dbl>
-## 1 A          19.5
-## 2 B          15.5
+## 1 A          19  
+## 2 B          19.5
 \end{verbatim}
 
 \textbf{Note:} the \texttt{by} argument indicates which column should be use to make the \emph{join}. In some
@@ -8226,9 +8226,9 @@ hand the period effect takes just about 3 df.
 ## Basis dimension (k) checking results. Low p-value (k-index<1) may
 ## indicate that k is too low, especially if edf is close to k'.
 ## 
-##        k'  edf k-index p-value   
-## s(A) 9.00 8.14    0.93   0.005 **
-## s(P) 9.00 3.05    0.95   0.075 . 
+##        k'  edf k-index p-value  
+## s(A) 9.00 8.14    0.93   0.015 *
+## s(P) 9.00 3.05    0.95   0.095 .
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 \end{verbatim}
@@ -8729,330 +8729,339 @@ If we simulate the data, we know the data-generating mechanism and the \emph{tru
 an analysis approach will lead to estimates that correspond to what is generated. One could expect to see similar phenomena in real
 data analysis, if the data-generation mechanism is similar to what was used in simulations.
 
-\chapter{Graphics meccano}\label{graphics-meccano}
+\chapter{Graphics with ggplot2}\label{graphics-with-ggplot2}
 
-The plot below is from a randomized study of the effect of
-Tamoxifen treatment on bone mineral metabolism, in a group of
-patients who were treated for breast cancer.
+The plot below is from randomized study of the effect of Tamoxifen treatment on bone mineral metabolism in a group of patients who were treated for breast cancer (Kristensen et al, 1994). It is reproduced with permission from the author Peter Dalgaard who has also shared the original data.
 
 \includegraphics{./graph/bentK.png}
 
-The data are available in the file \texttt{alkfos.csv} (using comma as
-separator, so \texttt{read.csv} will read it).
+The purpose of this exercise is to show you how to build a similar plot in R using the \texttt{ggplot2} package.
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# change filename as needed}
-\NormalTok{alkfos }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"./data/alkfos.csv"}\NormalTok{) }
-\end{Highlighting}
-\end{Shaded}
+The outcome of the study is the percentage change in serum alkaline phosphate compared with the baseline when the participants first entered the study. The first measurement, on the left of the plot, is zero by definition. Then as we move from left to right, the plot shows the relative changes for the two groups of women: one receiving the anti-cancer drug tamoxifen; the other receiving standard treatment which is referred to as the \emph{control} group. Each woman was randomly allocated to one of these groups on entry to the study. The women returned for follow-up visits until the end of the study at 24 months.
 
-The purpose of this exercise is to show you how to build a similar
-graph using base graphics in R. This will take you through a number of
-fundamental techniques. The exercise will also walk you through
-creating the graph using \texttt{ggplot2}.
-
-To get started, run the code in the housekeeping script
-\texttt{alkfos-house.r} . You probably should not study the code in
-too much detail at this point. The script create the following
-objects in your workspace.
+Take a moment to study the graph and try to identify the different graphical elements that we will need to reproduce. Write down a description of these elements and compare it to my summary below.
 
 \begin{itemize}
 \tightlist
 \item
-  \texttt{times}, a vector of length 7 giving the observation times
+  The trajectory of the outcome variable is represented by points connected by straight lines. One point represents the mean value for one follow-up visit in one of the groups.
 \item
-  \texttt{means}, a \(2 \times 7\) matrix giving the mean percentage
-  change at each time point. Each group has its own row.
+  Separate trajectories are plotted for the treatment and control groups.
 \item
-  \texttt{sems}, a \(2 \times 7\) matrix giving standard errors of
-  the means, used to create the error bars.
+  Vertical error bars give a visual impression of the uncertainty associated with each point.
 \item
-  \texttt{available}, a \(2 \times 7\) matrixing giving the number
-  of participants still available
+  A horizontal line at zero is drawn as a reference so that we can see the size of the change relative to baseline.
+\item
+  The x-axis has tick marks at follow-up visits, which are irregularly spaced. Visits occurred every 3 months for the first year, then every 6 months for the second year.
+\item
+  The y-axis extends beyond the range of the data from -40\% to +30\%.
+\item
+  A table underneath the x-axis shows the number of women in the treatment and control groups at each visit. These numbers go down as the study progresses. This phenomenon is extremely common in medical studies and is called ``loss to follow-up''.
 \end{itemize}
 
-Use the \texttt{objects()} to see the objects created function to see
-them.
+These are the important graphical elements. You may have spotted some other features of the graph, but we will focus on trying to incorporate the features listed above.
 
-\section{Base graphics}\label{base-graphics}
+\section{Data}\label{data}
 
-Now we start building the plot. It is important that you use some form
-of script to hold the R code since you will frequently have to modify
-and rerun previously entered code.
+The data are available in the file \texttt{alkfos.csv}. This is a text file in comma-separated variable format. It can be read into R using the \texttt{read.csv()} function.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alkfos }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"./data/alkfos.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+There are 14 rows in the data frame \texttt{alkfos}: one for each combination of the 7 visits and the 2 groups. The variables in the data frame are:
 
 \begin{itemize}
 \tightlist
 \item
-  First, plot the means for group 1 (i.e.~\texttt{means{[}1,{]}}) against
-  \texttt{times}, using \texttt{type="b"} (look up what this does)
+  \texttt{time} The time since randomization for each follow-up visit.
 \item
-  Then \emph{add} a similar curve for group 2 to the plot using
-  \texttt{points} or \texttt{lines}. Notice that the new points are below the \(y\)
-  scale of the plot, so you need to revise the initial plot by setting
-  a suitable \texttt{ylim} value.
+  \texttt{mean} The outcome variable representing the mean percentage change in serum alkaline phosphate.
 \item
-  Add the error bars using \texttt{segments}. (You can calculate the
-  endpoints using \texttt{upper\ \textless{}-\ means\ +\ sems} etc.). You may have to
-  adjust the \texttt{ylim} again.
+  \texttt{available} The number of women still participating in the study.
 \item
-  Add the horizontal line at \(y=0\) using \texttt{abline}
+  \texttt{treat} The treatment group: a character vector taking values ``tamoxifen'' for the treatment group and ``control'' for the control group.
 \item
-  Use \texttt{xlab} and \texttt{ylab} in the initial \texttt{plot} call to give better axis labels.
-\item
-  We need a nonstandard x axis. Use \texttt{xaxt="n"} to avoid plotting
-  it at first, then add a custom axis with \texttt{axis}
-\item
-  The counts below the x axis can be added using \texttt{mtext} on
-  lines 5 and 6 below the bottom of the plot, but you need to make
-  room for the extra lines. Use \texttt{par(mar=.1\ +\ c(8,4,4,2))}
-  \emph{before} plotting anything to achieve this.
+  \texttt{sem} The standard error of the mean used to calculate the length of the error bars.
 \end{itemize}
 
-You now have quite a good reconstruction of the original plot. There
-are some additional steps you can take to reproduce the published plot
-exactly. These are advanced exercises so feel free to come back to
-them later.
+\section{Building the plot}\label{building-the-plot}
+
+\subsection{The ggplot2 package}\label{the-ggplot2-package}
+
+In this exercise, we will be using the R package ggplot2. The ``gg'' stands for ``Grammar of Graphics'', which is a conceptual framework for understanding statistical graphics created by Leland Wilkinson.
+
+The core function in the ggplot2 package is \texttt{ggplot()}. This function requires two arguments:
 
 \begin{itemize}
 \tightlist
 \item
-  It is not too important here (it was for some other variables
-  in the study), but the S-PLUS plot has the points for the second
-  group offset horizontally by a small amount (.25) to prevent
-  overlap. Redo the plot with this modification.
+  \texttt{data} is the name of the data frame that we will take the variables from.
 \item
-  Further things to fiddle with: Get rid of the bounding box.
-  Add Control/Tamoxifen labels to the lines of counts. Perhaps use
-  different plotting symbols. Rotate the y axis values. Modify the
-  line widths or line styles.
-\item
-  Finally, try plotting to the \texttt{pdf()} device and view
-  the results using a PDF viewer (\emph{e.g.} Adobe Acrobat
-  Reader). You may need to change the \texttt{pointsize} option
-  and/or the plot dimensions for optimal appearance. You might
-  also try saving the plot as a metafile and include it in a Word
-  document.
+  \texttt{mapping} is the \emph{aesthetic mapping} between variables in the data frame and graphical elements that we want to plot. In this example:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    y-axis is the mean of the percent change in alkaline phosphate represented by the variable \texttt{mean;}
+  \item
+    x-axis is the visit time represented by the variable \texttt{time.}
+  \end{itemize}
 \end{itemize}
 
-\section{Using ggplot2}\label{using-ggplot2}
+We make the mapping in a call to the function \texttt{aes()}.
 
-The housekeeping script \texttt{alkfos-house.r} also creates a data
-frame \texttt{ggdata} containing the variables in long format. The
-code for generating the data frame is shown below, but you do not need
-to repeat it if you have run the script.
+The code below creates a basic plot and assigns it to the object \texttt{p0}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{ggdata }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
-  \AttributeTok{times =} \FunctionTok{rep}\NormalTok{(times, }\DecValTok{2}\NormalTok{),}
-  \AttributeTok{means =} \FunctionTok{c}\NormalTok{(means[}\DecValTok{1}\NormalTok{, ], means[}\DecValTok{2}\NormalTok{, ]),}
-  \AttributeTok{sds =} \FunctionTok{c}\NormalTok{(sds[}\DecValTok{1}\NormalTok{, ], sds[}\DecValTok{2}\NormalTok{, ]),}
-  \AttributeTok{available =} \FunctionTok{c}\NormalTok{(available[}\DecValTok{1}\NormalTok{, ], available[}\DecValTok{2}\NormalTok{, ]),}
-  \AttributeTok{treat =} \FunctionTok{rep}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"placebo"}\NormalTok{, }\StringTok{"tamoxifen"}\NormalTok{), }\AttributeTok{each =} \DecValTok{7}\NormalTok{)}
-\NormalTok{)}
-\NormalTok{ggdata }\OtherTok{\textless{}{-}} \FunctionTok{transform}\NormalTok{(ggdata, }\AttributeTok{sems =}\NormalTok{ sds }\SpecialCharTok{/} \FunctionTok{sqrt}\NormalTok{(available))}
+\FunctionTok{library}\NormalTok{(ggplot2, }\AttributeTok{quietly=}\ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{p0 }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{alkfos, }\AttributeTok{mapping=}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{time, }\AttributeTok{y=}\NormalTok{mean))}
 \end{Highlighting}
 \end{Shaded}
 
-To create a first approximation to the plot in \texttt{ggplot2} we
-use the \texttt{qplot} function (short for \emph{quick plot}). First you
-must install the \texttt{ggplot2} package from CRAN and then load it:
+Running the code creates the plot but does not display it. This is an important difference between base graphics and ggplot graphics:
+
+\begin{itemize}
+\tightlist
+\item
+  Base graphics functions do not return an R object but will always display a plot on the current graphics device.
+\item
+  GGplot graphics functions return an R graphical object, which will only be displayed if we ask for it.
+\end{itemize}
+
+There are two ways to display a graphical object in R:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  If we have saved the result to an object, call the \texttt{print()} or \texttt{show()} functions.
+\item
+  If we have not saved the result, the graphical object will be displayed in the same way that a regular R object is printed to the screen.
+\end{enumerate}
+
+The code chunk below displays the object \texttt{p0} created in the chunk above.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(ggplot2)}
-\FunctionTok{qplot}\NormalTok{(}
-  \AttributeTok{x =}\NormalTok{ times, }
-  \AttributeTok{y =}\NormalTok{ means, }
-  \AttributeTok{group =}\NormalTok{ treat, }
-  \AttributeTok{geom =} \FunctionTok{c}\NormalTok{(}\StringTok{"point"}\NormalTok{, }\StringTok{"line"}\NormalTok{), }
-  \AttributeTok{data =}\NormalTok{ ggdata}
-\NormalTok{)}
+\FunctionTok{show}\NormalTok{(p0)}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-## Warning: `qplot()` was deprecated in ggplot2 3.4.0.
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.
-\end{verbatim}
+\includegraphics{ggplot2-s_files/figure-latex/unnamed-chunk-4-1.pdf}
 
-The first arguments to \texttt{qplot} are called \emph{aesthetics} in the
-grammar of graphics. Here we want to plot \texttt{y=means} by
-\texttt{x=times} grouped by \texttt{group=treat}. The aesthetics
-are used by the \emph{geometries}, which are specified with the
-\texttt{geom} argument. Here we want to plot both points and
-lines. The \texttt{data} argument tells \texttt{qplot} to get the
-aesthetics from the data frame \texttt{ggdata}.
+You may find the results a little disappointing. The \texttt{ggplot()} function has drawn x- and y-axes that span the range of the data, but otherwise has drawn no points or lines. This is another important difference between ggplot2 and base graphics. Whereas base plotting functions will usually create a sensible default plot, \texttt{ggplot()} makes no assumptions about what you want.
 
-To add the error bars, we add a new geometry \emph{linerange} which uses
-the aesthetics \texttt{ymin} and \texttt{ymax}
+We will recreate the plot in \emph{layers}. Layers are added to a ggplot object by calling additional functions and adding their return value to the basic plot using the \texttt{+} symbol.
+
+\subsection{Geometries}\label{geometries}
+
+The most important layers are \emph{geometries}, which describe how to display the data in the plot. Geometry functions in ggplot2 all start with the prefix \texttt{geom\_}.
+
+\subsubsection{Points and lines}\label{points-and-lines}
+
+We want to plot points representing the mean of the outcome at each visit. This is done with the function \texttt{geom\_point()}. We also want to plot lines between successive points in time. This is done with the function \texttt{geom\_line()}. The code chunk below adds point and line geometries to our basic plot \texttt{p0} and saves the result to the new object \texttt{p1}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{p }\OtherTok{\textless{}{-}} \FunctionTok{qplot}\NormalTok{(}
-  \AttributeTok{x =}\NormalTok{ times, }\AttributeTok{y =}\NormalTok{ means, }\AttributeTok{group =}\NormalTok{ treat,}
-  \AttributeTok{ymin =}\NormalTok{ means }\SpecialCharTok{{-}}\NormalTok{ sems, }\AttributeTok{ymax =}\NormalTok{ means }\SpecialCharTok{+}\NormalTok{ sems,}
-  \AttributeTok{yintercept =} \DecValTok{0}\NormalTok{, }\AttributeTok{geom =} \FunctionTok{c}\NormalTok{(}\StringTok{"point"}\NormalTok{, }\StringTok{"line"}\NormalTok{, }\StringTok{"linerange"}\NormalTok{),}
-  \AttributeTok{data =}\NormalTok{ ggdata}
-\NormalTok{)}
-\FunctionTok{print}\NormalTok{(p)}
+\NormalTok{p1 }\OtherTok{\textless{}{-}}\NormalTok{ p0 }\SpecialCharTok{+} \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{geom\_line}\NormalTok{()}
+\FunctionTok{show}\NormalTok{(p1)}
 \end{Highlighting}
 \end{Shaded}
 
-In this case we are saving the output of \texttt{qplot} to an R
-object \texttt{p}. This means the plot will not appear automatically
-when we call \texttt{qplot}. Instead, we must explicitly print it.
+\includegraphics{ggplot2-s_files/figure-latex/unnamed-chunk-5-1.pdf}
 
-Note how the y axes are automatically adjusted to include the error
-bars. This is because they are included in the call to \texttt{qplot}
-and not added later (as was the case with base graphics).
+Again, this is not quite what we want. The line geometry is mixing up observations from the treatment and control groups, but we want separate lines for each group. To obtain this we need to add an additional aesthetic mapping inside the call to \texttt{ggplot()}. The aesthetic \texttt{group} gives the name of the variable in the data frame that distinguishes observations from different groups.
 
-It remains to give informative axis labels and put the right tick
-marks on the x-axis. This is done by adding scales to the plot
+Modify the code chunk below so that it includes the \texttt{group} aesthetic to recreate plot \texttt{p1} correctly.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{p }\OtherTok{\textless{}{-}}\NormalTok{ p }\SpecialCharTok{+}
-  \FunctionTok{scale\_x\_continuous}\NormalTok{(}
-    \AttributeTok{name =} \StringTok{"Months after randomization"}\NormalTok{,}
-    \AttributeTok{breaks =}\NormalTok{ ggdata}\SpecialCharTok{$}\NormalTok{times}
-\NormalTok{  ) }\SpecialCharTok{+}
-  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{name =} \StringTok{"\% change in alkaline phosphatase"}\NormalTok{)}
-\FunctionTok{print}\NormalTok{(p)}
+\NormalTok{p1 }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{alkfos, }\AttributeTok{mapping=}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{time, }\AttributeTok{y=}\NormalTok{mean)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{geom\_line}\NormalTok{()}
+\FunctionTok{show}\NormalTok{(p1)}
 \end{Highlighting}
 \end{Shaded}
 
-We can also change the look and feel of the plot by adding a theme
-(in this case the black and white theme).
+\includegraphics{ggplot2-s_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+\subsubsection{Error bars}\label{error-bars}
+
+Now we can add the error bars. These can be added using the \texttt{linerange} geometry. This geometry needs some new aesthetic mappings. It will inherit the \texttt{x} mapping from the call to \texttt{ggplot()}. However, it needs new mappings \texttt{ymin} and \texttt{ymax} giving the lower and upper points of the error bar on the y-axis. We could go back and modify the aesthetic mappings in the call to \texttt{ggplot()}. However, we can also supply aesthetic mappings inside the call to a geometry function. It can be useful to do this when an aesthetic is only used by one geometry (which is the case here).
+
+Modify the code chunk below so that the \texttt{linerange} geometry has its own aesthetic mapping for \texttt{ymin} and \texttt{ymax}.
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{ymin} is the mean minus the standard error
+\item
+  \texttt{ymax} is the mean plus the standard error
+\end{itemize}
+
+Note that the error bars are \emph{not confidence intervals}. In statistical graphics it is very common to use plus/minus the standard error to represent the uncertainty in the data without making any statistical claims about coverage.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{p }\SpecialCharTok{+} \FunctionTok{theme\_bw}\NormalTok{()}
+\NormalTok{p2 }\OtherTok{\textless{}{-}}\NormalTok{ p1 }\SpecialCharTok{+} \FunctionTok{geom\_linerange}\NormalTok{(}\AttributeTok{mapping=}\FunctionTok{aes}\NormalTok{(}\AttributeTok{ymin=}\NormalTok{mean}\SpecialCharTok{{-}}\NormalTok{sem, }\AttributeTok{ymax=}\NormalTok{mean}\SpecialCharTok{+}\NormalTok{sem))}
+\FunctionTok{show}\NormalTok{(p2)}
 \end{Highlighting}
 \end{Shaded}
 
-As an alternative to \texttt{qplot}, we can use the \texttt{ggplot}
-function to define the data and the common aesthetics, then add the
-geometries with separate function calls. All the grobs (\emph{graphical objects})
-created by these function calls are combined with the
-\texttt{+} operator:
+\includegraphics{ggplot2-s_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+Compare the y-axes for plots \texttt{p1} and \texttt{p2}. Note that when we add the error bars, the y-axis automatically expanded the limits of the y-axis to include the highest and lowest values on the error bars.
+
+\subsubsection{Horizontal reference line}\label{horizontal-reference-line}
+
+The last geometry we want to add is the horizontal reference line at zero. This is added using the \texttt{hline} geometry. We must supply the argument \texttt{yintercept} which determines where the horizontal line intersects the y-axis.
+
+We should distinguish the reference line from the lines used to plot the data, otherwise it may distract the viewer. We could do this by changing the colour of the reference line. But here we will use a thinner line using the optional argument \texttt{linewidth} to the hline geometry. The default value of \texttt{linewidth} is 1. A value less than 1 draws a thinner line; a value greater than 1 draws a thicker line. Choose a suitable value for your plot.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{p }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}
-  \AttributeTok{data =}\NormalTok{ ggdata,}
-  \FunctionTok{aes}\NormalTok{(}
-    \AttributeTok{x =}\NormalTok{ times, }
-    \AttributeTok{y =}\NormalTok{ means, }
-    \AttributeTok{ymin =}\NormalTok{ means }\SpecialCharTok{{-}}\NormalTok{ sems, }
-    \AttributeTok{ymax =}\NormalTok{ means }\SpecialCharTok{+}\NormalTok{ sems,}
-    \AttributeTok{group =}\NormalTok{ treat}
-\NormalTok{  )}
-\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+}
+\NormalTok{p3 }\OtherTok{\textless{}{-}}\NormalTok{ p2 }\SpecialCharTok{+} \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept=}\DecValTok{0}\NormalTok{, }\AttributeTok{linewidth=}\FloatTok{0.1}\NormalTok{)}
+\FunctionTok{show}\NormalTok{(p3)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ggplot2-s_files/figure-latex/unnamed-chunk-8-1.pdf}
+
+\subsection{Scales}\label{scales}
+
+Next we want to fix the x- and y-axes. The \texttt{ggplot()} function will provide default axes for you, which are often good enough. But in this case we want custom axes. These are provided by scale functions. In fact axes are just one kind of scale. In the grammar of graphics framework, a scale is a way to annotate any quantity that represents a dimension of the data. This also includes shapes, colours, and sizes.
+
+Both axes are continuous. Therefore we use the \texttt{scale\_x\_continuous()} and \texttt{scale\_y\_continuous()} functions to create custom axes. These scale functions have the same arguments, but they affect the x- and y-axes, respectively. The arguments you want to supply are
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{breaks} A numeric vector of positions on the axis where you want tick marks.
+\item
+  \texttt{limits} A numeric vector of length 2 giving the minimum and maximum values to be displayed on the axis.
+\end{itemize}
+
+Modify the code chunk below to create the custom axes:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p4 }\OtherTok{\textless{}{-}}\NormalTok{ p3 }\SpecialCharTok{+} \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{breaks=}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{6}\NormalTok{,}\DecValTok{9}\NormalTok{,}\DecValTok{12}\NormalTok{,}\DecValTok{18}\NormalTok{,}\DecValTok{24}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{breaks=}\FunctionTok{seq}\NormalTok{(}\AttributeTok{from=}\SpecialCharTok{{-}}\DecValTok{40}\NormalTok{, }\AttributeTok{to=}\DecValTok{30}\NormalTok{, }\AttributeTok{by=}\DecValTok{5}\NormalTok{),}
+                              \AttributeTok{limits =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{40}\NormalTok{, }\DecValTok{30}\NormalTok{))}
+\FunctionTok{show}\NormalTok{(p4)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ggplot2-s_files/figure-latex/unnamed-chunk-9-1.pdf}
+
+We should also supply informative axis labels. The default axis labels are taken from the names of the variables that we used in the aesthetic mappings for \texttt{x} and \texttt{y}. Use the \texttt{xlab()} and \texttt{ylab()} functions to provide informative axis labels.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p5 }\OtherTok{\textless{}{-}}\NormalTok{ p4 }\SpecialCharTok{+} \FunctionTok{xlab}\NormalTok{(}\StringTok{"Months after randomization"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Percent change in serum alkaline phosphate"}\NormalTok{)}
+\FunctionTok{show}\NormalTok{(p5)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ggplot2-s_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+\subsection{Themes}\label{themes}
+
+Our plot contains most of the same graphical elements as the reference plot. But it does not look the same. The original plot was drawn on a white background. But our plot has a grey background with white major and minor grid lines.
+
+Themes control many aspects of the appearance of the plot that do not depend on the data. The default theme, which we have been using so far, is called \texttt{theme\_gray()}. Use the \texttt{help()} function to look up \texttt{theme\_gray()} and you will see the help page documents the other complete themes provided by the ggplot2 package.
+
+\begin{itemize}
+\tightlist
+\item
+  Modify the chunk below to use different themes until you find one that most closely matches the original plot in the file bentK.pdf.
+\item
+  Find the parameter that changes to the font size and use it to reduce the font until the y-axis label fits.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p6 }\OtherTok{\textless{}{-}}\NormalTok{ p5 }\SpecialCharTok{+} \FunctionTok{theme\_classic}\NormalTok{(}\AttributeTok{base\_size=}\DecValTok{9}\NormalTok{)}
+\FunctionTok{show}\NormalTok{(p6)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ggplot2-s_files/figure-latex/unnamed-chunk-11-1.pdf}
+
+\subsection{Putting everything together}\label{putting-everything-together}
+
+In this exercise, you have constructed the plot in steps, saving and displaying the plot in separate chunks to allow you to see the changes as we add each layer of the plot. In practice, we do not work like this. All the instructions for creating the plot should be together. Fill in the chunk below so that the plot is recreated in a single chunk.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(alkfos, }\AttributeTok{mapping=}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{time, }\AttributeTok{y=}\NormalTok{mean, }\AttributeTok{groups=}\NormalTok{treat)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{mapping=}\FunctionTok{aes}\NormalTok{(}\AttributeTok{shape=}\NormalTok{treat)) }\SpecialCharTok{+}
   \FunctionTok{geom\_line}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{geom\_linerange}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =} \DecValTok{0}\NormalTok{, }\AttributeTok{colour =} \StringTok{"darkgrey"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{breaks =}\NormalTok{ ggdata}\SpecialCharTok{$}\NormalTok{times) }\SpecialCharTok{+}
-  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{breaks =} \FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{35}\NormalTok{, }\DecValTok{25}\NormalTok{, }\DecValTok{5}\NormalTok{))}
-\FunctionTok{print}\NormalTok{(p)}
+  \FunctionTok{geom\_linerange}\NormalTok{(}\AttributeTok{mapping=}\FunctionTok{aes}\NormalTok{(}\AttributeTok{ymin=}\NormalTok{mean}\SpecialCharTok{{-}}\NormalTok{sem, }\AttributeTok{ymax=}\NormalTok{mean}\SpecialCharTok{+}\NormalTok{sem)) }\SpecialCharTok{+}
+  \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{breaks=}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{6}\NormalTok{,}\DecValTok{9}\NormalTok{,}\DecValTok{12}\NormalTok{,}\DecValTok{18}\NormalTok{,}\DecValTok{24}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{breaks=}\FunctionTok{seq}\NormalTok{(}\AttributeTok{from=}\SpecialCharTok{{-}}\DecValTok{40}\NormalTok{, }\AttributeTok{to=}\DecValTok{30}\NormalTok{, }\AttributeTok{by=}\DecValTok{5}\NormalTok{),}
+                     \AttributeTok{limits =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{40}\NormalTok{, }\DecValTok{30}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"Months after randomization"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{ylab}\NormalTok{(}\StringTok{"Percent change in serum alkaline phosphate"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept=}\DecValTok{0}\NormalTok{, }\AttributeTok{linewidth=}\FloatTok{0.1}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_classic}\NormalTok{(}\AttributeTok{base\_size=}\DecValTok{9}\NormalTok{)}
+\FunctionTok{show}\NormalTok{(p)}
 \end{Highlighting}
 \end{Shaded}
 
-This call adds another geometry \emph{hline} which uses the aesthetic
-\texttt{yintercept} to add a horizontal line at 0 on the y-axis. Note
-that this alternate syntax allows each geometry to have its own
-aesthetics: here we draw the horizontal line in darkgrey instead of
-the default black.
+\includegraphics{ggplot2-s_files/figure-latex/unnamed-chunk-12-1.pdf}
 
-\section{Grid graphics}\label{grid-graphics}
+There is still one thing missing from our reproduction. In the original plot, the treatment and control groups were distinguished by different plotting symbols, whereas in our plot they both have circular marks. We can change this by adding the aesthetic mapping \texttt{shape}.
 
-As a final, advanced topic, this subsection shows how viewports from
-the \texttt{grid} package may be used to display the plot and the
-table in the same graph. First we create a text table:
+Modify the chunk above so that the aesthetic \texttt{shape} is mapped onto the variable \texttt{treat}. You can do this inside the call to \texttt{ggplot()} or in the call to \texttt{geom\_point()}.
+
+Note that adding the shape aesthetic automatically adds a legend to the plot, telling us which shape corresponds to which group.
+
+\section{Self study}\label{self-study}
+
+Congratulations, you have mostly recreated the reference figure from Kristensen et al (1994). However, have you really learned anything? The best way to find out is to come back in a week's time and try to recreate the reference plot without looking at this exercise sheet.
+
+You may find it useful to download the ggplot cheatsheet. You can also use R help to find out more about the functions in the ggplot2 package. Finally, you can refer to the book Ggplot2: elegant graphics for data analysis by Hadley Wickham, creator of the ggplot2 package.
+
+\section{Adding the table (advanced topic)}\label{adding-the-table-advanced-topic}
+
+There is one important element missing from the graph. This is the table of the number of participants in each group. This is an advanced topic so instead of explaining each step I am just going to give you the solution. Do not be concerned if you do not understand this part.
+
+Firstly we create a new graphical object to represent the table. This object has its own aesthetic mappings, geometries and scales. I will skip a detailed description of this step except to note that some of the arguments below will suppress graphical features (e.g.~\texttt{NULL} and \texttt{element\_blank()})
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{tab }\OtherTok{\textless{}{-}} 
-  \FunctionTok{ggplot}\NormalTok{(}
-    \AttributeTok{data =}\NormalTok{ ggdata, }
-    \FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ times, }\AttributeTok{y =}\NormalTok{ treat, }\AttributeTok{label =}\NormalTok{ available)}
-\NormalTok{  ) }\SpecialCharTok{+}
-  \FunctionTok{geom\_text}\NormalTok{(}\AttributeTok{size =} \DecValTok{3}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{xlab}\NormalTok{(}\ConstantTok{NULL}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{ylab}\NormalTok{(}\ConstantTok{NULL}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{breaks =} \ConstantTok{NULL}\NormalTok{)}
+\NormalTok{tab }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data=}\NormalTok{alkfos, }
+              \AttributeTok{mapping=}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{time, }\AttributeTok{y=}\NormalTok{treat, }\AttributeTok{label=}\NormalTok{available)) }\SpecialCharTok{+}
+              \FunctionTok{geom\_text}\NormalTok{(}\AttributeTok{size=}\DecValTok{2}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{xlab}\NormalTok{(}\ConstantTok{NULL}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{ylab}\NormalTok{(}\ConstantTok{NULL}\NormalTok{) }\SpecialCharTok{+}
+              \FunctionTok{scale\_x\_continuous}\NormalTok{(}\AttributeTok{breaks=}\ConstantTok{NULL}\NormalTok{) }\SpecialCharTok{+} 
+              \FunctionTok{theme\_bw}\NormalTok{(}\AttributeTok{base\_size=}\DecValTok{9}\NormalTok{) }\SpecialCharTok{+}
+              \FunctionTok{theme}\NormalTok{(}\AttributeTok{panel.grid=}\FunctionTok{element\_blank}\NormalTok{())}
 \NormalTok{tab}
 \end{Highlighting}
 \end{Shaded}
 
-Then we create a layout that will contain the graph above the
-table. Most of the space is taken by the graph. The
-\texttt{grid.show.layout} allows you to preview the layout.
+\includegraphics{ggplot2-s_files/figure-latex/unnamed-chunk-13-1.pdf}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(grid)}
-\NormalTok{Layout }\OtherTok{\textless{}{-}} \FunctionTok{grid.layout}\NormalTok{(}\AttributeTok{nrow =} \DecValTok{2}\NormalTok{, }\AttributeTok{ncol =} \DecValTok{1}\NormalTok{, }\AttributeTok{heights =} \FunctionTok{unit}\NormalTok{(}
-  \FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\FloatTok{0.25}\NormalTok{),}
-  \FunctionTok{c}\NormalTok{(}\StringTok{"null"}\NormalTok{, }\StringTok{"null"}\NormalTok{)}
-\NormalTok{))}
-\FunctionTok{grid.show.layout}\NormalTok{(Layout)}
-\end{Highlighting}
-\end{Shaded}
-
-The units are relative (\emph{null}) units. You can specify exact sizes
-in centimetres, inches, or lines if you prefer.
-
-We then print the graph and the table in the appropriate viewports
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{grid.newpage}\NormalTok{() }\CommentTok{\# Clear the page}
-\FunctionTok{pushViewport}\NormalTok{(}\FunctionTok{viewport}\NormalTok{(}\AttributeTok{layout =}\NormalTok{ Layout))}
-\FunctionTok{print}\NormalTok{(p, }\AttributeTok{vp =} \FunctionTok{viewport}\NormalTok{(}\AttributeTok{layout.pos.row =} \DecValTok{1}\NormalTok{, }\AttributeTok{layout.pos.col =} \DecValTok{1}\NormalTok{))}
-\FunctionTok{print}\NormalTok{(tab, }\AttributeTok{vp =} \FunctionTok{viewport}\NormalTok{(}\AttributeTok{layout.pos.row =} \DecValTok{2}\NormalTok{, }\AttributeTok{layout.pos.col =} \DecValTok{1}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-Notice that the left margins do not match. One way to get the margins to match is to use the \texttt{plot\_grid}
-function from the\texttt{cowplot} package.
+Next use the \texttt{plot\_grid()} function from the cowplot package to stack the displayed objects vertically (\texttt{align="v"}), in a single column (\texttt{ncol=1}, \texttt{nrow=2}), with the left and right ends of the x-axes aligned (\texttt{axis="lr"}) and most of the space taken up by the plot (\texttt{rel\_heights=c(5,1)}).
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(cowplot)}
-\FunctionTok{plot\_grid}\NormalTok{(}
-\NormalTok{  p, }
-\NormalTok{  tab, }
-  \AttributeTok{align =} \StringTok{"v"}\NormalTok{, }
-  \AttributeTok{ncol =} \DecValTok{1}\NormalTok{, }
-  \AttributeTok{nrow =} \DecValTok{2}\NormalTok{, }
-  \AttributeTok{rel\_heights =} \FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{1}\NormalTok{)}
-\NormalTok{)}
+\FunctionTok{plot\_grid}\NormalTok{(}\AttributeTok{plotlist=}\FunctionTok{list}\NormalTok{(p, tab), }\AttributeTok{align=}\StringTok{"v"}\NormalTok{, }\AttributeTok{axis=}\StringTok{"lr"}\NormalTok{, }
+          \AttributeTok{ncol=}\DecValTok{1}\NormalTok{, }\AttributeTok{nrow=}\DecValTok{2}\NormalTok{, }\AttributeTok{rel\_heights=}\FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{,}\DecValTok{1}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
-The \texttt{cowplot} package has a theme that is useful for publications. It is a black and white theme with no grid:
+\includegraphics{ggplot2-s_files/figure-latex/unnamed-chunk-14-1.pdf}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{theme\_set}\NormalTok{(}\FunctionTok{theme\_cowplot}\NormalTok{())}
-\FunctionTok{plot\_grid}\NormalTok{(}
-\NormalTok{  p, }
-\NormalTok{  tab, }
-  \AttributeTok{align =} \StringTok{"v"}\NormalTok{, }
-  \AttributeTok{ncol =} \DecValTok{1}\NormalTok{, }
-  \AttributeTok{nrow =} \DecValTok{2}\NormalTok{, }
-  \AttributeTok{rel\_heights =} \FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{1}\NormalTok{)}
-\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+\section{References}\label{references}
 
-The \texttt{theme\_set} function changes the default
-\texttt{ggplot2} theme so that all subsequent displays will use the given theme.
+Kristensen B, Ejlertsen B, Dalgaard P, Larsen L, Holmegaard SN, Transbøl I, Mouridsen HT. Tamoxifen and bone metabolism in postmenopausal low-risk breast cancer patients: a randomized study. \emph{J Clin Oncol}. 1994 May;\textbf{12(5)}:992-7. doi: 10.1200/JCO.1994.12.5.992. PMID: 8164053.
 
 \chapter{Survival analysis with competing risks: Oral cancer patients}\label{survival-analysis-with-competing-risks-oral-cancer-patients}
 
@@ -13684,30 +13693,29 @@ Classes 'Lexis' and 'data.frame':   2 obs. of  11 variables:
 
 \begin{verbatim}
  lex.id     per   age  tfi lex.dur lex.Cst   lex.Xst id sex  dob  doe cens
-      1 2000.00 50.00 0.00    5.27     NRA      ESRD NA   M 1950 2000 2020
-      2 2000.00 50.00 0.00    6.28     NRA      ESRD NA   M 1950 2000 2020
-      3 2000.00 50.00 0.00    2.97     NRA       Rem NA   M 1950 2000 2020
-      3 2002.97 52.97 2.97   11.95     Rem ESRD(Rem) NA   M 1950 2000 2020
-      4 2000.00 50.00 0.00    4.51     NRA       Rem NA   M 1950 2000 2020
-      4 2004.51 54.51 4.51    1.58     Rem ESRD(Rem) NA   M 1950 2000 2020
-      5 2000.00 50.00 0.00    6.73     NRA      ESRD NA   M 1950 2000 2020
-      6 2000.00 50.00 0.00    7.45     NRA      ESRD NA   M 1950 2000 2020
-      7 2000.00 50.00 0.00    2.53     NRA      ESRD NA   M 1950 2000 2020
-      8 2000.00 50.00 0.00   16.44     NRA      ESRD NA   M 1950 2000 2020
-      9 2000.00 50.00 0.00    4.23     NRA      ESRD NA   M 1950 2000 2020
-     10 2000.00 50.00 0.00    1.01     NRA      ESRD NA   M 1950 2000 2020
-     11 2000.00 50.00 0.00    4.79     NRA       Rem NA   F 1950 2000 2020
-     11 2004.79 54.79 4.79    8.29     Rem ESRD(Rem) NA   F 1950 2000 2020
-     12 2000.00 50.00 0.00    0.42     NRA      ESRD NA   F 1950 2000 2020
-     13 2000.00 50.00 0.00    5.17     NRA      ESRD NA   F 1950 2000 2020
-     14 2000.00 50.00 0.00    1.69     NRA      ESRD NA   F 1950 2000 2020
-     15 2000.00 50.00 0.00    2.92     NRA      ESRD NA   F 1950 2000 2020
-     16 2000.00 50.00 0.00    5.75     NRA      ESRD NA   F 1950 2000 2020
-     17 2000.00 50.00 0.00    0.18     NRA       Rem NA   F 1950 2000 2020
-     17 2000.18 50.18 0.18   10.89     Rem ESRD(Rem) NA   F 1950 2000 2020
-     18 2000.00 50.00 0.00   13.01     NRA      ESRD NA   F 1950 2000 2020
-     19 2000.00 50.00 0.00    9.27     NRA      ESRD NA   F 1950 2000 2020
-     20 2000.00 50.00 0.00    1.06     NRA      ESRD NA   F 1950 2000 2020
+      1 2000.00 50.00 0.00   11.06     NRA      ESRD NA   M 1950 2000 2020
+      2 2000.00 50.00 0.00    4.51     NRA      ESRD NA   M 1950 2000 2020
+      3 2000.00 50.00 0.00    1.37     NRA       Rem NA   M 1950 2000 2020
+      3 2001.37 51.37 1.37   10.99     Rem ESRD(Rem) NA   M 1950 2000 2020
+      4 2000.00 50.00 0.00    3.47     NRA      ESRD NA   M 1950 2000 2020
+      5 2000.00 50.00 0.00   11.25     NRA      ESRD NA   M 1950 2000 2020
+      6 2000.00 50.00 0.00    1.70     NRA      ESRD NA   M 1950 2000 2020
+      7 2000.00 50.00 0.00    0.04     NRA      ESRD NA   M 1950 2000 2020
+      8 2000.00 50.00 0.00   12.25     NRA      ESRD NA   M 1950 2000 2020
+      9 2000.00 50.00 0.00    0.88     NRA      ESRD NA   M 1950 2000 2020
+     10 2000.00 50.00 0.00    6.08     NRA       Rem NA   M 1950 2000 2020
+     10 2006.08 56.08 6.08   11.19     Rem ESRD(Rem) NA   M 1950 2000 2020
+     11 2000.00 50.00 0.00   11.23     NRA      ESRD NA   F 1950 2000 2020
+     12 2000.00 50.00 0.00    1.13     NRA      ESRD NA   F 1950 2000 2020
+     13 2000.00 50.00 0.00    7.50     NRA      ESRD NA   F 1950 2000 2020
+     14 2000.00 50.00 0.00    2.43     NRA      ESRD NA   F 1950 2000 2020
+     15 2000.00 50.00 0.00    0.60     NRA      ESRD NA   F 1950 2000 2020
+     16 2000.00 50.00 0.00    3.40     NRA       Rem NA   F 1950 2000 2020
+     16 2003.40 53.40 3.40    8.96     Rem ESRD(Rem) NA   F 1950 2000 2020
+     17 2000.00 50.00 0.00    6.30     NRA      ESRD NA   F 1950 2000 2020
+     18 2000.00 50.00 0.00    4.37     NRA      ESRD NA   F 1950 2000 2020
+     19 2000.00 50.00 0.00    6.04     NRA      ESRD NA   F 1950 2000 2020
+     20 2000.00 50.00 0.00    3.90     NRA      ESRD NA   F 1950 2000 2020
 \end{verbatim}
 
 \begin{Shaded}
@@ -13722,18 +13730,18 @@ $M
 Transitions:
      To
 From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-  NRA   0   2    8         0        10       10      57.42        10
-  Rem   0   0    0         2         2        2      13.53         2
-  Sum   0   2    8         2        12       12      70.95        10
+  NRA   0   2    8         0        10       10      52.60        10
+  Rem   0   0    0         2         2        2      22.18         2
+  Sum   0   2    8         2        12       12      74.78        10
 
 $F
 
 Transitions:
      To
 From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-  NRA   0   2    8         0        10       10      44.25        10
-  Rem   0   0    0         2         2        2      19.18         2
-  Sum   0   2    8         2        12       12      63.43        10
+  NRA   0   1    9         0        10       10      46.90        10
+  Rem   0   0    0         1         1        1       8.96         1
+  Sum   0   1    9         1        11       11      55.85        10
 \end{verbatim}
 
   What type of object have you got as \texttt{iL}?
@@ -13750,7 +13758,7 @@ From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
 
 \begin{verbatim}
    user  system elapsed 
-  2.756   3.205   2.053 
+  2.626   3.381   2.063 
 \end{verbatim}
 
 \begin{Shaded}
@@ -13765,18 +13773,18 @@ $M
 Transitions:
      To
 From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-  NRA  33  79  388         0       500      467    2651.53       500
-  Rem   0  44    0        35        79       35     490.62        79
-  Sum  33 123  388        35       579      502    3142.15       500
+  NRA  45  60  395         0       500      455    2804.33       500
+  Rem   0  48    0        12        60       12     415.58        60
+  Sum  45 108  395        12       560      467    3219.91       500
 
 $F
 
 Transitions:
      To
 From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-  NRA  45 156  299         0       500      455    2493.05       500
-  Rem   0  90    0        66       156       66    1053.62       156
-  Sum  45 246  299        66       656      521    3546.67       500
+  NRA  30 153  317         0       500      470    2477.42       500
+  Rem   0  99    0        54       153       54    1021.70       153
+  Sum  30 252  317        54       653      524    3499.12       500
 \end{verbatim}
 
   Why are there so many ESRD-events in the resulting data set?
@@ -13801,20 +13809,20 @@ From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
       State
 when   NRA Rem ESRD ESRD(Rem)
   50   500   0    0         0
-  50.1 495   2    3         0
-  50.2 491   6    3         0
-  50.3 483  11    6         0
-  50.4 478  13    8         1
-  50.5 472  15   12         1
-  50.6 464  19   16         1
-  50.7 460  21   18         1
-  50.8 455  23   21         1
-  50.9 449  27   23         1
-  51   447  27   25         1
-  51.1 445  29   25         1
-  51.2 441  30   28         1
-  51.3 433  33   33         1
-  51.4 430  35   34         1
+  50.1 495   4    1         0
+  50.2 488   9    3         0
+  50.3 483  10    7         0
+  50.4 477  14    9         0
+  50.5 468  18   14         0
+  50.6 464  19   17         0
+  50.7 461  21   18         0
+  50.8 455  24   21         0
+  50.9 451  27   22         0
+  51   445  29   26         0
+  51.1 439  33   28         0
+  51.2 436  34   30         0
+  51.3 431  36   33         0
+  51.4 429  37   34         0
 \end{verbatim}
 
   What is in the object \texttt{nStf}?
@@ -13833,13 +13841,13 @@ when   NRA Rem ESRD ESRD(Rem)
 
 \begin{verbatim}
       State
-when     Rem   NRA  ESRD ESRD(Rem)
-  50   0.000 1.000 1.000         1
-  50.1 0.004 0.994 1.000         1
-  50.2 0.012 0.994 1.000         1
-  50.3 0.022 0.988 1.000         1
-  50.4 0.026 0.982 0.998         1
-  50.5 0.030 0.974 0.998         1
+when     Rem   NRA ESRD ESRD(Rem)
+  50   0.000 1.000    1         1
+  50.1 0.008 0.998    1         1
+  50.2 0.018 0.994    1         1
+  50.3 0.020 0.986    1         1
+  50.4 0.028 0.982    1         1
+  50.5 0.036 0.972    1         1
 \end{verbatim}
 
 \begin{Shaded}
@@ -13851,12 +13859,12 @@ when     Rem   NRA  ESRD ESRD(Rem)
 \begin{verbatim}
       State
 when     Rem   NRA  ESRD ESRD(Rem)
-  59.5 0.204 0.342 0.908         1
-  59.6 0.204 0.336 0.906         1
-  59.7 0.204 0.334 0.906         1
-  59.8 0.204 0.332 0.906         1
-  59.9 0.200 0.326 0.902         1
-  60   0.200 0.326 0.902         1
+  59.5 0.206 0.328 0.924         1
+  59.6 0.208 0.322 0.924         1
+  59.7 0.208 0.314 0.922         1
+  59.8 0.210 0.312 0.922         1
+  59.9 0.214 0.306 0.920         1
+  60   0.216 0.304 0.920         1
 \end{verbatim}
 
   What do the entries in \texttt{ppf} represent?
