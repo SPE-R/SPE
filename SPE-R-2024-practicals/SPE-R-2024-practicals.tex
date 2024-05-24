@@ -3587,15 +3587,74 @@ different aspects in estimating effects of various exposures on a metric respons
 \texttt{bweight} = birth weight, recorded in grams.
 
 \begin{itemize}
+\tightlist
 \item
   Load the packages needed in this exercise and the data set, and look at its content
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(Epi)}
+\FunctionTok{library}\NormalTok{(mgcv)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: nlme
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'nlme'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:dplyr':
+## 
+##     collapse
+\end{verbatim}
+
+\begin{verbatim}
+## This is mgcv 1.9-1. For overview type 'help("mgcv-package")'.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{data}\NormalTok{(births)}
+\FunctionTok{str}\NormalTok{(births)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   We perform similar housekeeping tasks as in a previous exercise.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{births}\SpecialCharTok{$}\NormalTok{hyp }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(births}\SpecialCharTok{$}\NormalTok{hyp, }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"normal"}\NormalTok{, }\StringTok{"hyper"}\NormalTok{))}
+\NormalTok{births}\SpecialCharTok{$}\NormalTok{sex }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(births}\SpecialCharTok{$}\NormalTok{sex, }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"M"}\NormalTok{, }\StringTok{"F"}\NormalTok{))}
+\NormalTok{births}\SpecialCharTok{$}\NormalTok{maged }\OtherTok{\textless{}{-}} \FunctionTok{cut}\NormalTok{(births}\SpecialCharTok{$}\NormalTok{matage, }\AttributeTok{breaks =} \FunctionTok{c}\NormalTok{(}\DecValTok{22}\NormalTok{, }\DecValTok{35}\NormalTok{, }\DecValTok{44}\NormalTok{), }\AttributeTok{right =} \ConstantTok{FALSE}\NormalTok{)}
+\NormalTok{births}\SpecialCharTok{$}\NormalTok{gest4 }\OtherTok{\textless{}{-}} \FunctionTok{cut}\NormalTok{(births}\SpecialCharTok{$}\NormalTok{gestwks,}
+  \AttributeTok{breaks =} \FunctionTok{c}\NormalTok{(}\DecValTok{20}\NormalTok{, }\DecValTok{35}\NormalTok{, }\DecValTok{37}\NormalTok{, }\DecValTok{39}\NormalTok{, }\DecValTok{45}\NormalTok{), }\AttributeTok{right =} \ConstantTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Have a look at univariate summaries of the different
   variables in the data; especially
   the location and dispersion of the distribution of \texttt{bweight}.
 \end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(births)}
+\FunctionTok{with}\NormalTok{(births, }\FunctionTok{sd}\NormalTok{(bweight))}
+\end{Highlighting}
+\end{Shaded}
 
 \section{\texorpdfstring{Simple estimation with \texttt{lm()} and \texttt{glm()}}{Simple estimation with lm() and glm()}}\label{simple-estimation-with-lm-and-glm}
 
@@ -3610,6 +3669,12 @@ means for a metric response.
   Comparison of two groups is commonly done by the conventional \(t\)-test and
   the associated confidence interval.
 \end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{with}\NormalTok{(births, }\FunctionTok{t.test}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ hyp, }\AttributeTok{var.equal =} \ConstantTok{TRUE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
 
 The \(P\)-value refers to the test
 of the null hypothesis that there is no effect of \texttt{shyp} on birth weight
@@ -3636,9 +3701,22 @@ is \(3199-2768 = 431\) g.
   models for metric responses assuming Gaussian distribution.
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m1 }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ hyp, }\AttributeTok{family =}\NormalTok{ gaussian, }\AttributeTok{data =}\NormalTok{ births)}
+\FunctionTok{summary}\NormalTok{(m1)}
+\end{Highlighting}
+\end{Shaded}
+
 Note the amount of output that \texttt{summary()} method produces.
 The point estimate plus confidence limits can, though, be concisely obtained by function
 \texttt{ci.lin()} found in \texttt{Epi} package.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{round}\NormalTok{(}\FunctionTok{ci.lin}\NormalTok{(m1)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{)], }\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 \section{Stratified effects, and interaction or effect-measure modification}\label{stratified-effects-and-interaction-or-effect-measure-modification}
 
@@ -3655,6 +3733,14 @@ causal interpretation to the estimated contrasts.
   shows how the mean \texttt{bweight} depends jointly on \texttt{hyp} and \texttt{gest4}
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\FunctionTok{with}\NormalTok{(births, }\FunctionTok{interaction.plot}\NormalTok{(sex, hyp, bweight))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{SPE-R-2024-practicals_files/figure-latex/bweight-by-hyp-sex-1.pdf}
 At face value it appears that the mean difference in \texttt{bweight} between
 hypertensive and normotensive
 mothers is somewhat bigger in boys than in girls.
@@ -3667,6 +3753,13 @@ mothers is somewhat bigger in boys than in girls.
   Stratified estimation of effects can be done by \texttt{lm()} as follows:
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m3 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sex }\SpecialCharTok{/}\NormalTok{ hyp, }\AttributeTok{data =}\NormalTok{ births)}
+\FunctionTok{round}\NormalTok{(}\FunctionTok{ci.lin}\NormalTok{(m3)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{)], }\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
 The estimated effects of \texttt{hyp} in the two strata defined by \texttt{sex} thus
 are \(-496\) g in boys and \(-380\) g among girls.
 The error margins of the two estimates are quite wide, though.
@@ -3678,6 +3771,13 @@ The error margins of the two estimates are quite wide, though.
   \emph{interaction term} between \texttt{sex} and \texttt{hyp} is
   fitted as follows:
 \end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m3I }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sex }\SpecialCharTok{+}\NormalTok{ hyp }\SpecialCharTok{+}\NormalTok{ sex}\SpecialCharTok{:}\NormalTok{hyp, }\AttributeTok{data =}\NormalTok{ births)}
+\FunctionTok{round}\NormalTok{(}\FunctionTok{ci.lin}\NormalTok{(m3I)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{)], }\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 From this output you would find a familiar estimate \(-231\) g for girls
 vs.~boys among normotensive mothers and the estimate \(-496\) g
@@ -3715,6 +3815,13 @@ Therefore, we may now proceed to estimate the overall effect of \texttt{hyp}
   Adjustment is done by adding \texttt{sex} to the model formula:
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m4 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sex }\SpecialCharTok{+}\NormalTok{ hyp, }\AttributeTok{data =}\NormalTok{ births)}
+\FunctionTok{ci.lin}\NormalTok{(m4)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{)]}
+\end{Highlighting}
+\end{Shaded}
+
 The estimated effect of \texttt{hyp} on \texttt{bweight}
 controlled for \texttt{sex} is thus \(-448\) g,
 which is a weighted average of the sex-specific estimates.
@@ -3743,6 +3850,13 @@ weight then \texttt{gestwks} is a numeric exposure variable.
   we can estimate the linear effect of \texttt{gestwks} with \texttt{lm()} as follows:
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m5 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ gestwks, }\AttributeTok{data =}\NormalTok{ births)}
+\FunctionTok{ci.lin}\NormalTok{(m5)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{)]}
+\end{Highlighting}
+\end{Shaded}
+
 We have fitted a simple linear regression model and
 obtained estimates of the
 two regression coefficient: \texttt{intercept} and \texttt{slope}.
@@ -3755,12 +3869,29 @@ for the \emph{generic function} \texttt{plot()} is a fitted \texttt{lm} object,
 it will provide you some common diagnostic graphs.
 
 \begin{itemize}
+\tightlist
 \item
   To check whether \texttt{bweight} goes up linearly with \texttt{gestwks} try
-\item
-  Moreover, take a look at the basic diagnostic plots for the fitted model.
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{with}\NormalTok{(births, }\FunctionTok{plot}\NormalTok{(gestwks, bweight))}
+\FunctionTok{abline}\NormalTok{(m5)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{SPE-R-2024-practicals_files/figure-latex/Plot-bweight-by-gestwks-1.pdf}
+- Moreover, take a look at the basic diagnostic plots for the fitted model.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(m5)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{SPE-R-2024-practicals_files/figure-latex/bweight-gestwks-m5-diag-1.pdf}
 What can you say about the agreement with data of the assumptions of the
 simple linear regression model,
 like linearity of the systematic dependence,
@@ -3785,6 +3916,13 @@ this package.
   for which you wish to fit a smooth function
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mPs }\OtherTok{\textless{}{-}}\NormalTok{ mgcv}\SpecialCharTok{::}\FunctionTok{gam}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(gestwks), }\AttributeTok{data =}\NormalTok{ births)}
+\FunctionTok{summary}\NormalTok{(mPs)}
+\end{Highlighting}
+\end{Shaded}
+
 From the output given by \texttt{summary()} you find that the
 estimated intercept is equal to the overall mean birth
 weight in the data. The estimated residual variance is given by
@@ -3792,12 +3930,20 @@ weight in the data. The estimated residual variance is given by
 \texttt{gam} object. Taking square root you will obtain the estimated
 residual standard deviation: \(445.2\) g.
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mPs}\SpecialCharTok{$}\NormalTok{sig2}
+\FunctionTok{sqrt}\NormalTok{(mPs}\SpecialCharTok{$}\NormalTok{sig2)}
+\end{Highlighting}
+\end{Shaded}
+
 The degrees of freedom in this model are not computed as simply as in previous
 models, and they typically are not integer-valued. However,
 the fitted spline seems to consume only a little more degrees of freedom
 as an 3rd degree polynomial model would take.
 
 \begin{itemize}
+\tightlist
 \item
   A graphical presentation of the fitted curve together with the
   confidence and prediction intervals is more informative.
@@ -3806,6 +3952,21 @@ as an 3rd degree polynomial model would take.
   in \texttt{Epi}, which creates shaded areas, and function \texttt{matlines()} which draws
   lines joining the pertinent end points over the \(x\)-values for which the
   predictions are computed.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{plotFitPredInt }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(xval, fit, pred, ...) \{}
+  \FunctionTok{matshade}\NormalTok{(xval, fit, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.2}\NormalTok{)}
+  \FunctionTok{matshade}\NormalTok{(xval, pred, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.2}\NormalTok{)}
+  \FunctionTok{matlines}\NormalTok{(xval, fit, }\AttributeTok{lty =} \DecValTok{1}\NormalTok{, }\AttributeTok{lwd =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{), }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{))}
+  \FunctionTok{matlines}\NormalTok{(xval, pred, }\AttributeTok{lty =} \DecValTok{1}\NormalTok{, }\AttributeTok{lwd =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{), }\AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"brown"}\NormalTok{, }\StringTok{"brown"}\NormalTok{))}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Finally, create a vector of \(x\)-values and compute
   the fitted/predicted values as well
@@ -3817,6 +3978,31 @@ as an 3rd degree polynomial model would take.
   make the graph:
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{nd }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{gestwks =} \FunctionTok{seq}\NormalTok{(}\DecValTok{24}\NormalTok{, }\DecValTok{45}\NormalTok{, }\AttributeTok{by =} \FloatTok{0.25}\NormalTok{))}
+\NormalTok{pr.Ps }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(mPs, }\AttributeTok{newdata =}\NormalTok{ nd, }\AttributeTok{se.fit =} \ConstantTok{TRUE}\NormalTok{)}
+\FunctionTok{str}\NormalTok{(pr.Ps) }\CommentTok{\# with se.fit=TRUE, only two columns: fitted value and its SE}
+\NormalTok{fit.Ps }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(}
+\NormalTok{  pr.Ps}\SpecialCharTok{$}\NormalTok{fit,}
+\NormalTok{  pr.Ps}\SpecialCharTok{$}\NormalTok{fit }\SpecialCharTok{{-}} \DecValTok{2} \SpecialCharTok{*}\NormalTok{ pr.Ps}\SpecialCharTok{$}\NormalTok{se.fit,}
+\NormalTok{  pr.Ps}\SpecialCharTok{$}\NormalTok{fit }\SpecialCharTok{+} \DecValTok{2} \SpecialCharTok{*}\NormalTok{ pr.Ps}\SpecialCharTok{$}\NormalTok{se.fit}
+\NormalTok{)}
+\NormalTok{pred.Ps }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(}
+\NormalTok{  pr.Ps}\SpecialCharTok{$}\NormalTok{fit, }\CommentTok{\# must add residual variance to se.fit\^{}2}
+\NormalTok{  pr.Ps}\SpecialCharTok{$}\NormalTok{fit }\SpecialCharTok{{-}} \DecValTok{2} \SpecialCharTok{*} \FunctionTok{sqrt}\NormalTok{(pr.Ps}\SpecialCharTok{$}\NormalTok{se.fit}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{+}\NormalTok{ mPs}\SpecialCharTok{$}\NormalTok{sig2),}
+\NormalTok{  pr.Ps}\SpecialCharTok{$}\NormalTok{fit }\SpecialCharTok{+} \DecValTok{2} \SpecialCharTok{*} \FunctionTok{sqrt}\NormalTok{(pr.Ps}\SpecialCharTok{$}\NormalTok{se.fit}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{+}\NormalTok{ mPs}\SpecialCharTok{$}\NormalTok{sig2)}
+\NormalTok{)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\FunctionTok{with}\NormalTok{(births, }\FunctionTok{plot}\NormalTok{(bweight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ gestwks,}
+  \AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(}\DecValTok{24}\NormalTok{, }\DecValTok{45}\NormalTok{),}
+  \AttributeTok{cex.axis =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{cex.lab =} \FloatTok{1.5}
+\NormalTok{))}
+\FunctionTok{plotFitPredInt}\NormalTok{(nd}\SpecialCharTok{$}\NormalTok{gestwks, fit.Ps, pred.Ps)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{SPE-R-2024-practicals_files/figure-latex/bweight-gestwks-mPs-plot-1.pdf}
 Compare this with the graph on slide 20 of the lecture we had.
 Are you happy with the end result?
 
@@ -3840,6 +4026,16 @@ and modelling binary outcome.
   of the prevalence of \texttt{lowbw} by maternal hypertension
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{stat.table}\NormalTok{(}
+  \AttributeTok{index =} \FunctionTok{list}\NormalTok{(hyp, lowbw),}
+  \AttributeTok{contents =} \FunctionTok{list}\NormalTok{(}\FunctionTok{count}\NormalTok{(), }\FunctionTok{percent}\NormalTok{(lowbw)),}
+  \AttributeTok{margins =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{data =}\NormalTok{ births}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
 It seems that the prevalence for hypertensive mothers
 is about 18 percent points higher,
 or about three times as high as that for normotensive mothers
@@ -3851,18 +4047,53 @@ or about three times as high as that for normotensive mothers
   estimated by \texttt{glm()} with different link functions:
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{binRD }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(lowbw }\SpecialCharTok{\textasciitilde{}}\NormalTok{ hyp, }\AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\AttributeTok{link =} \StringTok{"identity"}\NormalTok{), }\AttributeTok{data =}\NormalTok{ births)}
+\FunctionTok{round}\NormalTok{(}\FunctionTok{ci.lin}\NormalTok{(binRD)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{5}\SpecialCharTok{:}\DecValTok{6}\NormalTok{)], }\DecValTok{3}\NormalTok{)}
+\NormalTok{binRR }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(lowbw }\SpecialCharTok{\textasciitilde{}}\NormalTok{ hyp, }\AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\AttributeTok{link =} \StringTok{"log"}\NormalTok{), }\AttributeTok{data =}\NormalTok{ births)}
+\FunctionTok{round}\NormalTok{(}\FunctionTok{ci.lin}\NormalTok{(binRR, }\AttributeTok{Exp =} \ConstantTok{TRUE}\NormalTok{)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{5}\SpecialCharTok{:}\DecValTok{7}\NormalTok{)], }\DecValTok{3}\NormalTok{)}
+\NormalTok{binOR }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(lowbw }\SpecialCharTok{\textasciitilde{}}\NormalTok{ hyp, }\AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\AttributeTok{link =} \StringTok{"logit"}\NormalTok{), }\AttributeTok{data =}\NormalTok{ births)}
+\FunctionTok{round}\NormalTok{(}\FunctionTok{ci.lin}\NormalTok{(binOR, }\AttributeTok{Exp =} \ConstantTok{TRUE}\NormalTok{)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{5}\SpecialCharTok{:}\DecValTok{7}\NormalTok{)], }\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
 Check that these results were quite compatible with the
 \emph{about} estimates given in the previous item.
 How well is the odds ratio approximating the risk ratio here?
 
 \begin{itemize}
+\tightlist
 \item
   The prevalence of low birth weight is expected to be inversely related
   to gestational age (weeks), as is evident from simple tabulation
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{stat.table}\NormalTok{(}
+  \AttributeTok{index =} \FunctionTok{list}\NormalTok{(gest4, lowbw),}
+  \AttributeTok{contents =} \FunctionTok{list}\NormalTok{(}\FunctionTok{count}\NormalTok{(), }\FunctionTok{percent}\NormalTok{(lowbw)),}
+  \AttributeTok{margins =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{data =}\NormalTok{ births}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Let's jump right away to spline modelling of this relationship
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{binm1 }\OtherTok{\textless{}{-}}\NormalTok{ mgcv}\SpecialCharTok{::}\FunctionTok{gam}\NormalTok{(lowbw }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(gestwks), }\AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\AttributeTok{link =} \StringTok{"logit"}\NormalTok{), }\AttributeTok{data =}\NormalTok{ births)}
+\FunctionTok{summary}\NormalTok{(binm1)}
+\FunctionTok{plot}\NormalTok{(binm1)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{SPE-R-2024-practicals_files/figure-latex/lowbw-gestwks-spline-1.pdf}
 Inspect the output. Would you agree, that the logit of the prevalence
 of outcome is almost linearly dependent on \texttt{gestwks}?
 
@@ -3873,6 +4104,13 @@ of outcome is almost linearly dependent on \texttt{gestwks}?
   with \texttt{glm()} and assuming logit-linearity
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{binm2 }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(lowbw }\SpecialCharTok{\textasciitilde{}} \FunctionTok{I}\NormalTok{(gestwks }\SpecialCharTok{{-}} \DecValTok{40}\NormalTok{), }\AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\AttributeTok{link =} \StringTok{"logit"}\NormalTok{), }\AttributeTok{data =}\NormalTok{ births)}
+\FunctionTok{round}\NormalTok{(}\FunctionTok{ci.lin}\NormalTok{(binm2, }\AttributeTok{Exp =} \ConstantTok{TRUE}\NormalTok{)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{5}\SpecialCharTok{:}\DecValTok{7}\NormalTok{)], }\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
 Inspect the results. How do you interpret the estimated coefficients
 and their exponentiated values?
 -
@@ -3880,13 +4118,17 @@ Instead of fitted logits, it can be more informative
 to plot the fitted prevalences against \texttt{gestwks},
 in which we utilize the previously created data frame \texttt{nd}
 
-\begin{itemize}
-\tightlist
-\item
-  The curve seems to cover practically the whole range of
-  the outcome probability scale with a relatively
-  steep slope between about 33 to 37 weeks.
-\end{itemize}
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{predm2 }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(binm2, }\AttributeTok{newdata =}\NormalTok{ nd, }\AttributeTok{type =} \StringTok{"response"}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(nd}\SpecialCharTok{$}\NormalTok{gestwks, predm2, }\AttributeTok{type =} \StringTok{"l"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{SPE-R-2024-practicals_files/figure-latex/lowbw-gestwks-pred-1.pdf}
+- The curve seems to cover practically the whole range of
+the outcome probability scale with a relatively
+steep slope between about 33 to 37 weeks.
 
 \chapter{Poisson regression \& analysis of curved effects}\label{poisson-regression-analysis-of-curved-effects}
 
@@ -9163,7 +9405,7 @@ occurrence rate of remission itself.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{   user  system elapsed }
-\NormalTok{  2.644   3.202   2.057 }
+\NormalTok{  2.568   3.132   1.988 }
 \end{Highlighting}
 \end{Shaded}
 
