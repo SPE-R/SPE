@@ -22,56 +22,32 @@ summary(births)
 with(births, sd(bweight))
 
 
-## ----t test for sex on bweight------------------------------------------------
-with(births, t.test(bweight ~ sex, var.equal = TRUE))
+## ----t test for hyp on bweight------------------------------------------------
+with(births, t.test(bweight ~ hyp, var.equal = TRUE))
 
 
-## ----lm of bweight by sex-----------------------------------------------------
-m1 <- glm(bweight ~ sex, family = gaussian, data = births)
+## ----lm of bweight by hyp-----------------------------------------------------
+m1 <- glm(bweight ~ hyp, family = gaussian, data = births)
 summary(m1)
 
 
-## ----ci.lin of bweight by sex-------------------------------------------------
+## ----ci.lin of bweight by hyp-------------------------------------------------
 round(ci.lin(m1)[, c(1, 5, 6)], 1)
 
 
-## ----lm of gest4 on bweight---------------------------------------------------
-m2 <- lm(bweight ~ gest4, data = births)
-round(ci.lin(m2)[, c(1, 5, 6)], 1)
-
-
-## ----Table of mean bweight by gest4-------------------------------------------
-stat.table(gest4, mean(bweight), data = births)
-
-
-## ----bweight-by-hyp-gest4, fig = FALSE----------------------------------------
+## ----bweight-by-hyp-sex, fig = FALSE------------------------------------------
 par(mfrow = c(1, 1))
-with(births, interaction.plot(gest4, hyp, bweight))
+with(births, interaction.plot(sex, hyp, bweight))
 
 
 ## ----lm for hyp on bweight stratified by gest4--------------------------------
-m3 <- lm(bweight ~ gest4 / hyp, data = births)
+m3 <- lm(bweight ~ sex / hyp, data = births)
 round(ci.lin(m3)[, c(1, 5, 6)], 1)
 
 
-## ----lmIa for hyp on bweight stratified by gest4------------------------------
-m3I <- lm(bweight ~ gest4 + hyp + gest4:hyp, data = births)
-round(ci.lin(m3I)[, c(1, 5, 6)], 1)
-
-
-## ----lmIb for hyp on bweight stratified by gest4b-----------------------------
-births$gest4b <- Relevel(births$gest4, ref = 4)
-m3Ib <- lm(bweight ~ gest4b * hyp, data = births)
-round(ci.lin(m3Ib)[, c(1, 5, 6)], 1)
-
-
-## ----lmIc for hyp on bweight stratified by gest4------------------------------
-m3M <- lm(bweight ~ gest4 + hyp, data = births)
-round(ci.lin(m3M)[, c(1, 5, 6)], 1)
-
-
-## ----test for hyp-gest4 interaction on bweight--------------------------------
-anova(m3I, m3M)
+## ----lmIa for hyp on bweight stratified by sex--------------------------------
+m3I <- lm(bweight ~ sex + hyp + sex:hyp, data = births)
+round(ci.lin(m3I)[, c(1, 4, 5, 6)], 2)
 
 
 ## ----lm for hyp on bweight controlled for sex---------------------------------
@@ -108,8 +84,8 @@ sqrt(mPs$sig2)
 plotFitPredInt <- function(xval, fit, pred, ...) {
   matshade(xval, fit, lwd = 2, alpha = 0.2)
   matshade(xval, pred, lwd = 2, alpha = 0.2)
-  matlines(xval, fit, lty = 1, lwd = c(3, 2, 2), col = c("red", "blue", "blue"))
-  matlines(xval, pred, lty = 1, lwd = c(3, 2, 2), col = c("red", "green", "green"))
+  matlines(xval, fit, lty = 1, lwd = c(3, 2, 2), col = c("black", "blue", "blue"))
+  matlines(xval, pred, lty = 1, lwd = c(3, 2, 2), col = c("black", "brown", "brown"))
 }
 
 
@@ -174,23 +150,4 @@ round(ci.lin(binm2, Exp = TRUE)[, c(1, 2, 5:7)], 3)
 ## ----lowbw-gestwks-pred, fig=FALSE--------------------------------------------
 predm2 <- predict(binm2, newdata = nd, type = "response")
 plot(nd$gestwks, predm2, type = "l")
-
-
-## ----lowbw-gestwks-hyp--------------------------------------------------------
-binm3 <- glm(lowbw ~ hyp * I(gestwks - 40), family = binomial, data = births)
-round(ci.lin(binm3, Exp = TRUE)[, c(1, 2, 5:7)], 3)
-
-
-## ----lowbw-gestwks-hyp-pred, fig=FALSE----------------------------------------
-predm3hyp <- predict(binm3,
-  newdata = data.frame(hyp = "hyper", nd), type = "response"
-)
-predm3nor <- predict(binm3,
-  newdata = data.frame(hyp = "normal", nd), type = "response"
-)
-par(mfrow = c(1, 2))
-plot(nd$gestwks, qlogis(predm3hyp), type = "l")
-lines(nd$gestwks, qlogis(predm3nor), lty = 2)
-plot(nd$gestwks, predm3hyp, type = "l")
-lines(nd$gestwks, predm3nor, lty = 2)
 
