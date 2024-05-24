@@ -167,7 +167,7 @@ births |> head(4)
 ```
 **Note:** By default the chained object is given as the first argument to the following 
 function.
-You can use `.` if this is not the case.  This trick works only with `dplyr` pipe `%>%`
+You can use `.` if this is not the case.  
 
 Here is a dummy example where we do not give the first argument to `head` function but the second one.
 
@@ -183,10 +183,14 @@ Here is a dummy example where we do not give the first argument to `head` functi
 ## 4  4    3751     0   39.80       0     31   0   1
 ```
 
-Which could be also be achieve with `base` pipe `|>` with a slightly more complex syntax. 
+This can also be achieves with `base` pipe `|>` with two differences
+
+* The place holder is an underscore `_` not a dot `.`. This is a deliberate design choice to help people with less acute eyesight
+* The argument must be named
+
 
 ```r
-4 |> (\(.) head(births, .))() # Note the extra parentheses
+4 |> head(births, pos=_)
 ```
 
 ```
@@ -195,6 +199,8 @@ Which could be also be achieve with `base` pipe `|>` with a slightly more comple
 ## 2  2    3270     0      NA      NA     30   0   1
 ## 3  3    2620     0   38.15       0     35   0   2
 ## 4  4    3751     0   39.80       0     31   0   1
+## 5  5    3200     0   38.89       0     33   1   1
+## 6  6    3673     0   40.97       0     33   0   2
 ```
 
 ## `mutate` columns
@@ -795,12 +801,12 @@ age
 ## # A tibble: 6 × 2
 ##     pid   age
 ##   <int> <int>
-## 1     1    25
-## 2     2    20
-## 3     3    24
-## 4     4    19
-## 5     5    25
-## 6     6    21
+## 1     1    23
+## 2     2    22
+## 3     3    17
+## 4     4    23
+## 5     5    23
+## 6     6    15
 ```
 
 ```r
@@ -830,12 +836,12 @@ bind_rows(age, center)
 ## # A tibble: 11 × 3
 ##      pid   age center
 ##    <dbl> <int> <chr> 
-##  1     1    25 <NA>  
-##  2     2    20 <NA>  
-##  3     3    24 <NA>  
-##  4     4    19 <NA>  
-##  5     5    25 <NA>  
-##  6     6    21 <NA>  
+##  1     1    23 <NA>  
+##  2     2    22 <NA>  
+##  3     3    17 <NA>  
+##  4     4    23 <NA>  
+##  5     5    23 <NA>  
+##  6     6    15 <NA>  
 ##  7     1    NA A     
 ##  8     2    NA B     
 ##  9     3    NA A     
@@ -861,12 +867,12 @@ left_join(age, center, by = c("pid"))
 ## # A tibble: 6 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    25 A     
-## 2     2    20 B     
-## 3     3    24 A     
-## 4     4    19 B     
-## 5     5    25 <NA>  
-## 6     6    21 <NA>
+## 1     1    23 A     
+## 2     2    22 B     
+## 3     3    17 A     
+## 4     4    23 B     
+## 5     5    23 <NA>  
+## 6     6    15 <NA>
 ```
 
 ```r
@@ -878,12 +884,12 @@ full_join(age, center, by = c("pid"))
 ## # A tibble: 7 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    25 A     
-## 2     2    20 B     
-## 3     3    24 A     
-## 4     4    19 B     
-## 5     5    25 <NA>  
-## 6     6    21 <NA>  
+## 1     1    23 A     
+## 2     2    22 B     
+## 3     3    17 A     
+## 4     4    23 B     
+## 5     5    23 <NA>  
+## 6     6    15 <NA>  
 ## 7    10    NA C
 ```
 
@@ -896,10 +902,10 @@ inner_join(age, center, by = c("pid"))
 ## # A tibble: 4 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    25 A     
-## 2     2    20 B     
-## 3     3    24 A     
-## 4     4    19 B
+## 1     1    23 A     
+## 2     2    22 B     
+## 3     3    17 A     
+## 4     4    23 B
 ```
 Can you spot the differences between the commands above?
 As an exercise, you can try to compute the individuals' mean age per center.
@@ -917,8 +923,8 @@ inner_join(age, center, by = c("pid")) |>
 ## # A tibble: 2 × 2
 ##   center mean_age
 ##   <chr>     <dbl>
-## 1 A          24.5
-## 2 B          19.5
+## 1 A          20  
+## 2 B          22.5
 ```
 
 **Note:** the `by` argument indicates which column should be use to make the *join*. In some 
