@@ -107,22 +107,24 @@ with(births, sd(bweight))
 
 ## Simple estimation with `lm()` and `glm()` 
 
-We are ready to analyze the effect of `sex` on `bweight`.
-A binary explanatory variable, like `sex`, leads to an elementary
+We are ready to analyze the effect of maternal hypertension `hyp` on `bweight`.
+A binary explanatory variable, like `hyp`, leads to an elementary
  two-group comparison of group
 means for a metric response. 
 
 - Comparison of two groups is commonly done by the conventional $t$-test and
 the associated confidence interval. 
-```{r t test for sex on bweight}
-with(births, t.test(bweight ~ sex, var.equal = TRUE))
+```{r t test for hyp on bweight}
+with(births, t.test(bweight ~ hyp, var.equal = TRUE))
 ```
 The $P$-value refers to the test
-of the  null hypothesis that there is no effect of `sex` on birth weight
- (quite an uninteresting null hypothesis in itself!). However, `t.test()` does not provide
-the point estimate for the effect of sex; only the test result and a confidence interval. -- The estimated effect of sex on birth weight, 
-measured as a difference in means between girls and boys, 
-is $-197$ g.
+of the  null hypothesis that there is no effect of `shyp` on birth weight
+ (somewhat implausible null hypothesis in itself!). 
+ However, `t.test()` does not provide
+the point estimate for the effect of `hyp`; only the test result and a confidence interval. -- The estimated effect of `hyp` on birth weight, 
+measured as a difference in means between hypertensive and normotensive
+mothers, 
+is $3199-2768 = 431$ g.
 
 - The same task can easily be performed by `lm()` or by `glm()`. 
 The main argument in both 
@@ -130,46 +132,22 @@ is the *model formula*, the left hand side being the response variable
 and the right hand side
 after $\sim$ defines the explanatory variables and their 
 joint effects on the response. Here the only
-explanatory variable is the binary factor `sex`. With `glm()` one specifies the
+explanatory variable is the binary factor `hyp`. With `glm()` one specifies the
 `family`, i.e. the assumed distribution of the response variable. However,
 in case you use
 `lm()`, this argument is not needed, because `lm()` fits only 
 models for metric responses assuming Gaussian distribution.
-```{r lm of bweight by sex}
-m1 <- glm(bweight ~ sex, family = gaussian, data = births)
+```{r lm of bweight by hyp}
+m1 <- glm(bweight ~ hyp, family = gaussian, data = births)
 summary(m1)
 ```
  Note the amount of output that `summary()` method produces.
 The point estimate plus confidence limits can, though, be concisely obtained by function 
 `ci.lin()` found in `Epi` package.  
-```{r ci.lin of bweight by sex}
+```{r ci.lin of bweight by hyp}
 round(ci.lin(m1)[, c(1, 5, 6)], 1)
 ```
 
-## Factors on more than two levels
-
-The variable `gest4` became as the result of cutting `gestwks`
- into 4 groups with left-closed and right-open boundaries  [20,35) [35,37) [37,39) [39,45).
-
-- We shall find the effects of `gest4` on the metric response `bweight`.
-  by `lm()` and find out how the coefficients are related to the group means
-```{r lm of gest4 on bweight}
-m2 <- lm(bweight ~ gest4, data = births)
-round(ci.lin(m2)[, c(1, 5, 6)], 1)
-```
-
-There are now 3 effect estimates:
-```
-[35,37) vs [20,35)  857
-[37,39) vs [20,35) 1360
-[39,45) vs [20,35) 1668
-```
-The command
-```{r Table of mean bweight by gest4 }
-stat.table(gest4, mean(bweight), data = births)
-```
-confirms that e.g. the effect of `gest4` (level~2 vs level~1) is
-$2590-1733=857$, etc.
 
 
 ## Stratified effects, and interaction or effect-measure modification
@@ -177,114 +155,87 @@ $2590-1733=857$, etc.
 We shall now examine whether and to what extent the 
 *effect*  of `hyp`  on `bweight`, i.e. the 
  mean difference between hypertensive and normotensive mothers, 
- varies by `gest4` without assigning 
+ varies by `sex` without assigning 
  causal interpretation to the estimated contrasts.
 
 - The following *interaction plot*
 shows how the mean `bweight` depends jointly on `hyp` and `gest4`
-```{r bweight-by-hyp-gest4, fig = FALSE}
+```{r bweight-by-hyp-sex, fig = FALSE}
 par(mfrow = c(1, 1))
-with(births, interaction.plot(gest4, hyp, bweight))
+with(births, interaction.plot(sex, hyp, bweight))
 ```
-It appears that the mean difference in `bweight` between 
+At face value it appears that the mean difference in `bweight` between 
 hypertensive and normotensive 
-mothers is related to gestational age.
+mothers is somewhat bigger in boys than in girls.
 
 - Let us get numerical values for the mean differences
-in the different `gest4` categories. 
+in the two levels of `sex`. 
 Stratified estimation of effects can be done by `lm()` as follows:
 ```{r lm for hyp on bweight stratified by gest4 }
-m3 <- lm(bweight ~ gest4 / hyp, data = births)
+m3 <- lm(bweight ~ sex / hyp, data = births)
 round(ci.lin(m3)[, c(1, 5, 6)], 1)
 ```
-The estimated effects of `hyp` in the different strata defined by `gest4` thus
-range from about $-100$ g among those with $\geq 39$ weeks of 
-gestation to about $-700$ g among those
-with $< 35$ weeks of gestation. The error margin especially 
-around the latter estimate is quite wide, though.
-The $P$-value 0.055  from the test for 
-*effect(-measure) modification* indicates weak evidence 
-against the null hypothesis of *no interaction between `hyp` and `gest4`*.
-On the other hand, this test may well be not very sensitive given
- the small number of preterm babies in these data. 
+The estimated effects of `hyp` in the two strata defined by `sex` thus
+are $-496$ g in boys and $-380$ g among girls.
+ The error margins of the two estimates are quite wide, though.
 
 - An equivalent model with an explicit *product term* or
-*interaction term* between `gest4` and `hyp` is
+*interaction term* between `sex` and `hyp` is
 fitted as follows:
-```{r lmIa for hyp on bweight stratified by gest4 }
-m3I <- lm(bweight ~ gest4 + hyp + gest4:hyp, data = births)
-round(ci.lin(m3I)[, c(1, 5, 6)], 1)
+```{r lmIa for hyp on bweight stratified by sex }
+m3I <- lm(bweight ~ sex + hyp + sex:hyp, data = births)
+round(ci.lin(m3I)[, c(1, 4, 5, 6)], 2)
 ```
-From this  output you would find a familiar estimate $-673$ g for those $< 35$ gestational weeks. 
-The remaining coefficients are estimates of the interaction effects such that e.g. $515 = -158 - (-673)$ g 
+From this  output you would find a familiar estimate $-231$ g for girls
+vs. boys among normotensive mothers and the estimate $-496$ g 
+contrasting hypertensive and normotensive mothers in the
+reference class of `sex`, i.e. among boys.
+The remaining coefficient is the estimate of the interaction 
+effect such that $116.6 = -496.4 - 379.8$ g 
 describes the contrast in the effect of `hyp` on `bweight`
- between those 35 to $< 37$ weeks and those $< 35$ weeks of gestation.
+ between girls and boys. 
  
-- Perhaps a more appropriate reference level for the categorized gestational age would be the highest one.
-Changing the reference level, here to be the 4th category,
- can be done by `Relevel()` function in the `Epi` package,
-after which an equivalent interaction model is fitted, now using a shorter
-expression for it in the model formula:
-```{r lmIb for hyp on bweight stratified by gest4b }
-births$gest4b <- Relevel(births$gest4, ref = 4)
-m3Ib <- lm(bweight ~ gest4b * hyp, data = births)
-round(ci.lin(m3Ib)[, c(1, 5, 6)], 1)
-```
-Notice now the coefficient $-91.6$ for `hyp`. 
-It estimates the contrast `"hyper"` vs. `"normal"` on
-`bweight` among those with $\geq 39$ weeks of gestation.
-The estimate $-88.5$ g = $-180.1 -(-91.6)$ g describes the additional
-effect of `hyp` in the category 37 to 38 weeks of gestation upon
-that in the reference class.
-
-- At this stage it is interesting to compare the results from the
-interaction models to those from the corresponding  
-*main effects* model, in which the effect of `hyp` 
-is assumed not to be modified by `gest4`:
-```{r lmIc for hyp on bweight stratified by gest4 }
-m3M <- lm(bweight ~ gest4 + hyp, data = births)
-round(ci.lin(m3M)[, c(1, 5, 6)], 1)
-```
-The estimate $-201$ g describing the overall  contrast
-between hypertensive and normotensive mothers is obtained
-as a weighted average of the stratum-specific estimates 
-that were got by `effx()` above. 
-<!-- %% It is a meaningful estimate adjusting for `gest4`  -->
-<!-- %% insofar as it is reasonable to assume -->
-<!-- %% that the effect of `hyp` is not modified by `gest4`.  -->
-This assumption or the
-*no interaction* null hypothesis can formally be tested by a common deviance test.
-```{r test for hyp-gest4 interaction on bweight}
-anova(m3I, m3M)
-```
-The $P$-value is practically the same as before,
-when the interaction was tested in  `effx()`.
-However, in spite of obtaining a *non-significant* 
-result from this test, the possibility
-of a real effect-measure modification
-should not be ignored in this case.
+ The $P$-value $0.46$ as well 
+ as the wide confidence interval about zero of this interaction
+ parameter suggest good compatibility of the data with
+ the null hypothesis of 
+  *no interaction between `hyp` and `sex`*. Thus, 
+  there is insufficient evidence against
+  the possibility of *effect(-measure) modification* by
+  `sex` on the effect of `hyp`.
+On the other hand, this test is not very sensitive given
+the small sample size. Thus, in spite of obtaining a *non-significant* 
+result, the possibility of a real effect-measure modification
+cannot be ignored based on these data only.
+ 
+ 
 
 
-## Controlling or adjusting for the effect of hyp for sex 
+## Controlling or adjusting for the effect of `hyp` for `sex`
 
-The effect of `hyp` is *controlled for* -- or *adjusted for* -- `sex`
-by first looking at the estimated effects of `hyp` in the two stata defined 
-by `sex`, and then combining these effects if they seem sufficiently similar. 
-In this case the estimated effects were $-496$ and $-380$ which look quite
-similar (and the $P$-value against *no interaction* was quite large, too),
- so we can perhaps combine them, and control for `sex`.
+The estimated effects of `hyp`: 
+$-496$ in boys and $-380$ in girls, look quite
+similar (and the $P$-value against *no interaction* was quite large, too).
+Therefore, we may now proceed to estimate the overall effect of `hyp` 
+ *controlling for* -- or *adjusting for* -- `sex`. 
 
-- The combining is done by adding `sex` to the model formula:
+- Adjustment is done by adding `sex` to the model formula:
 ```{r lm for hyp on bweight controlled for sex }
 m4 <- lm(bweight ~ sex + hyp, data = births)
 ci.lin(m4)[, c(1, 5, 6)]
 ```
 The estimated effect of `hyp` on `bweight` 
-controlled for `sex` is thus $-448$ g.
- There can be more than one control variable, e.g 
- `control=list(sex,maged)`.
+controlled for `sex` is thus $-448$ g, 
+which is a weighted average of the sex-specific estimates. 
+It is slightly different from the unadjusted estimate $-431$ g, indicating
+that there was no essential confounding by `sex`.
+Note also, that the model that was fitted makes the assumption that
+the estimated effect is the same for boys and girls.
 
-Many people go straight ahead and control for variables which are likely to confound the effect of exposure without bothering to stratify first, but usually it is useful to stratify first.
+Many people go straight ahead and control for variables which are likely to
+confound the effect of exposure without bothering to stratify first, 
+but often it is useful to examine the possibility of effect-measure 
+modification before that.
 
 
 ## Numeric exposure, simple linear regression and checking assumptions  
@@ -305,7 +256,7 @@ We have fitted a simple linear regression model and
 obtained estimates of the
 two regression coefficient: `intercept` and `slope`.
 The linear effect of `gestwks` is thus estimated by the
-slope coefficient, which is 197 g per each additional week of gestation.
+slope coefficient, which is $197$ g per each additional week of gestation.
 
 At this stage it will be best to make some visual check concerning
 our model assumptions using `plot()`. In particular, when the main argument
@@ -328,6 +279,7 @@ like linearity of the systematic dependence,
 homoskedasticity and normality of the error terms? 
 
 
+
 ## Penalized spline model
 
 We shall now continue the analysis such that the apparently curved effect
@@ -338,8 +290,6 @@ You cannot fit a penalized spline model with `lm()` or
 `glm()`, Instead, function `gam()` in package
 `mgcv` can be used for this purpose. Make sure that you have loaded
 this package.
-
-
 
 -  When calling `gam()`, the model formula contains
   expression '`s(X)`' for any explanatory variable `X`,
@@ -353,7 +303,7 @@ estimated intercept is equal to the overall mean birth
 weight in the data.  The estimated residual variance is given by
 *Scale est.*  or from subobject `sig2` of the fitted
 `gam` object.  Taking square root you will obtain the estimated
-residual standard deviation: 445.2 g.
+residual standard deviation: $445.2$ g.
 ```{r mPs-sig2}
 mPs$sig2
 sqrt(mPs$sig2)
@@ -374,8 +324,8 @@ as an 3rd degree polynomial model would take.
 plotFitPredInt <- function(xval, fit, pred, ...) {
   matshade(xval, fit, lwd = 2, alpha = 0.2)
   matshade(xval, pred, lwd = 2, alpha = 0.2)
-  matlines(xval, fit, lty = 1, lwd = c(3, 2, 2), col = c("red", "blue", "blue"))
-  matlines(xval, pred, lty = 1, lwd = c(3, 2, 2), col = c("red", "green", "green"))
+  matlines(xval, fit, lty = 1, lwd = c(3, 2, 2), col = c("black", "blue", "blue"))
+  matlines(xval, pred, lty = 1, lwd = c(3, 2, 2), col = c("black", "brown", "brown"))
 }
 ```
 -  Finally, create a vector of $x$-values and compute 
@@ -488,45 +438,5 @@ plot(nd$gestwks, predm2, type = "l")
 - The curve seems to cover practically the whole range of
 the outcome probability scale with a relatively 
 steep slope between about 33 to 37 weeks. 
-
-As with numeric birth weight, it may be of interest,
-whether the effect of `gestwks` is modified
-by maternal hypertension, so let's fit
-an interaction model and view the results
-```{r lowbw-gestwks-hyp}
-binm3 <- glm(lowbw ~ hyp * I(gestwks - 40), family = binomial, data = births)
-round(ci.lin(binm3, Exp = TRUE)[, c(1, 2, 5:7)], 3)
-```
-How would you interpret the coefficients and their antilogarithms here?
-
-- Even though there seems to be no sufficient evidence
-for effect-measure modification, it can be of interest
-to compare both the fitted lines on the logit scale
-and the fitted curves on the probability scale between
-the two groups. Function `qlogis()` returns the
-value of the logit transformation of the given argument. 
-```{r lowbw-gestwks-hyp-pred, fig=FALSE}
-predm3hyp <- predict(binm3,
-  newdata = data.frame(hyp = "hyper", nd), type = "response"
-)
-predm3nor <- predict(binm3,
-  newdata = data.frame(hyp = "normal", nd), type = "response"
-)
-par(mfrow = c(1, 2))
-plot(nd$gestwks, qlogis(predm3hyp), type = "l")
-lines(nd$gestwks, qlogis(predm3nor), lty = 2)
-plot(nd$gestwks, predm3hyp, type = "l")
-lines(nd$gestwks, predm3nor, lty = 2)
-```
-The logit-line starts from a higher level and its slope is steeper
-for the hypertensive mothers, which sounds reasonable.
-However, the two lines
-appear to cross at about 38 weeks. On the other hand, the vertical difference
-of the two probability curves appears discernible only in the area
-from about 32 to 38 weeks of gestation
-
-When interpreting these findings, one needs to keep in mind that
-the precision of these curves is very low, because of 
-the small number of outcome cases overall. 
 
 
