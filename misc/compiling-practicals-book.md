@@ -33,15 +33,17 @@ If you want to compile the book you should use `bookdown` package (see. <https:/
 To compile the `HTML` version just type:
 
 ```r 
-bookdown::render_book('pracs-book/', 'bookdown::gitbook')
+options(knitr.duplicate.label = "allow")
+bookdown::render_book('pracs-book/', 'bookdown::gitbook', clean = TRUE, new_session = TRUE)
 ```
 
 For the `pdf` one:
 
 ```r
-bookdown::render_book('pracs-book/', 'bookdown::pdf_book')
+options(knitr.duplicate.label = "allow")
+bookdown::render_book('pracs-book/', 'bookdown::pdf_book', clean = TRUE, new_session = TRUE)
 ```
 
-This will create a `_book` directory in which all the needed compiled files are stored.
+This will create a `SPE-R-2024-practicals` directory in which all the needed compiled files are stored.
 
-To open the website, open `_book/index.html` file in your web browser. To open the \`pdf\` version of the book, open `_book/_main.pdf`
+To open the website, open `SPE-R-2024-practicals/index.html` file in your web browser. To open the \`pdf\` version of the book, open `SPE-R-2024-practicals/SPE-R-2024-practicals.pdf`
