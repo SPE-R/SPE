@@ -243,7 +243,6 @@ round(ci.lin(m1)[, c(1, 5, 6)], 1)
 ```
 
 
-
 ## Stratified effects, and interaction or effect-measure modification
 
 We shall now examine whether and to what extent the 
@@ -306,7 +305,7 @@ vs. boys among normotensive mothers and the estimate $-496$ g
 contrasting hypertensive and normotensive mothers in the
 reference class of `sex`, i.e. among boys.
 The remaining coefficient is the estimate of the interaction 
-effect such that $116.6 = -496.4 - 379.8$ g 
+effect such that $116.6 = -379.8 -(-496.4)$ g 
 describes the contrast in the effect of `hyp` on `bweight`
  between girls and boys. 
  
@@ -322,8 +321,6 @@ On the other hand, this test is not very sensitive given
 the small sample size. Thus, in spite of obtaining a *non-significant* 
 result, the possibility of a real effect-measure modification
 cannot be ignored based on these data only.
- 
- 
 
 
 ## Controlling or adjusting for the effect of `hyp` for `sex`
@@ -348,11 +345,12 @@ ci.lin(m4)[, c(1, 5, 6)]
 ## hyphyper    -448.0817 -600.8911 -295.2723
 ```
 The estimated effect of `hyp` on `bweight` 
-controlled for `sex` is thus $-448$ g, 
+adjusted for `sex` is thus $-448$ g, 
 which is a weighted average of the sex-specific estimates. 
 It is slightly different from the unadjusted estimate $-431$ g, indicating
-that there was no essential confounding by `sex`.
-Note also, that the model that was fitted makes the assumption that
+that there was no essential confounding by `sex` in the
+simple comparison of means.
+Note also, that the model being fitted makes the assumption that
 the estimated effect is the same for boys and girls.
 
 Many people go straight ahead and control for variables which are likely to
