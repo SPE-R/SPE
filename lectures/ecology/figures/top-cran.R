@@ -7,7 +7,7 @@ x <- x[N:1,]
 tidyverse.imports <- available.packages()["tidyverse","Imports"]
 in.tidyverse <- logical(N)
 for (i in 1:N) {
-    in.tidyverse[i] <- grepl(x$package[i], tidyverse.imports)
+    in.tidyverse[i] <- grepl(x$package[i], paste(tidyverse.imports, "tidyverse"))
 }
 
 pch <- 19
