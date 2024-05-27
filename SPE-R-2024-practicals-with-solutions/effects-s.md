@@ -62,9 +62,9 @@ Traditionally, these types of models have also been used
 to estimate *causal effects* of exposure variables
 from the pertinent regression coefficients. 
 More serious causal analysis is introduced in the lecture and practical
-on Saturday afternoon, and modern approaches 
+on Tuesday morning, and modern approaches 
 to estimate causal effects will be  considered
-on Tuesday afternoon.  
+on Thursday afternoon.  
 
 ## Data set `births`
 
@@ -260,6 +260,7 @@ with(births, interaction.plot(sex, hyp, bweight))
 ```
 
 ![](effects-s_files/figure-epub3/bweight-by-hyp-sex-1.png)<!-- -->
+
 At face value it appears that the mean difference in `bweight` between 
 hypertensive and normotensive 
 mothers is somewhat bigger in boys than in girls.
@@ -313,12 +314,12 @@ describes the contrast in the effect of `hyp` on `bweight`
  as the wide confidence interval about zero of this interaction
  parameter suggest good compatibility of the data with
  the null hypothesis of 
-  *no interaction between `hyp` and `sex`*. Thus, 
+  no interaction between `hyp` and `sex`. Thus, 
   there is insufficient evidence against
   the possibility of *effect(-measure) modification* by
   `sex` on the effect of `hyp`.
 On the other hand, this test is not very sensitive given
-the small sample size. Thus, in spite of obtaining a *non-significant* 
+the small sample size. Thus, in spite of obtaining a 'non-significant' 
 result, the possibility of a real effect-measure modification
 cannot be ignored based on these data only.
 
@@ -327,7 +328,7 @@ cannot be ignored based on these data only.
 
 The estimated effects of `hyp`: 
 $-496$ in boys and $-380$ in girls, look quite
-similar (and the $P$-value against *no interaction* was quite large, too).
+similar (and the $P$-value against no interaction was quite large, too).
 Therefore, we may now proceed to estimate the overall effect of `hyp` 
  *controlling for* -- or *adjusting for* -- `sex`. 
 
@@ -421,7 +422,7 @@ of `gestwks` is modelled by a *penalized spline*,
 based on the recommendations of Martyn in his lecture today. 
 
 You cannot fit a penalized spline model with `lm()` or
-`glm()`, Instead, function `gam()` in package
+`glm()`. Instead, function `gam()` in package
 `mgcv` can be used for this purpose. Make sure that you have loaded
 this package.
 
@@ -460,7 +461,7 @@ summary(mPs)
 From the output given by `summary()` you find that the
 estimated intercept is equal to the overall mean birth
 weight in the data.  The estimated residual variance is given by
-*Scale est.*  or from subobject `sig2` of the fitted
+`Scale est.`  or from subobject `sig2` of the fitted
 `gam` object.  Taking square root you will obtain the estimated
 residual standard deviation: $445.2$ g.
 
@@ -558,7 +559,7 @@ occurrence of low birth weight; whether birth weight is
 $< 2.5$ kg or not. Variable `lowbw` with values 1 and 0
 in the `births` data represents that dichotomy.
 Some analyses on `lowbw` were already conducted 
-in the previous exercise. Here we illustrate further
+in a previous practical. Here we illustrate further
 aspects of effect estimation
 and modelling binary outcome.
 
@@ -629,7 +630,7 @@ round(ci.lin(binOR, Exp = TRUE)[, c(1, 2, 5:7)], 3)
 ## hyphyper       1.317  0.311     3.731 2.027 6.865
 ```
 Check that these results were quite compatible with the
-*about* estimates given in the previous item.
+'about' estimates given in the previous item.
 How well is the odds ratio approximating the risk ratio here?
 
 - The prevalence of low birth weight is expected to be inversely related
@@ -717,10 +718,11 @@ round(ci.lin(binm2, Exp = TRUE)[, c(1, 2, 5:7)], 3)
 ## (Intercept)       -4.011  0.338     0.018 0.009 0.035
 ## I(gestwks - 40)   -0.896  0.108     0.408 0.330 0.505
 ```
+
 Inspect the results. How do you interpret the estimated coefficients
 and their exponentiated values?
-- 
-Instead of fitted logits, it can be more informative
+
+-  Instead of fitted logits, it can be more informative
 to plot the fitted prevalences against `gestwks`,
 in which we utilize the previously created data frame `nd`
 
@@ -732,6 +734,6 @@ plot(nd$gestwks, predm2, type = "l")
 ![](effects-s_files/figure-epub3/lowbw-gestwks-pred-1.png)<!-- -->
 - The curve seems to cover practically the whole range of
 the outcome probability scale with a relatively 
-steep slope between about 33 to 37 weeks. 
+steep slope between 33 to 37 weeks. 
 
 
