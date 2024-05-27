@@ -4,7 +4,7 @@ output:
   html_document: default
 ---
 ```{r, include=FALSE}
-knitr::opts_chunk$set(results = "hide", keep.source = TRUE, include = TRUE, eps = FALSE, prefix.string = "./graph/cont-eff")
+knitr::opts_chunk$set(results = "hide", fig.show="hide", messages=FALSE, keep.source = TRUE, include = TRUE, eps = FALSE, prefix.string = "./graph/cont-eff")
 ```
 
 ```{r echo=FALSE}
@@ -20,7 +20,7 @@ knitr::opts_chunk$set(results = "hide", keep.source = TRUE, include = TRUE, eps 
 This exercise deals with modelling incidence rates
 using Poisson regression. Our special interest is in
 estimating and reporting  curved effects of continuous
-explanatory variables on the theoretical rate
+explanatory variables on the hazard rate, i.e. the theoretical incidence rate
 
 We analyse the `testisDK` data found in the
 `Epi` package.
@@ -33,7 +33,7 @@ but finally, a penalized spline model is fitted.
 
 ## Testis cancer: Data input and housekeeping
 
-Load the packages and the data set, and inspect its structure:
+1. Load the packages and the data set, and inspect its structure:
 ```{r data-input}
 library(Epi)
 library(mgcv)
@@ -42,11 +42,10 @@ str(testisDK)
 summary(testisDK)
 head(testisDK)
 ```
-- There are nearly 5000 observations from 90 one-year age groups
+2. There are nearly 5000 observations from 90 one-year age groups
   and 54 calendar years. To get a clearer picture of what's going on,
   we do some housekeeping. The age range will be limited to 15-79
-  years, and age and period are both categorized into 5-year intervals
-  - according to the time-honoured practice in epidemiology.
+  years, and age and period are both categorized into 5-year intervals -- following to the time-honoured practice in epidemiology.
 ```{r housekeeping}
 tdk <- subset(testisDK, A > 14 & A < 80)
 tdk$Age <- cut(tdk$A, br = 5 * (3:16), include.lowest = TRUE, right = FALSE)
@@ -62,7 +61,7 @@ nPer <- length(levels(tdk$Per))
 
 Computation and tabulation of incidence rates
 
--  Tabulate numbers of cases and person-years, and compute the
+1.  Tabulate numbers of cases and person-years, and compute the
   incidence rates (per 100,000 y) in each 5 y $\times$ 5 y cell using
   `stat.table()`. Take a look at the structure of the thus created object
 ```{r tabulation}
@@ -79,9 +78,9 @@ tab <- stat.table(
 str(tab)
 ``` 
 The table is too wide to be readable as such. A graphical
-presentation is morew informative.
+presentation is more informative.
 
--  From the saved table object `tab` you can plot an
+2.  From the saved table object `tab` you can plot an
   age-incidence curve for each period separately, after you have
   checked the structure of the table, so that you know the relevant
   dimensions in it. There is a function `rateplot()` in `Epi`
@@ -97,9 +96,10 @@ rateplot(
   col = heat.colors(16), ann = TRUE
 )
 ```	
-Whan can you conclude about the trend in age-specific incidence rates 
-over calendar time? What about the effect of age?
-Is there any common pattern in the age-incidence curves across the periods?
+
+What can you conclude about the trend in age-specific incidence rates 
+over calendar time? What about the effect of age;
+is there any common pattern in the age-incidence curves across the periods?
 
 ## Age and period as categorical factors
 
@@ -108,7 +108,8 @@ on age and period model in the traditional way,
 in which both factors are treated as categorical.
 The model is additive on the log-rate scale.
 It is useful to scale the person-years to be expressed in $10^5$ y.
-In fitting the model we utilize the `poisreg` family object
+
+1. In fitting the model we utilize the `poisreg` family object
 found in package `Epi`. 
 
 ```{r mCat}
@@ -119,7 +120,7 @@ round(ci.exp(mCat), 2)
 ``` 
 What do the estimated rate ratios tell about the age and period effects? 
 
--  A graphical inspection of point estimates and confidence
+2.  A graphical inspection of point estimates and confidence
   intervals can be obtained as follows. In the beginning it is useful
   to define shorthands for the pertinent mid-age and mid-period values
   of the different intervals
@@ -128,30 +129,32 @@ aMid <- seq(17.5, 77.5, by = 5)
 pMid <- seq(1945, 1995, by = 5)
 par(mfrow = c(1, 2))
 matplot(aMid, rbind(c(1,1,1), ci.exp(mCat)[2:13, ]), type = "o", pch = 16,     
-   log = "y", cex.lab = 1.5, cex.axis = 1.5, col=c("black", "blue", "blue"),
+   log = "y", cex.lab = 1.5, cex.axis = 1.5, col= c("black", "blue", "blue"),
   xlab = "Age (years)", ylab = "Rate ratio" )
 matplot(pMid, rbind(c(1,1,1), ci.exp(mCat)[14:23, ]), type = "o", pch = 16,
   log = "y", cex.lab = 1.5, cex.axis = 1.5, col=c("black", "blue", "blue"),
   xlab = "Calendar year - 1900", ylab = "Rate ratio" )
 ``` 
--  In the fitted model the reference category for each factor was
+
+3.  In the fitted model the reference category for each factor was
   the first one.  As age is the dominating factor, it may be more
   informative to remove the intercept from the model.  As a
   consequence the age effects describe fitted rates at the reference
   level of the period factor. For the latter one could choose the
-  middle period 1968-72.
+  middle period 1968-72 using `Relevel()`.
 ```{r mCat2-new-ref}
 tdk$Per70 <- Relevel(tdk$Per, ref = 6)
 mCat2 <- glm(cbind(D, Y) ~ -1 + Age + Per70,
   family = poisreg(link = log), data = tdk )
 round(ci.exp(mCat2), 2)
 ``` 
-Let us also plot estimates from the latter model, too. 
+
+4. Let us also plot estimates from the latter model, too. 
 ```{r mCat2-plot, fig =FALSE}
 par(mfrow = c(1, 2))
 matplot(aMid, rbind(c(1,1,1), ci.exp(mCat2)[2:13, ]), type = "o", pch = 16,     
    log = "y", cex.lab = 1.5, cex.axis = 1.5, col=c("black", "blue", "blue"),
-  xlab = "Age (years)", ylab = "Rate ratio" )
+  xlab = "Age (years)", ylab = "Rate" )
 matplot(pMid, rbind(ci.exp(mCat2)[14:18, ], c(1,1,1), ci.exp(mCat2)[19:23, ]),
         type = "o", pch = 16, log = "y", cex.lab = 1.5, cex.axis = 1.5,
         col=c("black", "blue", "blue"),
@@ -167,11 +170,12 @@ non-linear. Yet, it is less clear whether the true period effect
 deviates from linearity. Nevertheless, there are good reasons to
 try fitting smooth continuous functions for both time scales. 
 
--  As the next task we fit a generalized additive model for the
+1.  As the next task we fit a generalized additive model for the
   log-rate on continuous age and period applying penalized splines
   with default settings of function `gam()` in package
   `mgcv`. In this fitting an *optimal* value for the penalty
-  parameter is chosen based on an AIC-like criterion known as UBRE.
+  parameter is chosen based on an AIC-like criterion known as UBRE
+  ('Un-Biased Risk Estimator')
 ```{r mPen}
 library(mgcv)
 mPen <- mgcv::gam(cbind(D, Y) ~ s(A) + s(P),
@@ -185,14 +189,14 @@ which the relative age effects and period effects will be contrasted.
 On the rate scale the baseline level 5.53 per 100000 y is obtained by
 `exp(1.7096)`.
 
--  See also the default plot for the fitted curves (solid lines)
+2.  See also the default plot for the fitted curves (solid lines)
   describing the age and the period effects which are interpreted as
   contrasts to the baseline level on the log-rate scale.
 ```{r mPen-plot, fig=FALSE}
 par(mfrow = c(1, 2))
-plot(mPen, seWithMean = TRUE)
+plot(mPen, se=2, seWithMean = TRUE)
 ``` 
-The dashed lines describe the 95% confidence band for the pertinent
+The dashed lines describe the approximate 95% confidence band for the pertinent
 curve.  One could get the impression that year 1968 would be some kind
 of reference value for the period effect, like period 1968-72 
 chosen as the reference  in the categorical
@@ -216,7 +220,7 @@ relevant argument that determines the basis dimension when specifying
 a smooth term by `s()` in the model formula).  On the other
 hand the period effect takes just about 3 df.
 
--  It is a good idea to do some diagnostic checking of the fitted
+3.  It is a good idea to do some diagnostic checking of the fitted
   model
 ```{r mPen-check}
 par(mfrow = c(2, 2))
@@ -224,10 +228,10 @@ gam.check(mPen)
 ``` 
 The four diagnostic plots are analogous to some of those used in
 the context of linear models for Gaussian responses, but not all of them
-may be as easy to interpret. - Pay attention to the note
+may be as easy to interpret. -- Pay attention to the note
 given in the printed output about the value of `k`.
 
-- Let us refit the model but now with an increased `k` for age:
+4. Let us refit the model but now with an increased `k` for age:
 ```{r mPen2}
 mPen2 <- mgcv::gam(cbind(D, Y) ~ s(A, k = 20) + s(P),
   family = poisreg(link = log), data = tdk
@@ -248,7 +252,7 @@ There does not seem to have happened any essential changes from the
 previously fitted curves, so maybe 8 df could, after all, be quite
 enough for the age effect.
 
--  Graphical presentation of the effects using `plot.gam()`
+5.  Graphical presentation of the effects using `plot.gam()`
  can be improved. For instance, we may present the
   age effect to describe the *mean* incidence rates by age, averaged
   over the whole time span of 54 years. This is obtained by adding 
