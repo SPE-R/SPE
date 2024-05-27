@@ -1,5 +1,5 @@
 ## ----include=FALSE------------------------------------------------------------
-knitr::opts_chunk$set(results = "markup", keep.source = TRUE, include = TRUE, eps = FALSE, prefix.string = "./graph/cont-eff")
+knitr::opts_chunk$set(results = "markup", fig.show="hide", messages=FALSE, keep.source = TRUE, include = TRUE, eps = FALSE, prefix.string = "./graph/cont-eff")
 
 
 ## ----echo=FALSE---------------------------------------------------------------
@@ -64,7 +64,7 @@ aMid <- seq(17.5, 77.5, by = 5)
 pMid <- seq(1945, 1995, by = 5)
 par(mfrow = c(1, 2))
 matplot(aMid, rbind(c(1,1,1), ci.exp(mCat)[2:13, ]), type = "o", pch = 16,     
-   log = "y", cex.lab = 1.5, cex.axis = 1.5, col=c("black", "blue", "blue"),
+   log = "y", cex.lab = 1.5, cex.axis = 1.5, col= c("black", "blue", "blue"),
   xlab = "Age (years)", ylab = "Rate ratio" )
 matplot(pMid, rbind(c(1,1,1), ci.exp(mCat)[14:23, ]), type = "o", pch = 16,
   log = "y", cex.lab = 1.5, cex.axis = 1.5, col=c("black", "blue", "blue"),
@@ -82,7 +82,7 @@ round(ci.exp(mCat2), 2)
 par(mfrow = c(1, 2))
 matplot(aMid, rbind(c(1,1,1), ci.exp(mCat2)[2:13, ]), type = "o", pch = 16,     
    log = "y", cex.lab = 1.5, cex.axis = 1.5, col=c("black", "blue", "blue"),
-  xlab = "Age (years)", ylab = "Rate ratio" )
+  xlab = "Age (years)", ylab = "Rate" )
 matplot(pMid, rbind(ci.exp(mCat2)[14:18, ], c(1,1,1), ci.exp(mCat2)[19:23, ]),
         type = "o", pch = 16, log = "y", cex.lab = 1.5, cex.axis = 1.5,
         col=c("black", "blue", "blue"),
@@ -100,7 +100,7 @@ summary(mPen)
 
 ## ----mPen-plot, fig=FALSE-----------------------------------------------------
 par(mfrow = c(1, 2))
-plot(mPen, seWithMean = TRUE)
+plot(mPen, se=2, seWithMean = TRUE)
 
 
 ## ----mPen-check---------------------------------------------------------------

@@ -1,5 +1,5 @@
 ## ----include=FALSE------------------------------------------------------------
-knitr::opts_chunk$set(results = "markup", prefix.string = "./graph/effects", include=TRUE)
+knitr::opts_chunk$set(results = "markup", fig.show="hide", message=FALSE, prefix.string = "./graph/effects", include=TRUE)
 
 
 ## ----Run births-house---------------------------------------------------------
