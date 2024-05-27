@@ -1,8 +1,8 @@
 ## ----include=FALSE------------------------------------------------------------
-knitr::opts_chunk$set(results = "markup", keep.source = TRUE, include = TRUE, eps = FALSE, prefix.string = "./graph/causInf2")
+knitr::opts_chunk$set(results = "markup", fig.show="hide", messages=FALSE, keep.source = TRUE, include = TRUE, eps = FALSE, prefix.string = "./graph/causInf2")
 
 
-## ----echo=FALSE, message=FALSE, warning=FALSE, results=TRUE, fig.show=TRUE----
+## ----dagitty, echo=FALSE, message=FALSE, warning=FALSE, results=TRUE, fig.show=TRUE----
 library(dagitty)
 d <-
   dagitty("dag {
@@ -32,8 +32,6 @@ plot(d)
 library(Epi)
 library(stdReg)
 library(PSweight)
-library(SuperLearner)
-library(tmle)
 
 
 ## ----true models--------------------------------------------------------------
@@ -64,7 +62,7 @@ set.seed(7777)
 dd <- genData(N)
 
 
-## ----association--------------------------------------------------------------
+## ----Contr function and associational contrasts-------------------------------
 Contr <- function(mu1, mu0) {
   RD <- mu1 - mu0
   RR <- mu1 / mu0
@@ -81,9 +79,9 @@ dd <- transform(dd,
   EY1.ind = EY(x = 1, z1, z2, z3, z4),
   EY0.ind = EY(x = 0, z1, z2, z3, z4)
 )
-EY1 <- mean(dd$EY1.ind)
-EY0 <- mean(dd$EY0.ind)
-round(Contr(EY1, EY0), 4)
+EY1pot <- mean(dd$EY1.ind)
+EY0pot <- mean(dd$EY0.ind)
+round(Contr(EY1pot, EY0pot), 4)
 
 
 ## ----outcome model------------------------------------------------------------
@@ -91,7 +89,7 @@ mY <- glm(y ~ x + z1 + z2 + z3 + z4, family = binomial, data = dd)
 round(ci.lin(mY, Exp = TRUE)[, c(1, 5)], 3)
 
 
-## ----predict------------------------------------------------------------------
+## ----fitted risks and predicted potential risks-------------------------------
 dd$yh <- predict(mY, type = "response") #  fitted values
 dd$yp1 <- predict(mY, newdata = data.frame(
   x = rep(1, N), # x=1
@@ -104,9 +102,9 @@ dd$yp0 <- predict(mY, newdata = data.frame(
 
 
 ## ----causal contrasts---------------------------------------------------------
-EY1.g <- mean(dd$yp1)
-EY0.g <- mean(dd$yp0)
-round(Contr(EY1.g, EY0.g), 4)
+EY1pot.g <- mean(dd$yp1)
+EY0pot.g <- mean(dd$yp0)
+round(Contr(EY1pot.g, EY0pot.g), 4)
 
 
 ## ----stdReg-------------------------------------------------------------------
@@ -118,18 +116,6 @@ round(summary(mY.std,
   transform = "odds",
   contrast = "ratio", reference = 0
 )$est.table, 4)
-
-
-## ----g-formula-att------------------------------------------------------------
-EY1att.g <- mean(subset(dd, x == 1)$yp1)
-EY0att.g <- mean(subset(dd, x == 1)$yp0)
-round(Contr(EY1att.g, EY0att.g), 4)
-
-
-## ----true among exposed-------------------------------------------------------
-EY1att <- mean(subset(dd, x == 1)$EY1.ind)
-EY0att <- mean(subset(dd, x == 1)$EY0.ind)
-round(Contr(EY1att, EY0att), 4)
 
 
 ## ----exposure model-----------------------------------------------------------
@@ -152,17 +138,9 @@ with(dd, tapply(w, x, sum))
 
 
 ## ----ipw-estimate-------------------------------------------------------------
-EY1.w <- sum(dd$x * dd$w * dd$y) / sum(dd$x * dd$w)
-EY0.w <- sum((1 - dd$x) * dd$w * dd$y) / sum((1 - dd$x) * dd$w)
-round(Contr(EY1.w, EY0.w), 4)
-
-
-## ----aipw---------------------------------------------------------------------
-EY1.a <- EY1.g + mean(dd$x * (dd$y - dd$yp1) * dd$w / sum(dd$x * dd$w))
-##  or   EY1.w - mean( ( ( dd$x*dd$w /sum(dd$x*dd$w) ) - 1 )*dd$yp1 )
-EY0.a <- EY0.g + mean((1 - dd$x) * (dd$y - dd$yp0) * dd$w / sum((1 - dd$x) * dd$w))
-##  or   EY0.w - mean( ( ( (1-dd$x)*dd$w/sum((1-dd$x)*dd$w) ) - 1 )*dd$yp0 )
-round(Contr(EY1.a, EY0.a), 4)
+EY1pot.w <- sum(dd$x * dd$w * dd$y) / sum(dd$x * dd$w)
+EY0pot.w <- sum((1 - dd$x) * dd$w * dd$y) / sum((1 - dd$x) * dd$w)
+round(Contr(EY1pot.w, EY0pot.w), 4)
 
 
 ## ----PSweight, fig=FALSE------------------------------------------------------
@@ -190,12 +168,32 @@ round(exp(logRR.ipw$estimates[c(1, 4, 5)]), 3)
 round(exp(summary(ipwest, type = "OR")$estimates[c(1, 4, 5)]), 3)
 
 
+## ----g-formula-att------------------------------------------------------------
+EY1att.g <- mean(subset(dd, x == 1)$yp1)
+EY0att.g <- mean(subset(dd, x == 1)$yp0)
+round(Contr(EY1att.g, EY0att.g), 4)
+
+
+## ----true among exposed-------------------------------------------------------
+EY1att <- mean(subset(dd, x == 1)$EY1.ind)
+EY0att <- mean(subset(dd, x == 1)$EY0.ind)
+round(Contr(EY1att, EY0att), 4)
+
+
 ## ----ps-estimation-att--------------------------------------------------------
 psatt <- PSweight(ps.formula = mX2, yname = "y", data = dd, weight = "treated")
 psatt
 round(summary(psatt)$estimates[1], 4)
 round(exp(summary(psatt, type = "RR")$estimates[1]), 3)
 round(exp(summary(psatt, type = "OR")$estimates[1]), 3)
+
+
+## ----aipw---------------------------------------------------------------------
+EY1pot.a <- EY1pot.g + mean(dd$x * (dd$y - dd$yp1) * dd$w / sum(dd$x * dd$w))
+##  or   EY1.w - mean( ( ( dd$x*dd$w /sum(dd$x*dd$w) ) - 1 )*dd$yp1 )
+EY0pot.a <- EY0pot.g + mean((1 - dd$x) * (dd$y - dd$yp0) * dd$w / sum((1 - dd$x) * dd$w))
+##  or   EY0.w - mean( ( ( (1-dd$x)*dd$w/sum((1-dd$x)*dd$w) ) - 1 )*dd$yp0 )
+round(Contr(EY1pot.a, EY0pot.a), 4)
 
 
 ## ----clever covariates--------------------------------------------------------
@@ -211,18 +209,20 @@ eps <- coef(epsmod)
 eps
 
 
-## ----tmle estimates-----------------------------------------------------------
-yp0.H <- plogis(qlogis(dd$yp0) + eps[1] / (1 - dd$PS2))
-yp1.H <- plogis(qlogis(dd$yp1) + eps[2] / dd$PS2)
+## ----tmle predictions---------------------------------------------------------
+ypred0.H <- plogis(qlogis(dd$yp0) + eps[1] / (1 - dd$PS2))
+ypred1.H <- plogis(qlogis(dd$yp1) + eps[2] / dd$PS2)
 
 
 ## ----tmle-estimates-----------------------------------------------------------
-EY0.t <- mean(yp0.H)
-EY1.t <- mean(yp1.H)
-round(Contr(EY1.t, EY0.t), 4)
+EY0pot.t <- mean(ypred0.H)
+EY1pot.t <- mean(ypred1.H)
+round(Contr(EY1pot.t, EY0pot.t), 4)
 
 
 ## ----sample-------------------------------------------------------------------
+library(SuperLearner)
+library(tmle)
 set.seed(7622)
 n <- 2000
 sampind <- sample(N, n)
