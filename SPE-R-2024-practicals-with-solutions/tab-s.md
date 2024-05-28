@@ -33,7 +33,7 @@ singleton births in a large London hospital. The outcome of interest
 is the birth weight of the baby, also dichotomised as normal or low
 birth weight. These data are available in the Epi package:
 
-```r
+``` r
 library(Epi)
 data(births)
 names(births)
@@ -44,7 +44,7 @@ names(births)
 ## [8] "sex"
 ```
 
-```r
+``` r
 head(births)
 ```
 
@@ -60,7 +60,7 @@ head(births)
 In order to work with this data set we need to transform some of the variables
 into factors. This is done with the following commands:
 
-```r
+``` r
 births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
 births$sex <- factor(births$sex, labels = c("M", "F"))
 births$agegrp <- 
@@ -87,7 +87,7 @@ can be tabulated.
 
 The simplest table one-way table is created by
 
-```r
+``` r
 stat.table(index = sex, data = births)
 ```
 
@@ -108,7 +108,7 @@ specifying the frame.
 You can display several summary statistics in the same table by
 giving a list of expressions to the `contents` argument:
 
-```r
+``` r
 stat.table(
   index = sex, 
   contents = list(count(), percent(sex)), 
@@ -144,7 +144,7 @@ same as the number of rows of the data frame `births`.
 ```
 To see how the mean birth weight changes with `sex`, try
 
-```r
+``` r
 stat.table(index = sex, contents = mean(bweight), data = births)
 ```
 
@@ -171,7 +171,7 @@ Add the count to this table. Add also the margin with `margin=TRUE`.
 ```
 As an alternative to `bweight` we can look at `lowbw` with
 
-```r
+``` r
 stat.table(index = sex, contents = percent(lowbw), data = births)
 ```
 
@@ -185,7 +185,7 @@ stat.table(index = sex, contents = percent(lowbw), data = births)
 ```
 All the percentages are 100! To use the `percent` function the variable `lowbw` must also be in the index, as in
 
-```r
+``` r
 stat.table(
   index = list(sex, lowbw), 
   contents = percent(lowbw), 
@@ -245,7 +245,7 @@ The final column is the percentage of babies with low birth weight by different 
 Another way of obtaining the percentage of low birth weight babies by
 gestation is to use the ratio function:
 
-```r
+``` r
 stat.table(gest4, ratio(lowbw, 1, 100), data = births)
 ```
 
@@ -276,7 +276,7 @@ on the `contents` argument, but these are not always very informative.
 Supply your own column headings using *tagged* lists as the
 value of the `contents` argument, within a `stat.table` call:
 
-```r
+``` r
 stat.table(gest4, contents = list(
   N = count(),
   "(%)" = percent(gest4)
@@ -298,7 +298,7 @@ informative title to the index variable. You can do this in the same way:
 instead of giving `gest4` as the `index` argument to `stat.table`,
 use a named list:
 
-```r
+``` r
 stat.table(index = list("Gestation time" = gest4), data = births)
 ```
 
@@ -319,7 +319,7 @@ stat.table(index = list("Gestation time" = gest4), data = births)
 The following call gives a $2\times 2$ table showing the mean birth weight
 cross-classified by `sex` and `hyp`.
 
-```r
+``` r
 stat.table(
   list(sex, hyp), 
   contents = mean(bweight), 
@@ -409,7 +409,7 @@ There are two arguments to the print method for `stat.table`. The
 `digits` argument which controls
 the number of digits printed after the decimal point. This table
 
-```r
+``` r
 odds.tab <- 
   stat.table(
     gest4, 

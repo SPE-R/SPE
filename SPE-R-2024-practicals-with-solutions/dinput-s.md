@@ -15,7 +15,7 @@ dedicated to data which includes around 100 data sets.  This is
 attached towards the end of the search path, and you can see its
 contents with
 
-```r
+``` r
 objects("package:datasets")
 ```
 
@@ -59,7 +59,7 @@ objects("package:datasets")
 A description of all of these objects is available using the `help()`
 function. For example
 
-```r
+``` r
 help(Titanic)
 ```
 gives an explanation of the `Titanic` data set, along with
@@ -70,7 +70,7 @@ available automatically when you load the `Epi` package, but
 you can make a copy in your workspace using the `data()`
 function. For example
 
-```r
+``` r
 library(Epi)
 data(bdendo)
 ```
@@ -150,7 +150,7 @@ the data frame (integer, double precision, or text).
 
 Read in the table with:
 
-```r
+``` r
 fem <- read.table("./data/fem.dat", header = TRUE)
 ```
 Note that you must assign the result of `read.table()` to an
@@ -159,7 +159,7 @@ screen and then lost.
 
 You can see the names of the variables with
 
-```r
+``` r
 names(fem)
 ```
 
@@ -169,7 +169,7 @@ names(fem)
 ```
 The structure of the data frame can be seen with
 
-```r
+``` r
 str(fem)
 ```
 
@@ -187,7 +187,7 @@ str(fem)
 ```
 You can also inspect the top few rows with
 
-```r
+``` r
 head(fem)
 ```
 
@@ -210,7 +210,7 @@ the calculation with an error message.
 
 You can recode the missing values with
 
-```r
+``` r
 fem$IQ[fem$IQ == -99] <- NA
 ```
 Of course it is much better to handle special missing value codes
@@ -233,7 +233,7 @@ The `read.table()` function does not assume this by default so
 you have to specify this with the argument `header=TRUE`.  See
 what happens when you forget to include this option:
 
-```r
+``` r
 fem2 <- read.table("data/fem.dat")
 str(fem2)
 ```
@@ -251,7 +251,7 @@ str(fem2)
 ##  $ V9: chr  "WEIGHT" "2.23" "1" "1.82" ...
 ```
 
-```r
+``` r
 head(fem2)
 ```
 
@@ -283,7 +283,7 @@ given default names `V1`, `V2`, ... . You will soon realise this
 mistake if you try to access a variable in the data frame by, for
 example
 
-```r
+``` r
 fem2$IQ
 ```
 
@@ -307,7 +307,7 @@ using the `sep` argument. See what happens when you assume the
 wrong separator, in this case a tab, which is specified using the
 escape sequence `"\t"`
 
-```r
+``` r
 fem3 <- read.table("data/fem.dat", sep = "\t")
 str(fem3)
 ```
@@ -336,7 +336,7 @@ are represented by *NA*.
 Inspect the file with a text editor, and then see what happens when
 you read the file in incorrectly:
 
-```r
+``` r
 fem4 <- read.table("data/fem-dot.dat", header = TRUE)
 str(fem4)
 ```
@@ -357,7 +357,7 @@ You should have enough clues by now to work out what went wrong.
 
 You can read the data correctly using the `na.strings` argument
 
-```r
+``` r
 fem4 <- 
   read.table(
     "data/fem-dot.dat", 
@@ -383,7 +383,7 @@ do is specify the file name.
 You can see what these default arguments are with the `args()`
 function.
 
-```r
+``` r
 args(read.csv)
 ```
 
@@ -393,7 +393,7 @@ args(read.csv)
 ## NULL
 ```
 
-```r
+``` r
 args(read.csv2)
 ```
 
@@ -434,7 +434,7 @@ A copy of the file `fem.dat` is held at
 read it in with
 
 
-```r
+``` r
 fem6 <- 
   read.table(
     "http://www.bendixcarstensen.com/SPE/data/fem.dat",
@@ -493,7 +493,7 @@ packages.
 The file `fem.dta` contains the FEM dataset in the format
 used by Stata. Read it into `R` with
 
-```r
+``` r
 library(foreign)
 fem5 <- read.dta("data/fem.dta")
 head(fem5)
@@ -517,7 +517,7 @@ but the original variable labels are not lost. They are still attached
 to the data frame as an invisible *attribute*, which you can see
 with
 
-```r
+``` r
 attr(fem5, "var.labels")
 ```
 
@@ -535,7 +535,7 @@ attr(fem5, "var.labels")
 A lot of *meta-data* is attached to the data in the form of
 attributes. You can see the whole list of attributes with
 
-```r
+``` r
 attributes(fem5)
 ```
 
@@ -606,7 +606,7 @@ attributes(fem5)
 ```
 or just the attribute names with
 
-```r
+``` r
 names(attributes(fem5))
 ```
 

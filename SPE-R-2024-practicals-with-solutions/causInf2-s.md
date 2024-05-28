@@ -100,7 +100,7 @@ to include covariate
 1.  Load the necessary packages.
 
 
-```r
+``` r
 library(Epi)
 library(stdReg)
 library(PSweight)
@@ -111,7 +111,7 @@ for the exposure and those for the outcome based on the assumed
 true exposure model and the true outcome model, respectively.
 
 
-```r
+``` r
 EX <- function(z2, z3, z4) {
   plogis(-5 + 0.05 * z2 + 0.25 * z3 + 0.5 * z4 + 0.4 * z2 * z4)
 }
@@ -126,7 +126,7 @@ simulating random values from pertinent probability
 distributions based on the given    assumptions.
 
 
-```r
+``` r
 genData <- function(N) {
   z1 <- rbinom(N, size = 1, prob = 0.5) # Bern(0.5)
   z2 <- rbinom(N, size = 1, prob = 0.65) # Bern(0.65)
@@ -142,7 +142,7 @@ genData <- function(N) {
 500000  subjects
 
 
-```r
+``` r
 N <- 500000
 set.seed(7777)
 dd <- genData(N)
@@ -158,7 +158,7 @@ in the whole target population, as well as their
     ratio. Before that define a useful function
 
 
-```r
+``` r
 Contr <- function(mu1, mu0) {
   RD <- mu1 - mu0
   RR <- mu1 / mu0
@@ -196,7 +196,7 @@ radiotherapy only as compared with those receiving chemotherapy, too?
     $$
 
 
-```r
+``` r
 dd <- transform(dd,
   EY1.ind = EY(x = 1, z1, z2, z3, z4),
   EY0.ind = EY(x = 0, z1, z2, z3, z4)
@@ -245,7 +245,7 @@ $$ E(Y^{X=x}) = E_Z[E(Y|X=x,Z)]
     <!-- % model -->
 
 
-```r
+``` r
 mY <- glm(y ~ x + z1 + z2 + z3 + z4, family = binomial, data = dd)
 round(ci.lin(mY, Exp = TRUE)[, c(1, 5)], 3)
 ```
@@ -271,7 +271,7 @@ confidence intervals in such a big population.
     $Z$-variables as they are.
 
 
-```r
+``` r
 dd$yh <- predict(mY, type = "response") #  fitted values
 dd$yp1 <- predict(mY, newdata = data.frame(
   x = rep(1, N), # x=1
@@ -292,7 +292,7 @@ g-formula compute now the
     $E(Y^{X=0})=\pi^0$ as well as the marginal causal contrasts
 
 
-```r
+``` r
 EY1pot.g <- mean(dd$yp1)
 EY0pot.g <- mean(dd$yp0)
 round(Contr(EY1pot.g, EY0pot.g), 4)
@@ -326,7 +326,7 @@ in package `stdReg`
 (see [Sjölander 2016](https://doi.org/10.1007/s10654-016-0157-3))
 
 
-```r
+``` r
 mY.std <- stdGlm(fit = mY, data = dd, X = "x")
 summary(mY.std)
 ```
@@ -343,7 +343,7 @@ summary(mY.std)
 ## 1    0.833   0.001562      0.830      0.836
 ```
 
-```r
+``` r
 round(summary(mY.std, contrast = "difference", reference = 0)$est.table, 4)
 ```
 
@@ -353,7 +353,7 @@ round(summary(mY.std, contrast = "difference", reference = 0)$est.table, 4)
 ## 1   0.1822     0.0017     0.1788     0.1856
 ```
 
-```r
+``` r
 round(summary(mY.std, contrast = "ratio", reference = 0)$est.table, 4)
 ```
 
@@ -363,7 +363,7 @@ round(summary(mY.std, contrast = "ratio", reference = 0)$est.table, 4)
 ## 1     1.28     0.0028     1.2745     1.2855
 ```
 
-```r
+``` r
 round(summary(mY.std,
   transform = "odds",
   contrast = "ratio", reference = 0
@@ -413,7 +413,7 @@ model for the exposure including the main effects of the
     $$
 
 
-```r
+``` r
 mX <- glm(x ~ z1 + z2 + z3 + z4,
   family = binomial(link = logit), data = dd
 )
@@ -436,7 +436,7 @@ fitted probabilities of
     compare their distribution between the two groups.
 
 
-```r
+``` r
 dd$PS <- predict(mX, type = "response")
 summary(dd$PS)
 ```
@@ -446,7 +446,7 @@ summary(dd$PS)
 ## 0.005256 0.041532 0.112765 0.172440 0.248554 0.613993
 ```
 
-```r
+``` r
 with(subset(dd, x == 0), plot(density(PS), lty = 2))
 with(subset(dd, x == 1), lines(density(PS), lty = 1))
 ```
@@ -465,7 +465,7 @@ $$
     sum of weights should be close to $N$ in both groups.
 
 
-```r
+``` r
 dd$w <- ifelse(dd$x == 1, 1 / dd$PS, 1 / (1 - dd$PS))
 with(dd, tapply(w, x, sum))
 ```
@@ -490,7 +490,7 @@ potential or counterfactual risks for
     $$
 
 
-```r
+``` r
 EY1pot.w <- sum(dd$x * dd$w * dd$y) / sum(dd$x * dd$w)
 EY0pot.w <- sum((1 - dd$x) * dd$w * dd$y) / sum((1 - dd$x) * dd$w)
 round(Contr(EY1pot.w, EY0pot.w), 4)
@@ -525,7 +525,7 @@ flexible exposure model
     `SumStat()`:
 
 
-```r
+``` r
 mX2 <- glm(x ~ (z2 + z3 + z4)^2, family = binomial, data = dd)
 round(ci.lin(mX2, Exp = TRUE)[, c(1, 5)], 3)
 ```
@@ -541,7 +541,7 @@ round(ci.lin(mX2, Exp = TRUE)[, c(1, 5)], 3)
 ## z3:z4          0.001     1.001
 ```
 
-```r
+``` r
 psw <- SumStat(
   ps.formula = mX2$formula, data = dd,
   weight = c("IPW", "treated", "overlap")
@@ -564,7 +564,7 @@ properties of the distribution and to check the balance
 of the propensity scores, for instance
 
 
-```r
+``` r
 plot(psw, type = "balance", metric = "PSD")
 ```
 
@@ -576,7 +576,7 @@ these measures for given weights are less than 0.1.
     on the log-scale; therefore $\exp$-transformation
 
 
-```r
+``` r
 ipwest <- PSweight(ps.formula = mX2, yname = "y", data = dd, weight = "IPW")
 ipwest
 ```
@@ -588,7 +588,7 @@ ipwest
 ## 0.6526, 0.8255
 ```
 
-```r
+``` r
 summary(ipwest)
 ```
 
@@ -608,7 +608,7 @@ summary(ipwest)
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-```r
+``` r
 (logRR.ipw <- summary(ipwest, type = "RR"))
 ```
 
@@ -629,7 +629,7 @@ summary(ipwest)
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-```r
+``` r
 round(exp(logRR.ipw$estimates[c(1, 4, 5)]), 3)
 ```
 
@@ -637,7 +637,7 @@ round(exp(logRR.ipw$estimates[c(1, 4, 5)]), 3)
 ## [1] 1.265 1.257 1.273
 ```
 
-```r
+``` r
 round(exp(summary(ipwest, type = "OR")$estimates[c(1, 4, 5)]), 3)
 ```
 
@@ -681,7 +681,7 @@ The risks and their
 contrasts are estimated from the fit of the outcome model:
 
 
-```r
+``` r
 EY1att.g <- mean(subset(dd, x == 1)$yp1)
 EY0att.g <- mean(subset(dd, x == 1)$yp0)
 round(Contr(EY1att.g, EY0att.g), 4)
@@ -704,7 +704,7 @@ exposed based on the true model are similarly obtained
 from the quantities in item 4.2 above:
 
 
-```r
+``` r
 EY1att <- mean(subset(dd, x == 1)$EY1.ind)
 EY0att <- mean(subset(dd, x == 1)$EY0.ind)
 round(Contr(EY1att, EY0att), 4)
@@ -725,7 +725,7 @@ approach, then the weights are $W_i = 1$ for the exposed and
     Call again `PSweight` but with another choice of weight:
 
 
-```r
+``` r
 psatt <- PSweight(ps.formula = mX2, yname = "y", data = dd, weight = "treated")
 psatt
 ```
@@ -738,7 +738,7 @@ psatt
 ## 0.7667, 0.8949
 ```
 
-```r
+``` r
 round(summary(psatt)$estimates[1], 4)
 ```
 
@@ -746,7 +746,7 @@ round(summary(psatt)$estimates[1], 4)
 ## [1] 0.1282
 ```
 
-```r
+``` r
 round(exp(summary(psatt, type = "RR")$estimates[1]), 3)
 ```
 
@@ -754,7 +754,7 @@ round(exp(summary(psatt, type = "RR")$estimates[1]), 3)
 ## [1] 1.167
 ```
 
-```r
+``` r
 round(exp(summary(psatt, type = "OR")$estimates[1]), 3)
 ```
 
@@ -788,7 +788,7 @@ $$
 $$
 
 
-```r
+``` r
 EY1pot.a <- EY1pot.g + mean(dd$x * (dd$y - dd$yp1) * dd$w / sum(dd$x * dd$w))
 ##  or   EY1.w - mean( ( ( dd$x*dd$w /sum(dd$x*dd$w) ) - 1 )*dd$yp1 )
 EY0pot.a <- EY0pot.g + mean((1 - dd$x) * (dd$y - dd$yp0) * dd$w / sum((1 - dd$x) * dd$w))
@@ -818,7 +818,7 @@ obtained from the outcome model by elements that are derived from the exposure m
 obtained above and define the "clever covariates"
 
 
-```r
+``` r
 dd$H1 <- dd$x / dd$PS2
 dd$H0 <- (1 - dd$x) / (1 - dd$PS2)
 ```
@@ -835,7 +835,7 @@ in which the clever
     removed.
 
 
-```r
+``` r
 epsmod <- glm(y ~ -1 + H0 + H1 + offset(qlogis(yh)),
   family = binomial(link = logit), data = dd
 )
@@ -856,7 +856,7 @@ eps
     predictions are returned to the original scale.
 
 
-```r
+``` r
 ypred0.H <- plogis(qlogis(dd$yp0) + eps[1] / (1 - dd$PS2))
 ypred1.H <- plogis(qlogis(dd$yp1) + eps[2] / dd$PS2)
 ```
@@ -866,7 +866,7 @@ ypred1.H <- plogis(qlogis(dd$yp1) + eps[2] / dd$PS2)
 Estimates of the causal contrasts:
 
 
-```r
+``` r
 EY0pot.t <- mean(ypred0.H)
 EY1pot.t <- mean(ypred1.H)
 round(Contr(EY1pot.t, EY0pot.t), 4)
@@ -893,7 +893,7 @@ sample of 2000 subjects only.
 1.  A simple random sample of $n=2000$ is drawn from the population.
 
 
-```r
+``` r
 library(SuperLearner)
 ```
 
@@ -929,7 +929,7 @@ library(SuperLearner)
 ## Package created on 2024-02-06
 ```
 
-```r
+``` r
 library(tmle)
 ```
 
@@ -951,7 +951,7 @@ library(tmle)
 ## Use tmleNews() to see details on changes and bug fixes
 ```
 
-```r
+``` r
 set.seed(7622)
 n <- 2000
 sampind <- sample(N, n)
@@ -961,7 +961,7 @@ samp <- dd[sampind, ]
 2.  The algorithms to be used in this exercise are chosen
 
 
-```r
+``` r
 SL.library <- c(
   "SL.glm", "SL.step", "SL.step.interaction",
   "SL.glm.interaction", "SL.gam",
@@ -975,7 +975,7 @@ variable, and argument `W` contains the confounders. --
 The run can take a while ...
 
 
-```r
+``` r
 tmlest <- tmle(
   Y = samp$y, A = samp$x, W = samp[, c("z1", "z2", "z3", "z4")],
   family = "binomial", Q.SL.library = SL.library,
