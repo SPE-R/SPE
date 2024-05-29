@@ -2,46 +2,46 @@
 knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.string = "./graph/oral")
 
 
-## ----packages, echo=T,eval=FALSE----------------------------------------------
+## ----packages, echo=TRUE,eval=FALSE-------------------------------------------
 ## library(Epi)
 ## library(survival)
 
 
-## ----dinput, echo=T,eval=FALSE------------------------------------------------
+## ----dinput, echo=TRUE,eval=FALSE---------------------------------------------
 ## orca <- read.table("pracs/data/oralca2.txt", header = TRUE)
 ## head(orca)
 ## str(orca)
 ## summary(orca)
 
 
-## ----Survobject, echo=T,eval=FALSE--------------------------------------------
-## orca$suob <- Surv(orca$time, 1 * (orca$event > 0))
-## str(orca$suob)
-## summary(orca$suob)
+## ----Survobject, echo=TRUE,eval=FALSE-----------------------------------------
+## suob <- Surv(orca$time, 1 * (orca$event > 0))
+## str(suob)
+## summary(suob)
 
 
-## ----surv1, echo=T,eval=FALSE-------------------------------------------------
+## ----surv1, echo=TRUE,eval=FALSE----------------------------------------------
 ## s.all <- survfit(suob ~ 1, data = orca)
 
 
-## ----surv2, echo=T,eval=FALSE-------------------------------------------------
+## ----surv2, echo=TRUE,eval=FALSE----------------------------------------------
 ## s.all
 ## str(s.all)
 
 
-## ----survcdf1, echo=T, fig=T, height=6, width=7,eval=FALSE--------------------
+## ----survcdf1, echo=TRUE, fig=TRUE, height=6, width=7,eval=FALSE--------------
 ## plot(s.all)
 ## lines(s.all, fun = "event", mark.time = F, conf.int = FALSE)
 
 
-## ----cdfstage, echo=T, fig=T, height=6, width=7,eval=FALSE--------------------
+## ----cdfstage, echo=TRUE, fig=TRUE, height=6, width=7,eval=FALSE--------------
 ## s.stg <- survfit(suob ~ stage, data = orca)
 ## col5 <- c("green", "blue", "black", "red", "gray")
 ## plot(s.stg, col = col5, fun = "event", mark.time = FALSE)
 ## s.stg
 
 
-## ----chstage, echo=T, fig=T, height=6, width=12,eval=FALSE--------------------
+## ----chstage, echo=TRUE, fig=TRUE, height=6, width=12,eval=FALSE--------------
 ## par(mfrow = c(1, 2))
 ## plot(s.stg, col = col5, fun = "cumhaz", main = "cum. hazards")
 ## plot(
@@ -52,7 +52,7 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## )
 
 
-## ----sexage, echo=T,eval=FALSE------------------------------------------------
+## ----sexage, echo=TRUE,eval=FALSE---------------------------------------------
 ## orca$agegr <- cut(orca$age, br = c(0, 55, 75, 95))
 ## stat.table(list(sex, agegr), list(count(), percent(agegr)),
 ##   margins = TRUE,
@@ -60,7 +60,7 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## )
 
 
-## ----cdfsexage, echo=T, fig=T, height=6, width=7,eval=FALSE-------------------
+## ----cdfsexage, echo=TRUE, fig=TRUE, height=6, width=7,eval=FALSE-------------
 ## s.agrx <- survfit(suob ~ agegr + sex, data = orca)
 ## par(mfrow = c(1, 1))
 ## plot(s.agrx,
@@ -69,7 +69,7 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## )
 
 
-## ----cif1a, echo=T,eval=FALSE-------------------------------------------------
+## ----cif1a, echo=TRUE,eval=FALSE----------------------------------------------
 ## library(survival)
 ## cif1 <- survfit(Surv(time, event, type = "mstate") ~ 1,
 ##   data = orca
@@ -77,13 +77,13 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## str(cif1)
 
 
-## ----plotcif1, echo=T,fig=T,eval=FALSE----------------------------------------
+## ----plotcif1, echo=TRUE,fig=TRUE,eval=FALSE----------------------------------
 ## par(mfrow = c(1, 2))
 ## plotCIF(cif1, 1, main = "Cancer death")
 ## plotCIF(cif1, 2, main = "Other deaths")
 
 
-## ----plotcif2, echo=T, fig=T, height=6, width=10,eval=FALSE-------------------
+## ----plotcif2, echo=TRUE, fig=TRUE, height=6, width=10,eval=FALSE-------------
 ## col5 <- c("green", "blue", "black", "red", "gray")
 ## cif2 <- survfit(Surv(time, event, type = "mstate") ~ stage,
 ##   data = orca
@@ -101,23 +101,23 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## )
 
 
-## ----stackedcif1, echo=T, fig=T, eval=FALSE-----------------------------------
+## ----stackedcif1, echo=TRUE, fig=TRUE, eval=FALSE-----------------------------
 ## par(mfrow = c(1, 1))
 ## stackedCIF(cif1, colour = c("gray70", "gray85"))
 
 
-## ----cox1, echo=T,eval=FALSE--------------------------------------------------
+## ----cox1, echo=TRUE,eval=FALSE-----------------------------------------------
 ## options(show.signif.stars = FALSE)
 ## m1 <- coxph(suob ~ sex + I((age - 65) / 10) + stage, data = orca)
 ## summary(m1)
 ## round(ci.exp(m1), 4)
 
 
-## ----coxzph, echo=T,eval=FALSE------------------------------------------------
+## ----coxzph, echo=TRUE,eval=FALSE---------------------------------------------
 ## cox.zph(m1)
 
 
-## ----cox2, echo=T,eval=FALSE--------------------------------------------------
+## ----cox2, echo=TRUE,eval=FALSE-----------------------------------------------
 ## orca2 <- subset(orca, stage != "unkn")
 ## orca2$st3 <- Relevel(orca2$stage, list(1:2, 3, 4:5))
 ## levels(orca2$st3) <- c("I-II", "III", "IV")
@@ -125,7 +125,7 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## round(ci.exp(m2), 4)
 
 
-## ----cox2cll, echo=T,eval=FALSE-----------------------------------------------
+## ----cox2cll, echo=TRUE,eval=FALSE--------------------------------------------
 ## newd <- data.frame(
 ##   sex = c(rep("Male", 6), rep("Female", 6)),
 ##   age = rep(c(rep(40, 3), rep(80, 3)), 2),
@@ -160,7 +160,7 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## )
 
 
-## ----coxhaz1, echo=T,eval=FALSE-----------------------------------------------
+## ----coxhaz1, echo=TRUE,eval=FALSE--------------------------------------------
 ## m2haz1 <-
 ##   coxph(
 ##     Surv(time, event == 1) ~ sex + I((age - 65) / 10) + st3,
@@ -170,7 +170,7 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## cox.zph(m2haz1)
 
 
-## ----coxhaz2, echo=T,eval=FALSE-----------------------------------------------
+## ----coxhaz2, echo=TRUE,eval=FALSE--------------------------------------------
 ## m2haz2 <-
 ##   coxph(
 ##     Surv(time, event == 2) ~ sex + I((age - 65) / 10) + st3,
@@ -180,7 +180,7 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## cox.zph(m2haz2)
 
 
-## ----lexis 1, echo=T,eval=FALSE-----------------------------------------------
+## ----lexis 1, echo=TRUE,eval=FALSE--------------------------------------------
 ## orca.lex <- Lexis(
 ##   exit = list(stime = time),
 ##   exit.status = factor(event,
@@ -191,29 +191,29 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## summary(orca.lex)
 
 
-## ----lexis, echo=T,eval=FALSE-------------------------------------------------
+## ----lexis, echo=TRUE,eval=FALSE----------------------------------------------
 ## boxes(orca.lex)
 
 
-## ----split, echo=T,eval=FALSE-------------------------------------------------
+## ----split, echo=TRUE,eval=FALSE----------------------------------------------
 ## orca2.lex <- subset(orca.lex, stage != "unkn")
 ## orca2.lex$st3 <- Relevel(orca2$stage, list(1:2, 3, 4:5))
 ## levels(orca2.lex$st3) <- c("I-II", "III", "IV")
 
 
-## ----split b, echo=T,eval=FALSE-----------------------------------------------
+## ----split b, echo=TRUE,eval=FALSE--------------------------------------------
 ## cuts <- sort(orca2$time[orca2$event == 1])
 ## orca2.spl <-
 ##   splitLexis(orca2.lex, br = cuts, time.scale = "stime")
 ## orca2.spl$timeband <- as.factor(orca2.spl$stime)
 
 
-## ----strsplit, echo=T,eval=FALSE----------------------------------------------
+## ----strsplit, echo=TRUE,eval=FALSE-------------------------------------------
 ## str(orca2.spl)
 ## orca2.spl[1:20, ]
 
 
-## ----poisson, echo=T,eval=FALSE-----------------------------------------------
+## ----poisson, echo=TRUE,eval=FALSE--------------------------------------------
 ## m2pois1 <- glm(
 ##   1 * (lex.Xst == "Oral ca. death") ~
 ##     -1 + timeband + sex + I((age - 65) / 10) + st3,
@@ -221,7 +221,7 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## )
 
 
-## ----poissonresults, echo=T, fig=T,eval=FALSE---------------------------------
+## ----poissonresults, echo=TRUE, fig=TRUE,eval=FALSE---------------------------
 ## tb <- as.numeric(levels(orca2.spl$timeband))
 ## ntb <- length(tb)
 ## tbmid <- (tb[-ntb] + tb[-1]) / 2 # midpoints of the intervals
@@ -232,7 +232,7 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## )
 
 
-## ----poissonspline, echo=T, fig=T,eval=FALSE----------------------------------
+## ----poissonspline, echo=TRUE, fig=TRUE,eval=FALSE----------------------------
 ## library(splines)
 ## m2pspli <-
 ##   update(
