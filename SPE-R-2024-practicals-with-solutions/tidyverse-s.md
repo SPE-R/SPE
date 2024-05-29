@@ -801,11 +801,11 @@ age
 ## # A tibble: 6 × 2
 ##     pid   age
 ##   <int> <int>
-## 1     1    23
+## 1     1    21
 ## 2     2    24
-## 3     3    21
-## 4     4    22
-## 5     5    24
+## 3     3    16
+## 4     4    17
+## 5     5    25
 ## 6     6    25
 ```
 
@@ -836,11 +836,11 @@ bind_rows(age, center)
 ## # A tibble: 11 × 3
 ##      pid   age center
 ##    <dbl> <int> <chr> 
-##  1     1    23 <NA>  
+##  1     1    21 <NA>  
 ##  2     2    24 <NA>  
-##  3     3    21 <NA>  
-##  4     4    22 <NA>  
-##  5     5    24 <NA>  
+##  3     3    16 <NA>  
+##  4     4    17 <NA>  
+##  5     5    25 <NA>  
 ##  6     6    25 <NA>  
 ##  7     1    NA A     
 ##  8     2    NA B     
@@ -867,11 +867,11 @@ left_join(age, center, by = c("pid"))
 ## # A tibble: 6 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    23 A     
+## 1     1    21 A     
 ## 2     2    24 B     
-## 3     3    21 A     
-## 4     4    22 B     
-## 5     5    24 <NA>  
+## 3     3    16 A     
+## 4     4    17 B     
+## 5     5    25 <NA>  
 ## 6     6    25 <NA>
 ```
 
@@ -884,11 +884,11 @@ full_join(age, center, by = c("pid"))
 ## # A tibble: 7 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    23 A     
+## 1     1    21 A     
 ## 2     2    24 B     
-## 3     3    21 A     
-## 4     4    22 B     
-## 5     5    24 <NA>  
+## 3     3    16 A     
+## 4     4    17 B     
+## 5     5    25 <NA>  
 ## 6     6    25 <NA>  
 ## 7    10    NA C
 ```
@@ -902,10 +902,10 @@ inner_join(age, center, by = c("pid"))
 ## # A tibble: 4 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    23 A     
+## 1     1    21 A     
 ## 2     2    24 B     
-## 3     3    21 A     
-## 4     4    22 B
+## 3     3    16 A     
+## 4     4    17 B
 ```
 Can you spot the differences between the commands above?
 As an exercise, you can try to compute the individuals' mean age per center.
@@ -923,8 +923,8 @@ inner_join(age, center, by = c("pid")) |>
 ## # A tibble: 2 × 2
 ##   center mean_age
 ##   <chr>     <dbl>
-## 1 A            22
-## 2 B            23
+## 1 A          18.5
+## 2 B          20.5
 ```
 
 **Note:** the `by` argument indicates which column should be use to make the *join*. In some 

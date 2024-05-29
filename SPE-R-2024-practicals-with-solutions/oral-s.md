@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 
 
 
@@ -381,7 +386,7 @@ cox.zph(m2haz2)
 <!-- % for cancer deaths with the same covariates as above. For this you have to -->
 <!-- % first load package `cmprsk`, containing the necessary function -->
 <!-- % `crr()`, and attach the data frame. -->
-<!-- % ```{r fg1, echo=T,eval=FALSE} -->
+<!-- % ```{r fg1, echo=TRUE,eval=FALSE} -->
 <!-- % library(cmprsk) -->
 <!-- % attach(orca2) -->
 <!-- % m2fg1 <- crr(time, event, cov1 = model.matrix(m2), failcode=1) -->
@@ -392,7 +397,7 @@ cox.zph(m2haz2)
 <!-- %  -->
 <!-- % -  -->
 <!-- %  Fit a similar model for deaths from other causes and compare the results. -->
-<!-- % ```{r fg2, echo=T,eval=FALSE} -->
+<!-- % ```{r fg2, echo=TRUE,eval=FALSE} -->
 <!-- % m2fg2 <- crr(time, event, cov1 = model.matrix(m2), failcode=2) -->
 <!-- % summary(m2fg2, Exp=T) -->
 <!-- % @ -->
