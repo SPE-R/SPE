@@ -28,7 +28,7 @@ but finally, a penalized spline model is fitted.
 
 1. Load the packages and the data set, and inspect its structure:
 
-``` r
+```r
 library(Epi)
 library(mgcv)
 ```
@@ -41,7 +41,7 @@ library(mgcv)
 ## This is mgcv 1.9-1. For overview type 'help("mgcv-package")'.
 ```
 
-``` r
+```r
 data(testisDK)
 str(testisDK)
 ```
@@ -54,7 +54,7 @@ str(testisDK)
 ##  $ Y: num  39650 36943 34588 33267 32614 ...
 ```
 
-``` r
+```r
 summary(testisDK)
 ```
 
@@ -68,7 +68,7 @@ summary(testisDK)
 ##  Max.   :89.0   Max.   :1996   Max.   :17.000   Max.   :47226.8
 ```
 
-``` r
+```r
 head(testisDK)
 ```
 
@@ -86,7 +86,7 @@ head(testisDK)
   we do some housekeeping. The age range will be limited to 15-79
   years, and age and period are both categorized into 5-year intervals -- following to the time-honoured practice in epidemiology.
 
-``` r
+```r
 tdk <- subset(testisDK, A > 14 & A < 80)
 tdk$Age <- cut(tdk$A, br = 5 * (3:16), include.lowest = TRUE, right = FALSE)
 nAge <- length(levels(tdk$Age))
@@ -105,7 +105,7 @@ Computation and tabulation of incidence rates
   incidence rates (per 100,000 y) in each 5 y $\times$ 5 y cell using
   `stat.table()`. Take a look at the structure of the thus created object
 
-``` r
+```r
 tab <- stat.table(
   index = list(Age, Per),
   contents = list(
@@ -139,7 +139,7 @@ presentation is more informative.
  `rateplot`)
  
 
-``` r
+```r
 str(tab)
 ```
 
@@ -153,7 +153,7 @@ str(tab)
 ##  - attr(*, "table.fun")= chr [1:3] "sum" "sum" "ratio"
 ```
 
-``` r
+```r
 par(mfrow = c(1, 1))
 rateplot(
   rates = tab[3, 1:nAge, 1:nPer], which = "ap", ylim = c(1, 30),
@@ -178,7 +178,7 @@ It is useful to scale the person-years to be expressed in $10^5$ y.
 found in package `Epi`. 
 
 
-``` r
+```r
 tdk$Y <- tdk$Y / 100000
 mCat <- glm(cbind(D, Y) ~ Age + Per,
   family = poisreg(link = log), data = tdk )
@@ -218,7 +218,7 @@ What do the estimated rate ratios tell about the age and period effects?
   to define shorthands for the pertinent mid-age and mid-period values
   of the different intervals
 
-``` r
+```r
 aMid <- seq(17.5, 77.5, by = 5)
 pMid <- seq(1945, 1995, by = 5)
 par(mfrow = c(1, 2))
@@ -237,7 +237,7 @@ matplot(pMid, rbind(c(1,1,1), ci.exp(mCat)[14:23, ]), type = "o", pch = 16,
   level of the period factor. For the latter one could choose the
   middle period 1968-72 using `Relevel()`.
 
-``` r
+```r
 tdk$Per70 <- Relevel(tdk$Per, ref = 6)
 mCat2 <- glm(cbind(D, Y) ~ -1 + Age + Per70,
   family = poisreg(link = log), data = tdk )
@@ -273,7 +273,7 @@ round(ci.exp(mCat2), 2)
 
 4. Let us also plot estimates from the latter model, too. 
 
-``` r
+```r
 par(mfrow = c(1, 2))
 matplot(aMid, rbind(c(1,1,1), ci.exp(mCat2)[2:13, ]), type = "o", pch = 16,     
    log = "y", cex.lab = 1.5, cex.axis = 1.5, col=c("black", "blue", "blue"),
@@ -300,7 +300,7 @@ try fitting smooth continuous functions for both time scales.
   parameter is chosen based on an AIC-like criterion known as UBRE
   ('Un-Biased Risk Estimator')
 
-``` r
+```r
 library(mgcv)
 mPen <- mgcv::gam(cbind(D, Y) ~ s(A) + s(P),
   family = poisreg(link = log), data = tdk
@@ -342,7 +342,7 @@ On the rate scale the baseline level 5.53 per 100000 y is obtained by
   describing the age and the period effects which are interpreted as
   contrasts to the baseline level on the log-rate scale.
 
-``` r
+```r
 par(mfrow = c(1, 2))
 plot(mPen, se=2, seWithMean = TRUE)
 ```
@@ -373,7 +373,7 @@ hand the period effect takes just about 3 df.
 3.  It is a good idea to do some diagnostic checking of the fitted
   model
 
-``` r
+```r
 par(mfrow = c(2, 2))
 gam.check(mPen)
 ```
@@ -403,7 +403,7 @@ given in the printed output about the value of `k`.
 
 4. Let us refit the model but now with an increased `k` for age:
 
-``` r
+```r
 mPen2 <- mgcv::gam(cbind(D, Y) ~ s(A, k = 20) + s(P),
   family = poisreg(link = log), data = tdk
 )
@@ -435,7 +435,7 @@ summary(mPen2)
 ## UBRE = 0.081809  Scale est. = 1         n = 3510
 ```
 
-``` r
+```r
 par(mfrow = c(2, 2))
 gam.check(mPen2)
 ```
@@ -452,9 +452,9 @@ gam.check(mPen2)
 ## Basis dimension (k) checking results. Low p-value (k-index<1) may
 ## indicate that k is too low, especially if edf is close to k'.
 ## 
-##         k'   edf k-index p-value   
-## s(A) 19.00 11.13    0.93   0.005 **
-## s(P)  9.00  3.05    0.95   0.135   
+##         k'   edf k-index p-value    
+## s(A) 19.00 11.13    0.93  <2e-16 ***
+## s(P)  9.00  3.05    0.95     0.1    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -462,7 +462,7 @@ With this choice of `k` the df value for age became about 11,
 which is well below $k-1 = 19$. Let us plot the fitted curves from
 this fitting, too
 
-``` r
+```r
 par(mfrow = c(1, 2))
 plot(mPen2, seWithMean = TRUE)
 abline(v = 1968, h = 0, lty = 3)
@@ -484,7 +484,7 @@ enough for the age effect.
  relative indidence rates in relation to the fitted baseline rate, 
  as determined  by the model intercept.
 
-``` r
+```r
 par(mfrow = c(1, 2))
 icpt <- coef(mPen2)[1] #  estimated intecept
 plot(mPen2,

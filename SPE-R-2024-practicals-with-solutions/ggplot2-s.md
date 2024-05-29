@@ -27,7 +27,7 @@ These are the important graphical elements. You may have spotted some other feat
 The data are available in the file `alkfos.csv`. This is a text file in comma-separated variable format. It can be read into R using the `read.csv()` function.
 
 
-``` r
+```r
 alkfos <- read.csv("./data/alkfos.csv")
 ```
 
@@ -57,7 +57,7 @@ We make the mapping in a call to the function `aes()`.
 The code below creates a basic plot and assigns it to the object `p0`.
 
 
-``` r
+```r
 library(ggplot2, quietly=TRUE)
 p0 <- ggplot(data=alkfos, mapping=aes(x=time, y=mean))
 ```
@@ -75,7 +75,7 @@ There are two ways to display a graphical object in R:
 The code chunk below displays the object `p0` created in the chunk above.
 
 
-``` r
+```r
 show(p0)
 ```
 
@@ -94,7 +94,7 @@ The most important layers are *geometries*, which describe how to display the da
 We want to plot points representing the mean of the outcome at each visit. This is done with the function `geom_point()`. We also want to plot lines between successive points in time. This is done with the function `geom_line()`. The code chunk below adds point and line geometries to our basic plot `p0` and saves the result to the new object `p1`.
 
 
-``` r
+```r
 p1 <- p0 + geom_point() + geom_line()
 show(p1)
 ```
@@ -106,7 +106,7 @@ Again, this is not quite what we want. The line geometry is mixing up observatio
 Modify the code chunk below so that it includes the `group` aesthetic to recreate plot `p1` correctly.
 
 
-``` r
+```r
 p1 <- ggplot(data=alkfos, mapping=aes(x=time, y=mean)) +
   geom_point() + geom_line()
 show(p1)
@@ -126,7 +126,7 @@ Modify the code chunk below so that the `linerange` geometry has its own aesthet
 Note that the error bars are *not confidence intervals*. In statistical graphics it is very common to use plus/minus the standard error to represent the uncertainty in the data without making any statistical claims about coverage.
 
 
-``` r
+```r
 p2 <- p1 + geom_linerange(mapping=aes(ymin=mean-sem, ymax=mean+sem))
 show(p2)
 ```
@@ -142,7 +142,7 @@ The last geometry we want to add is the horizontal reference line at zero. This 
 We should distinguish the reference line from the lines used to plot the data, otherwise it may distract the viewer. We could do this by changing the colour of the reference line. But here we will use a thinner line using the optional argument `linewidth` to the hline geometry. The default value of `linewidth` is 1. A value less than 1 draws a thinner line; a value greater than 1 draws a thicker line. Choose a suitable value for your plot.
 
 
-``` r
+```r
 p3 <- p2 + geom_hline(yintercept=0, linewidth=0.1)
 show(p3)
 ```
@@ -161,7 +161,7 @@ Both axes are continuous. Therefore we use the `scale_x_continuous()` and `scale
 Modify the code chunk below to create the custom axes:
 
 
-``` r
+```r
 p4 <- p3 + scale_x_continuous(breaks=c(0,3,6,9,12,18,24)) +
   scale_y_continuous(breaks=seq(from=-40, to=30, by=5),
                               limits = c(-40, 30))
@@ -173,7 +173,7 @@ show(p4)
 We should also supply informative axis labels. The default axis labels are taken from the names of the variables that we used in the aesthetic mappings for `x` and `y`. Use the `xlab()` and `ylab()` functions to provide informative axis labels.
 
 
-``` r
+```r
 p5 <- p4 + xlab("Months after randomization") + 
   ylab("Percent change in serum alkaline phosphate")
 show(p5)
@@ -191,7 +191,7 @@ Themes control many aspects of the appearance of the plot that do not depend on 
 -   Find the parameter that changes to the font size and use it to reduce the font until the y-axis label fits.
 
 
-``` r
+```r
 p6 <- p5 + theme_classic(base_size=9)
 show(p6)
 ```
@@ -203,7 +203,7 @@ show(p6)
 In this exercise, you have constructed the plot in steps, saving and displaying the plot in separate chunks to allow you to see the changes as we add each layer of the plot. In practice, we do not work like this. All the instructions for creating the plot should be together. Fill in the chunk below so that the plot is recreated in a single chunk.
 
 
-``` r
+```r
 p <- ggplot(alkfos, mapping=aes(x=time, y=mean, groups=treat)) +
   geom_point(mapping=aes(shape=treat)) +
   geom_line() +
@@ -239,7 +239,7 @@ There is one important element missing from the graph. This is the table of the 
 Firstly we create a new graphical object to represent the table. This object has its own aesthetic mappings, geometries and scales. I will skip a detailed description of this step except to note that some of the arguments below will suppress graphical features (e.g. `NULL` and `element_blank()`)
 
 
-``` r
+```r
 tab <- ggplot(data=alkfos, 
               mapping=aes(x=time, y=treat, label=available)) +
               geom_text(size=2) + xlab(NULL) + ylab(NULL) +
@@ -254,7 +254,7 @@ tab
 Next use the `plot_grid()` function from the cowplot package to stack the displayed objects vertically (`align="v"`), in a single column (`ncol=1`, `nrow=2`), with the left and right ends of the x-axes aligned (`axis="lr"`) and most of the space taken up by the plot (`rel_heights=c(5,1)`).
 
 
-``` r
+```r
 library(cowplot)
 plot_grid(plotlist=list(p, tab), align="v", axis="lr", 
           ncol=1, nrow=2, rel_heights=c(5,1))

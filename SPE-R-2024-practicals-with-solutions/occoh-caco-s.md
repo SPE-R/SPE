@@ -72,7 +72,7 @@ Read in the cohort data file and name
 the resulting data frame as `oc`.
 See its structure and print the univariate summaries.
 
-``` r
+```r
 library(Epi)
 library(survival)
 url <- "https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data"
@@ -90,7 +90,7 @@ str(oc)
 ##  $ chdeath: int  0 0 0 0 0 0 0 1 0 0 ...
 ```
 
-``` r
+```r
 summary(oc)
 ```
 
@@ -113,7 +113,7 @@ summary(oc)
 
 - It is convenient to change all the dates into fractional calendar years
 
-``` r
+```r
 oc$ybirth <- cal.yr(oc$birth)
 oc$yentry <- cal.yr(oc$entry)
 oc$yexit <- cal.yr(oc$exit)
@@ -122,7 +122,7 @@ oc$yexit <- cal.yr(oc$exit)
 We shall also compute the age at entry and at exit, respectively,
 as age will be the main time scale in our analyses.
 
-``` r
+```r
 oc$agentry <- oc$yentry - oc$ybirth
 oc$agexit <- oc$yexit - oc$ybirth
 ```
@@ -130,7 +130,7 @@ oc$agexit <- oc$yexit - oc$ybirth
 from the data frame along the calendar period and age axes,
 and as the outcome event we specify the coronary death.
 
-``` r
+```r
 oc.lex <- Lexis(
   entry = list(
     per = yentry,
@@ -146,7 +146,7 @@ oc.lex <- Lexis(
 ## NOTE: entry.status has been set to 0 for all.
 ```
 
-``` r
+```r
 str(oc.lex)
 ```
 
@@ -176,7 +176,7 @@ str(oc.lex)
 ##   ..$ age: NULL
 ```
 
-``` r
+```r
 summary(oc.lex)
 ```
 
@@ -194,7 +194,7 @@ Lexis diagram. Make use of the `plot` method for `Lexis` objects.
 Gray lifelines are drawn and a bullet is put at the exit point of those lifelines
 that end with the outcome event.
 
-``` r
+```r
 par(mfrow = c(1, 1))
 plot(oc.lex, xlim = c(1990, 2010), grid = TRUE)
 points(oc.lex, pch = c(NA, 16)[oc.lex$lex.Xst + 1])
@@ -213,7 +213,7 @@ deaths occur are drawn to identify the pertinent
  jointly by age at exit & age at entry, 
  and to give a new ID number according to that order.
 
-``` r
+```r
 oc.ord <- cbind(ID = 1:1501, oc[order(oc$agexit, oc$agentry), ])
 oc.lexord <- Lexis(
   entry = list(age = agentry),
@@ -227,7 +227,7 @@ oc.lexord <- Lexis(
 ## NOTE: entry.status has been set to 0 for all.
 ```
 
-``` r
+```r
 plot(oc.lexord, "age")
 points(oc.lexord, pch = ifelse(oc.lexord$lex.Xst == 1, 16, NA))
 with(
@@ -243,7 +243,7 @@ event times occurring between 50 to 58 years. --
 Copy the last four lines from the previous item and add arguments `xlim` and `ylim`
 to the call of `plot()`.
 
-``` r
+```r
 plot(oc.lexord, "age", xlim = c(50, 58), ylim = c(5, 65))
 points(
   oc.lexord, "age", pch = ifelse(oc.lexord$lex.Xst == 1, 16, NA)
@@ -268,7 +268,7 @@ within the cohort.
 For this purpose we first generate a categorical variable
 `agen2` for age at entry 
 
-``` r
+```r
 oc.lex$agen2 <- cut(oc.lex$agentry, br = seq(40, 62, 1))
 ```
 
@@ -284,7 +284,7 @@ make a call of this function and see
 the structure of the resulting data frame `cactrl` 
 containing the cases and the chosen individual controls. 
 
-``` r
+```r
 set.seed(98623)
 cactrl <-
   ccwc(
@@ -300,7 +300,7 @@ cactrl <-
 ## Sampling risk sets: ........................................................................................................................
 ```
 
-``` r
+```r
 str(cactrl)
 ```
 
@@ -331,7 +331,7 @@ values of the following variables.
 | `tchol`   | total cholesterol level (mmol/l) |
 
 
-``` r
+```r
 ocX <- 
   read.table(
     paste(url, "occoh-Xdata.txt", sep = "/"), header = TRUE
@@ -360,7 +360,7 @@ these into a single file (see exercise 1.1, subsection 1.1.8, where
  The `id` variable in both files is used as the key to link each
 individual case or control with his own data on risk factors.
 
-``` r
+```r
 oc.ncc <- merge(cactrl, ocX[, c("id", "smok", "tchol", "sbp")],
   by = "id"
 )
@@ -393,7 +393,7 @@ latter will be divided by 10 to get more interpretable effect estimates.
 
 Convert the smoking variable into a factor.
 
-``` r
+```r
 oc.ncc$smok <- factor(oc.ncc$smok,
   labels = c("never", "ex", "1-14/d", ">14/d")
 )
@@ -407,7 +407,7 @@ in which matching is ignored, can be obtained as follows.
 <!-- %% on Poisson and logistic models on Saturday 23 May.  -->
 We shall focus on smoking
 
-``` r
+```r
 stat.table(
   index = list(smok, Fail),
   contents = list(count(), percent(smok)),
@@ -439,7 +439,7 @@ stat.table(
 ##  ---------------------------------
 ```
 
-``` r
+```r
 smok.crncc <- glm(Fail ~ smok, family = binomial, data = oc.ncc)
 round(ci.exp(smok.crncc), 3)
 ```
@@ -463,7 +463,7 @@ In this analysis function `clogit()` in `survival` package is
 utilized. It is in fact a wrapper of function `coxph()`. 
 
 
-``` r
+```r
 m.clogit <- clogit(Fail ~ smok + I(sbp / 10) + tchol +
   strata(Set), data = oc.ncc)
 summary(m.clogit)
@@ -498,7 +498,7 @@ summary(m.clogit)
 ## Score (logrank) test = 27.31  on 5 df,   p=5e-05
 ```
 
-``` r
+```r
 round(ci.exp(m.clogit), 3)
 ```
 
@@ -527,7 +527,7 @@ The `id`-numbers of the individuals that are
 selected will be stored in vector `subcids`, and
 `subcind` is an indicator for inclusion to the subcohort. 
 
-``` r
+```r
 N <- 1501
 n <- 260
 set.seed(15792)
@@ -542,7 +542,7 @@ and the case group from the data frame of the full cohort.
 After that we collect the data of the risk factors from the
 data storehouse for the  subjects in the case-cohort data 
 
-``` r
+```r
 oc.cc <- subset(oc.lexord, subcind == 1 | chdeath == 1)
 oc.cc <- merge(oc.cc, ocX[, c("id", "smok", "tchol", "sbp")],
   by = "id"
@@ -586,7 +586,7 @@ those for subcohort cases are blue with blue bullet at exit, and
 for cases outside the subcohort the lines are red and dotted with
 red bullets at exit. 
 
-``` r
+```r
 plot(subset(oc.cc, chdeath == 0), "age")
 lines(subset(oc.cc, chdeath == 1 & subcind == 1), col = "blue")
 lines(subset(oc.cc, chdeath == 1 & subcind == 0), col = "red")
@@ -600,7 +600,7 @@ points(subset(oc.cc, chdeath == 1),
 
 -  Define the categorical smoking variable again.
 
-``` r
+```r
 oc.cc$smok <- factor(oc.cc$smok,
   labels = c("never", "ex", "1-14/d", ">14/d")
 )
@@ -620,7 +620,7 @@ relevant exposure odds ratio for each category:
 $$ \text{HR}_k ^{\text{crude}} = \frac{D_k/D_1}{y_k/y_1} $$
 
 
-``` r
+```r
 sm.cc <- stat.table(
   index = smok,
   contents = list(Cases = sum(lex.Xst), Pyrs = sum(lex.dur)),
@@ -643,7 +643,7 @@ print(sm.cc, digits = c(sum = 0, ratio = 1))
 ##  -------------------------
 ```
 
-``` r
+```r
 HRcc <- 
   (sm.cc[1, -5] / sm.cc[1, 1]) / (sm.cc[2, -5] / sm.cc[2, 1])
 round(HRcc, 3)
@@ -663,7 +663,7 @@ This analysis can be done using function `cch()`
 in package `survival` with `method = "LinYing"`
 
 
-``` r
+```r
 oc.cc$survobj <- with(oc.cc, Surv(agentry, agexit, chdeath))
 cch.LY <- cch(survobj ~ smok + I(sbp / 10) + tchol,
   stratum = NULL,
@@ -700,7 +700,7 @@ data on risk factors from the storehouse for the whole cohort.
 Let us form the data frame corresponding to the full cohort design
 and convert again smoking to be categorical.
 
-``` r
+```r
 oc.full <- merge(oc.lex, ocX[, c("id", "smok", "tchol", "sbp")],
   by.x = "id", by.y = "id"
 )
@@ -712,7 +712,7 @@ oc.full$smok <- factor(oc.full$smok,
 Juts for comparison with the corresponding analysis in case-cohort data
 perform a similar crude estimation of hazard ratios associated with smoking.
 
-``` r
+```r
 sm.coh <- stat.table(
   index = smok,
   contents = list(Cases = sum(lex.Xst), Pyrs = sum(lex.dur)),
@@ -735,7 +735,7 @@ print(sm.coh, digits = c(sum = 0, ratio = 1))
 ##  -------------------------
 ```
 
-``` r
+```r
 HRcoh <- 
   (sm.coh[1, -5] / sm.coh[1, 1]) / (sm.coh[2, -5] / sm.coh[2, 1])
 round(HRcoh, 3)
@@ -752,7 +752,7 @@ Fit now the ordinary Cox model to the full cohort. There is no need
 to employ extra tricks upon the ordinary `coxph()` fit.
 
 
-``` r
+```r
 cox.coh <- coxph(Surv(agentry, agexit, chdeath) ~
   smok + I(sbp / 10) + tchol, data = oc.full)
 summary(cox.coh)
@@ -792,7 +792,7 @@ Lastly, a comparison of the point estimates and standard errors between
 the different designs, including variants of analysis for the case-cohort design, can be performed.
 
 
-``` r
+```r
 betas <- cbind(coef(cox.coh), coef(m.clogit), coef(cch.LY))
 colnames(betas) <- c("coh", "ncc", "cch.LY")
 round(betas, 3)
@@ -807,7 +807,7 @@ round(betas, 3)
 ## tchol      0.265  0.401  0.350
 ```
 
-``` r
+```r
 SEs <- cbind(
   sqrt(diag(cox.coh$var)),
   sqrt(diag(m.clogit$var)),

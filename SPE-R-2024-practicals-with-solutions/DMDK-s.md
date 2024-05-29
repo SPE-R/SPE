@@ -18,7 +18,7 @@ with date of diagnosis after 1994.
 
 Start by loading the relevant packages:
 
-``` r
+```r
 library(Epi)
 library(popEpi)
 library(mgcv)
@@ -32,7 +32,7 @@ Loading required package: nlme
 This is mgcv 1.9-1. For overview type 'help("mgcv-package")'.
 ```
 
-``` r
+```r
 library(tidyverse)
 ```
 
@@ -55,7 +55,7 @@ library(tidyverse)
 ```
 Then load the data and take a look at the data:
 
-``` r
+```r
 data(DMlate)
 str(DMlate)
 ```
@@ -73,7 +73,7 @@ str(DMlate)
 You can get a more detailed explanation of the data by referring to
 the help page:
 
-``` r
+```r
 ?DMlate
 ```
 1.  Set up the dataset as a `Lexis` object with age, calendar
@@ -81,7 +81,7 @@ the help page:
     event. Make sure that you know what each of the arguments to
     `Lexis` mean:
     
-    ``` r
+    ```r
     LL <- Lexis(entry = list(A = dodm - dobth, 
                              P = dodm, 
                            dur = 0),
@@ -102,7 +102,7 @@ the help page:
     to tabulate no. deaths, person-years (`lex.dur`) and the
     crude mortality rate by sex. Try:
     
-    ``` r
+    ```r
     stat.table(sex,
                list(D = sum(lex.Xst == "Dead"),
                     Y = sum(lex.dur),
@@ -124,7 +124,7 @@ the help page:
      --------------------------------- 
     ```
     
-    ``` r
+    ```r
     # stat.table is more versatile than xtabs:
     xtabs(cbind(D = lex.Xst == "Dead",
                 Y = lex.dur) 
@@ -150,7 +150,7 @@ the help page:
     age-axis in sutiable intervals (here set to 1/2 year, but really
     immaterial as long as it is small):
     
-    ``` r
+    ```r
     SL <- splitLexis(LL, 
                      breaks = seq(0, 125, 1 / 2), 
                  time.scale = "A")
@@ -173,7 +173,7 @@ the help page:
     women separately, using splines as implemented in `gam`.
     We use `k = 20` to be sure to catch any irregularities by age.
     
-    ``` r
+    ```r
     r.m <- mgcv::gam(cbind(lex.Xst == "Dead", lex.dur) ~ s(A, k = 20),
                      family = poisreg,
                        data = subset(SL, sex == "M"))
@@ -184,7 +184,7 @@ the help page:
     There is a convenient wrapper for this, exploiting the `Lexis`
     structure of data, but which does not have an update
     
-    ``` r
+    ```r
     r.m <- gam.Lexis(subset(SL, sex == "M"), ~ s(A, k = 20))
     ```
     
@@ -194,7 +194,7 @@ the help page:
     Alive->Dead
     ```
     
-    ``` r
+    ```r
     r.f <- gam.Lexis(subset(SL, sex == "F"), ~ s(A, k = 20))
     ```
     
@@ -211,7 +211,7 @@ the help page:
       the rates in the (inverse) units in which the person-years were
       given; that is the units in which `lex.dur` is recorded.
     
-    ``` r
+    ```r
     nd <- data.frame(A = seq(20, 90, 0.5))
     p.m <- ci.pred(r.m, newdata = nd)
     p.f <- ci.pred(r.f, newdata = nd)
@@ -227,7 +227,7 @@ the help page:
 4.  Plot the predicted rates for men and women together - using for
       example `matplot` or `matshade`.
     
-    ``` r
+    ```r
         par(mar = c(3.5,3.5,1,1),
             mgp = c(3,1,0) / 1.6,
             las = 1,
@@ -259,7 +259,7 @@ the help page:
     As before specify the model exploiting the `Lexis` class
     of the dataset, try:
     
-    ``` r
+    ```r
     Mcr <- gam.Lexis(subset(SL, sex == "M"),
                      ~ s(A, bs = "cr", k = 10) +
                        s(P, bs = "cr", k = 10) +
@@ -272,7 +272,7 @@ the help page:
     Alive->Dead
     ```
     
-    ``` r
+    ```r
     summary(Mcr)
     ```
     
@@ -302,7 +302,7 @@ the help page:
     Fit the same model for women as well. Are the models reasonably fitting?
     
     
-    ``` r
+    ```r
     Fcr <- gam.Lexis(subset(SL, sex == "F"),
                      ~ s(A, bs = "cr", k = 10) +
                        s(P, bs = "cr", k = 10) +
@@ -315,7 +315,7 @@ the help page:
     Alive->Dead
     ```
     
-    ``` r
+    ```r
     summary(Fcr)
     ```
     
@@ -348,7 +348,7 @@ the help page:
       estimated, so it is useful set up a multi-panel display, and for
       the sake of comparability to set ylim to the same for men and women:
     
-    ``` r
+    ```r
     par(mfrow = c(2, 3))
     plot(Mcr, ylim = c(-3, 3))
     plot(Fcr, ylim = c(-3, 3))
@@ -356,7 +356,7 @@ the help page:
     
     ![](DMDK-s_files/figure-epub3/unnamed-chunk-15-1.png)<!-- -->
     
-    ``` r
+    ```r
     par(mfcol = c(3, 2))
     plot(Mcr, ylim = c(-3, 3))
     plot(Fcr, ylim = c(-3, 3))
@@ -368,7 +368,7 @@ the help page:
 7.  Compare the fit of the naive model with just age and the
       three-factor models, using `anova`, e.g.:
     
-    ``` r
+    ```r
     anova(Mcr, r.m, test = "Chisq")
     ```
     
@@ -401,7 +401,7 @@ the help page:
     the `newdata = ` argument. So a person diagnosed in age 50 in
     1995 will have a mortality measured in cases per 1000 PY as:
     
-    ``` r
+    ```r
     pts <- seq(0, 12, 1/4)
     nd <- data.frame(A = 50   + pts, 
                      P = 1995 + pts, 
@@ -418,13 +418,13 @@ the help page:
     range of ages, say 50, 60, 70, and plot these together in the same
     graph:
     
-    ``` r
+    ```r
     cbind(nd, ci.pred(Mcr, newdata = nd))[1:10,]
     ```
 9.  From figure it seems that the duration effect is
     over-modeled, so refit constraining the d.f. to 5:
     
-    ``` r
+    ```r
     Mcr <- gam.Lexis(subset(SL, sex == "M"),
                      ~ s(A, bs = "cr", k = 10) +
                        s(P, bs = "cr", k = 10) +
@@ -437,7 +437,7 @@ the help page:
     Alive->Dead
     ```
     
-    ``` r
+    ```r
     Fcr <- gam.Lexis(subset(SL, sex == "F"),
                      ~ s(A, bs = "cr", k = 10) +
                        s(P, bs = "cr", k = 10) +
@@ -489,7 +489,7 @@ table.
     for each follow-up interval in the `SL` data have an age and
     a period variable that can be used in merging with the population data.
     
-    ``` r
+    ```r
     str(SL)
     ```
     
@@ -517,7 +517,7 @@ table.
      - attr(*, "time.since")= chr [1:3] "" "" ""
     ```
     
-    ``` r
+    ```r
     SL$Am <- floor(SL$A + 0.25)
     SL$Pm <- floor(SL$P + 0.25)
     data(M.dk)
@@ -535,7 +535,7 @@ table.
      - attr(*, "Contents")= chr "Number of deaths and risk time in Denmark"
     ```
     
-    ``` r
+    ```r
     M.dk <- transform(M.dk,
                       Am = A,
                       Pm = P,
@@ -558,7 +558,7 @@ table.
     `sex`, `Am` and `Pm` are the common variables,
     and therefore the match is on these variables:
     
-    ``` r
+    ```r
     SLr <- merge(SL, 
                  M.dk[, c("sex", "Am", "Pm", "rate")])
     dim(SL)
@@ -568,7 +568,7 @@ table.
     [1] 118473     16
     ```
     
-    ``` r
+    ```r
     dim(SLr)
     ```
     
@@ -591,7 +591,7 @@ table.
     Some of the population mortality rates are 0, so you need to exclude
     those records from the analysis.
     
-    ``` r
+    ```r
     msmr <- glm((lex.Xst == "Dead") ~ sex - 1,
                 offset = log(E),
                 family = poisson,
@@ -607,7 +607,7 @@ table.
     Do you recognize the numbers?
     -  The same model can be fitted a bit simpler by the `poisreg` family, try:
     
-    ``` r
+    ```r
     msmr <- glm(cbind(lex.Xst == "Dead", E) ~ sex - 1, 
                 family = poisreg,
                   data = subset(SLr, E > 0))
@@ -622,7 +622,7 @@ table.
     We can assess the ratios of SMRs between men and women by using the
     `ctr.mat` argument which should be a matrix:
     
-    ``` r
+    ```r
     (CM <- rbind(M = c(1, 0),
                  W = c(0, 1),
              "M/F" = c(1, -1)))
@@ -635,7 +635,7 @@ table.
     M/F    1   -1
     ```
     
-    ``` r
+    ```r
     round(ci.exp(msmr, ctr.mat = CM), 2)
     ```
     
@@ -660,7 +660,7 @@ table.
     where no deaths in the population occur (that is where the 
     population mortality rate is 0).
     
-    ``` r
+    ```r
     Msmr <- gam(cbind(lex.Xst == "Dead", E) 
                 ~ s(  A, bs = "cr", k = 5) +
                   s(  P, bs = "cr", k = 5) +
@@ -687,7 +687,7 @@ table.
     s(dur).4    1.8176744 1.1041338 2.9923368
     ```
     
-    ``` r
+    ```r
     Fsmr <- update(Msmr, data = subset(SLr, E > 0 & sex == "F"))
     ```
     Plot the estimated smooth effects for both men and women using
@@ -697,7 +697,7 @@ table.
     diagnosed in ages 50, 60 and 70 as you did for the rates. What do
     you see?
     
-    ``` r
+    ```r
     par(mfrow = c(1,1))
     n50 <- nd
     n60 <- mutate(n50, A = A + 10)
@@ -715,7 +715,7 @@ table.
     6 71.25 1996.25 1.25
     ```
     
-    ``` r
+    ```r
     matshade(n50$A, cbind(ci.pred(Msmr, n50),
                           ci.pred(Fsmr, n50)), plot = TRUE,
              col = c("blue", "red"), lwd = 3,
@@ -740,7 +740,7 @@ table.
     giving an estimate of the change in SMR by age and calendar
     time. 
     
-    ``` r
+    ```r
     Bsmr <- gam(cbind(lex.Xst == "Dead", E) 
                 ~ sex / A +
                   sex / P +
@@ -770,7 +770,7 @@ table.
 12. Use your previous code to plot the predicted mortality from this
     model too. Are the predicted SMR curves credible?
     
-    ``` r
+    ```r
     m50 <- mutate(n50, sex = "M")
     f50 <- mutate(n50, sex = "F")
     m60 <- mutate(m50, A = A + 10)
