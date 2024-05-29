@@ -5,10 +5,12 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## ----packages, echo=TRUE,eval=FALSE-------------------------------------------
 ## library(Epi)
 ## library(survival)
+## cB8  <- c("#000000", "#E69F00", "#56B4E9", "#009E73",
+##           "#F0E442", "#0072B2", "#D55E00", "#CC79A7") #colors chosen
 
 
 ## ----dinput, echo=TRUE,eval=FALSE---------------------------------------------
-## orca <- read.table("pracs/data/oralca2.txt", header = TRUE)
+## orca <-  read.table(file = 'https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/oralca2.txt', header = TRUE, sep = " ",row.names = 1 )
 ## head(orca)
 ## str(orca)
 ## summary(orca)
@@ -36,8 +38,11 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 
 ## ----cdfstage, echo=TRUE, fig=TRUE, height=6, width=7,eval=FALSE--------------
 ## s.stg <- survfit(suob ~ stage, data = orca)
-## col5 <- c("green", "blue", "black", "red", "gray")
+## col5 <- cB8[1:5]
 ## plot(s.stg, col = col5, fun = "event", mark.time = FALSE)
+## legend(15, 0.5, legend=levels(factor(orca$stage)),
+##        col=col5, lty=1, cex=0.8,
+##        title="Stage", text.font=4, bg='white')
 ## s.stg
 
 
@@ -50,6 +55,9 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ##   fun = "cloglog",
 ##   main = "cloglog: log cum.haz"
 ## )
+## legend(2, -2, legend=levels(factor(orca$stage)),
+##        col=col5, lty=1, cex=0.8,
+##        title="Stage", text.font=4, bg='white')
 
 
 ## ----sexage, echo=TRUE,eval=FALSE---------------------------------------------
@@ -65,7 +73,7 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## par(mfrow = c(1, 1))
 ## plot(s.agrx,
 ##   fun = "event", mark.time = FALSE, xlim = c(0, 15),
-##   col = rep(c("red", "blue"), 3), lty = c(2, 2, 1, 1, 5, 5)
+##   col = rep(c(cB8[8], cB8[6]), 3), lty = c(2, 2, 1, 1, 5, 5),lwd=2
 ## )
 
 
@@ -84,7 +92,6 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 
 
 ## ----plotcif2, echo=TRUE, fig=TRUE, height=6, width=10,eval=FALSE-------------
-## col5 <- c("green", "blue", "black", "red", "gray")
 ## cif2 <- survfit(Surv(time, event, type = "mstate") ~ stage,
 ##   data = orca
 ## )
@@ -93,12 +100,17 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## par(mfrow = c(1, 2))
 ## plotCIF(cif2, 1,
 ##   main = "Cancer death by stage",
-##   col = col5, ylim = c(0, 0.7)
+##   col = cB8[1:5], ylim = c(0, 0.7)
 ## )
+## 
 ## plotCIF(cif2, 2,
 ##   main = "Other deaths by stage",
-##   col = col5, ylim = c(0, 0.7)
+##   col = cB8[1:5], ylim = c(0, 0.7)
 ## )
+## 
+## legend(0, 0.6, legend=levels(factor(orca$stage)), col=col5, lty=1, cex=0.5,
+##        title="Stage", text.font=4, bg='white')
+## 
 
 
 ## ----stackedcif1, echo=TRUE, fig=TRUE, eval=FALSE-----------------------------
@@ -108,9 +120,9 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 
 ## ----cox1, echo=TRUE,eval=FALSE-----------------------------------------------
 ## options(show.signif.stars = FALSE)
-## m1 <- coxph(suob ~ sex + I((age - 65) / 10) + stage, data = orca)
+## m1 <- coxph(Surv(time, 1 * (event > 0)) ~ sex + I((age - 65) / 10) + stage, data = orca)
 ## summary(m1)
-## round(ci.exp(m1), 4)
+## round(ci.exp(m1), 3)
 
 
 ## ----coxzph, echo=TRUE,eval=FALSE---------------------------------------------
@@ -122,7 +134,7 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## orca2$st3 <- Relevel(orca2$stage, list(1:2, 3, 4:5))
 ## levels(orca2$st3) <- c("I-II", "III", "IV")
 ## m2 <- update(m1, . ~ . - stage + st3, data = orca2)
-## round(ci.exp(m2), 4)
+## round(ci.exp(m2), 3)
 
 
 ## ----cox2cll, echo=TRUE,eval=FALSE--------------------------------------------
@@ -132,13 +144,14 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ##   st3 = rep(levels(orca2$st3), 4)
 ## )
 ## newd
-## col3 <- c("green", "black", "red")
+## col3 <- cB8[1:3]
 ## par(mfrow = c(1, 2))
 ## plot(
 ##   survfit(
 ##     m2, newdata = subset(newd, sex == "Male" & age == 40)
 ##   ),
-##   col = col3, fun = "event", mark.time = FALSE
+##   col = col3, fun = "event", mark.time = FALSE,
+##   main="Cum. mortality by sex and stage \n age 40", ylim=c(0,1)
 ## )
 ## lines(
 ##   survfit(
@@ -148,16 +161,19 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 ## )
 ## plot(
 ##   survfit(
-##     m2, newdata = subset(newd, sex == "Male" & age == 80)
-##   ),
-##   ylim = c(0, 1), col = col3, fun = "event", mark.time = FALSE
-## )
+##     m2, newdata = subset(newd, sex == "Male" & age == 80)),
+##   ylim = c(0, 1), col = col3, fun = "event", mark.time = FALSE,
+##   main="Cum. mortality by sex and stage \n age 80")
 ## lines(
 ##   survfit(
 ##     m2, newdata = subset(newd, sex == "Female" & age == 80)
 ##   ),
 ##   col = col3, fun = "event", lty = 2, mark.time = FALSE
 ## )
+## 
+## legend(10, 0.4, legend=levels(interaction(levels(factor(newd$st3)),
+##                                           levels(factor(newd$sex)))),       col=col3, lty=c(2,2,2,1,1,1), cex=0.5,
+##        title="Stage and sex", text.font=4, bg='white')
 
 
 ## ----coxhaz1, echo=TRUE,eval=FALSE--------------------------------------------
@@ -192,7 +208,7 @@ knitr::opts_chunk$set(keep.source = TRUE, eps = FALSE, include = TRUE, prefix.st
 
 
 ## ----lexis, echo=TRUE,eval=FALSE----------------------------------------------
-## boxes(orca.lex)
+## boxes(orca.lex,boxpos=T)
 
 
 ## ----split, echo=TRUE,eval=FALSE----------------------------------------------
