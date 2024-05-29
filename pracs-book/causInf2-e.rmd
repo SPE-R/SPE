@@ -49,9 +49,10 @@ and the assumed marginal distributions of the covariates are
 | $Z_4$    | comorbidity score; 5 classes; $Z_3 \sim \text{DiscUnif}(1, \dots, 5)$ |
 
 For simplicity, covariates $Z_3$ and $Z_4$ are treated as continuous
-variables in the models. The assumed causal diagram is shown below.
+variables in the models. The assumed causal diagram is drawn using
+`dagitty` and is shown below.
 
-```{r dagitty, echo=FALSE, message=FALSE, warning=FALSE, results=TRUE, fig.show=TRUE}
+```{r dagitty, echo=TRUE, message=FALSE, warning=FALSE, results=TRUE, fig.show=TRUE}
 library(dagitty)
 d <-
   dagitty("dag {
@@ -71,7 +72,7 @@ d <-
 dagitty::coordinates(d) <-
   list(
     x = c(X = 1, Y = 5, Z1 = 5, Z2 = 1, Z3 = 4, Z4 = 2),
-    y = c(X = 3, Y = 3, Z1 = 1, Z2 = 1, Z3 = 2, Z4 = 2)
+    y = c(X = 2, Y = 2, Z1 = 0, Z2 = 0, Z3 = 1, Z4 = 1)
   )
 
 plot(d)
@@ -103,8 +104,9 @@ $$ E(X|Z_1 = z_1, \dots, Z_4 = z_4) =
 assumed true model for the outcome is
 $$ E(Y|X=x, Z_1 = z_1, \dots, Z_4 = z_4) =
            \text{expit}(-1 + x - 0.1z_1 + 0.35z_2 + 0.25z_3 +
-                 0.20z_4 + 0.15z_2z_4) $$ Note that $X$ does not depend
-on $Z_1$, and that in both models there is a product term $Z_2 Z_4$,
+                 0.20z_4 + 0.15z_2z_4) $$ 
+Note that $X$ does not depend on $Z_1$, and that in both models
+there is a product term $Z_2 Z_4$,
 the effect of which appears weaker for the outcome model.
 
 ## Control of confounding
@@ -125,10 +127,12 @@ to include covariate
 
 1.  Load the necessary packages.
 
-```{r packages 2}
+```{r packages 2, message=FALSE}
 library(Epi)
 library(stdReg)
 library(PSweight)
+library(SuperLearner)
+library(tmle)
 ```
 
 2.  Define two R-functions, which compute the expected values 
@@ -374,7 +378,7 @@ round(ci.lin(mX, Exp = TRUE)[, c(1, 5)], 4)
 2.  Extract the **propensity scores**, i.e. 
 fitted probabilities of
     belonging to exposure group 1: 
-    $ \text{PS}_i = \widehat{p_i} $, and
+    PS$_i = \widehat{p}_i$, and
     compare their distribution between the two groups.
 
 ```{r propScore, fig=FALSE}
@@ -422,8 +426,10 @@ EY0pot.w <- sum((1 - dd$x) * dd$w * dd$y) / sum((1 - dd$x) * dd$w)
 round(Contr(EY1pot.w, EY0pot.w), 4)
 ```
 
-These estimates seem to be somewhat downward biased when comparing to
-true values. Could this be because of omitting the relatively strong
+These estimates seem to be somewhat downward biased when 
+comparing to
+true values. Could this be because of omitting 
+the relatively strong
 product term effect of $Z_2$ and $Z_4$?
 
 
@@ -431,7 +437,8 @@ product term effect of $Z_2$ and $Z_4$?
 
 We now try to improve IPW-estimation by a richer exposure 
 model. In
-computations we shall utilize the R package `PSweight` (see [PSweight
+computations we shall utilize the R package 
+`PSweight` (see [PSweight
 vignette](https://cran.r-project.org/web/packages/PSweight/vignettes/vignette.pdf)).
 
 1.  First, we compute the weights from a more 
@@ -568,7 +575,7 @@ Compare the results here with those obtained by
 g-formula in item 8.1
 and with the true contrasts above.
 
-## Augmented IPW
+## Double robust estimation by augmented IPW
 
 Let us attempt to correct the estimates by a **double 
 robust** (DR) approach
@@ -591,9 +598,9 @@ $$
 
 ```{r aipw}
 EY1pot.a <- EY1pot.g + mean(dd$x * (dd$y - dd$yp1) * dd$w / sum(dd$x * dd$w))
-##  or   EY1.w - mean( ( ( dd$x*dd$w /sum(dd$x*dd$w) ) - 1 )*dd$yp1 )
+##  or   EY1.w - mean( ( ( dd$x*dd$w /sum(dd$x*dd$w) ) + 1 )*dd$yp1 )
 EY0pot.a <- EY0pot.g + mean((1 - dd$x) * (dd$y - dd$yp0) * dd$w / sum((1 - dd$x) * dd$w))
-##  or   EY0.w - mean( ( ( (1-dd$x)*dd$w/sum((1-dd$x)*dd$w) ) - 1 )*dd$yp0 )
+##  or   EY0.w - mean( ( ( (1-dd$x)*dd$w/sum((1-dd$x)*dd$w) ) + 1 )*dd$yp0 )
 round(Contr(EY1pot.a, EY0pot.a), 4)
 ```
 
@@ -675,8 +682,6 @@ sample of 2000 subjects only.
 1.  A simple random sample of $n=2000$ is drawn from the population.
 
 ```{r sample}
-library(SuperLearner)
-library(tmle)
 set.seed(7622)
 n <- 2000
 sampind <- sample(N, n)
