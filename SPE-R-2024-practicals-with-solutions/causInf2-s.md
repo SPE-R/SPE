@@ -135,8 +135,6 @@ to include covariate
 library(Epi)
 library(stdReg)
 library(PSweight)
-library(SuperLearner)
-library(tmle)
 ```
 
 2.  Define two R-functions, which compute the expected values 
@@ -466,7 +464,7 @@ round(ci.lin(mX, Exp = TRUE)[, c(1, 5)], 4)
 2.  Extract the **propensity scores**, i.e. 
 fitted probabilities of
     belonging to exposure group 1: 
-    PS$_i = \widehat{p}_i$, and
+    $\text{PS}_i = \widehat{p_i}$, and
     compare their distribution between the two groups.
 
 
@@ -980,10 +978,10 @@ Both `AIPW` and `tmle` lean on the
  then creates an optimal weighted average of those models, 
  aka an "ensemble". These algorithms are computationally
  highly intensive. Fitting models with only 3 or 4
- covariates as in this practical to a data set of  
- observational units on our target cohort of 500,000 subjects
+ covariates as in this practical
+ on our target cohort of 500,000 subjects
  would take hours on an ordinary laptop. With a study population
- of a couple of thousands it takes several minutes. 
+ of 5000 it takes several minutes. 
 
 
 
