@@ -32,8 +32,6 @@ plot(d)
 library(Epi)
 library(stdReg)
 library(PSweight)
-library(SuperLearner)
-library(tmle)
 
 
 ## ----true models--------------------------------------------------------------
