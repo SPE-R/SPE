@@ -396,10 +396,8 @@ round(summary(mY.std, contrast = "ratio", reference = 0)$est.table, 4)
 ```
 
 ```r
-round(summary(mY.std,
-  transform = "odds",
-  contrast = "ratio", reference = 0
-)$est.table, 4)
+round(summary(mY.std, transform = "odds", 
+              contrast = "ratio", reference = 0)$est.table, 4)
 ```
 
 ```
@@ -557,7 +555,7 @@ and weights from a more flexible exposure model,
     is left out. The exposure model is 
     specified and the weights are
     obtained as follows using function
-    `SumStat()`:
+    `SumStat()` in `PSweight`:
 
 
 ```r
@@ -844,7 +842,7 @@ round(Contr(EY1pot.a, EY0pot.a), 4)
 Compare these results with those obtained by g-formula and by
 non-augmented IPW method. Was augmentation successful?
 
-2. Let us the look, how close we get when combining the results
+2. Let us then look, how close we get when combining the results
 from the slightly misspecified outcome model with the correct
 exposure model using the alternative AIPW-formula
 
@@ -871,7 +869,7 @@ be obtained, for instance, using `PSweight` by adding
 the model formula of the outcome model
 as the value for the argument `out.formula`.
 
-## Targeted maximum likelihood estimation (TMLE)
+## Double robust, targeted maximum likelihood estimation (TMLE)
 
 We now consider now another double robust approach, 
 known as **targeted
@@ -960,13 +958,13 @@ There are a few R packages in which some general
 algorithmic approaches for supervised learning
 are implemented for estimating causal parameters.
 For instance, package `AIPW` 
-[Zhong et al. (2021)](https://doi.org/10.1093/aje/kwab207)
+(see [Zhong et al., 2021](https://doi.org/10.1093/aje/kwab207))
 utilizes 
 several learning algorithms for exposure and outcome modelling
 and then performs AIPW estimation  of the
 parameters of interest coupled with 
 calculation of confidence intervals. Package `tmle`
-[Karim and Frank (2021)](https://ehsanx.github.io/TMLEworkshop/)
+(see [Karim and Frank, 2021](https://ehsanx.github.io/TMLEworkshop/))
 performs same tasks but uses the TMLE approach 
 in estimation.
 

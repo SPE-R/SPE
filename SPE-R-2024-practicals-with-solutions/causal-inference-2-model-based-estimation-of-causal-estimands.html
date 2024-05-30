@@ -304,7 +304,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="14.7" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#improving-ipw-estimation-and-using-r-package-psweight"><i class="fa fa-check"></i><b>14.7</b> Improving IPW estimation and using R package <code>PSweight</code></a></li>
 <li class="chapter" data-level="14.8" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#effect-of-exposure-among-those-exposed"><i class="fa fa-check"></i><b>14.8</b> Effect of exposure among those exposed</a></li>
 <li class="chapter" data-level="14.9" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#double-robust-estimation-by-augmented-ipw"><i class="fa fa-check"></i><b>14.9</b> Double robust estimation by augmented IPW</a></li>
-<li class="chapter" data-level="14.10" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#targeted-maximum-likelihood-estimation-tmle"><i class="fa fa-check"></i><b>14.10</b> Targeted maximum likelihood estimation (TMLE)</a></li>
+<li class="chapter" data-level="14.10" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#double-robust-targeted-maximum-likelihood-estimation-tmle"><i class="fa fa-check"></i><b>14.10</b> Double robust, targeted maximum likelihood estimation (TMLE)</a></li>
 <li class="chapter" data-level="14.11" data-path="causal-inference-2-model-based-estimation-of-causal-estimands.html"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#double-robust-estimation-with-aipw-and-tmle-packages"><i class="fa fa-check"></i><b>14.11</b> Double robust estimation with <code>AIPW</code> and <code>tmle</code> packages</a></li>
 </ul></li>
 <li class="chapter" data-level="15" data-path="time-dependent-variables-and-multiple-states.html"><a href="time-dependent-variables-and-multiple-states.html"><i class="fa fa-check"></i><b>15</b> Time-dependent variables and multiple states</a>
@@ -664,10 +664,8 @@ in package <code>stdReg</code>
 <pre><code>##   Estimate Std. Error lower 0.95 upper 0.95
 ## 0     1.00     0.0000     1.0000     1.0000
 ## 1     1.28     0.0028     1.2745     1.2855</code></pre>
-<div class="sourceCode" id="cb669"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb669-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb669-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(mY.std,</span>
-<span id="cb669-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb669-2" tabindex="-1"></a>  <span class="at">transform =</span> <span class="st">&quot;odds&quot;</span>,</span>
-<span id="cb669-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb669-3" tabindex="-1"></a>  <span class="at">contrast =</span> <span class="st">&quot;ratio&quot;</span>, <span class="at">reference =</span> <span class="dv">0</span></span>
-<span id="cb669-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb669-4" tabindex="-1"></a>)<span class="sc">$</span>est.table, <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb669"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb669-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb669-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(mY.std, <span class="at">transform =</span> <span class="st">&quot;odds&quot;</span>, </span>
+<span id="cb669-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb669-2" tabindex="-1"></a>              <span class="at">contrast =</span> <span class="st">&quot;ratio&quot;</span>, <span class="at">reference =</span> <span class="dv">0</span>)<span class="sc">$</span>est.table, <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>##   Estimate Std. Error lower 0.95 upper 0.95
 ## 0   1.0000     0.0000     1.0000     1.0000
 ## 1   2.6763     0.0315     2.6146     2.7379</code></pre>
@@ -787,7 +785,7 @@ not in that subset, so it
 is left out. The exposure model is
 specified and the weights are
 obtained as follows using function
-<code>SumStat()</code>:</li>
+<code>SumStat()</code> in <code>PSweight</code>:</li>
 </ol>
 <div class="sourceCode" id="cb680"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb680-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb680-1" tabindex="-1"></a>mX2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(x <span class="sc">~</span> (z2 <span class="sc">+</span> z3 <span class="sc">+</span> z4)<span class="sc">^</span><span class="dv">2</span>, <span class="at">family =</span> binomial, <span class="at">data =</span> dd)</span>
 <span id="cb680-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb680-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(mX2, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>)], <span class="dv">3</span>)</span></code></pre></div>
@@ -976,7 +974,7 @@ misspecified exposure model.</li>
 <p>Compare these results with those obtained by g-formula and by
 non-augmented IPW method. Was augmentation successful?</p>
 <ol start="2" style="list-style-type: decimal">
-<li>Let us the look, how close we get when combining the results
+<li>Let us then look, how close we get when combining the results
 from the slightly misspecified outcome model with the correct
 exposure model using the alternative AIPW-formula</li>
 </ol>
@@ -995,8 +993,8 @@ be obtained, for instance, using <code>PSweight</code> by adding
 the model formula of the outcome model
 as the value for the argument <code>out.formula</code>.</p>
 </div>
-<div id="targeted-maximum-likelihood-estimation-tmle" class="section level2 hasAnchor" number="14.10">
-<h2><span class="header-section-number">14.10</span> Targeted maximum likelihood estimation (TMLE)<a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#targeted-maximum-likelihood-estimation-tmle" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="double-robust-targeted-maximum-likelihood-estimation-tmle" class="section level2 hasAnchor" number="14.10">
+<h2><span class="header-section-number">14.10</span> Double robust, targeted maximum likelihood estimation (TMLE)<a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#double-robust-targeted-maximum-likelihood-estimation-tmle" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We now consider now another double robust approach,
 known as <strong>targeted
 maximum likelihood estimation</strong> (TMLE).
@@ -1064,13 +1062,13 @@ if thoughtfully applied.</p>
 algorithmic approaches for supervised learning
 are implemented for estimating causal parameters.
 For instance, package <code>AIPW</code>
-<a href="https://doi.org/10.1093/aje/kwab207">Zhong et al. (2021)</a>
+(see <a href="https://doi.org/10.1093/aje/kwab207">Zhong et al., 2021</a>)
 utilizes
 several learning algorithms for exposure and outcome modelling
 and then performs AIPW estimation of the
 parameters of interest coupled with
 calculation of confidence intervals. Package <code>tmle</code>
-<a href="https://ehsanx.github.io/TMLEworkshop/">Karim and Frank (2021)</a>
+(see <a href="https://ehsanx.github.io/TMLEworkshop/">Karim and Frank, 2021</a>)
 performs same tasks but uses the TMLE approach
 in estimation.</p>
 <p>Both <code>AIPW</code> and <code>tmle</code> lean on the
