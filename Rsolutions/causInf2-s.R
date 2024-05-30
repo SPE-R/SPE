@@ -112,10 +112,8 @@ mY.std <- stdGlm(fit = mY, data = dd, X = "x")
 summary(mY.std)
 round(summary(mY.std, contrast = "difference", reference = 0)$est.table, 4)
 round(summary(mY.std, contrast = "ratio", reference = 0)$est.table, 4)
-round(summary(mY.std,
-  transform = "odds",
-  contrast = "ratio", reference = 0
-)$est.table, 4)
+round(summary(mY.std, transform = "odds", 
+              contrast = "ratio", reference = 0)$est.table, 4)
 
 
 ## ----exposure model-----------------------------------------------------------
