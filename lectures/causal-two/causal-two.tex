@@ -221,7 +221,7 @@ CRC Press.
 \href{https://doi.org/10.1002/sim.9234}{\color{blue}Smith et al. (2022)} {\it Stat Med} 2022;41(2):407-432.
 \medskip
 \item
-\href{https://cran.r-project.org/web/packages/PSweight/vignettes/vignette.pdf}{\color{blue}Zhou et al. (2022)} \texttt{PSweight} vignette.
+\href{https://journal.r-project.org/articles/RJ-2022-011/RJ-2022-011.pdf}{\color{blue}Zhou et al. (2022)} {\it R Journal} 2022;14(1):282-289.
 
 \ei
 
@@ -268,12 +268,12 @@ Causal questions of interest -- comparisons of \textbf{counterfactuals}:
 Let %% $T$ = time to outcome event,  
  $Y$ %% (t) = {\mathbf 1}_{\{T \leq t\}}$
  be a binary indicator (1/0)
-for the outcome to occur within a fixed risk period (assuming no censoring, nor competing events), 
-and \\ $X$ be an exposure variable or risk factor. 
+for the {\it outcome} to occur within a fixed risk period (assuming no censoring, nor competing events), 
+and \\ $X$ be an {\it exposure} variable or risk factor. 
 \pause
 \medskip
 \item
-Let $\pi_x$ = risk of the outcome to occur during the period in the
+Let $\pi_x$ = {\it risk} of the outcome to occur during the period in the
 \underline{subset of the target population factually exposed} to level $X=x$:
 $$ \pi_x = P \{ Y=1\mid X=x\} = E(Y|X=x) . $$
 \pause
@@ -368,8 +368,8 @@ $P\{ Z=1 \} = 1 - P\{ Z=0 \}$ = 0.40 in the population and
 \toprule
       & $Z=1$ & $Z=0$ & $\pi_x$ (obtained by formula of total probability) \\
 \midrule						
-$X=1$ & 0.50  & 0.20 & $\pi_1$ = \textbf{0.40} (0.50$\times$ 0.667 + 0.20$\times$ 0.333) \\
-$X=0$ & 0.25  & 0.10 & $\pi_0$ = \textbf{0.13} (0.25$\times$ 0.182 + 0.10$\times$ 0.818) \\
+$X=1$ & 0.50  & 0.20 & $\pi_1$ = \textbf{0.40} (0.50 $\times$ 0.667 + 0.20 $\times$ 0.333) \\
+$X=0$ & 0.25  & 0.10 & $\pi_0$ = \textbf{0.13} (0.25 $\times$ 0.182 + 0.10 $\times$ 0.818) \\
 \midrule
 Contrasts & $\tau_1$ =0.25 & $\tau_0$ = 0.10 & $\tau$ = \textbf{0.27} \\
 \bottomrule  
@@ -1050,7 +1050,7 @@ $ \widetilde{\pi}_i^{X_i=x} = \text{expit}\{ \widehat\alpha + \widehat\beta x +
 \frametitle{\large Modern approach: Causal contrasts by g-formula (cont'd)}
 \bi
 \item
-Marginal counterfactual risks for $x=1,0$ are estimated applying
+Marginal potential or counterfactual risks for $x=1,0$ are estimated applying
 the principle of {\bf standardization} or {\bf g-formula}:
 $$ \widehat{\pi}^{X=x} = \widehat{E}_Z[E(Y|X=x, Z)]  = \frac{1}{n} \sum_{i=1}^n \widetilde{E}(Y_i|X_i=x, Z=z_i) 
 = \frac{1}{n} \sum_{i=1}^n \widetilde{\pi}_i^{X_i=x}
@@ -1059,8 +1059,8 @@ as the data provide a non-parametric estimate of the joint distribution of $Z$.
 \pause
 {\small\color{blue}
 \begin{verbatim}
-> probY.1 <- mean(dd$ypred1)
-> probY.0 <- mean(dd$ypred0)
+> EYpot.1 <- mean(dd$ypred1)
+> EYpot.0 <- mean(dd$ypred0)
 \end{verbatim}
 }
 \medskip
@@ -1074,9 +1074,9 @@ $ \widehat\tau^c = \widehat{\pi}^{X=1} - \widehat{\pi}^{X=0}, \qquad
 \medskip
 {\small\color{blue}
 \begin{verbatim}
-> tau.c <- probY.1 - probY.0
-> phi.c <- probY.1 / probY.0
-> psi.c <- ( probY.1/(1-probY.1) ) / ( probY.0/(1-probY.0) )  
+> tau.c <- EYpot.1 - EYpot.0
+> phi.c <- EYpot.1 / EYpot.0
+> psi.c <- ( EYpot.1/(1-EYpot.1) ) / ( EYpot.0/(1-EYpot.0) )  
 \end{verbatim}
 }
 %% {\bf NB.} The latter estimates marginal OR $\psi^c$ -- not $z$-conditional OR $\psi_z^c$. 
@@ -1133,7 +1133,7 @@ $$ W_i = w(\text{PS}_i, X_i) = \frac{ {\mathbf 1}_{ \{X_i=1\} } }{\text{PS}_i} +
 $$
 {\small \color{blue}
 \begin{verbatim}
-> dd$w <- 1*(dd$x==1)/dd$PS + 1*(dd$x==0)/(1-dd$PS))
+> dd$w <- 1*(dd$x==1)/dd$PS + 1*(dd$x==0)/(1-dd$PS)
 \end{verbatim}
 }
 \ei
@@ -1152,8 +1152,8 @@ $$
 $$
 {\small\color{blue}
 \begin{verbatim}
-> probY.1 <- sum( 1*(dd$x==1)*dd$w*dd$y ) / sum( 1*(dd$x==1)*dd$w )
-> probY.0 <- sum( 1*(dd$x==0)*dd$w*dd$y ) / sum( 1*(dd$x==0)*dd$w )
+> EYpot.1 <- sum( 1*(dd$x==1)*dd$w*dd$y ) / sum( 1*(dd$x==1)*dd$w )
+> EYpot.0 <- sum( 1*(dd$x==0)*dd$w*dd$y ) / sum( 1*(dd$x==0)*dd$w )
 \end{verbatim}
 }
 and from these, marginal causal contrasts are estimated as before.
@@ -1229,12 +1229,13 @@ for the outcome to occur by $t$.
 \pause
 \medskip
 \item
-The \textbf{hazard} of outcome at $t$ and the risk of outcome in $(0,t]$ for those factually 
-exposed to level $X=x$, $x=1,0$ (See Janne's lecture on Wednesday).
+The \textbf{hazard} of outcome at $t$, $\lambda_x(t)$, and the {\bf risk}
+ of outcome during $(0,t]$, $\pi_x(t)$, for those factually 
+exposed to level $X=x$, $x=1,0$: %% (See Janne's lecture on Wednesday).
 \begin{align*}
  \lambda_x(t) & = \lambda(t \mid X=x ) \approx 
- \frac{1}{h} P\{Y(t+h)=1 \mid Y(t)=0, X=x\}/h, \\
-   \pi_x(t) & = P\{ Y(t)=1 | X=x \} = 1 - \exp \left( - \int_0^t \lambda_x(v) dv \right)
+  P\{Y(t+h)=1 \mid Y(t)=0, X=x\}/h, \\
+  \pi_x(t) & = P\{ Y(t)=1 | X=x \} = 1 - \exp \left( - \int_0^t \lambda_x(v) dv \right)
 \end{align}
 \pause
 \item
@@ -1463,6 +1464,8 @@ curve to the same level as in MHT group.
 \end{minipage}
 \end{frame}
 
+\begin{comment}
+
 \begin{frame}
 \frametitle{\large From hazards to causal contrasts of risk}
 \bi
@@ -1471,7 +1474,8 @@ A well-specified predictive model for hazards $\lambda(t|x,z)$ (e.g.
 Cox or Poisson; suitably flexible) can, however, be used 
 to estimate counterfactual cumulative risks  % $\pi^1(t)$ and $\pi^0(t)$:
 %% \begin{center}
-   $ \pi^x(t) = P\{ Y^{X=x}(t) \} = P\{ T^{X=x} \leq t \}, x=0,1 $. 
+   $ \pi^x(t) = P\{ Y^{X=x}(t) \} = P\{ T^{X=x} \leq t \}, x=0,1 $,
+	the contrasts of which are causally interpretable. 
 %% \end{center}
 \pause
 \medskip
@@ -1524,21 +1528,24 @@ $$ \pi^x(t) = \sum_z \pi_x(t|Z=z) P\{ Z=z \} . $$
 
 \end{frame}
 
+\end{comment}
+
 \begin{frame}
-\frametitle{\large Estimation of causal contrasts from time-to-event data}
+\frametitle{\large Estimation of causal contrasts of risks} 
 \bi
 \item
-Various methods to estimate counterfactual % survival probabilities $1-\pi^x(t)$ and 
-risks $\pi^{X=x}(t)$ and their contrasts 
+ Counterfactual % survival probabilities $1-\pi^x(t)$ and 
+risks $\pi^{X=x}(t)$ and their contrasts are causally interpretable.  
+Various methods to estimate them exist
 ({\small see \href{https://doi.org/10.1002/sim.9681}{\color{blue}Denz et al. 2023} })
 \pause
- -- For instance
+ -- e.g.
 \medskip
 \item[(a)] 
-Fit a Cox model $\lambda(t|x_i, z_i) = \lambda_0(t)\exp(\beta x_i + \gamma^{T}z_i)$,
-take estimates of coefficients and baseline cumulative hazard $\widehat\Lambda_0(t)$
+Fit a hazard model, e.g. $\lambda(t|x_i, z_i) = \lambda_0(t)\exp(\beta x_i + \gamma^{T}z_i)$,
+extract $\widehat\beta$, $\widehat\gamma$, and baseline cumulative hazard $\widehat\Lambda_0(t)$
 % plus $\widehat\beta$ and $\widehat\gamma$, 
-from which:
+and plug in them:
 $$ % \begin{center}
  \widetilde{\pi}_i^{X_i=x}(t) = 1 - \exp \{ -\widehat\Lambda_0(t)\exp(\widehat\beta x + \widehat\gamma^{\small{\text{T}}} z_i) \}  .
 $$ % \end{center}
@@ -1546,9 +1553,10 @@ Counterfactuals $ {\pi}^{X=x}(t)$ and contrasts are then estimated by g-formula.
 \pause
 \medskip
 \item[(b)]
-Get weights $W_i$ from an exposure model, fit Cox with ``intercept only'' 
-specifying $X$ as a \texttt{strata()} variable and $W_i$:s as \texttt{weights}, and estimate $\widehat{\pi}^{X=x}(t)$
-using \texttt{survfit()}, etc.
+Get weights $W_i$ from $\text{PS}_i$s of an exposure model, fit Cox with ``intercept only'' 
+specifying $X$ as a {\color{blue}\texttt{strata()}} variable and 
+$W_i$:s as {\color{blue}\texttt{weights}}, and estimate $\widehat{\pi}^{X=x}(t)$
+using {\color{blue}\texttt{survfit()}}, etc.
 \pause
 \medskip
 \item Other: IPW Kaplan-Meier, use of pseudo-values, DR methods, \dots
@@ -1591,8 +1599,8 @@ Extensions exist for
  \pause
  \medskip
 \item
-Time-to-event outcomes: contrasts of risks preferable as causal estimands; 
-there are hazards with hazard ratios as causal parameters.  
+Time-to-event outcomes: contrasts of risks or survival preferable as causal estimands; 
+there are hazards with hazard ratios.  
 \pause
 \medskip
  \item
