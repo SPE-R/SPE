@@ -359,7 +359,7 @@ birth_per_ageg_long_02 <-
 identical(birth_per_ageg, birth_per_ageg_long_02)
 
 
-## -----------------------------------------------------------------------------
+## ----reults = 'hide'----------------------------------------------------------
 # read a csv using core R
 fem.csv.core <- read.csv("data/fem.csv")
 # read a csv using tidyverse
