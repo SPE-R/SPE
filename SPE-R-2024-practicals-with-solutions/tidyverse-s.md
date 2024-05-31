@@ -802,11 +802,11 @@ age
 ##     pid   age
 ##   <int> <int>
 ## 1     1    20
-## 2     2    20
+## 2     2    18
 ## 3     3    19
-## 4     4    23
-## 5     5    23
-## 6     6    23
+## 4     4    20
+## 5     5    22
+## 6     6    17
 ```
 
 ``` r
@@ -837,11 +837,11 @@ bind_rows(age, center)
 ##      pid   age center
 ##    <dbl> <int> <chr> 
 ##  1     1    20 <NA>  
-##  2     2    20 <NA>  
+##  2     2    18 <NA>  
 ##  3     3    19 <NA>  
-##  4     4    23 <NA>  
-##  5     5    23 <NA>  
-##  6     6    23 <NA>  
+##  4     4    20 <NA>  
+##  5     5    22 <NA>  
+##  6     6    17 <NA>  
 ##  7     1    NA A     
 ##  8     2    NA B     
 ##  9     3    NA A     
@@ -868,11 +868,11 @@ left_join(age, center, by = c("pid"))
 ##     pid   age center
 ##   <dbl> <int> <chr> 
 ## 1     1    20 A     
-## 2     2    20 B     
+## 2     2    18 B     
 ## 3     3    19 A     
-## 4     4    23 B     
-## 5     5    23 <NA>  
-## 6     6    23 <NA>
+## 4     4    20 B     
+## 5     5    22 <NA>  
+## 6     6    17 <NA>
 ```
 
 ``` r
@@ -885,11 +885,11 @@ full_join(age, center, by = c("pid"))
 ##     pid   age center
 ##   <dbl> <int> <chr> 
 ## 1     1    20 A     
-## 2     2    20 B     
+## 2     2    18 B     
 ## 3     3    19 A     
-## 4     4    23 B     
-## 5     5    23 <NA>  
-## 6     6    23 <NA>  
+## 4     4    20 B     
+## 5     5    22 <NA>  
+## 6     6    17 <NA>  
 ## 7    10    NA C
 ```
 
@@ -903,9 +903,9 @@ inner_join(age, center, by = c("pid"))
 ##     pid   age center
 ##   <dbl> <int> <chr> 
 ## 1     1    20 A     
-## 2     2    20 B     
+## 2     2    18 B     
 ## 3     3    19 A     
-## 4     4    23 B
+## 4     4    20 B
 ```
 Can you spot the differences between the commands above?
 As an exercise, you can try to compute the individuals' mean age per center.
@@ -924,7 +924,7 @@ inner_join(age, center, by = c("pid")) |>
 ##   center mean_age
 ##   <chr>     <dbl>
 ## 1 A          19.5
-## 2 B          21.5
+## 2 B          19
 ```
 
 **Note:** the `by` argument indicates which column should be use to make the *join*. In some 
