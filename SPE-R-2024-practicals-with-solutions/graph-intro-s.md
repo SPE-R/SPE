@@ -19,7 +19,7 @@ preferably in a script.
 
 Load the births data and get an overview of the variables:
 
-```r
+``` r
 library(Epi)
 data(births)
 str(births)
@@ -38,26 +38,26 @@ str(births)
 ```
 Now look at the birth weight distribution with
 
-```r
+``` r
 hist(births$bweight)
 ```
 
 ![](graph-intro-s_files/figure-epub3/unnamed-chunk-3-1.png)<!-- -->
 The histogram can be refined -- take a look at the possible options with
 
-```r
+``` r
 help(hist)
 ```
 and try some of the options, for example:
 
-```r
+``` r
 hist(births$bweight, col = "gray", border = "white")
 ```
 
 ![](graph-intro-s_files/figure-epub3/unnamed-chunk-5-1.png)<!-- -->
 To look at the relationship between birthweight and gestational weeks, try
 
-```r
+``` r
 with(births, plot(gestwks, bweight))
 ```
 
@@ -65,7 +65,7 @@ with(births, plot(gestwks, bweight))
 You can change the plot-symbol by the option `pch=`. If you
 want to see all the plot symbols try:
 
-```r
+``` r
 plot(1:25, pch = 1:25)
 ```
 
@@ -74,14 +74,14 @@ plot(1:25, pch = 1:25)
 
   -  Make a plot of the birth weight versus maternal age with
 
-```r
+``` r
 with(births, plot(matage, bweight))
 ```
 
 ![](graph-intro-s_files/figure-epub3/unnamed-chunk-8-1.png)<!-- -->
 -  Label the axes with
 
-```r
+``` r
 with(
   births, 
   plot(
@@ -103,7 +103,7 @@ There are many colours recognized by `R`. You can list them all by
 use British or American spelling).  To colour the points of birthweight
 versus gestational weeks, try
 
-```r
+``` r
 with(births, plot(gestwks, bweight, pch = 16, col = "green"))
 ```
 
@@ -113,7 +113,7 @@ points and it is no longer possible to see individual points.  You can
 recover this information by overwriting the points with black circles
 using the `points()` function.
 
-```r
+``` r
 with(births, plot(gestwks, bweight, pch = 16, col = "green"))
 with(births, points(gestwks, bweight, pch = 1))
 ```
@@ -133,7 +133,7 @@ an empty plot, with `type='n'` argument.
 
 Then add the points with the `points` function.
 
-```r
+``` r
 with(births, plot(gestwks, bweight, type = "n"))
 with(
   births, 
@@ -149,7 +149,7 @@ with(
 
 To add a legend explaining the colours, try
 
-```r
+``` r
 with(births, plot(gestwks, bweight, type = "n"))
 with(
   births, 
@@ -172,7 +172,7 @@ which puts the legend in the top left hand corner.
 
 Finally we can add a title to the plot with
 
-```r
+``` r
 with(births, plot(gestwks, bweight, type = "n"))
 with(
   births, 
@@ -212,7 +212,7 @@ that `sex` takes the values 1 and 2, as follows:
 First create a colour vector with two colours,
 and take look at `sex`:
 
-```r
+``` r
 c("blue", "red")
 ```
 
@@ -220,7 +220,7 @@ c("blue", "red")
 ## [1] "blue" "red"
 ```
 
-```r
+``` r
 births$sex
 ```
 
@@ -242,7 +242,7 @@ births$sex
 ```
 Now see what happens if you index the colour vector by sex:
 
-```r
+``` r
 c("blue", "red")[births$sex]
 ```
 
@@ -304,7 +304,7 @@ For every occurrence of a `1` in `sex` you get
 `"red"`s corresponding to the males and females.
 This can now be used in the plot:
 
-```r
+``` r
 with(
   births, 
   plot(gestwks, bweight, pch = 16, col = c("blue", "red")[sex])
@@ -315,14 +315,14 @@ with(
 The same trick can be used if we want to have a separate symbol for
 mothers over 40 say. We first generate the indexing variable:
 
-```r
+``` r
 births$oldmum <- (births$matage >= 40) + 1
 ```
 Note we add 1 because `( matage >= 40 )` generates a logic
 variable, so by adding 1 we get a numeric variable with values 1 and
 2, suitable for indexing:
 
-```r
+``` r
 with(
   births, 
   plot(
@@ -342,7 +342,7 @@ R will accept any kind of complexity in the indexing as
 long as the result is a valid index, so you don't need to create the
 variable `oldmum`, you can create it on the fly:
 
-```r
+``` r
 with(
   births, 
   plot(
@@ -370,7 +370,7 @@ automatically gives indexes 1,2,3 etc.).
 
 R has functions that generate a vector of colours for you. For example,
 
-```r
+``` r
 rainbow(4)
 ```
 
@@ -388,7 +388,7 @@ Gray-tones are produced by the function `gray` (or
 `grey`), which takes a numerical argument between 0 and 1;
 `gray(0)` is black and `gray(1)` is white. Try:
 
-```r
+``` r
 plot(0:10, pch = 16, cex = 3, col = gray(0:10 / 10))
 points(0:10, pch = 1, cex = 3)
 ```
@@ -404,7 +404,7 @@ you can  start a non-interactive graphics device and then re-run the script.
 directly to a file.  After the plot has been completed you will need
 to close the device again in order to be able to access the file. Try:
 
-```r
+``` r
 pdf(file = "bweight_gwks.pdf", height = 4, width = 4)
 with(births, plot(gestwks, bweight, col = c("blue", "red")[sex]))
 legend(
@@ -432,7 +432,7 @@ effect until a new graphics device is opened.
 
 Look at the typewriter-version of the help-page with
 
-```r
+``` r
 help(par)
 ```
 or better, use the the html-version through
@@ -452,7 +452,7 @@ in the current plot.
 
 If you want more plots on a single page you can use the command
 
-```r
+``` r
 par(mfrow = c(2, 3))
 ```
 This will give you a layout of 2 rows by 3 columns for the next 6
@@ -462,7 +462,7 @@ row first. If you want the plots to appear columnwise, use
 
 To restore the layout to a single plot per page use
 
-```r
+``` r
 par(mfrow = c(1, 1))
 ```
 If you want a more detailed control over the layout of multiple graphs
@@ -479,14 +479,14 @@ You can use `locator()` inside other graphics functions to position
 graphical elements exactly where you want them. Recreate the birth-weight
 plot,
 
-```r
+``` r
 with(births, plot(gestwks, bweight, col = c("blue", "red")[sex]))
 ```
 
 ![](graph-intro-s_files/figure-epub3/unnamed-chunk-27-1.png)<!-- -->
 and then add the legend where you wish it to appear by typing
 
-```r
+``` r
 legend(
   locator(1), 
   pch = 1, 
@@ -498,7 +498,7 @@ legend(
 The `identify()` function allows you to find out which records
 in the data correspond to points on the graph. Try
 
-```r
+``` r
 with(births, identify(gestwks, bweight))
 ```
 When you click the left mouse button, a label will appear on the graph
@@ -513,7 +513,7 @@ returns a vector of identified points.
 smallest and largest number of gestational weeks and view the
 corresponding records:
 
-```r
+``` r
 with(births, births[identify(gestwks, bweight), ])
 ```
 

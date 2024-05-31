@@ -77,7 +77,7 @@ different aspects in estimating effects of various exposures on a metric respons
 
 1. Load the packages needed in this exercise and the data set, and look at its content
 
-```r
+``` r
 library(Epi)
 library(mgcv)
 data(births)
@@ -101,7 +101,7 @@ str(births)
 <!-- %% created by function `cut()`. -->
 <!-- %% Also, express birth weights in kilograms -->
 
-```r
+``` r
 births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
 births$sex <- factor(births$sex, labels = c("M", "F"))
 births$maged <- cut(births$matage, breaks = c(22, 35, 44), right = FALSE)
@@ -112,7 +112,7 @@ births$gest4 <- cut(births$gestwks,
 variables in the data; especially
 the location and dispersion of the distribution of  `bweight`.
 
-```r
+``` r
 summary(births)
 ```
 
@@ -135,7 +135,7 @@ summary(births)
 ## 
 ```
 
-```r
+``` r
 with(births, sd(bweight))
 ```
 
@@ -153,7 +153,7 @@ means for a metric response.
 1. Comparison of two groups is commonly done by the conventional $t$-test and
 the associated confidence interval. 
 
-```r
+``` r
 with(births, t.test(bweight ~ hyp, var.equal = TRUE))
 ```
 
@@ -191,7 +191,7 @@ in case you use
 `lm()`, this argument is not needed, because `lm()` fits only 
 models for metric responses assuming Gaussian distribution.
 
-```r
+``` r
 m1 <- glm(bweight ~ hyp, family = gaussian, data = births)
 summary(m1)
 ```
@@ -219,7 +219,7 @@ summary(m1)
 3. Note the amount of output that `summary()` method produces.
 The point estimate plus confidence limits can, though, be concisely obtained by function `ci.lin()` found in `Epi` package.  
 
-```r
+``` r
 round(ci.lin(m1)[, c(1, 5, 6)], 1)
 ```
 
@@ -241,7 +241,7 @@ We shall now examine whether and to what extent the
 1. The following *interaction plot*
 shows how the mean `bweight` depends jointly on `hyp` and `gest4`
 
-```r
+``` r
 par(mfrow = c(1, 1))
 with(births, interaction.plot(sex, hyp, bweight))
 ```
@@ -254,7 +254,7 @@ mothers is somewhat bigger in boys than in girls.
 in the two levels of `sex`. 
 Stratified estimation of effects can be done by `lm()` as follows:
 
-```r
+``` r
 m3 <- lm(bweight ~ sex / hyp, data = births)
 round(ci.lin(m3)[, c(1, 5, 6)], 1)
 ```
@@ -274,7 +274,7 @@ are $-496$ g in boys and $-380$ g among girls.
 *interaction term* between `sex` and `hyp` is
 fitted as follows:
 
-```r
+``` r
 m3I <- lm(bweight ~ sex + hyp + sex:hyp, data = births)
 round(ci.lin(m3I)[, c(1, 4, 5, 6)], 2)
 ```
@@ -309,7 +309,7 @@ result, the possibility of a real effect-measure modification
 cannot be ignored based on these data only.
 
 
-## Estimating the effect of `hyp` adjusted for `sex`
+## Controlling or adjusting for the effect of `hyp` for `sex`
 
 The estimated effects of `hyp`: 
 $-496$ in boys and $-380$ in girls, look quite
@@ -319,7 +319,7 @@ Therefore, we may now proceed to estimate the overall effect of `hyp`
 
 1. Adjustment is done by adding `sex` to the model formula:
 
-```r
+``` r
 m4 <- lm(bweight ~ sex + hyp, data = births)
 ci.lin(m4)[, c(1, 5, 6)]
 ```
@@ -356,7 +356,7 @@ of the response with `gestwks` is roughly linear
 % or log-linear (for a binary or failure rate response) 
 we can estimate the linear effect of `gestwks` with `lm()` as follows:
 
-```r
+``` r
 m5 <- lm(bweight ~ gestwks, data = births)
 ci.lin(m5)[, c(1, 5, 6)]
 ```
@@ -379,14 +379,14 @@ it will provide you some common diagnostic graphs.
 
 2. To check whether `bweight` goes up linearly with `gestwks` try
 
-```r
+``` r
 with(births, plot(gestwks, bweight))
 abline(m5)
 ```
 
 3. Moreover, take a look at the basic diagnostic plots for the fitted model.
 
-```r
+``` r
 par(mfrow = c(2, 2))
 plot(m5)
 ```
@@ -412,7 +412,7 @@ this package.
   expression '`s(X)`' for any explanatory variable `X`,
   for which you wish to fit a smooth function
 
-```r
+``` r
 mPs <- mgcv::gam(bweight ~ s(gestwks), data = births)
 summary(mPs)
 ```
@@ -447,7 +447,7 @@ weight in the data.  The estimated residual variance is given by
 `gam` object.  Taking square root you will obtain the estimated
 residual standard deviation: $445.2$ g.
 
-```r
+``` r
 mPs$sig2
 ```
 
@@ -455,7 +455,7 @@ mPs$sig2
 ## [1] 198186
 ```
 
-```r
+``` r
 sqrt(mPs$sig2)
 ```
 
@@ -474,7 +474,7 @@ as an 3rd degree polynomial model would take.
   lines joining the pertinent end points over the $x$-values for which the
   predictions are computed.
 
-```r
+``` r
 plotFitPredInt <- function(xval, fit, pred, ...) {
   matshade(xval, fit, lwd = 2, alpha = 0.2)
   matshade(xval, pred, lwd = 2, alpha = 0.2)
@@ -492,7 +492,7 @@ This function creates a matrix of three columns: (1) fitted/predicted
 values, (2) lower limits, (3) upper limits and 
 make the graph:
 
-```r
+``` r
 nd <- data.frame(gestwks = seq(24, 45, by = 0.25))
 pr.Ps <- predict(mPs, newdata = nd, se.fit = TRUE)
 str(pr.Ps) # with se.fit=TRUE, only two columns: fitted value and its SE
@@ -508,7 +508,7 @@ str(pr.Ps) # with se.fit=TRUE, only two columns: fitted value and its SE
 ##   .. ..$ : chr [1:85] "1" "2" "3" "4" ...
 ```
 
-```r
+``` r
 fit.Ps <- cbind(
   pr.Ps$fit,
   pr.Ps$fit - 2 * pr.Ps$se.fit,
@@ -546,7 +546,7 @@ and modelling binary outcome.
 1. We start with simple tabulation 
 of the prevalence of `lowbw` by maternal hypertension
 
-```r
+``` r
 stat.table(
   index = list(hyp, lowbw),
   contents = list(count(), percent(lowbw)),
@@ -577,7 +577,7 @@ or about three times as high as that for normotensive mothers
 2. The three comparative measures of prevalences can be 
 estimated by `glm()` with different link functions:
 
-```r
+``` r
 binRD <- glm(lowbw ~ hyp, family = binomial(link = "identity"), data = births)
 round(ci.lin(binRD)[, c(1, 2, 5:6)], 3)
 ```
@@ -588,7 +588,7 @@ round(ci.lin(binRD)[, c(1, 2, 5:6)], 3)
 ## hyphyper       0.184  0.055 0.077 0.291
 ```
 
-```r
+``` r
 binRR <- glm(lowbw ~ hyp, family = binomial(link = "log"), data = births)
 round(ci.lin(binRR, Exp = TRUE)[, c(1, 2, 5:7)], 3)
 ```
@@ -599,7 +599,7 @@ round(ci.lin(binRR, Exp = TRUE)[, c(1, 2, 5:7)], 3)
 ## hyphyper       1.089  0.242     2.972 1.848 4.780
 ```
 
-```r
+``` r
 binOR <- glm(lowbw ~ hyp, family = binomial(link = "logit"), data = births)
 round(ci.lin(binOR, Exp = TRUE)[, c(1, 2, 5:7)], 3)
 ```
@@ -616,7 +616,7 @@ How well is the odds ratio approximating the risk ratio here?
 3. The prevalence of low birth weight is expected to be inversely related
 to gestational age (weeks), as is evident from simple tabulation
 
-```r
+``` r
 stat.table(
   index = list(gest4, lowbw),
   contents = list(count(), percent(lowbw)),
@@ -649,7 +649,7 @@ stat.table(
 
 4. Let's jump right away to spline modelling of this relationship
 
-```r
+``` r
 binm1 <- mgcv::gam(lowbw ~ s(gestwks), family = binomial(link = "logit"), data = births)
 summary(binm1)
 ```
@@ -678,7 +678,7 @@ summary(binm1)
 ## UBRE = -0.57194  Scale est. = 1         n = 490
 ```
 
-```r
+``` r
 plot(binm1)
 ```
 
@@ -688,7 +688,7 @@ of outcome is almost linearly dependent on `gestwks`?
 5. Encouraged by the result of the previous item, we continue the analysis
 with `glm()` and assuming logit-linearity
 
-```r
+``` r
 binm2 <- glm(lowbw ~ I(gestwks - 40), family = binomial(link = "logit"), data = births)
 round(ci.lin(binm2, Exp = TRUE)[, c(1, 2, 5:7)], 3)
 ```
@@ -706,7 +706,7 @@ and their exponentiated values?
 to plot the fitted prevalences against `gestwks`,
 in which we utilize the previously created data frame `nd`
 
-```r
+``` r
 predm2 <- predict(binm2, newdata = nd, type = "response")
 plot(nd$gestwks, predm2, type = "l")
 ```

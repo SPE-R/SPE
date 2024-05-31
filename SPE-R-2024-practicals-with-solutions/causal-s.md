@@ -37,7 +37,7 @@ average to $0.5mmHg$ difference in (systolic) blood pressures.
 
 The `R` commands to generate the data are:
 
-```r
+``` r
 bdat <- data.frame(sex = c(rep(0, 500), rep(1, 500)))
 # a data frame with 500 females, 500 males
 bdat$beer <- rbinom(1000, 1, 0.2 + 0.5 * bdat$sex)
@@ -66,7 +66,7 @@ Which (if any) of the models gives an unbiased estimate of the
   the conclusions in the above models now. 
 Thus the data is generated as before, but the weight variable is computed as:
 
-```r
+``` r
 bdat$weight <- 
   60 + 10 * bdat$sex + 2 * bdat$beer + rnorm(1000, 0, 7)
 ```
@@ -84,7 +84,7 @@ bdat$weight <-
 
 There is a software *DAGitty* ([http://www.dagitty.net/](http://www.dagitty.net/)) and also an R package *dagitty* that can be helpful in dealing with DAGs. Let's try to get the answer to the previous exercise using this package. 
 
-```r
+``` r
 if (!("dagitty" %in% installed.packages())){
   install.packages("dagitty")
 }
@@ -94,7 +94,7 @@ library(dagitty)
 
 Let's recreate the graph on the lecture slide 23 (but omitting the direct causal effect of interest, $C \rightarrow D$):
 
-```r
+``` r
 g <- dagitty("dag {
     C <- S -> Y -> U -> D
     C -> Z <- Y
@@ -111,7 +111,7 @@ plot(g)
 To get a more similar look as on the slide, we must supply the coordinates (x increases from left to right, y from top to bottom):
 
 
-```r
+``` r
 coordinates(g) <- 
   list(
     x = 
@@ -130,7 +130,7 @@ plot(g)
 
 Let's look at all possible paths from $C$ to $D$:
 
-```r
+``` r
 paths(g, "C", "D")$paths
 ```
 As you see, one path contains a collider and is therefore a *closed* path and the others are *open*.   
@@ -138,7 +138,7 @@ As you see, one path contains a collider and is therefore a *closed* path and th
 Let's identify the minimal sets of variables needed to adjust the model for $D$ for, to obtain an unbiased estimate of the effect of $C$. You can specify, whether you want to estimate direct or total effect of $C$:
 
 
-```r
+``` r
 adjustmentSets(
   g, exposure = "C", outcome = "D", effect = "direct"
 )
@@ -167,14 +167,14 @@ Suppose you want to estimate the effect of Body Mass Index (BMI) on blood glucos
 
 -  Start by generating the genotype variable as *Binomial(2,p)*, with $p=0.2$ (and look at the resulting genotype frequencies):
 
-```r
+``` r
 n <- 10000
 mrdat <- data.frame(G = rbinom(n, 2, 0.2))
 table(mrdat$G)
 ```
 -  Also generate the confounder variable U 
 
-```r
+``` r
 mrdat$U <- rnorm(n)
 ```
 
@@ -182,12 +182,12 @@ mrdat$U <- rnorm(n)
 Check with linear regression, whether there is enough power to get significant parameter estimates.  
 For instance:
 
-```r
+``` r
 mrdat$BMI <- with(mrdat, 25 + 0.7 * G + 2 * U + rnorm(n))
 ```
 -  Finally generate $Y$ ("Blood glucose level") so that it depends on $BMI$ and $U$ (but not on $G$).
 
-```r
+``` r
 mrdat$Y <- 
   with(mrdat, 3 + 0.1 * BMI - 1.5 * U + rnorm(n, 0, 0.5))
 ```
@@ -204,7 +204,7 @@ Could you explain analytically, why one may see a significant parameter estimate
 in the lecture notes (use two linear models and find a ratio of the parameter estimates). 
 Does the estimate get closer to the generated effect size?
 
-```r
+``` r
 mgx <- lm(BMI ~ G, data = mrdat)
 ci.lin(mgx) # check the instrument effect
 bgx <- mgx$coef[2] # save the 2nd coefficient (coef of G)
@@ -218,7 +218,7 @@ causeff # closer to 0.1?
 -   A proper simulation study would require the analysis to be run several times, to see the extent of variability in the parameter estimates. 
 A simple way to do it here would be using a `for`-loop. Modify the code as follows (exactly the same commands as executed so far, adding a few lines of code to the beginning and to the end):
 
-```r
+``` r
 n <- 10000
 # initializing simulations:
 # 30 simulations (change it, if you want more):
@@ -242,13 +242,13 @@ for (i in 1:nsim) { # start the loop
 ```
 Now look at the distribution of the parameter estimate:
 
-```r
+``` r
 summary(mr)
 ```
 
 -  (*optional*) Change the code of simulations so that the assumptions are violated: add a weak direct effect of the genotype G to the equation that generates $Y$:
 
-```r
+``` r
 mrdat$Y <- 
   with(
     mrdat, 
@@ -260,7 +260,7 @@ Repeat the simulation study to see, what is the bias in the average estimated ca
 -  (*optional*) Using library `sem`  and function `tsls`, one can obtain a two-stage least squares estimate for the  
 causal effect and also the proper standard error. Do you get the same estimate as before? 
 
-```r
+``` r
 if (!("sem" %in% installed.packages())) install.packages("sem")
 library(sem)
 summary(tsls(Y ~ BMI, ~G, data = mrdat))

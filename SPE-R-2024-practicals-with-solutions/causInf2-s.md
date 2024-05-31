@@ -31,8 +31,6 @@ Sources of inspiration: [Luque Fernandez, M.A. et al.
 [Smith et al. (2022)](https://doi.org/10.1002/sim.9234) *Stat Med*
 2022;41(2):407-432.
 
-## Introduction
-
 We shall illustrate with simulated data the estimation of causal effects
 of a binary exposure $X$ when the outcome $Y$ is also binary, and there
 is a set of four covariates $Z = (Z_1, Z_2, Z_3, Z_4)$. As a background
@@ -49,35 +47,7 @@ and the assumed marginal distributions of the covariates are
 | $Z_4$    | comorbidity score; 5 classes; $Z_3 \sim \text{DiscUnif}(1, \dots, 5)$ |
 
 For simplicity, covariates $Z_3$ and $Z_4$ are treated as continuous
-variables in the models. The assumed causal diagram 
-is drawn using `dagitty` and is shown below.
-
-
-```r
-library(dagitty)
-d <-
-  dagitty("dag {
-  Z2 -> Z3 -> Y
-  Z2 -> Z4 -> Y
-  Z2 -> Y
-  Z2 -> Z3 -> X
-  Z2 -> Z4 -> X
-  Z2 -> X
-  Z1 -> Z3 -> Y
-  Z1 -> Z4 -> Y
-  Z1 -> Y
-  Z1 -> Z3 -> X
-  Z1 -> Z4 -> X
-}")
-
-dagitty::coordinates(d) <-
-  list(
-    x = c(X = 1, Y = 5, Z1 = 5, Z2 = 1, Z3 = 4, Z4 = 2),
-    y = c(X = 2, Y = 2, Z1 = 0, Z2 = 0, Z3 = 1, Z4 = 1)
-  )
-
-plot(d)
-```
+variables in the models. The assumed causal diagram is shown below.
 
 ![](causInf2-s_files/figure-epub3/dagitty-1.png)<!-- -->
 
@@ -89,7 +59,7 @@ where $Z$ is the vector of relevant
 covariates. 
 
 The same principle is applied in expressing the conditional
-probability of $X=1$, i.e. being exposed, given $Z=z$:
+probability of $X=1$ given $Z=z$:
 $$ E(X|Z=z) = P(X=1|Z=z). $$
 The fitted or predicted probabilities
 of $Y=1$ are denoted as fitted $\widehat{Y}$ or predicted values
@@ -107,9 +77,8 @@ $$ E(X|Z_1 = z_1, \dots, Z_4 = z_4) =
 assumed true model for the outcome is
 $$ E(Y|X=x, Z_1 = z_1, \dots, Z_4 = z_4) =
            \text{expit}(-1 + x - 0.1z_1 + 0.35z_2 + 0.25z_3 +
-                 0.20z_4 + 0.15z_2z_4) $$ 
-Note that $X$ does not depend on $Z_1$, and that in both models
-there is a product term $Z_2 Z_4$,
+                 0.20z_4 + 0.15z_2z_4) $$ Note that $X$ does not depend
+on $Z_1$, and that in both models there is a product term $Z_2 Z_4$,
 the effect of which appears weaker for the outcome model.
 
 ## Control of confounding
@@ -131,7 +100,7 @@ to include covariate
 1.  Load the necessary packages.
 
 
-```r
+``` r
 library(Epi)
 library(stdReg)
 library(PSweight)
@@ -142,7 +111,7 @@ for the exposure and those for the outcome based on the assumed
 true exposure model and the true outcome model, respectively.
 
 
-```r
+``` r
 EX <- function(z2, z3, z4) {
   plogis(-5 + 0.05 * z2 + 0.25 * z3 + 0.5 * z4 + 0.4 * z2 * z4)
 }
@@ -157,7 +126,7 @@ simulating random values from pertinent probability
 distributions based on the given    assumptions.
 
 
-```r
+``` r
 genData <- function(N) {
   z1 <- rbinom(N, size = 1, prob = 0.5) # Bern(0.5)
   z2 <- rbinom(N, size = 1, prob = 0.65) # Bern(0.65)
@@ -173,7 +142,7 @@ genData <- function(N) {
 500000  subjects
 
 
-```r
+``` r
 N <- 500000
 set.seed(7777)
 dd <- genData(N)
@@ -189,16 +158,16 @@ in the whole target population, as well as their
     ratio. Before that define a useful function
 
 
-```r
+``` r
 Contr <- function(mu1, mu0) {
   RD <- mu1 - mu0
   RR <- mu1 / mu0
   OR <- (mu1 / (1 - mu1)) / (mu0 / (1 - mu0))
   return(c(mu1, mu0, RD = RD, RR = RR, OR = OR))
 }
-Ey1fact <- with(dd, sum(y == 1 & x == 1) / sum(x == 1))
-Ey0fact <- with(dd, sum(y == 1 & x == 0) / sum(x == 0))
-round(Contr(Ey1fact, Ey0fact), 4)
+Ey1 <- with(dd, sum(y == 1 & x == 1) / sum(x == 1))
+Ey0 <- with(dd, sum(y == 1 & x == 0) / sum(x == 0))
+round(Contr(Ey1, Ey0), 4)
 ```
 
 ```
@@ -209,7 +178,7 @@ round(Contr(Ey1fact, Ey0fact), 4)
 How much bigger is the risk of death of those factually exposed to
 radiotherapy only as compared with those receiving chemotherapy, too?
 
-2.  Compute now the true **counterfactual** or 
+2.  Compute now first the **counterfactual** or 
   **potential risks**  of death
     $$ E(Y_i^{X_i=x}) = P(Y_i^{X_i=x}=1) = \pi_i^{X_i=x} $$ 
     for each
@@ -227,7 +196,7 @@ radiotherapy only as compared with those receiving chemotherapy, too?
     $$
 
 
-```r
+``` r
 dd <- transform(dd,
   EY1.ind = EY(x = 1, z1, z2, z3, z4),
   EY0.ind = EY(x = 0, z1, z2, z3, z4)
@@ -242,7 +211,7 @@ round(Contr(EY1pot, EY0pot), 4)
 ## 0.8273 0.6530 0.1743 1.2670 2.5462
 ```
 
-3.  Compare the associational contrasts computed in 
+3.  Compare the associational contrasts computed in in 
    item 4.1 with the
     causal contrasts in item 4.2. What do you conclude about
     confoundedness of the associational contrasts?
@@ -276,7 +245,7 @@ $$ E(Y^{X=x}) = E_Z[E(Y|X=x,Z)]
     <!-- % model -->
 
 
-```r
+``` r
 mY <- glm(y ~ x + z1 + z2 + z3 + z4, family = binomial, data = dd)
 round(ci.lin(mY, Exp = TRUE)[, c(1, 5)], 3)
 ```
@@ -302,7 +271,7 @@ confidence intervals in such a big population.
     $Z$-variables as they are.
 
 
-```r
+``` r
 dd$yh <- predict(mY, type = "response") #  fitted values
 dd$yp1 <- predict(mY, newdata = data.frame(
   x = rep(1, N), # x=1
@@ -314,17 +283,16 @@ dd$yp0 <- predict(mY, newdata = data.frame(
 ), type = "response")
 ```
 
-3.  Applying the method of **standardization** or 
-**g-formula** compute now the
+3.  Applying the method of standardization or 
+g-formula compute now the
     point estimates 
     $$ \widehat{E}_g(Y^{X=x}) =
      \frac{1}{n} \sum_{i=1}^n \widetilde{Y}_i^{X_i=x}, \quad x=0,1. $$
     of the two counterfactual risks $E(Y^{X=1}) = \pi^1$ and
-    $E(Y^{X=0})=\pi^0$ as well as  
-    those of the marginal causal contrasts
+    $E(Y^{X=0})=\pi^0$ as well as the marginal causal contrasts
 
 
-```r
+``` r
 EY1pot.g <- mean(dd$yp1)
 EY0pot.g <- mean(dd$yp0)
 round(Contr(EY1pot.g, EY0pot.g), 4)
@@ -358,7 +326,7 @@ in package `stdReg`
 (see [Sjölander 2016](https://doi.org/10.1007/s10654-016-0157-3))
 
 
-```r
+``` r
 mY.std <- stdGlm(fit = mY, data = dd, X = "x")
 summary(mY.std)
 ```
@@ -375,7 +343,7 @@ summary(mY.std)
 ## 1    0.833   0.001562      0.830      0.836
 ```
 
-```r
+``` r
 round(summary(mY.std, contrast = "difference", reference = 0)$est.table, 4)
 ```
 
@@ -385,7 +353,7 @@ round(summary(mY.std, contrast = "difference", reference = 0)$est.table, 4)
 ## 1   0.1822     0.0017     0.1788     0.1856
 ```
 
-```r
+``` r
 round(summary(mY.std, contrast = "ratio", reference = 0)$est.table, 4)
 ```
 
@@ -395,9 +363,11 @@ round(summary(mY.std, contrast = "ratio", reference = 0)$est.table, 4)
 ## 1     1.28     0.0028     1.2745     1.2855
 ```
 
-```r
-round(summary(mY.std, transform = "odds", 
-              contrast = "ratio", reference = 0)$est.table, 4)
+``` r
+round(summary(mY.std,
+  transform = "odds",
+  contrast = "ratio", reference = 0
+)$est.table, 4)
 ```
 
 ```
@@ -443,7 +413,7 @@ model for the exposure including the main effects of the
     $$
 
 
-```r
+``` r
 mX <- glm(x ~ z1 + z2 + z3 + z4,
   family = binomial(link = logit), data = dd
 )
@@ -466,7 +436,7 @@ fitted probabilities of
     compare their distribution between the two groups.
 
 
-```r
+``` r
 dd$PS <- predict(mX, type = "response")
 summary(dd$PS)
 ```
@@ -476,7 +446,7 @@ summary(dd$PS)
 ## 0.005256 0.041532 0.112765 0.172440 0.248554 0.613993
 ```
 
-```r
+``` r
 with(subset(dd, x == 0), plot(density(PS), lty = 2))
 with(subset(dd, x == 1), lines(density(PS), lty = 1))
 ```
@@ -495,7 +465,7 @@ $$
     sum of weights should be close to $N$ in both groups.
 
 
-```r
+``` r
 dd$w <- ifelse(dd$x == 1, 1 / dd$PS, 1 / (1 - dd$PS))
 with(dd, tapply(w, x, sum))
 ```
@@ -520,7 +490,7 @@ potential or counterfactual risks for
     $$
 
 
-```r
+``` r
 EY1pot.w <- sum(dd$x * dd$w * dd$y) / sum(dd$x * dd$w)
 EY0pot.w <- sum((1 - dd$x) * dd$w * dd$y) / sum((1 - dd$x) * dd$w)
 round(Contr(EY1pot.w, EY0pot.w), 4)
@@ -531,10 +501,8 @@ round(Contr(EY1pot.w, EY0pot.w), 4)
 ## 0.8037 0.6519 0.1518 1.2329 2.1868
 ```
 
-These estimates seem to be somewhat downward biased when 
-comparing to
-true values. Could this be because of omitting 
-the relatively strong
+These estimates seem to be somewhat downward biased when comparing to
+true values. Could this be because of omitting the relatively strong
 product term effect of $Z_2$ and $Z_4$?
 
 
@@ -542,12 +510,11 @@ product term effect of $Z_2$ and $Z_4$?
 
 We now try to improve IPW-estimation by a richer exposure 
 model. In
-computations we shall utilize the R package 
-`PSweight` (see [PSweight
+computations we shall utilize the R package `PSweight` (see [PSweight
 vignette](https://cran.r-project.org/web/packages/PSweight/vignettes/vignette.pdf)).
 
-1.  First, we compute the propensity scores
-and weights from a more flexible exposure model,
+1.  First, we compute the weights from a more 
+flexible exposure model
     which contains all pairwise product terms 
     of the parents of $X$.
     According to the causal diagram, $Z_1$ is 
@@ -555,10 +522,10 @@ and weights from a more flexible exposure model,
     is left out. The exposure model is 
     specified and the weights are
     obtained as follows using function
-    `SumStat()` in `PSweight`:
+    `SumStat()`:
 
 
-```r
+``` r
 mX2 <- glm(x ~ (z2 + z3 + z4)^2, family = binomial, data = dd)
 round(ci.lin(mX2, Exp = TRUE)[, c(1, 5)], 3)
 ```
@@ -574,13 +541,12 @@ round(ci.lin(mX2, Exp = TRUE)[, c(1, 5)], 3)
 ## z3:z4          0.001     1.001
 ```
 
-```r
-psw2 <- SumStat(
+``` r
+psw <- SumStat(
   ps.formula = mX2$formula, data = dd,
   weight = c("IPW", "treated", "overlap")
 )
-dd$PS2 <- psw2$propensity[, 2] 
-dd$w2 <- ifelse(dd$x == 1, 1 / dd$PS2, 1 / (1 - dd$PS2)) 
+dd$PS2 <- psw$propensity[, 2] # propensity scores extracted
 plot(density(dd$PS2[dd$x == 0]), lty = 2)
 lines(density(dd$PS2[dd$x == 1]), lty = 1)
 ```
@@ -598,8 +564,8 @@ properties of the distribution and to check the balance
 of the propensity scores, for instance
 
 
-```r
-plot(psw2, type = "balance", metric = "PSD")
+``` r
+plot(psw, type = "balance", metric = "PSD")
 ```
 
 It is desirable that the horisontal values of 
@@ -610,9 +576,9 @@ these measures for given weights are less than 0.1.
     on the log-scale; therefore $\exp$-transformation
 
 
-```r
-ipw2est <- PSweight(ps.formula = mX2, yname = "y", data = dd, weight = "IPW")
-ipw2est
+``` r
+ipwest <- PSweight(ps.formula = mX2, yname = "y", data = dd, weight = "IPW")
+ipwest
 ```
 
 ```
@@ -622,8 +588,8 @@ ipw2est
 ## 0.6526, 0.8255
 ```
 
-```r
-summary(ipw2est)
+``` r
+summary(ipwest)
 ```
 
 ```
@@ -642,8 +608,8 @@ summary(ipw2est)
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-```r
-(logRR.ipw2 <- summary(ipw2est, type = "RR"))
+``` r
+(logRR.ipw <- summary(ipwest, type = "RR"))
 ```
 
 ```
@@ -663,16 +629,16 @@ summary(ipw2est)
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-```r
-round(exp(logRR.ipw2$estimates[c(1, 4, 5)]), 3)
+``` r
+round(exp(logRR.ipw$estimates[c(1, 4, 5)]), 3)
 ```
 
 ```
 ## [1] 1.265 1.257 1.273
 ```
 
-```r
-round(exp(summary(ipw2est, type = "OR")$estimates[c(1, 4, 5)]), 3)
+``` r
+round(exp(summary(ipwest, type = "OR")$estimates[c(1, 4, 5)]), 3)
 ```
 
 ```
@@ -715,7 +681,7 @@ The risks and their
 contrasts are estimated from the fit of the outcome model:
 
 
-```r
+``` r
 EY1att.g <- mean(subset(dd, x == 1)$yp1)
 EY0att.g <- mean(subset(dd, x == 1)$yp0)
 round(Contr(EY1att.g, EY0att.g), 4)
@@ -738,7 +704,7 @@ exposed based on the true model are similarly obtained
 from the quantities in item 4.2 above:
 
 
-```r
+``` r
 EY1att <- mean(subset(dd, x == 1)$EY1.ind)
 EY0att <- mean(subset(dd, x == 1)$EY0.ind)
 round(Contr(EY1att, EY0att), 4)
@@ -759,7 +725,7 @@ approach, then the weights are $W_i = 1$ for the exposed and
     Call again `PSweight` but with another choice of weight:
 
 
-```r
+``` r
 psatt <- PSweight(ps.formula = mX2, yname = "y", data = dd, weight = "treated")
 psatt
 ```
@@ -772,7 +738,7 @@ psatt
 ## 0.7667, 0.8949
 ```
 
-```r
+``` r
 round(summary(psatt)$estimates[1], 4)
 ```
 
@@ -780,7 +746,7 @@ round(summary(psatt)$estimates[1], 4)
 ## [1] 0.1282
 ```
 
-```r
+``` r
 round(exp(summary(psatt, type = "RR")$estimates[1]), 3)
 ```
 
@@ -788,7 +754,7 @@ round(exp(summary(psatt, type = "RR")$estimates[1]), 3)
 ## [1] 1.167
 ```
 
-```r
+``` r
 round(exp(summary(psatt, type = "OR")$estimates[1]), 3)
 ```
 
@@ -800,91 +766,59 @@ Compare the results here with those obtained by
 g-formula in item 8.1
 and with the true contrasts above.
 
-## Double robust estimation by augmented IPW
+## Augmented IPW
 
 Let us attempt to correct the estimates by a **double 
 robust** (DR) approach
 called **augmented IPW estimation** (AIPW), which 
 combines the g-formula and
-the IPW approach. The classical 
-AIPW-estimator can be expressed in two ways:
+the IPW approach. The AIPW-estimator can be expressed in two ways:
 either an IPW-corrected g-formula estimator, or a g-corrected
 IPW-estimator.
 
 $$
 \begin{aligned}
- \widehat{E}_a(Y^{X=x}) 
-       & = \widehat{E}_g(Y^{X=x}) +
-\frac{1}{n} \sum_{i=1}^n  {\mathbf 1}_{\{X_i=x\}} W_i 
-                   ( Y_i - \widetilde{Y}_i^{X_i=x} )   \\
-       & = \widehat{E}_w(Y^{X=x}) +
-\frac{1}{n} \sum_{i=1}^n ( 1 - {\mathbf 1}_{\{X_i=x\}} W_i ) 
-                      \widetilde{Y}_i^{X_i=x}.
+ \widehat{E}_a(Y^{X=x}) & = \widehat{E}_g(Y^{X=x}) +
+   \frac{1}{n} \sum_{i=1}^n \frac{ {\mathbf 1}_{\{X_i=x\}} W_i ( Y_i - \widetilde{Y}_i^{X_i=x} ) }
+   {\sum_{i=1}^n {\mathbf 1}_{\{X_i=x\}} W_i} \\
+       & =   \widehat{E}_w(Y^{X=x}) -
+    \frac{1}{n} \sum_{i=1}^n \left[ \frac{ {\mathbf 1}_{\{X_i=x\}} W_i }
+            {\sum_{i=1}^n {\mathbf 1}_{\{X_i=x\}} W_i } - 1 \right] \widetilde{Y}_i^{X_i=x}.
 \end{aligned}
 $$
 
-1. We shall first combine the results from the slightly
-misspecified outcome model with those from the more 
-misspecified exposure model.
 
-
-```r
-EY1pot.a <- EY1pot.g + mean( 1*(dd$x==1) * dd$w * (dd$y - dd$yp1) )
-EY0pot.a <- EY0pot.g + mean( 1*(dd$x==0) * dd$w * (dd$y - dd$yp0) )
+``` r
+EY1pot.a <- EY1pot.g + mean(dd$x * (dd$y - dd$yp1) * dd$w / sum(dd$x * dd$w))
+##  or   EY1.w - mean( ( ( dd$x*dd$w /sum(dd$x*dd$w) ) - 1 )*dd$yp1 )
+EY0pot.a <- EY0pot.g + mean((1 - dd$x) * (dd$y - dd$yp0) * dd$w / sum((1 - dd$x) * dd$w))
+##  or   EY0.w - mean( ( ( (1-dd$x)*dd$w/sum((1-dd$x)*dd$w) ) - 1 )*dd$yp0 )
 round(Contr(EY1pot.a, EY0pot.a), 4)
 ```
 
 ```
 ##                   RD     RR     OR 
-## 0.8241 0.6523 0.1718 1.2634 2.4972
+## 0.8330 0.6508 0.1822 1.2800 2.6763
 ```
 
 Compare these results with those obtained by g-formula and by
 non-augmented IPW method. Was augmentation successful?
 
-2. Let us then look, how close we get when combining the results
-from the slightly misspecified outcome model with the correct
-exposure model using the alternative AIPW-formula
 
-
-```r
-EY1pot.w2 <- ipw2est$muhat[2]
-EY0pot.w2 <- ipw2est$muhat[1]
-EY1pot.a2 <- EY1pot.w2 + mean( (1 - 1*(dd$x==1) * dd$w2) * dd$yp1 )
-EY0pot.a2 <- EY0pot.w2 + mean( (1 - 1*(dd$x==0) * dd$w2) * dd$yp0 )
-round(Contr(EY1pot.a2, EY0pot.a2), 4)
-```
-
-```
-##      1      0   RD.1   RR.1   OR.1 
-## 0.8261 0.6526 0.1735 1.2658 2.5285
-```
-
-Compare the results with previous ones.
-How successful was augmentation now?
-
-AIPW-estimates and confidence
-intervals for the causal contrasts of interest can
-be obtained, for instance, using `PSweight` by adding
-the model formula of the outcome model
-as the value for the argument `out.formula`.
-
-## Double robust, targeted maximum likelihood estimation (TMLE)
+## Targeted maximum likelihood estimation (TMLE)
 
 We now consider now another double robust approach, 
 known as **targeted
 maximum likelihood estimation** (TMLE). 
 It also corrects the estimator
-obtained from the outcome model by elements that are derived from the exposure model. The corrections are, though, not as
-intuitive as those in AIPW. See [Schuler and Rose
-(2017)](https://doi.org/10.1093/aje/kww165) for more details.
+obtained from the outcome model by elements that are derived from the exposure model. See [Schuler and Rose
+(2017)](https://doi.org/10.1093/aje/kww165) for more details
 
 1.  The first step is to utilize the propensity scores 
-obtained above for the correct exposure model 
-and define the "clever covariates"
+obtained above and define the "clever covariates"
 
 
-```r
+``` r
 dd$H1 <- dd$x / dd$PS2
 dd$H0 <- (1 - dd$x) / (1 - dd$PS2)
 ```
@@ -896,11 +830,12 @@ in which the clever
     the previously fitted linear predictor
     $\widehat{\eta}_i = \text{logit}(\widehat Y_i)$ 
     from the original
-    outcome model `mY` as an offset term; see item 5.2.
-    Moreover, the intercept is removed.
+    outcome model `mY` as an offset term.
+    Moreover, the intercept is
+    removed.
 
 
-```r
+``` r
 epsmod <- glm(y ~ -1 + H0 + H1 + offset(qlogis(yh)),
   family = binomial(link = logit), data = dd
 )
@@ -921,15 +856,17 @@ eps
     predictions are returned to the original scale.
 
 
-```r
+``` r
 ypred0.H <- plogis(qlogis(dd$yp0) + eps[1] / (1 - dd$PS2))
 ypred1.H <- plogis(qlogis(dd$yp1) + eps[2] / dd$PS2)
 ```
 
-4. Estimates of the causal contrasts:
+-   
+
+Estimates of the causal contrasts:
 
 
-```r
+``` r
 EY0pot.t <- mean(ypred0.H)
 EY1pot.t <- mean(ypred1.H)
 round(Contr(EY1pot.t, EY0pot.t), 4)
@@ -942,44 +879,129 @@ round(Contr(EY1pot.t, EY0pot.t), 4)
 
 Compare these with previous results and with the true values.
 
-## Double robust estimation with `AIPW` and `tmle` packages
+## TMLE with SuperLearner
 
-It may be difficult to specify 
-conventional generalized linear models 
-or even generalized additive 
-models for exposure and outcome which are 
-sufficiently realistic, yet which do not suffer from overfitting.
- Modern approaches of **statistical learning**, aka
-"machine learning" provide tools for flexible modelling,
-which may be used to reduce the risk of misspecification,
- if thoughtfully applied. 
+Let us finally apply some fashionable tools 
+of *statistical learning*, aka
+"machine learning", using the 
+package `SuperLearner` to fit flexible
+models for both exposure and outcome. 
+As this method is computationally
+much more demanding, we illustrate its use by a 
+sample of 2000 subjects only.
 
-There are a few R packages in which some general
-algorithmic approaches for supervised learning
-are implemented for estimating causal parameters.
-For instance, package `AIPW` 
-(see [Zhong et al., 2021](https://doi.org/10.1093/aje/kwab207))
-utilizes 
-several learning algorithms for exposure and outcome modelling
-and then performs AIPW estimation  of the
-parameters of interest coupled with 
-calculation of confidence intervals. Package `tmle`
-(see [Karim and Frank, 2021](https://ehsanx.github.io/TMLEworkshop/))
-performs same tasks but uses the TMLE approach 
-in estimation.
-
-Both `AIPW` and `tmle` lean on the
- `SuperLearner` package, which uses multiple learning 
- algorithms (e.g. GLM, GAM, Random Forest, Recursive Partitioning,
- Gradient Boosting, etc.) for constructing
- predictions of the counterfactual quantities, and 
- then creates an optimal weighted average of those models, 
- aka an "ensemble". These algorithms are computationally
- highly intensive. Fitting models with only 3 or 4
- covariates as in this practical
- on our target cohort of 500,000 subjects
- would take hours on an ordinary laptop. With a study population
- of 5000 it takes several minutes. 
+1.  A simple random sample of $n=2000$ is drawn from the population.
 
 
+``` r
+library(SuperLearner)
+```
 
+```
+## Loading required package: nnls
+```
+
+```
+## Loading required package: gam
+```
+
+```
+## Loading required package: splines
+```
+
+```
+## Loading required package: foreach
+```
+
+```
+## Loaded gam 1.22-3
+```
+
+```
+## Super Learner
+```
+
+```
+## Version: 2.0-29
+```
+
+```
+## Package created on 2024-02-06
+```
+
+``` r
+library(tmle)
+```
+
+```
+## Loading required package: glmnet
+```
+
+```
+## Loading required package: Matrix
+```
+
+```
+## Loaded glmnet 4.1-8
+```
+
+```
+## Welcome to the tmle package, version 2.0.1
+## 
+## Use tmleNews() to see details on changes and bug fixes
+```
+
+``` r
+set.seed(7622)
+n <- 2000
+sampind <- sample(N, n)
+samp <- dd[sampind, ]
+```
+
+2.  The algorithms to be used in this exercise are chosen
+
+
+``` r
+SL.library <- c(
+  "SL.glm", "SL.step", "SL.step.interaction",
+  "SL.glm.interaction", "SL.gam",
+  "SL.randomForest", "SL.rpart"
+)
+```
+
+3.  Function `tmle()` computes estimates of the causal 
+contrasts of interest. Argument `A` is for the exposure 
+variable, and argument `W` contains the confounders. --
+The run can take a while ...
+
+
+``` r
+tmlest <- tmle(
+  Y = samp$y, A = samp$x, W = samp[, c("z1", "z2", "z3", "z4")],
+  family = "binomial", Q.SL.library = SL.library,
+  g.SL.library = SL.library
+)
+summary(tmlest)
+```
+
+Let us take a closer look at the results. 
+In the beginning are reported
+the fractions by which the separate algorithms contribute to the
+combined algorithm. After that are given estimates of the causal
+contrasts together with their estimated variances and 95%
+confidence intervals. The variance of each contrast 
+(on log-scale for RR and OR) is
+estimated as the variance of the empirical influence curve 
+divided by $n$, the number of i.i.d. units of observation.
+Furthermore, causal risk
+differences are estimated also for those factually exposed and
+unexposed, respectively.
+
+Note that because this analysis was based on sample data, the estimates
+are most probably deviating from the true values because of pure random
+error. Therefore it is not possible to assess the magnitude of a
+possible bias from a single sample.
+
+**Homework.** When you have more time, try to run `tmle` on as large
+sample as is possible and compare its results with previous ones
+computed for the whole target population.

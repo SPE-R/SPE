@@ -21,7 +21,7 @@ First of all, load the `Epi` and `tidyverse` packages.
 Then load the births data-set.
 
 
-```r
+``` r
 library(Epi)
 suppressPackageStartupMessages(library(tidyverse))
 data(births)
@@ -36,7 +36,7 @@ Most `dplyr` functions outputs return `tibble` object instead of
 Inspect the class and characteristics of the `births` object.
 
 
-```r
+``` r
 class(births)
 ```
 
@@ -44,7 +44,7 @@ class(births)
 ## [1] "data.frame"
 ```
 
-```r
+``` r
 head(births)
 ```
 
@@ -60,7 +60,7 @@ head(births)
 **Note:** As any `R` object this can be summarized using `str` function.
 
 
-```r
+``` r
 str(births)
 ```
 
@@ -79,7 +79,7 @@ str(births)
 Let's convert `births` to `tibble` format with `as_tibble` function.
 
 
-```r
+``` r
 births_tbl <- as_tibble(births)
 
 class(births_tbl)
@@ -89,7 +89,7 @@ class(births_tbl)
 ## [1] "tbl_df"     "tbl"        "data.frame"
 ```
 
-```r
+``` r
 births_tbl
 ```
 
@@ -110,7 +110,7 @@ births_tbl
 ## # ℹ 490 more rows
 ```
 
-```r
+``` r
 # another way to visualize data set is to use glimpse function
 glimpse(births_tbl)
 ```
@@ -142,7 +142,7 @@ It can help to make the code more comprehensive and readable.
 Here is an example of classic vs piped functions.
 
 
-```r
+``` r
 head(births, 4)
 ```
 
@@ -154,7 +154,7 @@ head(births, 4)
 ## 4  4    3751     0   39.80       0     31   0   1
 ```
 
-```r
+``` r
 births |> head(4)
 ```
 
@@ -171,7 +171,7 @@ You can use `.` if this is not the case.
 
 Here is a dummy example where we do not give the first argument to `head` function but the second one.
 
-```r
+``` r
 4 %>% head(births, .)
 ```
 
@@ -189,7 +189,7 @@ This can also be achieves with `base` pipe `|>` with two differences
 * The argument must be named
 
 
-```r
+``` r
 4 |> head(births, pos=_)
 ```
 
@@ -219,7 +219,7 @@ And modify 2 others:
 
 
 
-```r
+``` r
 births_tbl <-
   births_tbl |>
   mutate(
@@ -290,7 +290,7 @@ Let's display a table where only babies' `id`, `sex`, `bweight` and mothers'
 `agegrp` are kept for babies with a `bweight` above 4000g.
 
 
-```r
+``` r
 births_tbl |>
   # select only id, women age group, sex 
   # and birth weight of the baby
@@ -320,7 +320,7 @@ births_tbl |>
 Let's rename `agegrp`, `sex` and `bweight` with better looking labels (e.g. `Age group`, `Sex`, `Birth weight`) and reorder the table according to babies' decreasing birth weight.
 
 
-```r
+``` r
 births_tbl |>
   # select only id, women age group, sex 
   # and birth weight of the baby
@@ -356,7 +356,7 @@ rendering. When you want to work with columns with blank spaces, do not forget t
 Try to produce the same table but arranging the rows by decreasing birth weights within each sex.
 
 
-```r
+``` r
 births_tbl |>
   # select only id, women age group, sex 
   # and birth weight of the baby
@@ -395,7 +395,7 @@ Here we want to compute the number of boys and girls in the data-set.
 The idea here is to split the `births` table in two groups. One with the boys, the other with the girls and to count the number of rows in each group.
 
 
-```r
+``` r
 births.01 <-
   births_tbl |>
   # group the data according to the sex attribute
@@ -419,7 +419,7 @@ births.01
 Now we have the number of boys and girls, we can compute the distribution (in percentage) of newborns per sex.
 
 
-```r
+``` r
 births.02 <-
   births.01 |>
   mutate(
@@ -431,7 +431,7 @@ births.02 <-
 As an example below a code to compute the `sum` of every `birth.02` numerical columns (numerical columns only)
 
 
-```r
+``` r
 births.03 <-
   births_tbl |>
   select(gest4, sex, gestwks, bweight, matage) |>
@@ -468,7 +468,7 @@ As an example we can rename only columns which are not numeric at once (here we 
 the combination of `rename_with` and `where`.
 
 
-```r
+``` r
 births.03 |>
   rename_with(toupper, where(~ !is.numeric(.x)))
 ```
@@ -490,7 +490,7 @@ births.03 |>
 Let's now compute the number of births and the mean birth weight according to newborn gender.
 
 
-```r
+``` r
 births.05 <-
   births_tbl |>
   group_by(sex) |>
@@ -513,7 +513,7 @@ With `births.05` table, compute the global mean birth weight.
 **Note:** with such a table the mean baby's birth weight have to be weighted by number of boys and girls (see. `?weighted.mean`). 
 
 
-```r
+``` r
 births.05 |>
   summarise(
     count.tot = sum(count),
@@ -528,7 +528,7 @@ births.05 |>
 ## 1       500            3137.
 ```
 
-```r
+``` r
 # this is equivalent to
 births_tbl |>
   summarise(
@@ -551,7 +551,7 @@ In some cases, we can be interested in looking at more than a single strata. Thi
 Let's count the number of births per gender and birth weight class (low vs not low)
 
 
-```r
+``` r
 births.06 <-
   births_tbl |>
   group_by(sex, lowbw) |>
@@ -565,7 +565,7 @@ births.06 <-
 ## argument.
 ```
 
-```r
+``` r
 births.06
 ```
 
@@ -583,7 +583,7 @@ Try then to compute the percentage of babies in each group.
 Look at the difference between the 2 following command lines:
 
 
-```r
+``` r
 births.06 |>
   mutate(
     percent = count / sum(count) * 100
@@ -601,7 +601,7 @@ births.06 |>
 ## 4 F         1    33    14.0
 ```
 
-```r
+``` r
 births.06 |>
   ungroup() |>
   mutate(
@@ -627,7 +627,7 @@ percentages.
 **Trick:** a good practice is to always ungroup the summarized dataset in order to prevent form confusion. You can do it using the `.group = 'drop'` option in `summarize()`. 
 
 
-```r
+``` r
 # this tibble will still be grouped by sex
 births_tbl |>
   group_by(sex, lowbw) |>
@@ -647,7 +647,7 @@ births_tbl |>
 ## 4 F         1    33
 ```
 
-```r
+``` r
 # this tibble will be group free
 births_tbl |>
   group_by(sex, lowbw) |>
@@ -670,7 +670,7 @@ The same exercise can be done using gestation time group (`gest4`) as stratifyin
 Lets compute number of births and mean birth weights according to gestation time category.
 
 
-```r
+``` r
 births_tbl |>
   group_by(gest4) |>
   summarise(
@@ -696,7 +696,7 @@ We will do not consider this observation for the rest of the exercise.
 Lets cross-tabulate the birth weight category and the gestation time groups.
 
 
-```r
+``` r
 births_tbl |>
   # keep only the newborn with defined gesational time category
   filter(
@@ -734,7 +734,7 @@ births_tbl |>
 Similarly we can be interested in the birth weight distribution per gestational time. 
 
 
-```r
+``` r
 births_tbl |>
   filter(
     !is.na(gest4)
@@ -781,7 +781,7 @@ Another nice feature of `dplyr` is tables binding and joining. To practice we wi
 
 
 
-```r
+``` r
 age <-
   tibble(
     pid = 1:6,
@@ -801,15 +801,15 @@ age
 ## # A tibble: 6 × 2
 ##     pid   age
 ##   <int> <int>
-## 1     1    17
-## 2     2    21
-## 3     3    22
-## 4     4    17
-## 5     5    25
-## 6     6    19
+## 1     1    20
+## 2     2    20
+## 3     3    19
+## 4     4    23
+## 5     5    23
+## 6     6    23
 ```
 
-```r
+``` r
 center
 ```
 
@@ -828,7 +828,7 @@ they belong to.
 First of all let's have a look to `bind_rows` function.
 
 
-```r
+``` r
 bind_rows(age, center)
 ```
 
@@ -836,12 +836,12 @@ bind_rows(age, center)
 ## # A tibble: 11 × 3
 ##      pid   age center
 ##    <dbl> <int> <chr> 
-##  1     1    17 <NA>  
-##  2     2    21 <NA>  
-##  3     3    22 <NA>  
-##  4     4    17 <NA>  
-##  5     5    25 <NA>  
-##  6     6    19 <NA>  
+##  1     1    20 <NA>  
+##  2     2    20 <NA>  
+##  3     3    19 <NA>  
+##  4     4    23 <NA>  
+##  5     5    23 <NA>  
+##  6     6    23 <NA>  
 ##  7     1    NA A     
 ##  8     2    NA B     
 ##  9     3    NA A     
@@ -858,7 +858,7 @@ on the context you can be interested in joining tables differently. Have a look 
 between `left_join`, `full_join` and `inner_join`.
 
 
-```r
+``` r
 # all individuals from ages are kept
 left_join(age, center, by = c("pid"))
 ```
@@ -867,15 +867,15 @@ left_join(age, center, by = c("pid"))
 ## # A tibble: 6 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    17 A     
-## 2     2    21 B     
-## 3     3    22 A     
-## 4     4    17 B     
-## 5     5    25 <NA>  
-## 6     6    19 <NA>
+## 1     1    20 A     
+## 2     2    20 B     
+## 3     3    19 A     
+## 4     4    23 B     
+## 5     5    23 <NA>  
+## 6     6    23 <NA>
 ```
 
-```r
+``` r
 # everithing is kept
 full_join(age, center, by = c("pid"))
 ```
@@ -884,16 +884,16 @@ full_join(age, center, by = c("pid"))
 ## # A tibble: 7 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    17 A     
-## 2     2    21 B     
-## 3     3    22 A     
-## 4     4    17 B     
-## 5     5    25 <NA>  
-## 6     6    19 <NA>  
+## 1     1    20 A     
+## 2     2    20 B     
+## 3     3    19 A     
+## 4     4    23 B     
+## 5     5    23 <NA>  
+## 6     6    23 <NA>  
 ## 7    10    NA C
 ```
 
-```r
+``` r
 # only the individuals present in both dataset are kept
 inner_join(age, center, by = c("pid"))
 ```
@@ -902,16 +902,16 @@ inner_join(age, center, by = c("pid"))
 ## # A tibble: 4 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    17 A     
-## 2     2    21 B     
-## 3     3    22 A     
-## 4     4    17 B
+## 1     1    20 A     
+## 2     2    20 B     
+## 3     3    19 A     
+## 4     4    23 B
 ```
 Can you spot the differences between the commands above?
 As an exercise, you can try to compute the individuals' mean age per center.
 
 
-```r
+``` r
 inner_join(age, center, by = c("pid")) |>
   group_by(center) |>
   summarise(
@@ -924,7 +924,7 @@ inner_join(age, center, by = c("pid")) |>
 ##   center mean_age
 ##   <chr>     <dbl>
 ## 1 A          19.5
-## 2 B          19
+## 2 B          21.5
 ```
 
 **Note:** the `by` argument indicates which column should be use to make the *join*. In some 
@@ -942,14 +942,14 @@ Let's draw a bar plot to visualize the number of births by women age group.
 First you have to create a table with the number of birth per age group.
 
 
-```r
+``` r
 birth_per_ageg <- births_tbl |>
   group_by(agegrp) |>
   summarise(total_births = n())
 ```
 
 
-```r
+``` r
 (gg.01 <-
   ggplot(birth_per_ageg, aes(x = agegrp, y = total_births)) +
   geom_bar(stat = "identity"))
@@ -958,7 +958,7 @@ birth_per_ageg <- births_tbl |>
 ![](tidyverse-s_files/figure-epub3/unnamed-chunk-30-1.png)<!-- -->
 This graph can be customize adding labels and title to the plot:
 
-```r
+``` r
 (gg.02 <-
   gg.01 +
   xlab("Women Age Group") +
@@ -976,7 +976,7 @@ Let's transform in wide format the previously created `birth_per_ageg` table.
 We want to have a table with one column per age group containing the `total_births` numbers.
 
 
-```r
+``` r
 birth_per_ageg
 ```
 
@@ -991,7 +991,7 @@ birth_per_ageg
 ## 5 [40,45)           36
 ```
 
-```r
+``` r
 birth_per_ageg_wide <-
   birth_per_ageg |>
   pivot_wider(
@@ -1011,7 +1011,7 @@ birth_per_ageg_wide
 This table can easily be formatted back in long format using `pivot_longer` function:
 
 
-```r
+``` r
 birth_per_ageg_long <-
   birth_per_ageg_wide |>
   pivot_longer(
@@ -1036,7 +1036,7 @@ birth_per_ageg_long
 Are the tables `birth_per_ageg` and `birth_per_ageg_long` identical?
 
 
-```r
+``` r
 identical(birth_per_ageg, birth_per_ageg_long)
 ```
 
@@ -1047,7 +1047,7 @@ Not really because the factor type of `agegrp` column has been lost during the t
 Let's convert `agegrp` column into a factor. Is the new table identical to `birth_per_ageg` ?
 
 
-```r
+``` r
 birth_per_ageg_long_02 <-
   birth_per_ageg_long |>
   mutate(agegrp = as.factor(agegrp))
@@ -1067,7 +1067,7 @@ Another package from `tidyverse` that can be introduced here is `readr` that con
 Let's explore this differences with `fem` dataset available in `data` directory.
 
 
-```r
+``` r
 # read a csv using core R
 fem.csv.core <- read.csv("data/fem.csv")
 # read a csv using tidyverse
@@ -1084,7 +1084,7 @@ fem.csv.tidy <- read_csv("data/fem.csv")
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 ```
 
-```r
+``` r
 # compare
 fem.csv.core
 ```
@@ -1211,7 +1211,7 @@ fem.csv.core
 ## 118 118  42  NA       3       2     2   1    1   2.23
 ```
 
-```r
+``` r
 fem.csv.tidy
 ```
 
@@ -1232,7 +1232,7 @@ fem.csv.tidy
 ## # ℹ 108 more rows
 ```
 
-```r
+``` r
 # table dimensions
 dim(fem.csv.core)
 ```
@@ -1241,7 +1241,7 @@ dim(fem.csv.core)
 ## [1] 118   9
 ```
 
-```r
+``` r
 dim(fem.csv.tidy)
 ```
 
@@ -1249,7 +1249,7 @@ dim(fem.csv.tidy)
 ## [1] 118   9
 ```
 
-```r
+``` r
 # compare column types
 map(fem.csv.core, class)
 ```
@@ -1283,7 +1283,7 @@ map(fem.csv.core, class)
 ## [1] "numeric"
 ```
 
-```r
+``` r
 map(fem.csv.tidy, class)
 ```
 
@@ -1322,7 +1322,7 @@ Here we see that the only difference is the type of object loaded `data.frame` v
 What about loading `occoh.txt` you will be using in some other practical in the coming days.
 
 
-```r
+``` r
 # read a csv using core R
 occoh.txt.core <- read.table("data/occoh.txt")
 # read a csv using tidyverse
@@ -1354,7 +1354,7 @@ occoh.txt.tidy <- read_table("data/occoh.txt")
 ## See problems(...) for more details.
 ```
 
-```r
+``` r
 occoh.txt.tidy <- read_table("data/occoh.txt")
 ```
 
@@ -1383,7 +1383,7 @@ occoh.txt.tidy <- read_table("data/occoh.txt")
 ## See problems(...) for more details.
 ```
 
-```r
+``` r
 # compare
 occoh.txt.core
 ```
@@ -2893,7 +2893,7 @@ occoh.txt.core
 ## 1677 1501 1933-05-07 1992-12-09 2009-12-31     0       0
 ```
 
-```r
+``` r
 occoh.txt.tidy
 ```
 
@@ -2914,7 +2914,7 @@ occoh.txt.tidy
 ## # ℹ 1,491 more rows
 ```
 
-```r
+``` r
 # table dimensions
 dim(occoh.txt.core)
 ```
@@ -2923,7 +2923,7 @@ dim(occoh.txt.core)
 ## [1] 1501    6
 ```
 
-```r
+``` r
 dim(occoh.txt.tidy)
 ```
 
@@ -2931,7 +2931,7 @@ dim(occoh.txt.tidy)
 ## [1] 1501    6
 ```
 
-```r
+``` r
 # compare column types
 map(occoh.txt.core, class)
 ```
@@ -2956,7 +2956,7 @@ map(occoh.txt.core, class)
 ## [1] "integer"
 ```
 
-```r
+``` r
 map(occoh.txt.tidy, class)
 ```
 
@@ -2989,7 +2989,7 @@ Another popular `tidyverse` popular package is `stringr` package. This package i
 
 Let's create a character vector with the following elements representing country names: "Estonia", "Finland", "Denmark", "United Kingdom", "France".
 
-```r
+``` r
 countries <- 
   c("Estonia", "Finland", "Denmark", "United Kingdom", "France")
 ```
@@ -2997,31 +2997,31 @@ With `stringr` functions perform the following actions.
 
 Extract the first three characters from each country name:
 
-```r
+``` r
 country_initials <- str_sub(countries, start = 1, end = 3)
 ```
 
 Convert all country names to uppercase:
 
-```r
+``` r
 countries_upper <- str_to_upper(countries)
 ```
 
 Replace "United" with "Utd" in each country name:
 
-```r
+``` r
 countries_modified <- str_replace(countries, "United", "Utd")
 ```
 Find the positions of the letter "n" in each country name:
 
-```r
+``` r
 a_positions <- str_locate_all(countries, "n")
 ```
 As you can see, the output of `str_locate_all` is a list (one element per character string) containing a 2 column table with one line for each match. The first column (start) being the position of the beginning of the match and the second one (end) being the end of the match. In our case, since we are searching for a single character match, this 2 indexes are always the same.
 
 Count the number of characters in each country name:
 
-```r
+``` r
 character_counts <- str_length(countries)
 ```
 These examples demonstrate various string manipulation operations using the `stringr` package. You can modify the exercises, combine several operations or explore other string manipulation functions provided by `stringr` to further practice and enhance your skills in manipulating and analyzing text data.
@@ -3035,7 +3035,7 @@ several functions that are very similar to `lapply` function.
 Apply a function to each element of the vector using map(). Here producing the mean of some grades per class:
 
 
-```r
+``` r
 # define the grade dataset
 grades <-
   list(
@@ -3050,7 +3050,7 @@ By default `map()` return a list. One of the nice feature of `purrr` functions i
 Check and try to explain the differences between the following command lines:
 
 
-```r
+``` r
 map(grades, mean)
 ```
 
@@ -3065,7 +3065,7 @@ map(grades, mean)
 ## [1] 90
 ```
 
-```r
+``` r
 map_dbl(grades, mean)
 ```
 
@@ -3074,7 +3074,7 @@ map_dbl(grades, mean)
 ## 85.0 79.5 90.0
 ```
 
-```r
+``` r
 map_chr(grades, mean)
 ```
 
@@ -3090,7 +3090,7 @@ map_chr(grades, mean)
 ## "85.000000" "79.500000" "90.000000"
 ```
 
-```r
+``` r
 map_df(grades, mean)
 ```
 
@@ -3108,7 +3108,7 @@ If you are interested you can have a look to this function help file and play wi
 
 Here an example of the cumulative product of the 10 first numbers.
 
-```r
+``` r
 1:10 |> purrr::reduce(`*`)
 ```
 
@@ -3116,7 +3116,7 @@ Here an example of the cumulative product of the 10 first numbers.
 ## [1] 3628800
 ```
 
-```r
+``` r
 1:10 |> purrr::accumulate(`*`)
 ```
 
@@ -3131,7 +3131,7 @@ Here an example of the cumulative product of the 10 first numbers.
 Once you have produced a nice data-set we can be interested in rendering it in a nice format that can meet presentation/publication expectations. The `kableExtra` table can be useful to achieve this goal.
 
 
-```r
+``` r
 # if(!require(kableExtra)) install.packages('kableExtra')
 library(kableExtra)
 

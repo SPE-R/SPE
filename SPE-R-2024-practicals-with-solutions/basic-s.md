@@ -45,7 +45,7 @@ used to see what files you have in the working directory.
 You can quit `R` by typing
 
 
-```r
+``` r
 q()
 ```
 
@@ -96,7 +96,7 @@ arrow key. You can edit a recalled command and then resubmit it by
 pressing the return key. Keeping that in mind, try the following:
 
 
-```r
+``` r
 12 + 16
 (12 + 16) * 5
 sqrt((12 + 16) * 5) # square root
@@ -111,7 +111,7 @@ used in two different ways. Firstly, they can be used to establish the
 order of operations. In the example
 
 
-```r
+``` r
 (12 + 16) * 5
 ```
 
@@ -123,7 +123,7 @@ they ensure that 12 is added to 16 before the result is multiplied by 5.
 If you omit the braces then you get a different answer
 
 
-```r
+``` r
 12 + 16 * 5
 ```
 
@@ -149,7 +149,7 @@ free from syntax errors.
 Instead of printing the result to the screen, you can store it in an object, say
 
 
-```r
+``` r
 a <- round(sqrt((12 + 16) * 5), 2)
 ```
 
@@ -159,7 +159,7 @@ by typing `a` and also use `a` for further calculations,
 e.g:
 
 
-```r
+``` r
 exp(a)
 log(a) # natural logarithm
 log10(a) # log to the base 10
@@ -184,7 +184,7 @@ combine function `c()`, together with the assignment operator, is
 used to create vectors. Thus
 
 
-```r
+``` r
 v <- c(4, 6, 1, 2.2)
 ```
 
@@ -196,7 +196,7 @@ meaning that you can carry out the same operation on
 each element of a vector in a single operation. Try
 
 
-```r
+``` r
 v
 ```
 
@@ -204,7 +204,7 @@ v
 ## [1] 4.0 6.0 1.0 2.2
 ```
 
-```r
+``` r
 3 + v
 ```
 
@@ -212,7 +212,7 @@ v
 ## [1] 7.0 9.0 4.0 5.2
 ```
 
-```r
+``` r
 3 * v
 ```
 
@@ -229,7 +229,7 @@ see this by repeating the same operations on a vector containing a
 missing value:
 
 
-```r
+``` r
 v <- c(4, 6, NA)
 3 + v
 ```
@@ -238,7 +238,7 @@ v <- c(4, 6, NA)
 ## [1]  7  9 NA
 ```
 
-```r
+``` r
 3 * v
 ```
 
@@ -250,7 +250,7 @@ The fact that every operation on a missing value produces a missing value
 can be a nuisance when you want to create a summary statistic for a vector:
 
 
-```r
+``` r
 mean(v)
 ```
 
@@ -264,7 +264,7 @@ non-missing elements. Fortunately the `mean` function has an
 optional argument called `na.rm` which can be used for this.
 
 
-```r
+``` r
 mean(v, na.rm = TRUE)
 ```
 
@@ -283,7 +283,7 @@ is numeric with 4 components. If you just want to know the length of a
 vector then it is much easier to use the `length` function.
 
 
-```r
+``` r
 length(v)
 ```
 
@@ -298,7 +298,7 @@ structure. For example, if you want a vector containing the sequence of
 integers from 1 to 10, you can use
 
 
-```r
+``` r
 1:10
 ```
 
@@ -311,7 +311,7 @@ sequences. For example, the vector (15, 20, 25, ... ,85) can be created
 with
 
 
-```r
+``` r
 seq(from = 15, to = 85, by = 5)
 ```
 
@@ -324,7 +324,7 @@ are ordinary vectors, and can be combined with other vectors using the
 combine function:
 
 
-```r
+``` r
 c(5, seq(from = 20, to = 85, by = 5))
 ```
 
@@ -382,7 +382,7 @@ will work.
 Try the following commands:
 
 
-```r
+``` r
 x <- c(2, 7, 0, 9, 10, 23, 11, 4, 7, 8, 6, 0)
 x[4]
 ```
@@ -391,7 +391,7 @@ x[4]
 ## [1] 9
 ```
 
-```r
+``` r
 x[3:5]
 ```
 
@@ -399,7 +399,7 @@ x[3:5]
 ## [1]  0  9 10
 ```
 
-```r
+``` r
 x[c(1, 5, 8)]
 ```
 
@@ -411,7 +411,7 @@ Trying to extract an element that is beyond the end of the vector is,
 surprisingly, not an error. Instead, this returns a missing value
 
 
-```r
+``` r
 N <- length(x)
 x[N + 1]
 ```
@@ -425,7 +425,7 @@ There is a reason for this behaviour, which we will discuss in the recap.
 `R` also allows *logical subscripting*. Try the following
 
 
-```r
+``` r
 x > 10
 ```
 
@@ -433,7 +433,7 @@ x > 10
 ##  [1] FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE
 ```
 
-```r
+``` r
 x[x > 10]
 ```
 
@@ -454,7 +454,7 @@ elements of x that are between 10 and 20 we combine two one-sided logical
 conditions for $x \geq 10$ *and* $x \leq 20$:
 
 
-```r
+``` r
 x[x >= 10 & x <= 20]
 ```
 
@@ -466,7 +466,7 @@ The remaining elements of `x` that are *either* less than 10
 *or* greater than 20 are selected with
 
 
-```r
+``` r
 x[x < 10 | x > 20]
 ```
 
@@ -477,7 +477,7 @@ x[x < 10 | x > 20]
 Indexing can also be used to replace parts of a vector:
 
 
-```r
+``` r
 x[1] <- 1000
 x
 ```
@@ -491,7 +491,7 @@ useful for replacing parts of a vector that satisfy a certain condition.
 For example to replace all elements that take the value 0 with the value 1:
 
 
-```r
+``` r
 x[x == 0] <- 1
 x
 ```
@@ -507,7 +507,7 @@ replaced. For example, to replace elements 2, 3, and 4 we need to
 supply a vector of replacement values of length 3.
 
 
-```r
+``` r
 x[2:4] <- c(0, 8, 1)
 x
 ```
@@ -524,7 +524,7 @@ element that is less than 3 then we can break the operation down into
 3 steps:
 
 
-```r
+``` r
 y <- x[x < 3]
 y <- y + 3
 x[x < 3] <- y
@@ -540,7 +540,7 @@ write back the modified values to the original positions. R experts will
 normally do this in a single expression.
 
 
-```r
+``` r
 x[x < 3] <- x[x < 3] + 3
 ```
 
@@ -558,7 +558,7 @@ elements of `x` that have value 0 when divided by 2 (i.e. the even numbers)
 and then create a new character vector with the labels *even* and *odd*:
 
 
-```r
+``` r
 x %% 2
 ```
 
@@ -566,7 +566,7 @@ x %% 2
 ##  [1] 0 1 0 0 0 1 1 0 1 0 0 0
 ```
 
-```r
+``` r
 ifelse(x %% 2 == 0, "even", "odd")
 ```
 
@@ -589,7 +589,7 @@ Collections of components of different types are called *lists*,
 and are created with the `list()` function. Thus
 
 
-```r
+``` r
 m <- list(4, TRUE, "name of company")
 m
 ```
@@ -616,7 +616,7 @@ list, but the result will always be another list, even if you select
 only one element
 
 
-```r
+``` r
 m[1:2] # A list containing first two elements of m
 ```
 
@@ -628,7 +628,7 @@ m[1:2] # A list containing first two elements of m
 ## [1] TRUE
 ```
 
-```r
+``` r
 m[3] # A list containing the third element of m
 ```
 
@@ -641,7 +641,7 @@ If you just want to extract a single element of a list then you must use
 double square braces:
 
 
-```r
+``` r
 m[[3]] # Extract third element
 ```
 
@@ -653,7 +653,7 @@ Lists are more useful when their elements are named. You can name an element
 by using the syntax `name=value` in the call to the `list` function:
 
 
-```r
+``` r
 mylist <- list(
   name = c("Joe", "Ann", "Jack", "Tom"),
   age = c(34, 50, 27, 42)
@@ -674,7 +674,7 @@ vector of names, and *age* a numeric vector of ages. The components
 of the list can be extracted with a dollar sign `$`
 
 
-```r
+``` r
 mylist$name
 ```
 
@@ -682,7 +682,7 @@ mylist$name
 ## [1] "Joe"  "Ann"  "Jack" "Tom"
 ```
 
-```r
+``` r
 mylist$age
 ```
 
@@ -698,7 +698,7 @@ For example, here we create a simple data frame containing the names of some ind
 along with their age in years, their sex (coded 1 or 2) and their height in cm.
 
 
-```r
+``` r
 mydata <- data.frame(
   name = c("Joe", "Ann", "Jack", "Tom"),
   age = c(34, 50, 27, 42), 
@@ -712,7 +712,7 @@ that we use the constructor function `data.frame` instead of `list`). In fact da
 extract vectors using the dollar sign:
 
 
-```r
+``` r
 mydata$height
 ```
 
@@ -723,7 +723,7 @@ mydata$height
 On the other hand, data frames are also two dimensional objects:
 
 
-```r
+``` r
 mydata
 ```
 
@@ -740,7 +740,7 @@ column.  You can use square brackets with two comma-separated
 arguments to take subsets of rows or columns.
 
 
-```r
+``` r
 mydata[1, ]
 ```
 
@@ -749,7 +749,7 @@ mydata[1, ]
 ## 1  Joe  34   1    185
 ```
 
-```r
+``` r
 mydata[, c("age", "height")]
 ```
 
@@ -761,7 +761,7 @@ mydata[, c("age", "height")]
 ## 4  42    182
 ```
 
-```r
+``` r
 mydata[2, 4]
 ```
 
@@ -775,7 +775,7 @@ Now let's create another data frame with more individuals than the
 first one:
 
 
-```r
+``` r
 yourdata <- data.frame(
   name = c("Ann", "Peter", "Sue", "Jack", "Tom", "Joe", "Jane"),
   weight = c(67, 81, 56, 90, 72, 79, 69)
@@ -786,7 +786,7 @@ This new data frame contains the weights of the individuals. The two
 data sets can be joined together with the `merge` function.
 
 
-```r
+``` r
 newdata <- merge(mydata, yourdata)
 newdata
 ```
@@ -807,7 +807,7 @@ for Peter, Sue, and Jane, which are not in `mydata` are
 discarded. If you want to keep them, use the optional argument `all=TRUE`.
   
 
-```r
+``` r
 newdata <- merge(mydata, yourdata, all = TRUE)
 newdata
 ```
@@ -835,7 +835,7 @@ as normal or low birth weight. These data are available in the [Epi](https://cra
 package:
 
 
-```r
+``` r
 library(Epi)
 data(births)
 objects()
@@ -849,7 +849,7 @@ objects()
 The function `objects()` shows what is in your workspace. To
 find out a bit more about `births` try
 
-```r
+``` r
 help(births)
 ```
 
@@ -861,7 +861,7 @@ coronary heart disease as the end-point.
 
 1. Load these data with
   
-  ```r
+  ``` r
   data(diet)
   ```
   and print the contents of the data frame to the screen..
@@ -870,7 +870,7 @@ coronary heart disease as the end-point.
 4. Remove the object `diet` with the command
 
   
-  ```r
+  ``` r
   remove(diet)
   ```
 
@@ -884,7 +884,7 @@ very helpful. You can use the `head` function to see just the
 first few rows of a data frame
 
 
-```r
+``` r
 head(births)
 ```
 
@@ -901,7 +901,7 @@ head(births)
 Now try
 
 
-```r
+``` r
 births[1, ]
 ```
 
@@ -912,7 +912,7 @@ births[1, ]
 
 This will list all the values for the first row. Similarly,
 
-```r
+``` r
 births[2, ]
 ```
 
@@ -924,7 +924,7 @@ will list the value taken by the second row, and so on.
 To list the data for the first 10 subjects, try
 
 
-```r
+``` r
 births[1:10, ]
 ```
 
@@ -947,7 +947,7 @@ To select all subjects with height less than 180 cm from the
 data frame `mydata` we can use the `subset()` function.
 
 
-```r
+``` r
 subset(mydata, height < 180)
 ```
 
@@ -963,7 +963,7 @@ A good way to start an analysis is to ask for a
 summary of the data by typing
 
 
-```r
+``` r
 summary(births)
 ```
 
@@ -993,7 +993,7 @@ of `NA`s is also printed.
 To see the names of the variables in the data frame try
 
 
-```r
+``` r
 names(births)
 ```
 
@@ -1009,7 +1009,7 @@ data frame, and typing `births$hyp` will print the data on this
 variable.  To summarize the variable `hyp` try
 
 
-```r
+``` r
 summary(births$hyp)
 ```
 
@@ -1021,7 +1021,7 @@ summary(births$hyp)
 Alternatively you can use
 
 
-```r
+``` r
 with(births, summary(hyp))
 ```
 
@@ -1036,14 +1036,14 @@ New variables can be produced using assignment together with the usual
 mathematical operations and functions. For example
 
 
-```r
+``` r
 logbw <- log(births$bweight)
 ```
 
 produces the variable `logbw` in your workspace,  while
 
 
-```r
+``` r
 births$logbw <- log(births$bweight)
 ```
 
@@ -1054,7 +1054,7 @@ birth weight in grams. To convert the units to kilograms we replace the
 original variable with a new one:
 
 
-```r
+``` r
 births$bweight <- births$bweight / 1000
 ```
 
@@ -1075,7 +1075,7 @@ to convert the variables to be factors, and to label the levels. To
 convert the variable `hyp` to be a factor, try
 
 
-```r
+``` r
 births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
 ```
 
@@ -1099,7 +1099,7 @@ useful function for making simple frequency tables is `table`.
 The distribution of the factor `hyp` can be viewed using
 
 
-```r
+``` r
 with(births, table(hyp))
 ```
 
@@ -1112,7 +1112,7 @@ with(births, table(hyp))
 or by specifying the data frame as in
 
 
-```r
+``` r
 table(births$hyp)
 ```
 
@@ -1170,7 +1170,7 @@ groups 20--29, 30--34, 35--39, 40--44, and then create a factor called
 with the function `cut`. Try
 
 
-```r
+``` r
 births$agegrp <- 
   cut(
     births$matage, 

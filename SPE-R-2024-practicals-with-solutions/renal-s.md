@@ -47,7 +47,7 @@ the study at death or kidney failure (dialysis or transplant).
     part of the standard `R`-distribution). At the same time, convert
     `sex` to a proper factor. Choose where to read the dataset.
     
-    ```r
+    ``` r
     library(Epi)
     library(survival)
     library(mgcv)
@@ -61,7 +61,7 @@ the study at death or kidney failure (dialysis or transplant).
     This is mgcv 1.9-1. For overview type 'help("mgcv-package")'.
     ```
     
-    ```r
+    ``` r
     library(foreign)
     # renal <- read.dta(
     #  "https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/renal.dta")
@@ -79,7 +79,7 @@ the study at death or kidney failure (dialysis or transplant).
     everyone starts in this state (unless of course
     `entry.status` is specified):
     
-    ```r
+    ``` r
     Lr <- Lexis(entry = list(per = doe,
                              age = doe - dob,
                              tfi = 0),
@@ -92,7 +92,7 @@ the study at death or kidney failure (dialysis or transplant).
     NOTE: entry.status has been set to "NRA" for all.
     ```
     
-    ```r
+    ``` r
     str(Lr)
     ```
     
@@ -120,7 +120,7 @@ the study at death or kidney failure (dialysis or transplant).
       ..$ tfi: NULL
     ```
     
-    ```r
+    ``` r
     summary(Lr)
     ```
     
@@ -136,13 +136,13 @@ the study at death or kidney failure (dialysis or transplant).
 3.  Visualize the follow-up in a Lexis-diagram, by using the
     `plot` method for `Lexis` objects.
     
-    ```r
+    ``` r
     plot(Lr, col = "black", lwd = 3)
     ```
     
     ![](renal-s_files/figure-epub3/Lexis-ups-1.png)<!-- -->
     
-    ```r
+    ``` r
     subset(Lr, age < 0)
     ```
     
@@ -156,7 +156,7 @@ the study at death or kidney failure (dialysis or transplant).
 
 4.  Correct the data and make a new plot, for example by:
     
-    ```r
+    ``` r
     Lr <- transform(Lr, age = ifelse(dob > 2000, age + 100, age),
                         dob = ifelse(dob > 2000, dob - 100, dob))
     subset(Lr, id == 586)
@@ -169,7 +169,7 @@ the study at death or kidney failure (dialysis or transplant).
          1
     ```
     
-    ```r
+    ``` r
     plot(Lr, col = "black", lwd = 3)
     ```
     
@@ -179,7 +179,7 @@ the study at death or kidney failure (dialysis or transplant).
     the variables sex and age at entry into the study, using time
     since entry to the study as time scale.
     
-    ```r
+    ``` r
     mc <- coxph(Surv(lex.dur, lex.Xst == "ESRD") 
                 ~ I(age / 10) + sex, data = Lr)
     summary(mc)
@@ -227,7 +227,7 @@ the study at death or kidney failure (dialysis or transplant).
     have different ESRD states according to whether a person had had
     remission or not prioer to ESRD. The statement to do this is:
     
-    ```r
+    ``` r
     Lc <- cutLexis(Lr, cut = Lr$dor, # where to cut follow up
                  timescale = "per",  # what timescale are we referring to
                  new.state = "Rem",  # name of the new state
@@ -251,12 +251,12 @@ the study at death or kidney failure (dialysis or transplant).
       between them by using `boxes`. This is an interactive command
       that requires you to click in the graph window:
     
-    ```r
+    ``` r
     boxes(Lc)
     ```
     It has a couple of fancy arguments, try:
     
-    ```r
+    ``` r
     boxes(Lc, boxpos = TRUE, scale.R = 100, show.BE = TRUE, hm = 1.5, wm = 1.5)
     ```
     
@@ -273,7 +273,7 @@ the study at death or kidney failure (dialysis or transplant).
     to indexing by the *index number* of the factor levels, so you
     must be know which order the factor levels are in:
     
-    ```r
+    ``` r
     levels(Lc) # names and order of states in lex.Cst and lex.Xst
     ```
     
@@ -281,7 +281,7 @@ the study at death or kidney failure (dialysis or transplant).
     [1] "NRA"       "Rem"       "ESRD"      "ESRD(Rem)"
     ```
     
-    ```r
+    ``` r
     par(mai = c(3, 3, 1, 1) / 4, mgp = c(3, 1, 0) / 1.6)
     plot(Lc, col = c("red", "limegreen")[Lc$lex.Cst],
             xlab = "Calendar time", ylab = "Age",
@@ -304,7 +304,7 @@ the study at death or kidney failure (dialysis or transplant).
     `tfi` to `tfi+lex.dur`. Make sure that you know
     why what goes where here in the call to `coxph`.
     
-    ```r
+    ``` r
     (EP <- levels(Lc)[3:4])           # define EndPoint states
     ```
     
@@ -312,7 +312,7 @@ the study at death or kidney failure (dialysis or transplant).
     [1] "ESRD"      "ESRD(Rem)"
     ```
     
-    ```r
+    ``` r
     m1 <- coxph(Surv(tfi,             # entry time
                      tfi + lex.dur,   # exit time
                      lex.Xst %in% EP) # event
@@ -360,7 +360,7 @@ the study at death or kidney failure (dialysis or transplant).
     that the number of events and risk time is the same as before and
     after the split:
     
-    ```r
+    ``` r
     sLc <- splitLexis(Lc, "tfi", breaks = seq(0, 30, 1/12))
     summary( Lc)
     ```
@@ -375,7 +375,7 @@ the study at death or kidney failure (dialysis or transplant).
       Sum  24  53   69         8       154      106    1084.67       125
     ```
     
-    ```r
+    ``` r
     summary(sLc)
     ```
     
@@ -396,7 +396,7 @@ the study at death or kidney failure (dialysis or transplant).
     baseline hazard that is not visible in the Cox-model). You 
     can use the wrapper function `glm.Lexis`
     
-    ```r
+    ``` r
     mp <- glm.Lexis(sLc, 
                     ~ Ns(tfi, knots = c(0, 2, 5, 10)) +
                       sex + I((doe - dob - 40) / 10) + 
@@ -410,7 +410,7 @@ the study at death or kidney failure (dialysis or transplant).
     Rem->ESRD(Rem)
     ```
     
-    ```r
+    ``` r
     ci.exp(mp)
     ```
     
@@ -430,7 +430,7 @@ the study at death or kidney failure (dialysis or transplant).
     `mgcv` package. There is convenience wrapper for this for
     `Lexis` objects as well:
     
-    ```r
+    ``` r
     mx <- gam.Lexis(sLc,
                     ~ s(tfi, k = 10) + 
                       sex + I((doe - dob - 40) / 10) + 
@@ -444,7 +444,7 @@ the study at death or kidney failure (dialysis or transplant).
     Rem->ESRD(Rem)
     ```
     
-    ```r
+    ``` r
     ci.exp(mp, subset = c("Cst", "doe", "sex"))
     ```
     
@@ -455,7 +455,7 @@ the study at death or kidney failure (dialysis or transplant).
     sexF                    0.9175116 0.5362584 1.5698169
     ```
     
-    ```r
+    ``` r
     ci.exp(mx, subset = c("Cst", "doe", "sex"))
     ```
     
@@ -471,7 +471,7 @@ the study at death or kidney failure (dialysis or transplant).
 14. Extract the regression parameters from the models using
       `ci.exp` and compare with the estimates from the Cox-model:
     
-    ```r
+    ``` r
     ci.exp(mx, subset = c("sex", "dob", "Cst"), pval = TRUE)
     ```
     
@@ -482,7 +482,7 @@ the study at death or kidney failure (dialysis or transplant).
     I(lex.Cst == "Rem")TRUE 0.2784659 0.1309446 0.5921838 0.0008970863
     ```
     
-    ```r
+    ``` r
     ci.exp(m1)
     ```
     
@@ -493,7 +493,7 @@ the study at death or kidney failure (dialysis or transplant).
     lex.Cst == "Rem"TRUE   0.2829710 0.1330996 0.601599
     ```
     
-    ```r
+    ``` r
     round(ci.exp(mp, subset = c("sex", "dob", "Cst")) / ci.exp(m1), 2)
     ```
     
@@ -514,7 +514,7 @@ the study at death or kidney failure (dialysis or transplant).
     general cross-validation. Try to look at the shape of the
     estimated effect of `tfi`:
     
-    ```r
+    ``` r
     plot(mx)
     ```
     
@@ -530,7 +530,7 @@ the study at death or kidney failure (dialysis or transplant).
     the prediction data frame must have these two variables and not
     the age, but it is only the difference that matters for the prediction:
     
-    ```r
+    ``` r
     nd <- data.frame(tfi = seq(0, 20, 0.1),
                      sex = "M",
                      doe = 1990,
@@ -548,7 +548,7 @@ the study at death or kidney failure (dialysis or transplant).
      $ lex.Cst: chr  "NRA" "NRA" "NRA" "NRA" ...
     ```
     
-    ```r
+    ``` r
     matshade(nd$tfi, cbind(ci.pred(mp, newdata = nd),
                            ci.pred(mx, newdata = nd)) * 100,
              plot = TRUE,
@@ -578,7 +578,7 @@ the study at death or kidney failure (dialysis or transplant).
     state should be used; this is most easily done using the
     `gam.Lexis` function
     
-    ```r
+    ``` r
     mr <- gam.Lexis(sLc, ~ s(tfi, k = 10) + sex,
                          from = "NRA",
                            to = "Rem")
@@ -590,7 +590,7 @@ the study at death or kidney failure (dialysis or transplant).
     NRA->Rem
     ```
     
-    ```r
+    ``` r
     summary(mr)
     ```
     
@@ -616,7 +616,7 @@ the study at death or kidney failure (dialysis or transplant).
     UBRE = -0.96024  Scale est. = 1         n = 9952
     ```
     
-    ```r
+    ``` r
     ci.exp(mr, pval = TRUE)
     ```
     
@@ -658,7 +658,7 @@ the study at death or kidney failure (dialysis or transplant).
     `subset` to select columns, and `NULL` to select rows
     (see the example in the help file for `simLexis`):
     
-    ```r
+    ``` r
     inL <- subset(sLc, select = 1:11)[NULL, ]
     str(inL)
     ```
@@ -684,7 +684,7 @@ the study at death or kidney failure (dialysis or transplant).
       ..$ tfi: num [1:361] 0 0.0833 0.1667 0.25 0.3333 ...
     ```
     
-    ```r
+    ``` r
     timeScales(inL)
     ```
     
@@ -692,7 +692,7 @@ the study at death or kidney failure (dialysis or transplant).
     [1] "per" "age" "tfi"
     ```
     
-    ```r
+    ``` r
     inL[1, "lex.id"] <- 1
     inL[1, "per"] <- 2000
     inL[1, "age"] <- 50
@@ -714,7 +714,7 @@ the study at death or kidney failure (dialysis or transplant).
           1 2000  50   0      NA     NRA    <NA> NA   F 1950 2000
     ```
     
-    ```r
+    ``` r
     str(inL)
     ```
     
@@ -745,7 +745,7 @@ the study at death or kidney failure (dialysis or transplant).
     the list will be `glm` objects, in this case the models we
     just fitted, describing the transition rates:
     
-    ```r
+    ``` r
     Tr <- list("NRA" = list("Rem"  = mr,
                             "ESRD" = mx),
                "Rem" = list("ESRD(Rem)" = mx))
@@ -754,37 +754,39 @@ the study at death or kidney failure (dialysis or transplant).
     to simulate life course of 10 persons (5 for each set of starting values
     in `inL`):
     
-    ```r
+    ``` r
     (iL <- simLexis(Tr, inL, N = 10))
     ```
     
     ```
      lex.id     per   age  tfi lex.dur lex.Cst   lex.Xst id sex  dob  doe cens
-          1 2000.00 50.00 0.00    5.01     NRA      ESRD NA   M 1950 2000 2020
-          2 2000.00 50.00 0.00   15.56     NRA      ESRD NA   M 1950 2000 2020
-          3 2000.00 50.00 0.00    4.96     NRA      ESRD NA   M 1950 2000 2020
-          4 2000.00 50.00 0.00    6.64     NRA      ESRD NA   M 1950 2000 2020
-          5 2000.00 50.00 0.00    4.34     NRA      ESRD NA   M 1950 2000 2020
-          6 2000.00 50.00 0.00    0.73     NRA       Rem NA   M 1950 2000 2020
-          6 2000.73 50.73 0.73   19.27     Rem       Rem NA   M 1950 2000 2020
-          7 2000.00 50.00 0.00    4.80     NRA      ESRD NA   M 1950 2000 2020
-          8 2000.00 50.00 0.00    1.66     NRA      ESRD NA   M 1950 2000 2020
-          9 2000.00 50.00 0.00    5.04     NRA      ESRD NA   M 1950 2000 2020
-         10 2000.00 50.00 0.00   10.26     NRA      ESRD NA   M 1950 2000 2020
-         11 2000.00 50.00 0.00    4.25     NRA      ESRD NA   F 1950 2000 2020
-         12 2000.00 50.00 0.00    0.94     NRA       Rem NA   F 1950 2000 2020
-         12 2000.94 50.94 0.94    5.65     Rem ESRD(Rem) NA   F 1950 2000 2020
-         13 2000.00 50.00 0.00   14.88     NRA      ESRD NA   F 1950 2000 2020
-         14 2000.00 50.00 0.00    4.18     NRA      ESRD NA   F 1950 2000 2020
-         15 2000.00 50.00 0.00    1.61     NRA      ESRD NA   F 1950 2000 2020
-         16 2000.00 50.00 0.00    2.80     NRA      ESRD NA   F 1950 2000 2020
-         17 2000.00 50.00 0.00    3.09     NRA      ESRD NA   F 1950 2000 2020
-         18 2000.00 50.00 0.00    7.61     NRA      ESRD NA   F 1950 2000 2020
-         19 2000.00 50.00 0.00    7.48     NRA      ESRD NA   F 1950 2000 2020
-         20 2000.00 50.00 0.00    1.24     NRA      ESRD NA   F 1950 2000 2020
+          1 2000.00 50.00 0.00    3.94     NRA      ESRD NA   M 1950 2000 2020
+          2 2000.00 50.00 0.00    3.28     NRA      ESRD NA   M 1950 2000 2020
+          3 2000.00 50.00 0.00    3.49     NRA      ESRD NA   M 1950 2000 2020
+          4 2000.00 50.00 0.00    3.01     NRA      ESRD NA   M 1950 2000 2020
+          5 2000.00 50.00 0.00    2.97     NRA      ESRD NA   M 1950 2000 2020
+          6 2000.00 50.00 0.00    3.68     NRA      ESRD NA   M 1950 2000 2020
+          7 2000.00 50.00 0.00    4.91     NRA      ESRD NA   M 1950 2000 2020
+          8 2000.00 50.00 0.00   14.80     NRA      ESRD NA   M 1950 2000 2020
+          9 2000.00 50.00 0.00    2.16     NRA      ESRD NA   M 1950 2000 2020
+         10 2000.00 50.00 0.00   10.37     NRA      ESRD NA   M 1950 2000 2020
+         11 2000.00 50.00 0.00    3.22     NRA       Rem NA   F 1950 2000 2020
+         11 2003.22 53.22 3.22    2.29     Rem ESRD(Rem) NA   F 1950 2000 2020
+         12 2000.00 50.00 0.00    4.52     NRA      ESRD NA   F 1950 2000 2020
+         13 2000.00 50.00 0.00    5.30     NRA      ESRD NA   F 1950 2000 2020
+         14 2000.00 50.00 0.00    8.65     NRA      ESRD NA   F 1950 2000 2020
+         15 2000.00 50.00 0.00    3.56     NRA       Rem NA   F 1950 2000 2020
+         15 2003.56 53.56 3.56    2.98     Rem ESRD(Rem) NA   F 1950 2000 2020
+         16 2000.00 50.00 0.00    0.17     NRA       Rem NA   F 1950 2000 2020
+         16 2000.17 50.17 0.17    4.80     Rem ESRD(Rem) NA   F 1950 2000 2020
+         17 2000.00 50.00 0.00    5.20     NRA      ESRD NA   F 1950 2000 2020
+         18 2000.00 50.00 0.00    3.59     NRA       Rem NA   F 1950 2000 2020
+         18 2003.59 53.59 3.59    0.61     Rem ESRD(Rem) NA   F 1950 2000 2020
+         19 2000.00 50.00 0.00    9.56     NRA      ESRD NA   F 1950 2000 2020
+         20 2000.00 50.00 0.00    2.48     NRA      ESRD NA   F 1950 2000 2020
     ```
     
-    ```r
+    ``` r
     summary(iL, by = "sex")
     ```
     
@@ -794,18 +796,16 @@ the study at death or kidney failure (dialysis or transplant).
     Transitions:
          To
     From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-      NRA   0   1    9         0        10       10      58.99        10
-      Rem   0   1    0         0         1        0      19.27         1
-      Sum   0   2    9         0        11       10      78.26        10
+      NRA   0   0   10         0        10       10      52.61        10
     
     $F
          
     Transitions:
          To
     From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-      NRA   0   1    9         0        10       10      48.09        10
-      Rem   0   0    0         1         1        1       5.65         1
-      Sum   0   1    9         1        11       11      53.74        10
+      NRA   0   4    6         0        10       10      46.26        10
+      Rem   0   0    0         4         4        4      10.68         4
+      Sum   0   4    6         4        14       14      56.94        10
     ```
     What type of object have you got as `iL`?
     
@@ -813,16 +813,16 @@ the study at death or kidney failure (dialysis or transplant).
     The `system.time` command is just to tell you how long it
     took, you may want to start with 500 just to see how long that takes.
     
-    ```r
+    ``` r
     system.time(sM <- simLexis(Tr, inL, N = 500, t.range = 12))
     ```
     
     ```
        user  system elapsed 
-      3.052   3.499   2.349 
+      2.874   3.476   2.201 
     ```
     
-    ```r
+    ``` r
     summary(sM, by = "sex")
     ```
     
@@ -832,18 +832,18 @@ the study at death or kidney failure (dialysis or transplant).
     Transitions:
          To
     From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-      NRA  34  84  382         0       500      466    2507.01       500
-      Rem   0  45    0        39        84       39     532.94        84
-      Sum  34 129  382        39       584      505    3039.95       500
+      NRA  27  71  402         0       500      473    2618.63       500
+      Rem   0  50    0        21        71       21     462.54        71
+      Sum  27 121  402        21       571      494    3081.17       500
     
     $F
          
     Transitions:
          To
     From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-      NRA  28 166  306         0       500      472    2385.76       500
-      Rem   0  94    0        72       166       72    1103.74       166
-      Sum  28 260  306        72       666      544    3489.51       500
+      NRA  29 154  317         0       500      471    2466.36       500
+      Rem   0  93    0        61       154       61    1023.66       154
+      Sum  29 247  317        61       654      532    3490.02       500
     ```
     Why are there so many ESRD-events in the resulting data set?
     
@@ -851,7 +851,7 @@ the study at death or kidney failure (dialysis or transplant).
     at each time for the first 10 years after entry (which is at age 50). This
     can be done by using `nState`. Try:
     
-    ```r
+    ``` r
     nStm <- nState(subset(sM, sex == "M"), time.scale = "age", 
                    at = seq(0, 10, 0.1), 
                  from = 50)
@@ -865,20 +865,20 @@ the study at death or kidney failure (dialysis or transplant).
           State
     when   NRA Rem ESRD ESRD(Rem)
       50   500   0    0         0
-      50.1 494   5    1         0
-      50.2 490   8    2         0
-      50.3 488  10    2         0
-      50.4 482  15    3         0
-      50.5 473  18    9         0
-      50.6 467  22   11         0
-      50.7 462  23   15         0
-      50.8 454  29   17         0
-      50.9 449  30   21         0
-      51   441  36   23         0
-      51.1 434  41   25         0
-      51.2 429  44   27         0
-      51.3 421  47   31         1
-      51.4 417  50   32         1
+      50.1 496   4    0         0
+      50.2 493   6    1         0
+      50.3 489   7    4         0
+      50.4 485   9    6         0
+      50.5 480  11    9         0
+      50.6 476  13   11         0
+      50.7 471  17   12         0
+      50.8 465  20   15         0
+      50.9 460  21   19         0
+      51   453  24   23         0
+      51.1 449  25   26         0
+      51.2 439  32   29         0
+      51.3 437  34   29         0
+      51.4 436  34   30         0
     ```
     What is in the object `nStf`?
     
@@ -886,7 +886,7 @@ the study at death or kidney failure (dialysis or transplant).
     designated time points (in `nStm`), compute the cumulative
     fraction over the states, arranged in order given by `perm`:
     
-    ```r
+    ``` r
     ppm <- pState(nStm, perm = c(2, 1, 3, 4))
     ppf <- pState(nStf, perm = c(2, 1, 3, 4))
     head(ppf)
@@ -896,33 +896,33 @@ the study at death or kidney failure (dialysis or transplant).
           State
     when     Rem   NRA ESRD ESRD(Rem)
       50   0.000 1.000    1         1
-      50.1 0.010 0.998    1         1
-      50.2 0.016 0.996    1         1
-      50.3 0.020 0.996    1         1
-      50.4 0.030 0.994    1         1
-      50.5 0.036 0.982    1         1
+      50.1 0.008 1.000    1         1
+      50.2 0.012 0.998    1         1
+      50.3 0.014 0.992    1         1
+      50.4 0.018 0.988    1         1
+      50.5 0.022 0.982    1         1
     ```
     
-    ```r
+    ``` r
     tail(ppf)
     ```
     
     ```
           State
     when     Rem   NRA  ESRD ESRD(Rem)
-      59.5 0.218 0.330 0.898         1
-      59.6 0.218 0.326 0.896         1
-      59.7 0.214 0.316 0.890         1
-      59.8 0.212 0.314 0.888         1
-      59.9 0.210 0.308 0.886         1
-      60   0.208 0.302 0.884         1
+      59.5 0.204 0.320 0.908         1
+      59.6 0.204 0.318 0.906         1
+      59.7 0.204 0.316 0.906         1
+      59.8 0.204 0.312 0.904         1
+      59.9 0.204 0.304 0.902         1
+      60   0.202 0.298 0.900         1
     ```
     What do the entries in `ppf` represent?
     
 22. Try to plot the cumulative probabilities using the `plot` method
     for `pState` objects: 
     
-    ```r
+    ``` r
     plot(ppf)
     ```
     
@@ -933,7 +933,7 @@ the study at death or kidney failure (dialysis or transplant).
 23. Now try to improve the plot so that it is easier to read, and
     easier to compare between men and women, for example:
     
-    ```r
+    ``` r
     par(mfrow = c(1, 2))
     # Men
     plot(ppm, col = c("limegreen", "red", "#991111", "forestgreen"))
