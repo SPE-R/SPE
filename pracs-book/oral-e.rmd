@@ -40,6 +40,7 @@ library(Epi)
 library(survival)
 cB8  <- c("#000000", "#E69F00", "#56B4E9", "#009E73", 
           "#F0E442", "#0072B2", "#D55E00", "#CC79A7") #colors chosen
+options(digits=3)
 ```
 
 -  Read the datafile `oralca2.txt` from
@@ -96,7 +97,9 @@ for a conventional illustration of the survival experience in the whole patient 
 one can draw a curve describing their complements: the cumulative mortality proportions. This curve is drawn together with the survival curve as the
  result of the second command line below.
 ```{r survcdf1, echo=TRUE, fig=TRUE, height=6, width=7,eval=FALSE}
-plot(s.all)
+plot(s.all,main="KM estimate of the survival
+     and cum. mortality proportions",
+     xlab="years", ylab="Survival")
 lines(s.all, fun = "event", mark.time = F, conf.int = FALSE)
 ```
 
@@ -170,12 +173,15 @@ Male patients are clearly younger than females in these data.
 
 Now, plot Kaplan--Meier curves jointly classified by sex and age.
 ```{r cdfsexage, echo=TRUE, fig=TRUE, height=6, width=7,eval=FALSE}
-s.agrx <- survfit(suob ~ agegr + sex, data = orca)
-par(mfrow = c(1, 1))
-plot(s.agrx,
-  fun = "event", mark.time = FALSE, xlim = c(0, 15),
-  col = rep(c(cB8[8], cB8[6]), 3), lty = c(2, 2, 1, 1, 5, 5),lwd=2
-)
+s.agrx <- survfit(suob ~ agegr + sex, data=orca)
+par(mfrow=c(1,1))
+plot(s.agrx, fun="event", mark.time=F, xlim = c(0,15), lwd=2,
+             col=rep(c(cB8[7], cB8[6]),3), lty=c(2,2, 1,1, 5,5), pch=c(1,1,2,2,4,4))
+legend(10,0.3, legend=c("(0,55] Female "," (0,55] Male",
+                       "(55,75] Female "," (55,75] Male",
+                       "(75,95] Female "," (75,95] Male" ),
+       col=rep(c(cB8[7], cB8[6]),3), lty=c(2,2, 1,1, 5,5),
+       pch=c(1,1,2,2,4,4),cex=0.65)
 ```
 
 In each age band the mortality curve for males is on a higher level
@@ -256,8 +262,13 @@ the lower curve is for the cancer deaths and the upper curve is for total mortal
 and the vertical difference between the two curves describes the
 cumulative mortality from other causes. You can also add some colours for the different zones: 
 ```{r stackedcif1, echo=TRUE, fig=TRUE, eval=FALSE}
-par(mfrow = c(1, 1))
-stackedCIF(cif1, colour = c("gray70", "gray85"))
+par(mfrow=c(1,1),xaxs="i", yaxs="i") # make plot start 0,0
+stackedCIF(cif1,xlim=c(0,20),
+           col = c("black"),
+           fill=c(cB8[6],cB8[8],cB8[2]))
+text( 10, 0.10, "Oral ca death ", pos = 4)
+text( 10, 0.5, " Other death ", pos = 4)
+text( 10, 0.80, " Alive ", pos = 4)
 ```
 
 ## Regression modelling of overall mortality.

@@ -3,28 +3,22 @@ library(Epi)
 library(survival)
 options(show.signif.stars = F)
 sessionInfo()
-<<<<<<< HEAD
-options( width=90 )
-# par()
+options( width=70, digits=3 )
+#some colors to be able to see
+cB8  <- c("#000000", "#E69F00", "#56B4E9", "#009E73", 
+          "#F0E442", "#0072B2", "#D55E00", "#CC79A7") 
 ###################################################
-setwd("C:/Users/janne/projects/SPE/pracs")
-# orca <- read.table("./data/oralca2.txt", header=T)
-orca <- read.table("https://bendixcarstensen.com/SPE/data/oralca2.txt", header=T)
-=======
-options( width=70 )
 
-###################################################
-orca <- read.table("https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/oralca2.txt", 
-                   header=T)
->>>>>>> 7fcd5eebc4326d741c049af7edf9f009beb1fb3b
+read.table(file = 'https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/oralca2.txt', header = TRUE, sep = " ",row.names = 1 )
 head(orca)
 str(orca)
 summary(orca)
 
 ###################################################
-orca$suob <- Surv(orca$time, 1*(orca$event > 0) )
-str(orca$suob)
-summary(orca$suob)
+#
+suob <- Surv(orca$time, 1*(orca$event > 0) )
+str(suob)
+summary(suob)
 
 ###################################################
 s.all <- survfit(suob ~ 1, data=orca)
@@ -34,30 +28,26 @@ s.all
 str(s.all)
 
 ###################################################
+#plot kaplan-meier estimate of the survival and cum. mortality prop.
+# line on 50% survival
 plot(s.all,main="KM estimate of the survival
      and cum. mortality proportions",
      xlab="years", ylab="Survival")
 lines(s.all, fun = "event", mark.time=T, conf.int=F)
 abline(h=0.5)
+
 ###################################################
-# Oral cancer patient suvival by stage
+# Oral cancer patient survival by stage
 ###################################################
 s.stg  <- survfit(suob ~ stage, data= orca)
 s.stg
-col5 <- c("green", "blue", "black", "red", "gray")
+col5 <- cB8[1:5]
 plot(s.stg, col= col5, fun="event", mark.time=F ,
      main="KM estimate of the cum. mortality proportions by stage",
-<<<<<<< HEAD
      xlab="years", ylab="Cum. mortality", lwd=2)
-legend(10, 0.4, legend=levels(factor(orca$stage)),
-=======
-     xlab="years", ylab="Cum. mortality")
 legend(15, 0.5, legend=levels(factor(orca$stage)),
->>>>>>> 7fcd5eebc4326d741c049af7edf9f009beb1fb3b
        col=col5, lty=1, cex=0.8,
        title="Stage", text.font=4, bg='white')
-text(rep(22,5), seq(0.22,0.05,,5), levels(factor(orca$stage)),
-     col = col5, font = 2, adj = 1)
 
 ###################################################
 # Cum haz and log-log of cum. haz by stage
@@ -87,20 +77,14 @@ stat.table( list( sex, agegr), list( count(), percent(agegr) ),
 ###################################################
 s.agrx <- survfit(suob ~ agegr + sex, data=orca)
 par(mfrow=c(1,1))
-plot(s.agrx, fun="event", mark.time=T, xlim = c(0,15), lwd=2,
-             col=rep(c("red", "blue"),3), lty=c(2,2, 1,1, 5,5))
+plot(s.agrx, fun="event", mark.time=F, xlim = c(0,15), lwd=2,
+             col=rep(c(cB8[7], cB8[6]),3), lty=c(2,2, 1,1, 5,5), pch=c(1,1,2,2,4,4))
 legend(10,0.3, legend=c("(0,55] Female "," (0,55] Male",
                        "(55,75] Female "," (55,75] Male",
                        "(75,95] Female "," (75,95] Male" ),
-<<<<<<< HEAD
-       col=rep(c("red", "blue"),3), lty=c(2,2, 1,1, 5,5),
-       pch=c(1,1,2,2,4,4),cex=0.7)
-
-=======
-       col=rep(c("red", "blue"),3), lty=c(2,2, 1,1, 5,5), 
-       cex=0.7)
+       col=rep(c(cB8[7], cB8[6]),3), lty=c(2,2, 1,1, 5,5),
+       pch=c(1,1,2,2,4,4),cex=0.65)
        
->>>>>>> 7fcd5eebc4326d741c049af7edf9f009beb1fb3b
 
 
 ###################################################
@@ -116,7 +100,8 @@ plotCIF(cif1, 1, main = "Cancer death")
 plotCIF(cif1, 2, main= "Other deaths")
 
 ###################################################
-col5 <- c("green", "blue", "black", "red", "gray")
+
+col5 <- cB8[1:5]
 cif2 <- survfit( Surv( time, event, type="mstate") ~ stage,
                  data = orca)
 str(cif2)
@@ -124,11 +109,11 @@ str(cif2)
 par(mfrow=c(1,2))
 plotCIF(cif2, 1, main = "Cancer death by stage",
         col = col5, ylim = c(0, 0.7) )
+plotCIF(cif2, 2, main= "Other deaths by stage",
+        col=col5, ylim = c(0, 0.7) )
 legend(10, 0.2, legend=levels(factor(orca$stage)),
        col=col5, lty=1, cex=0.6,
        title="Stage", text.font=4, bg='white')
-plotCIF(cif2, 2, main= "Other deaths by stage",
-        col=col5, ylim = c(0, 0.7) )
 
 ###################################################
 # Stacked plot
@@ -137,7 +122,7 @@ plotCIF(cif2, 2, main= "Other deaths by stage",
 par(mfrow=c(1,1),xaxs="i", yaxs="i") # make plot start 0,0
 stackedCIF(cif1,xlim=c(0,20),
            col = c("black"),
-           fill=c("blue","green","red"))
+           fill=c(cB8[6],cB8[8],cB8[2]))
 text( 10, 0.10, "Oral ca death ", pos = 4)
 text( 10, 0.5, " Other death ", pos = 4)
 text( 10, 0.80, " Alive ", pos = 4)
@@ -147,10 +132,10 @@ text( 10, 0.80, " Alive ", pos = 4)
 ############################
 # recall
 orca$stage<-factor(orca$stage)
-orca$suob <- Surv(orca$time, 1*(orca$event > 0) ) # total mortality
+suob <- Surv(orca$time, 1*(orca$event > 0) ) # total mortality
 m1 <- coxph(suob ~ sex + I(age/10) + stage, data= orca)
 summary( m1 )
-round( ci.exp( m1 ), 4 )
+round( ci.exp( m1 ), 3 )
 
 
 ###################################################
@@ -163,14 +148,14 @@ orca2 <- subset(orca, stage != "unkn")
 orca2$st3 <- Relevel( orca2$stage, list(1:2, 3, 4:5) )
 levels(orca2$st3) = c("I-II", "III", "IV")
 m2 <- update(m1, . ~ . - stage + st3, data=orca2 )
-round( ci.exp(m2 ), 4)
+round( ci.exp(m2 ),3)
 
 ###################################################
 newd <- data.frame( sex = c( rep("Male", 6), rep("Female", 6) ),
                     age = rep( c( rep(40, 3), rep(80, 3) ), 2 ),
                     st3 = rep( levels(orca2$st3), 4) )
 newd
-col3 <- c("green", "black", "red")
+col3 <- cB8[1:3]
 par(mfrow=c(1,2))
 plot( survfit(m2, newdata= subset(newd, sex=="Male" & age==40)),
      col=col3, fun="event", mark.time=F,main="Age 40", ylim=0:1)
@@ -181,12 +166,17 @@ plot( survfit(m2, newdata= subset(newd, sex=="Male" & age==80)),
      ylim = c(0,1), col= col3, fun="event", mark.time=F,main="Age 80")
 lines( survfit(m2, newdata= subset(newd, sex=="Female" & age==80)),
       col=col3, fun="event", lty=2, mark.time=F)
+legend(10, 0.4, legend=levels(interaction(levels(factor(newd$st3)),
+                                          levels(factor(newd$sex)))),
+       col=col3, lty=c(2,2,2,1,1,1), cex=0.5,
+       title="Stage and sex", text.font=4, bg='white')
 
 ###################################################
 # models for event specific hazards, oral cancer death
 m2haz1 <- coxph( Surv( time, event==1)  ~ sex + I((age-65)/10) + st3 , 
                  data=orca2 )
-round( ci.exp(m2haz1 ), 4)
+round( ci.exp(m2haz1 ),3 )
+################################
 cox.zph(m2haz1) # goofy!
 
 ###################################################
