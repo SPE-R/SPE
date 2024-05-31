@@ -1,6 +1,5 @@
 \documentclass[12pt,dvipsnames,t,aspectratio=169]{beamer}
 \setbeamertemplate{footline}[frame number]
-\beamertemplatenavigationsymbolsempty
 %\usepackage{pgfpages}
 %\pgfpagesuselayout{4 on 1}[a4paper,border shrink=5mm,landscape]
 %\SweaveOpts{out.width = "\\textwidth"}
@@ -8,7 +7,7 @@
 \title{Survival analysis with competing risks \newline }
 \author{Janne Pitk\"aniemi \newline \newline }
 \institute{Finnish Cancer Registry \newline Tampere University \newline
-\normalsize Statistical Practice in Epidemiology (2024, Lyon) }
+\normalsize Statistical Practice in Epidemiology (2023, Tartu) }
 \date{}
 
 
@@ -25,7 +24,7 @@
 \item[1.] Survival or time to event data \& censoring.
  \medskip
  \item[2.] 
- Competing risks: event-specific cumulative incidences \& hazards.
+ Competing risks:  event-specific cumulative incidences \& hazards.
  \medskip
 \item[3.] Kaplan--Meier and Aalen--Johansen estimators.
  \medskip
@@ -248,35 +247,35 @@ proportional hazards model on $\lambda(t)$.
 Tools for analysis with one outcome event.
 \footnotesize{
 \begin{itemize}
-\item
-\texttt{Surv(time, event)} \newline
-creates a \textbf{survival object} assuming that all start at 0, containing pairs $(y_i, \delta_i)$,
+\item 
+\texttt{Surv(time, event) -> sobj} \\ 
+creates a \textbf{survival object} \texttt{sobj} assuming that all start at 0, containing pairs $(y_i, \delta_i)$,
  \medskip
  \item
-\texttt{Surv(entry, exit, event)} \newline
+\texttt{Surv(entry, exit, event) -> sobj2} \\
  creates a survival object from
   \texttt{entry} and \texttt{exit} times, % \& event indicator,
-  %\pause
+  %\pause 
   \medskip
-\item
-\texttt{survfit(Surv()} $\sim$ \texttt{x)} \newline
-creates a \textbf{survfit} object
+\item 
+\verb!survfit(sobj ~ x) -> sfo! \\
+creates a \textbf{survfit} object {\tt sfo}
 containing KM or other non-parametric estimates
-% from survival object  \texttt{sobj}
-(also from a fitted Cox model),
+% from survival object  \texttt{sobj} 
+(also from a fitted Cox model), 
  \medskip
-\item
-\texttt{plot(), plotCIF()} \newline
+\item 
+\texttt{plot(sfo), plotCIF(sobj)} \\
 % applied to \texttt{survfit} object \texttt{sfo}
  plot method for survival curves and related graphs, 
   \medskip
-\item
-\texttt{coxph(Surv()} $\sim$ \texttt{x1 + x2)} \newline
+\item 
+\verb|coxph(sobj ~ x1 + x2)| \\ 
 fits a Cox model
-% for the relative hazards to depend
-with covariates \texttt{x1} and \texttt{x2}.
+% for the relative hazards to depend 
+with covariates \texttt{x1} and \texttt{x2}. 
     \medskip
-\item
+\item 
 \texttt{survreg()} -- parametric survival models.
 \end{itemize}   
 }
@@ -297,8 +296,6 @@ with covariates \texttt{x1} and \texttt{x2}.
 orca <-  read.table(file = 'https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/oralca2.txt', header = TRUE, sep = " ",row.names = 1 )
 library(survival)
 library(Epi)
-cB8  <- c("#000000", "#E69F00", "#56B4E9", "#009E73", 
-          "#F0E442", "#0072B2", "#D55E00", "#CC79A7") #suitable colorset
 @
 
 {\scriptsize
@@ -330,11 +327,11 @@ summary(km1)     #  detailed KM-estimate
 
 <<km,echo=FALSE,eval=TRUE,fig=TRUE,height=4>>=
 par(mfcol=c(1,1))
-plot(survfit(orca$suob~orca$sex), ylab="Proportion",xlab="Time since diagnosis (years)",lwd=c(2,1.5,1.5,2,1.5,1.5),lty=c(1,3,3,1,3,3),conf.int = T,col=c(cB8[7],cB8[6]),main="Estimated survival (95% CI)")
+plot(survfit(orca$suob~orca$sex), ylab="Proportion",xlab="Time since diagnosis (years)",lwd=c(2,1.5,1.5,2,1.5,1.5),lty=c(1,3,3,1,3,3),conf.int = T,col=c("red","blue"),main="Estimated survival (95% CI)")
 text(3,0.9,"KM for S(t)")
 legend(x=10, y=1,
             c("Female","Male"),
-            col=c(cB8[7],cB8[6]), lty=1:1,lwd=c(2,2))
+            col=c("red","blue"), lty=1:1,lwd=c(2,2))
 @
 
 
@@ -691,7 +688,7 @@ lines(km2$time,1-km2$surv,main = "Cancer death",lty=c(2),type="s")
 
 stackedCIF(cif1,xlim=c(0,20),main="Stacked CIF",
            col = c("black"),
-           fill=c(cB8[3],cB8[4],cB8[7]))
+           fill=c("blue","green","red"))
 text( 5, 0.10, "Oral ca death ", pos = 4)
 text( 4, 0.45, " Other death ", pos = 4)
 text( 1, 0.80, " Alive ", pos = 4)
@@ -717,12 +714,12 @@ text(17.5,0.6,paste(round(cif1$pstate[index15,3],2.2)),cex=1.2)
 <<plotcif2, echo=FALSE,eval=TRUE,fig=TRUE,width=12,height=7>>=
 par(mfrow=c(1,2),lwd=2.5)
 cif1 <- survfit( Surv(orca$time, orca$event, type="mstate")~sex,data=orca)
-plotCIF(cif1, 1, main = "CIF for cancer death",lty=c(2,1),col=c(cB8[7],cB8[3]),ylim=c(0,0.6))
+plotCIF(cif1, 1, main = "CIF for cancer death",lty=c(2,1),col=c("red","blue"),ylim=c(0,0.6))
 legend(x=10, y=1,
             c("Female","Male"),
-            col=c(cB8[7],cB8[3]), lty=2:1,lwd=c(2,2))
+            col=c("red","blue"), lty=2:1,lwd=c(2,2))
 
-plotCIF(cif1, 2, main = "CIF for other death",lty=c(2,1),col=c(cB8[7],cB8[3]),ylim=c(0,0.6))
+plotCIF(cif1, 2, main = "CIF for other death",lty=c(2,1),col=c("red","blue"),ylim=c(0,0.6))
 @
 
 CIF for cancer higher in women (chance?) but for other causes
@@ -797,12 +794,11 @@ other covariates except the $j^{\text{th}}$ one.
 
 \bigskip
 The ratio of hazards is constant:
-$  \frac{\lambda_i(t)}{\lambda_{i'}(t)} = \frac{\exp( \eta_{i}) }{\exp(\eta_{i'})}
-= \exp \{ \beta_j(x_{ij}-x_{i'j}) \} . $ \newline \newline
+$$  \frac{\lambda_i(t)}{\lambda_{i'}(t)} = \frac{\exp( \eta_{i}) }{\exp(\eta_{i'})}
+= \exp \{ \beta_j(x_{ij}-x_{i'j}) \} . $$
 Thus $e^{\beta_j} = \text{HR}_j$ = \textbf{hazard ratio} or relative rate
- associated with a unit change in covariate $X_j$.
- \newline \newline
-Hazard ratios should not be interpreted as causal estimands without proper causal inference (lectures by Esa)
+ associated with
+ a unit change in covariate $X_j$.
 
 \end{frame}
 
