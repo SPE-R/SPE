@@ -1,5 +1,5 @@
 ## ----include=FALSE------------------------------------------------------------
-knitr::opts_chunk$set(results = "markup", keep.source = TRUE, include = FALSE, eps = FALSE, prefix.string = "./graph/rates-rrrd")
+knitr::opts_chunk$set(results = "markup", keep.source = TRUE, include = TRUE, eps = FALSE, prefix.string = "./graph/rates-rrrd")
 
 
 ## ----eval=FALSE---------------------------------------------------------------
