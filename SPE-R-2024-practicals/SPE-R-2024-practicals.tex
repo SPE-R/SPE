@@ -4919,7 +4919,7 @@ conclude the true association structure.
 
 \begin{itemize}
 \item
-  Sketch a causal graph (not necessarily with R) to see, how should one generate the data
+  Sketch a DAG (not necessarily with R) to see, how should one generate the data
 \item
   Suppose the actual effect sizes are following:
 \item
@@ -5000,7 +5000,7 @@ There is a software \emph{DAGitty} (\url{http://www.dagitty.net/}) and also an R
 \end{Highlighting}
 \end{Shaded}
 
-Let's recreate the graph on the lecture slide 23 (but omitting the direct causal effect of interest, \(C \rightarrow D\)):
+Let's recreate the graph on the lecture slide 28 (but omitting the direct causal effect of interest, \(C \rightarrow D\)):
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -5015,8 +5015,6 @@ Let's recreate the graph on the lecture slide 23 (but omitting the direct causal
 \FunctionTok{plot}\NormalTok{(g)}
 \end{Highlighting}
 \end{Shaded}
-
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/dagitty2-1.pdf}
 
 To get a more similar look as on the slide, we must supply the coordinates (x increases from left to right, y from top to bottom):
 
@@ -5038,6 +5036,8 @@ To get a more similar look as on the slide, we must supply the coordinates (x in
 \FunctionTok{plot}\NormalTok{(g)}
 \end{Highlighting}
 \end{Shaded}
+
+\includegraphics{SPE-R-2024-practicals_files/figure-latex/dagitty3-1.pdf}
 
 Let's look at all possible paths from \(C\) to \(D\):
 
@@ -5076,6 +5076,73 @@ You can verify that, these are the variables that will block all open paths from
 \item
   Will you get the same recommendation for the adjustment variable selection as you found before?
 \end{itemize}
+
+\section{Identifying the true DAG for the data}\label{identifying-the-true-dag-for-the-data}
+
+The following code creates three DAGs
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{3}\NormalTok{))}
+\NormalTok{g1 }\OtherTok{\textless{}{-}} \FunctionTok{dagitty}\NormalTok{(}\StringTok{"dag \{}
+\StringTok{    U {-}\textgreater{} Z {-}\textgreater{} Y }
+\StringTok{    U {-}\textgreater{} X}
+\StringTok{    W {-}\textgreater{} Y}
+\StringTok{    Q {-}\textgreater{} W {-}\textgreater{} X}
+\StringTok{    Q {-}\textgreater{} Y}
+\StringTok{    \}"}\NormalTok{)}
+\NormalTok{g2 }\OtherTok{\textless{}{-}} \FunctionTok{dagitty}\NormalTok{(}\StringTok{"dag \{}
+\StringTok{    U {-}\textgreater{} Z {-}\textgreater{} Y {-}\textgreater{} W }
+\StringTok{    U {-}\textgreater{} X {-}\textgreater{} W }
+\StringTok{    Q {-}\textgreater{} W}
+\StringTok{    Q {-}\textgreater{} Y}
+\StringTok{    \}"}\NormalTok{)}
+\NormalTok{g3 }\OtherTok{\textless{}{-}} \FunctionTok{dagitty}\NormalTok{(}\StringTok{"dag \{}
+\StringTok{    U {-}\textgreater{} Z {-}\textgreater{} Y }
+\StringTok{    U {-}\textgreater{} X {-}\textgreater{} W  {-}\textgreater{} Y}
+\StringTok{    Q {-}\textgreater{} W}
+\StringTok{    Q {-}\textgreater{} Y}
+\StringTok{    \}"}\NormalTok{)}
+\NormalTok{coord }\OtherTok{\textless{}{-}} 
+  \FunctionTok{list}\NormalTok{( }\AttributeTok{x =} \FunctionTok{c}\NormalTok{(}\AttributeTok{X=}\DecValTok{1}\NormalTok{, }\AttributeTok{U =} \FloatTok{1.3}\NormalTok{, }\AttributeTok{W =} \DecValTok{2}\NormalTok{, }\AttributeTok{Z =} \FloatTok{2.3}\NormalTok{, }\AttributeTok{Q =} \FloatTok{2.7}\NormalTok{, }\AttributeTok{Y=}\DecValTok{3}\NormalTok{), }
+        \AttributeTok{y =} \FunctionTok{c}\NormalTok{(}\AttributeTok{U=}\DecValTok{1}\NormalTok{,   }\AttributeTok{Z=}\FloatTok{1.3}\NormalTok{, }\AttributeTok{X=}\DecValTok{2}\NormalTok{, }\AttributeTok{Y=}\DecValTok{2}\NormalTok{,   }\AttributeTok{W=}\FloatTok{2.7}\NormalTok{,  }\AttributeTok{Q=}\DecValTok{3}\NormalTok{)}
+\NormalTok{  )}
+\FunctionTok{coordinates}\NormalTok{(g1)}\OtherTok{\textless{}{-}}\FunctionTok{coordinates}\NormalTok{(g2)}\OtherTok{\textless{}{-}}\FunctionTok{coordinates}\NormalTok{(g3)}\OtherTok{\textless{}{-}}\NormalTok{coord}
+\FunctionTok{plot}\NormalTok{(g1)}
+\FunctionTok{title}\NormalTok{(}\StringTok{"(a)"}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(g2)}
+\FunctionTok{title}\NormalTok{(}\StringTok{"(b)"}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(g3)}
+\FunctionTok{title}\NormalTok{(}\StringTok{"(c)"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{SPE-R-2024-practicals_files/figure-latex/threedags-1.pdf}
+
+Now, the following script generates a dataset:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{source}\NormalTok{(}\StringTok{"gendata.r"}\NormalTok{)}
+\FunctionTok{head}\NormalTok{(dat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\#\#        Q      W      X      Z       Y}
+\NormalTok{\#\# 1 {-}0.397  1.056  0.199 {-}0.372  {-}4.198}
+\NormalTok{\#\# 2  0.460  2.393 {-}1.647 {-}3.004 {-}10.667}
+\NormalTok{\#\# 3  0.164 {-}0.364  0.205 {-}0.852  {-}1.830}
+\NormalTok{\#\# 4  1.584  3.285 {-}9.941  2.752  {-}4.121}
+\NormalTok{\#\# 5  1.048  1.637  0.783 {-}2.047  {-}4.378}
+\NormalTok{\#\# 6  1.895  3.272 {-}3.900 {-}2.313  {-}9.871}
+\end{Highlighting}
+\end{Shaded}
+
+\emph{Exercise:} Using linear models, try to identify, which of the three DAGs has been used to generate the data.
+
+If you have made your decision, you may check the script `gendata.r' to see, whether your guess was right.
 
 \section{Instrumental variables estimation: Mendelian randomization}\label{instrumental-variables-estimation-mendelian-randomization}
 
@@ -9759,7 +9826,7 @@ occurrence rate of remission itself.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{   user  system elapsed }
-\NormalTok{   2.49    3.12    1.96 }
+\NormalTok{   2.59    3.05    1.97 }
 \end{Highlighting}
 \end{Shaded}
 

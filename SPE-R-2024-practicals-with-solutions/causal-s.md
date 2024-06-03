@@ -23,7 +23,7 @@ subsequently analyse it to see, whether the results would allow us to
 conclude the true association structure.
 
 
--  Sketch a causal graph (not necessarily with R) to see, how should one generate the data
+-  Sketch a DAG (not necessarily with R) to see, how should one generate the data
 -  Suppose the actual effect sizes are following:
 
 -  People who drink beer weigh on average $2kg$ more than those who don't.
@@ -78,8 +78,6 @@ bdat$weight <-
 
 
 
-
-
 ## DAG tools in the package `dagitty`
 
 There is a software *DAGitty* ([http://www.dagitty.net/](http://www.dagitty.net/)) and also an R package *dagitty* that can be helpful in dealing with DAGs. Let's try to get the answer to the previous exercise using this package. 
@@ -92,7 +90,7 @@ library(dagitty)
 ```
 
 
-Let's recreate the graph on the lecture slide 23 (but omitting the direct causal effect of interest, $C \rightarrow D$):
+Let's recreate the graph on the lecture slide 28 (but omitting the direct causal effect of interest, $C \rightarrow D$):
 
 ``` r
 g <- dagitty("dag {
@@ -105,8 +103,6 @@ g <- dagitty("dag {
   }")
 plot(g)
 ```
-
-![](causal-s_files/figure-epub3/dagitty2-1.png)<!-- -->
 
 To get a more similar look as on the slide, we must supply the coordinates (x increases from left to right, y from top to bottom):
 
@@ -127,6 +123,8 @@ coordinates(g) <-
   )
 plot(g)
 ```
+
+![](causal-s_files/figure-epub3/dagitty3-1.png)<!-- -->
 
 Let's look at all possible paths from $C$ to $D$:
 
@@ -160,6 +158,67 @@ You can verify that, these are the variables that will block all open paths from
 -  Will you get the same recommendation for the adjustment variable selection as you found before?
 
 
+## Identifying the true DAG for the data
+The following code creates three DAGs
+
+
+``` r
+par(mfrow=c(1,3))
+g1 <- dagitty("dag {
+	U -> Z -> Y 
+	U -> X
+	W -> Y
+	Q -> W -> X
+	Q -> Y
+	}")
+g2 <- dagitty("dag {
+	U -> Z -> Y -> W 
+	U -> X -> W 
+	Q -> W
+	Q -> Y
+	}")
+g3 <- dagitty("dag {
+	U -> Z -> Y 
+	U -> X -> W  -> Y
+	Q -> W
+	Q -> Y
+	}")
+coord <- 
+  list( x = c(X=1, U = 1.3, W = 2, Z = 2.3, Q = 2.7, Y=3), 
+        y = c(U=1,   Z=1.3, X=2, Y=2,   W=2.7,  Q=3)
+  )
+coordinates(g1)<-coordinates(g2)<-coordinates(g3)<-coord
+plot(g1)
+title("(a)")
+plot(g2)
+title("(b)")
+plot(g3)
+title("(c)")
+```
+
+![](causal-s_files/figure-epub3/threedags-1.png)<!-- -->
+
+Now, the following script generates a dataset:
+
+
+``` r
+source("gendata.r")
+head(dat)
+```
+
+```
+##        Q      W      X      Z       Y
+## 1 -0.397  1.056  0.199 -0.372  -4.198
+## 2  0.460  2.393 -1.647 -3.004 -10.667
+## 3  0.164 -0.364  0.205 -0.852  -1.830
+## 4  1.584  3.285 -9.941  2.752  -4.121
+## 5  1.048  1.637  0.783 -2.047  -4.378
+## 6  1.895  3.272 -3.900 -2.313  -9.871
+```
+
+*Exercise:* Using linear models, try to identify, which of the three DAGs has been used to generate the data.  
+
+If you have made your decision, you may check the script 'gendata.r' to see, whether your guess was right. 
 
 ## Instrumental variables estimation: Mendelian randomization
 Suppose you want to estimate the effect of Body Mass Index (BMI) on blood glucose level (associated with the risk of diabetes).
