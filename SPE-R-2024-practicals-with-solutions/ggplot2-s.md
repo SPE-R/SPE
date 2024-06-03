@@ -107,7 +107,7 @@ Modify the code chunk below so that it includes the `group` aesthetic to recreat
 
 
 ``` r
-p1 <- ggplot(data=alkfos, mapping=aes(x=time, y=mean)) +
+p1 <- ggplot(data=alkfos, mapping=aes(x=time, y=mean, group=treat)) +
   geom_point() + geom_line()
 show(p1)
 ```
