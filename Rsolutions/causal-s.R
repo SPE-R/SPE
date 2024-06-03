@@ -152,7 +152,7 @@ title("(c)")
 
 
 ## ----gendata, echo=TRUE, results=TRUE-----------------------------------------
-source("gendata.r")
+source("data/gendata.r")
 head(dat)
 
 
