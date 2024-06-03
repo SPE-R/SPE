@@ -202,7 +202,7 @@ Now, the following script generates a dataset:
 
 
 ``` r
-source("gendata.r")
+source("data/gendata.r")
 head(dat)
 ```
 
