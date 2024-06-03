@@ -3138,11 +3138,11 @@ Another nice feature of \texttt{dplyr} is tables binding and joining. To practic
 ##     pid   age
 ##   <int> <int>
 ## 1     1    17
-## 2     2    16
-## 3     3    17
-## 4     4    22
-## 5     5    17
-## 6     6    21
+## 2     2    20
+## 3     3    23
+## 4     4    19
+## 5     5    23
+## 6     6    22
 \end{verbatim}
 
 \begin{Shaded}
@@ -3177,11 +3177,11 @@ First of all let's have a look to \texttt{bind\_rows} function.
 ##      pid   age center
 ##    <dbl> <int> <chr> 
 ##  1     1    17 <NA>  
-##  2     2    16 <NA>  
-##  3     3    17 <NA>  
-##  4     4    22 <NA>  
-##  5     5    17 <NA>  
-##  6     6    21 <NA>  
+##  2     2    20 <NA>  
+##  3     3    23 <NA>  
+##  4     4    19 <NA>  
+##  5     5    23 <NA>  
+##  6     6    22 <NA>  
 ##  7     1    NA A     
 ##  8     2    NA B     
 ##  9     3    NA A     
@@ -3210,11 +3210,11 @@ between \texttt{left\_join}, \texttt{full\_join} and \texttt{inner\_join}.
 ##     pid   age center
 ##   <dbl> <int> <chr> 
 ## 1     1    17 A     
-## 2     2    16 B     
-## 3     3    17 A     
-## 4     4    22 B     
-## 5     5    17 <NA>  
-## 6     6    21 <NA>
+## 2     2    20 B     
+## 3     3    23 A     
+## 4     4    19 B     
+## 5     5    23 <NA>  
+## 6     6    22 <NA>
 \end{verbatim}
 
 \begin{Shaded}
@@ -3229,11 +3229,11 @@ between \texttt{left\_join}, \texttt{full\_join} and \texttt{inner\_join}.
 ##     pid   age center
 ##   <dbl> <int> <chr> 
 ## 1     1    17 A     
-## 2     2    16 B     
-## 3     3    17 A     
-## 4     4    22 B     
-## 5     5    17 <NA>  
-## 6     6    21 <NA>  
+## 2     2    20 B     
+## 3     3    23 A     
+## 4     4    19 B     
+## 5     5    23 <NA>  
+## 6     6    22 <NA>  
 ## 7    10    NA C
 \end{verbatim}
 
@@ -3249,9 +3249,9 @@ between \texttt{left\_join}, \texttt{full\_join} and \texttt{inner\_join}.
 ##     pid   age center
 ##   <dbl> <int> <chr> 
 ## 1     1    17 A     
-## 2     2    16 B     
-## 3     3    17 A     
-## 4     4    22 B
+## 2     2    20 B     
+## 3     3    23 A     
+## 4     4    19 B
 \end{verbatim}
 
 Can you spot the differences between the commands above?
@@ -3271,8 +3271,8 @@ As an exercise, you can try to compute the individuals' mean age per center.
 ## # A tibble: 2 x 2
 ##   center mean_age
 ##   <chr>     <dbl>
-## 1 A            17
-## 2 B            19
+## 1 A          20  
+## 2 B          19.5
 \end{verbatim}
 
 \textbf{Note:} the \texttt{by} argument indicates which column should be use to make the \emph{join}. In some
@@ -6693,6 +6693,23 @@ is given by
   interval:
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(Epi)}
+\FunctionTok{options}\NormalTok{(}\AttributeTok{digits =} \DecValTok{4}\NormalTok{) }\CommentTok{\#  to cut down decimal points in the output}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{D }\OtherTok{\textless{}{-}} \DecValTok{15}
+\NormalTok{Y }\OtherTok{\textless{}{-}} \FloatTok{5.532} \CommentTok{\# thousands of years!}
+\NormalTok{rate }\OtherTok{\textless{}{-}}\NormalTok{ D }\SpecialCharTok{/}\NormalTok{ Y}
+\NormalTok{SE.rate }\OtherTok{\textless{}{-}}\NormalTok{ rate }\SpecialCharTok{/} \FunctionTok{sqrt}\NormalTok{(D)}
+\FunctionTok{c}\NormalTok{(rate, SE.rate, rate }\SpecialCharTok{+} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\FloatTok{1.96}\NormalTok{, }\FloatTok{1.96}\NormalTok{) }\SpecialCharTok{*}\NormalTok{ SE.rate)}
+\end{Highlighting}
+\end{Shaded}
+
 \section{Poisson model for a single rate with logarithmic link}\label{poisson-model-for-a-single-rate-with-logarithmic-link}
 
 You are able to estimate the hazard rate \(\lambda\) and compute its CI with a \textbf{Poisson regression model}, as described in the relevant slides in the lecture handout.
@@ -6701,14 +6718,33 @@ Poisson regression is a \textbf{generalized linear model} in which the \textbf{f
 in Poisson regression is the natural logarithm; log for short.
 
 \begin{itemize}
+\tightlist
 \item
   A family object \texttt{poisreg}, a modified version of the original \texttt{poisson} family object, is available
   in package \texttt{Epi}. When using this, the response is defined as a \emph{matrix} of two columns: numbers
   of cases \(D\) and person-years \(Y\), these being combined into a matrix by \texttt{cbind(D,Y)}. No specification
   of \texttt{offset} is needed.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mreg }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(D, Y) }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{, }\AttributeTok{family =} \FunctionTok{poisreg}\NormalTok{(}\AttributeTok{link =}\NormalTok{ log))}
+\FunctionTok{ci.exp}\NormalTok{(mreg)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   If you want confidence interval for log rate
 \end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mreg }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(D, Y) }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{, }\AttributeTok{family =} \FunctionTok{poisreg}\NormalTok{(}\AttributeTok{link =}\NormalTok{ log))}
+\FunctionTok{ci.lin}\NormalTok{(mreg)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{)]}
+\end{Highlighting}
+\end{Shaded}
 
 In this course we endorse the use of family \texttt{poisreg} because of its advantages in more general settings.
 
@@ -6728,6 +6764,14 @@ and their differences as with the log link.
   confidence interval for the hazard rate from this model:
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mid }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(D, Y) }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{, }\AttributeTok{family =} \FunctionTok{poisreg}\NormalTok{(}\AttributeTok{link =} \StringTok{"identity"}\NormalTok{))}
+\FunctionTok{ci.lin}\NormalTok{(mid)}
+\FunctionTok{ci.lin}\NormalTok{(mid)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{)]}
+\end{Highlighting}
+\end{Shaded}
+
 How is the coefficient of this model interpreted?
 Verify that you actually get the same rate estimate and CI as in section 1.6.1, item 1.
 
@@ -6736,19 +6780,58 @@ Verify that you actually get the same rate estimate and CI as in section 1.6.1, 
 Now, suppose the events and person years are collected over three distinct periods.
 
 \begin{itemize}
+\tightlist
 \item
   Read in the data and compute period-specific rates
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Dx }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{7}\NormalTok{, }\DecValTok{5}\NormalTok{)}
+\NormalTok{Yx }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{1.412}\NormalTok{, }\FloatTok{2.783}\NormalTok{, }\FloatTok{1.337}\NormalTok{)}
+\NormalTok{Px }\OtherTok{\textless{}{-}} \DecValTok{1}\SpecialCharTok{:}\DecValTok{3}
+\NormalTok{rates }\OtherTok{\textless{}{-}}\NormalTok{ Dx }\SpecialCharTok{/}\NormalTok{ Yx}
+\NormalTok{rates}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Using these data,
   fit the same model with log link as in section 1.6.2, assuming a common single hazard \(\lambda\)
   for the separate periods. Compare the result from the previous ones
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m3 }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(Dx, Yx) }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{, }\AttributeTok{family =} \FunctionTok{poisreg}\NormalTok{(}\AttributeTok{link =}\NormalTok{ log))}
+\FunctionTok{ci.exp}\NormalTok{(m3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Now test whether the rates are the same in the three periods:
   Try to fit a model with the period as a factor in the model:
 \end{itemize}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mp }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(Dx, Yx) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{factor}\NormalTok{(Px), }\AttributeTok{family =} \FunctionTok{poisreg}\NormalTok{(}\AttributeTok{link =}\NormalTok{ log))}
+\FunctionTok{ci.exp}\NormalTok{(mp)}
+\end{Highlighting}
+\end{Shaded}
+
 Compare the goodness-of-fit of the two models using \texttt{anova()} with the argument
 \texttt{test="Chisq"}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(m3, mp, }\AttributeTok{test =} \StringTok{"Chisq"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 Compare the test statistic to the deviance of the model \texttt{mp}.
 -- What is the deviance indicating?
@@ -6772,12 +6855,35 @@ unexposed group and \(28\) events during \(4783\) person-years in an
 exposed group:
 
 \begin{itemize}
+\tightlist
 \item
   Calculate the incidence rates in the two groups, their ratio, and the CI of the true hazard ratio \(\rho\) by direct application of the above formulae:
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{D0 }\OtherTok{\textless{}{-}} \DecValTok{15}
+\NormalTok{D1 }\OtherTok{\textless{}{-}} \DecValTok{28}
+\NormalTok{Y0 }\OtherTok{\textless{}{-}} \FloatTok{5.532}
+\NormalTok{Y1 }\OtherTok{\textless{}{-}} \FloatTok{4.783}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Now achieve this using a Poisson model. For that we first combine
   the group-specific numbers into pertinent vectors and specify a factor to represent the contrast between the exposed and the unexposed group
 \end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{D }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(D0, D1)}
+\NormalTok{Y }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(Y0, Y1)}
+\NormalTok{expos }\OtherTok{\textless{}{-}} \DecValTok{0}\SpecialCharTok{:}\DecValTok{1}
+\NormalTok{mm }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(D, Y) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{factor}\NormalTok{(expos), }\AttributeTok{family =} \FunctionTok{poisreg}\NormalTok{(}\AttributeTok{link =}\NormalTok{ log))}
+\end{Highlighting}
+\end{Shaded}
 
 What do the parameters mean in this model?
 
@@ -6786,6 +6892,13 @@ What do the parameters mean in this model?
 \item
   You can extract the estimation results for exponentiated parameters in two ways, as before:
 \end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ci.exp}\NormalTok{(mm)}
+\FunctionTok{ci.lin}\NormalTok{(mm, }\AttributeTok{Exp =} \ConstantTok{TRUE}\NormalTok{)[, }\DecValTok{5}\SpecialCharTok{:}\DecValTok{7}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
 
 \section{Analysis of rate difference}\label{analysis-of-rate-difference}
 
@@ -6796,12 +6909,36 @@ Its variance is just the sum of the variances of the two rates
 \[ var(RD) = var(\widehat\lambda_1 ) + var( \widehat\lambda_0 ) =  D_1/Y_1^2 + D_0/Y_0^2 \]
 
 \begin{itemize}
+\tightlist
 \item
   Use this formula to compute the point estimate of the rate difference \(\lambda\) and a 95\% confidence interval for it:
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{R0 }\OtherTok{\textless{}{-}}\NormalTok{ D0 }\SpecialCharTok{/}\NormalTok{ Y0}
+\NormalTok{R1 }\OtherTok{\textless{}{-}}\NormalTok{ D1 }\SpecialCharTok{/}\NormalTok{ Y1}
+\NormalTok{RD }\OtherTok{\textless{}{-}} \FunctionTok{diff}\NormalTok{(D }\SpecialCharTok{/}\NormalTok{ Y)}
+\NormalTok{SED }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{sum}\NormalTok{(D }\SpecialCharTok{/}\NormalTok{ Y}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{))}
+\FunctionTok{c}\NormalTok{(R1, R0, RD, SED, RD }\SpecialCharTok{+} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{) }\SpecialCharTok{*} \FloatTok{1.96} \SpecialCharTok{*}\NormalTok{ SED)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Verify that this is the confidence interval you get when you fit
   an additive model (obtained by identity link) with exposure as a factor:
 \end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ma }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(D, Y) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{factor}\NormalTok{(expos),}
+  \AttributeTok{family =} \FunctionTok{poisreg}\NormalTok{(}\AttributeTok{link =}\NormalTok{ identity)}
+\NormalTok{)}
+\FunctionTok{ci.lin}\NormalTok{(ma)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{)]}
+\end{Highlighting}
+\end{Shaded}
 
 \section{Binary regression}\label{binary-regression}
 
@@ -6811,21 +6948,88 @@ maternal hypertension (hyp), mother's age at birth over 35 years and sex of the 
 
 Load the \texttt{Epi} package and the data set and look at its content
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(dplyr)}
+\FunctionTok{library}\NormalTok{(Epi)}
+\FunctionTok{data}\NormalTok{(births)}
+\FunctionTok{str}\NormalTok{(births)}
+\end{Highlighting}
+\end{Shaded}
+
 \begin{itemize}
+\tightlist
 \item
   Because all variables are numeric we need first to do a little housekeeping.
   Two of them are directly converted into factors,
   and categorical versions are created of two continuous variables by function \texttt{cut()}.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{births}\SpecialCharTok{$}\NormalTok{hyp }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(births}\SpecialCharTok{$}\NormalTok{hyp, }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"normal"}\NormalTok{, }\StringTok{"hyper"}\NormalTok{))}
+\NormalTok{births}\SpecialCharTok{$}\NormalTok{sex }\OtherTok{\textless{}{-}} \FunctionTok{factor}\NormalTok{(births}\SpecialCharTok{$}\NormalTok{sex, }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"M"}\NormalTok{, }\StringTok{"F"}\NormalTok{))}
+\NormalTok{births}\SpecialCharTok{$}\NormalTok{gest4 }\OtherTok{\textless{}{-}} \FunctionTok{cut}\NormalTok{(births}\SpecialCharTok{$}\NormalTok{gestwks,}
+  \AttributeTok{breaks =} \FunctionTok{c}\NormalTok{(}\DecValTok{20}\NormalTok{, }\DecValTok{35}\NormalTok{, }\DecValTok{37}\NormalTok{, }\DecValTok{39}\NormalTok{, }\DecValTok{45}\NormalTok{), }\AttributeTok{right =} \ConstantTok{FALSE}
+\NormalTok{)}
+\NormalTok{births}\SpecialCharTok{$}\NormalTok{maged }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(births}\SpecialCharTok{$}\NormalTok{matage }\SpecialCharTok{\textless{}} \DecValTok{35}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Cross tabulate (dplyr) counts of children by hypertension and low birth weight.
   calculate (mutate) proportions of low birth weigth children by hypertension.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{births }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{count}\NormalTok{(hyp, lowbw) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(hyp) }\SpecialCharTok{\%\textgreater{}\%} \CommentTok{\# now required with changes to dplyr::count()}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{prop =} \FunctionTok{prop.table}\NormalTok{(n))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Estimate relative risk of low birth weight for mothers with hypertension compared to those without using binary regression.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(lowbw }\SpecialCharTok{\textasciitilde{}}\NormalTok{ hyp, }\AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\AttributeTok{link =}\NormalTok{ log), }\AttributeTok{data =}\NormalTok{ births)}
+\FunctionTok{ci.exp}\NormalTok{(m)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Adjust relative risk of low birth and hypertension with the sex of children
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(lowbw }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sex }\SpecialCharTok{+}\NormalTok{ hyp, }\AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\AttributeTok{link =}\NormalTok{ log), }\AttributeTok{data =}\NormalTok{ births)}
+\FunctionTok{ci.exp}\NormalTok{(m)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Adjust relative risk of low birth and hypertension with the sex of children and mother beeing over 35 years.
 \end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{m }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(lowbw }\SpecialCharTok{\textasciitilde{}}\NormalTok{ maged }\SpecialCharTok{+}\NormalTok{ sex }\SpecialCharTok{+}\NormalTok{ hyp, }\AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\AttributeTok{link =}\NormalTok{ log), }\AttributeTok{data =}\NormalTok{ births)}
+\FunctionTok{ci.exp}\NormalTok{(m)}
+\end{Highlighting}
+\end{Shaded}
 
 \section{Optional/Homework: Hand calculations and calculations using matrix tools}\label{optionalhomework-hand-calculations-and-calculations-using-matrix-tools}
 
@@ -6836,23 +7040,84 @@ NB. This subsection requires some familiarity with matrix algebra. Do this only 
 First some basic hand calculations.
 
 \begin{itemize}
+\tightlist
 \item
   Suppose \(15\) outcome events are observed during \(5532\) person-years in a given study cohort.
   Let's use R as a simple desk calculator to estimate the underlying hazard rate \(\lambda\) (in 1000
   person-years; therefore 5.532) and to get the first version of an approximate confidence
   interval:
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(Epi)}
+\FunctionTok{options}\NormalTok{(}\AttributeTok{digits =} \DecValTok{4}\NormalTok{) }\CommentTok{\#  to cut down decimal points in the output}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{D }\OtherTok{\textless{}{-}} \DecValTok{15}
+\NormalTok{Y }\OtherTok{\textless{}{-}} \FloatTok{5.532} \CommentTok{\# thousands of years!}
+\NormalTok{rate }\OtherTok{\textless{}{-}}\NormalTok{ D }\SpecialCharTok{/}\NormalTok{ Y}
+\NormalTok{SE.rate }\OtherTok{\textless{}{-}}\NormalTok{ rate }\SpecialCharTok{/} \FunctionTok{sqrt}\NormalTok{(D)}
+\FunctionTok{c}\NormalTok{(rate, SE.rate, rate }\SpecialCharTok{+} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\FloatTok{1.96}\NormalTok{, }\FloatTok{1.96}\NormalTok{) }\SpecialCharTok{*}\NormalTok{ SE.rate)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Compute now the approximate confidence interval using the method
   based on log-transformation and compare the result with that in the previous item.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{SE.logr }\OtherTok{\textless{}{-}} \DecValTok{1} \SpecialCharTok{/} \FunctionTok{sqrt}\NormalTok{(D)}
+\NormalTok{EF }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(}\FloatTok{1.96} \SpecialCharTok{*}\NormalTok{ SE.logr)}
+\FunctionTok{c}\NormalTok{(}\FunctionTok{log}\NormalTok{(rate), SE.logr)}
+\FunctionTok{c}\NormalTok{(rate, EF, rate }\SpecialCharTok{/}\NormalTok{ EF, rate }\SpecialCharTok{*}\NormalTok{ EF)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Calculate the incidence rates in the two groups, their ratio, and the\\
   CI of the true hazard ratio \(\rho\) by direct application of the above formulae:
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{D0 }\OtherTok{\textless{}{-}} \DecValTok{15}
+\NormalTok{D1 }\OtherTok{\textless{}{-}} \DecValTok{28}
+\NormalTok{Y0 }\OtherTok{\textless{}{-}} \FloatTok{5.532}
+\NormalTok{Y1 }\OtherTok{\textless{}{-}} \FloatTok{4.783}
+\NormalTok{R1 }\OtherTok{\textless{}{-}}\NormalTok{ D1 }\SpecialCharTok{/}\NormalTok{ Y1}
+\NormalTok{R0 }\OtherTok{\textless{}{-}}\NormalTok{ D0 }\SpecialCharTok{/}\NormalTok{ Y0}
+\NormalTok{RR }\OtherTok{\textless{}{-}}\NormalTok{ R1 }\SpecialCharTok{/}\NormalTok{ R0}
+\NormalTok{SE.lrr }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\DecValTok{1} \SpecialCharTok{/}\NormalTok{ D0 }\SpecialCharTok{+} \DecValTok{1} \SpecialCharTok{/}\NormalTok{ D1)}
+\NormalTok{EF }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(}\FloatTok{1.96} \SpecialCharTok{*}\NormalTok{ SE.lrr)}
+\FunctionTok{c}\NormalTok{(R1, R0, RR, RR }\SpecialCharTok{/}\NormalTok{ EF, RR }\SpecialCharTok{*}\NormalTok{ EF)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Explore the function \texttt{ci.mat()}, which lets you use
   matrix multiplication (operator \texttt{\textquotesingle{}\%*\%\textquotesingle{}}
   in R) to produce a confidence interval from an estimate and its
   standard error (or CIs from whole columns of estimates and SEs):
 \end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ci.mat}
+\FunctionTok{ci.mat}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
 
 As you see, this function returns a \(2\times 3\) matrix (2 rows, 3 columns) containing familiar numbers.
 
@@ -6868,15 +7133,46 @@ As you see, this function returns a \(2\times 3\) matrix (2 rows, 3 columns) con
 
 Apply this method to the single rate calculations in 1.6.1, first creating the \(1 \times 2\) matrix and then performing the matrix multiplication.
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rateandSE }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(rate, SE.rate)}
+\NormalTok{rateandSE}
+\NormalTok{rateandSE }\SpecialCharTok{\%*\%} \FunctionTok{ci.mat}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
 \begin{itemize}
+\tightlist
 \item
   When the confidence interval is based on the log-rate and its
   standard error, the result is obtained by appropriate application of
   the exp-function on the pertinent matrix product
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lograndSE }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FunctionTok{log}\NormalTok{(rate), SE.logr)}
+\NormalTok{lograndSE}
+\FunctionTok{exp}\NormalTok{(lograndSE }\SpecialCharTok{\%*\%} \FunctionTok{ci.mat}\NormalTok{())}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   For computing the rate ratio and its CI as in 1.6.5, matrix
   multiplication with \texttt{ci.mat()} should give the same result as
   there:
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{exp}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\FunctionTok{log}\NormalTok{(RR), SE.lrr) }\SpecialCharTok{\%*\%} \FunctionTok{ci.mat}\NormalTok{())}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   The main argument in function \texttt{ci.mat()} is \texttt{alpha},
   which sets the confidence level: \(1 - \alpha\). The default value is
@@ -6884,19 +7180,68 @@ Apply this method to the single rate calculations in 1.6.1, first creating the \
   If you wish to get the confidence interval for the rate ratio at
   the 90\% level (= \(1-0.1\)), for instance, you may proceed as
   follows:
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ci.mat}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.1}\NormalTok{)}
+\FunctionTok{exp}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\FunctionTok{log}\NormalTok{(RR), SE.lrr) }\SpecialCharTok{\%*\%} \FunctionTok{ci.mat}\NormalTok{(}\AttributeTok{alpha =} \FloatTok{0.1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Now achieve this using a Poisson model. For that we first combine
   the group-specific numbers into pertinent vectors and specify a factor to represent the contrast between the exposed and the unexposed group
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{D }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(D0, D1)}
+\NormalTok{Y }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(Y0, Y1)}
+\NormalTok{expos }\OtherTok{\textless{}{-}} \DecValTok{0}\SpecialCharTok{:}\DecValTok{1}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Look again to the model used to analyse the rate ratio in. Often one would like to get simultaneously both
   the rates and the ratio between them. This can be achieved in one go
   using the \emph{contrast matrix} argument \texttt{ctr.mat} to
   \texttt{ci.lin()} or \texttt{ci.exp()}. Try:
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{CM }\OtherTok{\textless{}{-}} \FunctionTok{rbind}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{), }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{), }\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\FunctionTok{rownames}\NormalTok{(CM) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"rate 0"}\NormalTok{, }\StringTok{"rate 1"}\NormalTok{, }\StringTok{"RR 1 vs. 0"}\NormalTok{)}
+\NormalTok{CM}
+\NormalTok{mm }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(D }\SpecialCharTok{\textasciitilde{}} \FunctionTok{factor}\NormalTok{(expos),}
+  \AttributeTok{family =} \FunctionTok{poisson}\NormalTok{(}\AttributeTok{link =}\NormalTok{ log), }\AttributeTok{offset =} \FunctionTok{log}\NormalTok{(Y)}
+\NormalTok{)}
+\FunctionTok{ci.exp}\NormalTok{(mm, }\AttributeTok{ctr.mat =}\NormalTok{ CM)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
 \item
   Use the same machinery to the additive model to get the rates
   and the rate-difference in one go. Note that the annotation of the
   resulting estimates are via the column-names of the contrast matrix.
 \end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{rownames}\NormalTok{(CM) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"rate 0"}\NormalTok{, }\StringTok{"rate 1"}\NormalTok{, }\StringTok{"RD 1 vs. 0"}\NormalTok{)}
+\NormalTok{ma }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(D, Y) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{factor}\NormalTok{(expos),}
+  \AttributeTok{family =} \FunctionTok{poisreg}\NormalTok{(}\AttributeTok{link =}\NormalTok{ identity)}
+\NormalTok{)}
+\FunctionTok{ci.lin}\NormalTok{(ma, }\AttributeTok{ctr.mat =}\NormalTok{ CM)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{)]}
+\end{Highlighting}
+\end{Shaded}
 
 \chapter{Estimation of effects: simple and more complex}\label{estimation-of-effects-simple-and-more-complex}
 
@@ -8278,8 +8623,8 @@ hand the period effect takes just about 3 df.
 ## indicate that k is too low, especially if edf is close to k'.
 ## 
 ##        k'  edf k-index p-value   
-## s(A) 9.00 8.14    0.93    0.01 **
-## s(P) 9.00 3.05    0.95    0.11   
+## s(A) 9.00 8.14    0.93   0.005 **
+## s(P) 9.00 3.05    0.95   0.100 . 
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 \end{verbatim}
@@ -8350,9 +8695,9 @@ given in the printed output about the value of \texttt{k}.
 ## Basis dimension (k) checking results. Low p-value (k-index<1) may
 ## indicate that k is too low, especially if edf is close to k'.
 ## 
-##         k'   edf k-index p-value    
-## s(A) 19.00 11.13    0.93  <2e-16 ***
-## s(P)  9.00  3.05    0.95    0.09 .  
+##         k'   edf k-index p-value  
+## s(A) 19.00 11.13    0.93   0.015 *
+## s(P)  9.00  3.05    0.95   0.095 .
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 \end{verbatim}
@@ -14439,29 +14784,29 @@ Classes 'Lexis' and 'data.frame':   2 obs. of  11 variables:
 \end{Shaded}
 
 \begin{verbatim}
- lex.id     per   age   tfi lex.dur lex.Cst   lex.Xst id sex  dob  doe cens
-      1 2000.00 50.00  0.00    2.51     NRA      ESRD NA   M 1950 2000 2020
-      2 2000.00 50.00  0.00    1.34     NRA      ESRD NA   M 1950 2000 2020
-      3 2000.00 50.00  0.00    2.28     NRA      ESRD NA   M 1950 2000 2020
-      4 2000.00 50.00  0.00    6.18     NRA      ESRD NA   M 1950 2000 2020
-      5 2000.00 50.00  0.00    6.60     NRA      ESRD NA   M 1950 2000 2020
-      6 2000.00 50.00  0.00    8.03     NRA      ESRD NA   M 1950 2000 2020
-      7 2000.00 50.00  0.00   10.93     NRA      ESRD NA   M 1950 2000 2020
-      8 2000.00 50.00  0.00   13.08     NRA      ESRD NA   M 1950 2000 2020
-      9 2000.00 50.00  0.00    8.04     NRA      ESRD NA   M 1950 2000 2020
-     10 2000.00 50.00  0.00    8.31     NRA      ESRD NA   M 1950 2000 2020
-     11 2000.00 50.00  0.00    8.02     NRA      ESRD NA   F 1950 2000 2020
-     12 2000.00 50.00  0.00    3.91     NRA      ESRD NA   F 1950 2000 2020
-     13 2000.00 50.00  0.00   11.22     NRA       Rem NA   F 1950 2000 2020
-     13 2011.22 61.22 11.22    8.78     Rem       Rem NA   F 1950 2000 2020
-     14 2000.00 50.00  0.00    2.83     NRA      ESRD NA   F 1950 2000 2020
-     15 2000.00 50.00  0.00    1.62     NRA      ESRD NA   F 1950 2000 2020
-     16 2000.00 50.00  0.00    0.52     NRA       Rem NA   F 1950 2000 2020
-     16 2000.52 50.52  0.52    0.25     Rem ESRD(Rem) NA   F 1950 2000 2020
-     17 2000.00 50.00  0.00    2.20     NRA      ESRD NA   F 1950 2000 2020
-     18 2000.00 50.00  0.00    0.08     NRA      ESRD NA   F 1950 2000 2020
-     19 2000.00 50.00  0.00    4.80     NRA      ESRD NA   F 1950 2000 2020
-     20 2000.00 50.00  0.00   11.04     NRA      ESRD NA   F 1950 2000 2020
+ lex.id     per   age  tfi lex.dur lex.Cst   lex.Xst id sex  dob  doe cens
+      1 2000.00 50.00 0.00    3.49     NRA      ESRD NA   M 1950 2000 2020
+      2 2000.00 50.00 0.00    0.68     NRA      ESRD NA   M 1950 2000 2020
+      3 2000.00 50.00 0.00    5.96     NRA      ESRD NA   M 1950 2000 2020
+      4 2000.00 50.00 0.00    9.92     NRA      ESRD NA   M 1950 2000 2020
+      5 2000.00 50.00 0.00    3.20     NRA      ESRD NA   M 1950 2000 2020
+      6 2000.00 50.00 0.00    1.02     NRA      ESRD NA   M 1950 2000 2020
+      7 2000.00 50.00 0.00    2.68     NRA      ESRD NA   M 1950 2000 2020
+      8 2000.00 50.00 0.00    4.96     NRA      ESRD NA   M 1950 2000 2020
+      9 2000.00 50.00 0.00    5.60     NRA      ESRD NA   M 1950 2000 2020
+     10 2000.00 50.00 0.00    0.91     NRA      ESRD NA   M 1950 2000 2020
+     11 2000.00 50.00 0.00    0.95     NRA      ESRD NA   F 1950 2000 2020
+     12 2000.00 50.00 0.00    4.65     NRA       Rem NA   F 1950 2000 2020
+     12 2004.65 54.65 4.65   15.35     Rem       Rem NA   F 1950 2000 2020
+     13 2000.00 50.00 0.00    5.06     NRA      ESRD NA   F 1950 2000 2020
+     14 2000.00 50.00 0.00    6.43     NRA       Rem NA   F 1950 2000 2020
+     14 2006.43 56.43 6.43    7.32     Rem ESRD(Rem) NA   F 1950 2000 2020
+     15 2000.00 50.00 0.00    6.79     NRA      ESRD NA   F 1950 2000 2020
+     16 2000.00 50.00 0.00    2.91     NRA      ESRD NA   F 1950 2000 2020
+     17 2000.00 50.00 0.00    5.97     NRA      ESRD NA   F 1950 2000 2020
+     18 2000.00 50.00 0.00    0.74     NRA      ESRD NA   F 1950 2000 2020
+     19 2000.00 50.00 0.00    0.17     NRA      ESRD NA   F 1950 2000 2020
+     20 2000.00 50.00 0.00   10.78     NRA      ESRD NA   F 1950 2000 2020
 \end{verbatim}
 
 \begin{Shaded}
@@ -14476,16 +14821,16 @@ $M
 Transitions:
      To
 From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-  NRA   0   0   10         0        10       10       67.3        10
+  NRA   0   0   10         0        10       10      38.41        10
 
 $F
 
 Transitions:
      To
 From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-  NRA   0   2    8         0        10       10      46.24        10
-  Rem   0   1    0         1         2        1       9.02         2
-  Sum   0   3    8         1        12       11      55.26        10
+  NRA   0   2    8         0        10       10      44.45        10
+  Rem   0   1    0         1         2        1      22.67         2
+  Sum   0   3    8         1        12       11      67.12        10
 \end{verbatim}
 
   What type of object have you got as \texttt{iL}?
@@ -14502,7 +14847,7 @@ From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
 
 \begin{verbatim}
    user  system elapsed 
-  2.577   3.368   2.048 
+  2.711   3.223   2.038 
 \end{verbatim}
 
 \begin{Shaded}
@@ -14517,18 +14862,18 @@ $M
 Transitions:
      To
 From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-  NRA  45  67  388         0       500      455    2801.29       500
-  Rem   0  43    0        24        67       24     429.15        67
-  Sum  45 110  388        24       567      479    3230.43       500
+  NRA  39  79  382         0       500      461    2781.50       500
+  Rem   0  51    0        28        79       28     504.69        79
+  Sum  39 130  382        28       579      489    3286.19       500
 
 $F
 
 Transitions:
      To
 From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
-  NRA  28 180  292         0       500      472    2421.47       500
-  Rem   0 115    0        65       180       65    1226.72       180
-  Sum  28 295  292        65       680      537    3648.19       500
+  NRA  28 140  332         0       500      472    2492.42       500
+  Rem   0  98    0        42       140       42    1016.24       140
+  Sum  28 238  332        42       640      514    3508.66       500
 \end{verbatim}
 
   Why are there so many ESRD-events in the resulting data set?
@@ -14553,20 +14898,20 @@ From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
       State
 when   NRA Rem ESRD ESRD(Rem)
   50   500   0    0         0
-  50.1 496   2    2         0
-  50.2 493   5    2         0
-  50.3 484  10    6         0
-  50.4 477  15    8         0
-  50.5 469  18   13         0
-  50.6 461  24   15         0
-  50.7 454  28   18         0
-  50.8 449  31   19         1
-  50.9 442  36   21         1
-  51   436  38   25         1
-  51.1 431  42   26         1
-  51.2 425  47   27         1
-  51.3 416  53   30         1
-  51.4 407  57   35         1
+  50.1 493   1    6         0
+  50.2 491   3    6         0
+  50.3 484   6   10         0
+  50.4 477  11   12         0
+  50.5 472  15   13         0
+  50.6 469  16   15         0
+  50.7 464  19   17         0
+  50.8 460  21   19         0
+  50.9 458  22   20         0
+  51   449  27   24         0
+  51.1 447  27   26         0
+  51.2 443  31   26         0
+  51.3 437  33   30         0
+  51.4 430  37   33         0
 \end{verbatim}
 
   What is in the object \texttt{nStf}?
@@ -14587,11 +14932,11 @@ when   NRA Rem ESRD ESRD(Rem)
       State
 when     Rem   NRA ESRD ESRD(Rem)
   50   0.000 1.000    1         1
-  50.1 0.004 0.996    1         1
-  50.2 0.010 0.996    1         1
-  50.3 0.020 0.988    1         1
-  50.4 0.030 0.984    1         1
-  50.5 0.036 0.974    1         1
+  50.1 0.002 0.988    1         1
+  50.2 0.006 0.988    1         1
+  50.3 0.012 0.980    1         1
+  50.4 0.022 0.976    1         1
+  50.5 0.030 0.974    1         1
 \end{verbatim}
 
 \begin{Shaded}
@@ -14603,12 +14948,12 @@ when     Rem   NRA ESRD ESRD(Rem)
 \begin{verbatim}
       State
 when     Rem   NRA  ESRD ESRD(Rem)
-  59.5 0.246 0.376 0.910         1
-  59.6 0.244 0.370 0.908         1
-  59.7 0.242 0.364 0.906         1
-  59.8 0.238 0.358 0.902         1
-  59.9 0.236 0.352 0.900         1
-  60   0.240 0.352 0.900         1
+  59.5 0.210 0.346 0.946         1
+  59.6 0.210 0.342 0.946         1
+  59.7 0.208 0.338 0.944         1
+  59.8 0.208 0.336 0.944         1
+  59.9 0.208 0.330 0.942         1
+  60   0.208 0.328 0.942         1
 \end{verbatim}
 
   What do the entries in \texttt{ppf} represent?

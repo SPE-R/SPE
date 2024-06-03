@@ -351,6 +351,13 @@ Let’s use R as a simple desk calculator to estimate the underlying hazard rate
 person-years; therefore 5.532) and to get the first version of an approximate confidence
 interval:</li>
 </ul>
+<div class="sourceCode" id="cb383"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb383-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb383-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
+<span id="cb383-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb383-2" tabindex="-1"></a><span class="fu">options</span>(<span class="at">digits =</span> <span class="dv">4</span>) <span class="co">#  to cut down decimal points in the output</span></span></code></pre></div>
+<div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb384-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb384-1" tabindex="-1"></a>D <span class="ot">&lt;-</span> <span class="dv">15</span></span>
+<span id="cb384-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb384-2" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="fl">5.532</span> <span class="co"># thousands of years!</span></span>
+<span id="cb384-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb384-3" tabindex="-1"></a>rate <span class="ot">&lt;-</span> D <span class="sc">/</span> Y</span>
+<span id="cb384-4"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb384-4" tabindex="-1"></a>SE.rate <span class="ot">&lt;-</span> rate <span class="sc">/</span> <span class="fu">sqrt</span>(D)</span>
+<span id="cb384-5"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb384-5" tabindex="-1"></a><span class="fu">c</span>(rate, SE.rate, rate <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.96</span>, <span class="fl">1.96</span>) <span class="sc">*</span> SE.rate)</span></code></pre></div>
 </div>
 <div id="poisson-model-for-a-single-rate-with-logarithmic-link" class="section level2 hasAnchor" number="6.2">
 <h2><span class="header-section-number">6.2</span> Poisson model for a single rate with logarithmic link<a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-for-a-single-rate-with-logarithmic-link" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -358,12 +365,18 @@ interval:</li>
 <p>Poisson regression is a <strong>generalized linear model</strong> in which the <strong>family</strong>, <em>i.e.</em> the distribution of the response variable, is assumed to be the Poisson distribution. The most commonly applied <strong>link function</strong>
 in Poisson regression is the natural logarithm; log for short.</p>
 <ul>
-<li><p>A family object <code>poisreg</code>, a modified version of the original <code>poisson</code> family object, is available
+<li>A family object <code>poisreg</code>, a modified version of the original <code>poisson</code> family object, is available
 in package <code>Epi</code>. When using this, the response is defined as a <em>matrix</em> of two columns: numbers
 of cases <span class="math inline">\(D\)</span> and person-years <span class="math inline">\(Y\)</span>, these being combined into a matrix by <code>cbind(D,Y)</code>. No specification
-of <code>offset</code> is needed.</p></li>
-<li><p>If you want confidence interval for log rate</p></li>
+of <code>offset</code> is needed.</li>
 </ul>
+<div class="sourceCode" id="cb385"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb385-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb385-1" tabindex="-1"></a>mreg <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(D, Y) <span class="sc">~</span> <span class="dv">1</span>, <span class="at">family =</span> <span class="fu">poisreg</span>(<span class="at">link =</span> log))</span>
+<span id="cb385-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb385-2" tabindex="-1"></a><span class="fu">ci.exp</span>(mreg)</span></code></pre></div>
+<ul>
+<li>If you want confidence interval for log rate</li>
+</ul>
+<div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb386-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb386-1" tabindex="-1"></a>mreg <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(D, Y) <span class="sc">~</span> <span class="dv">1</span>, <span class="at">family =</span> <span class="fu">poisreg</span>(<span class="at">link =</span> log))</span>
+<span id="cb386-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb386-2" tabindex="-1"></a><span class="fu">ci.lin</span>(mreg)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">6</span>)]</span></code></pre></div>
 <p>In this course we endorse the use of family <code>poisreg</code> because of its advantages in more general settings.</p>
 </div>
 <div id="poisson-model-for-a-single-rate-with-identity-link" class="section level2 hasAnchor" number="6.3">
@@ -378,6 +391,9 @@ and their differences as with the log link.</p>
 use <code>ci.lin()</code> to produce the estimate and the
 confidence interval for the hazard rate from this model:</li>
 </ul>
+<div class="sourceCode" id="cb387"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb387-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb387-1" tabindex="-1"></a>mid <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(D, Y) <span class="sc">~</span> <span class="dv">1</span>, <span class="at">family =</span> <span class="fu">poisreg</span>(<span class="at">link =</span> <span class="st">&quot;identity&quot;</span>))</span>
+<span id="cb387-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb387-2" tabindex="-1"></a><span class="fu">ci.lin</span>(mid)</span>
+<span id="cb387-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb387-3" tabindex="-1"></a><span class="fu">ci.lin</span>(mid)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">6</span>)]</span></code></pre></div>
 <p>How is the coefficient of this model interpreted?
 Verify that you actually get the same rate estimate and CI as in section 1.6.1, item 1.</p>
 </div>
@@ -385,15 +401,29 @@ Verify that you actually get the same rate estimate and CI as in section 1.6.1, 
 <h2><span class="header-section-number">6.4</span> Poisson model assuming the same rate for several periods<a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-assuming-the-same-rate-for-several-periods" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Now, suppose the events and person years are collected over three distinct periods.</p>
 <ul>
-<li><p>Read in the data and compute period-specific rates</p></li>
-<li><p>Using these data,
-fit the same model with log link as in section 1.6.2, assuming a common single hazard <span class="math inline">\(\lambda\)</span>
-for the separate periods. Compare the result from the previous ones</p></li>
-<li><p>Now test whether the rates are the same in the three periods:
-Try to fit a model with the period as a factor in the model:</p></li>
+<li>Read in the data and compute period-specific rates</li>
 </ul>
+<div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb388-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb388-1" tabindex="-1"></a>Dx <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">5</span>)</span>
+<span id="cb388-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb388-2" tabindex="-1"></a>Yx <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">1.412</span>, <span class="fl">2.783</span>, <span class="fl">1.337</span>)</span>
+<span id="cb388-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb388-3" tabindex="-1"></a>Px <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span></span>
+<span id="cb388-4"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb388-4" tabindex="-1"></a>rates <span class="ot">&lt;-</span> Dx <span class="sc">/</span> Yx</span>
+<span id="cb388-5"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb388-5" tabindex="-1"></a>rates</span></code></pre></div>
+<ul>
+<li>Using these data,
+fit the same model with log link as in section 1.6.2, assuming a common single hazard <span class="math inline">\(\lambda\)</span>
+for the separate periods. Compare the result from the previous ones</li>
+</ul>
+<div class="sourceCode" id="cb389"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb389-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb389-1" tabindex="-1"></a>m3 <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(Dx, Yx) <span class="sc">~</span> <span class="dv">1</span>, <span class="at">family =</span> <span class="fu">poisreg</span>(<span class="at">link =</span> log))</span>
+<span id="cb389-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb389-2" tabindex="-1"></a><span class="fu">ci.exp</span>(m3)</span></code></pre></div>
+<ul>
+<li>Now test whether the rates are the same in the three periods:
+Try to fit a model with the period as a factor in the model:</li>
+</ul>
+<div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb390-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb390-1" tabindex="-1"></a>mp <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(Dx, Yx) <span class="sc">~</span> <span class="fu">factor</span>(Px), <span class="at">family =</span> <span class="fu">poisreg</span>(<span class="at">link =</span> log))</span>
+<span id="cb390-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb390-2" tabindex="-1"></a><span class="fu">ci.exp</span>(mp)</span></code></pre></div>
 <p>Compare the goodness-of-fit of the two models using <code>anova()</code> with the argument
 <code>test="Chisq"</code>:</p>
+<div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb391-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb391-1" tabindex="-1"></a><span class="fu">anova</span>(m3, mp, <span class="at">test =</span> <span class="st">&quot;Chisq&quot;</span>)</span></code></pre></div>
 <p>Compare the test statistic to the deviance of the model <code>mp</code>.
 – What is the deviance indicating?</p>
 </div>
@@ -430,14 +460,26 @@ true rate ratio $\lambda_1/\lambda_0$ is then:
 unexposed group and <span class="math inline">\(28\)</span> events during <span class="math inline">\(4783\)</span> person-years in an
 exposed group:</p>
 <ul>
-<li><p>Calculate the incidence rates in the two groups, their ratio, and the CI of the true hazard ratio <span class="math inline">\(\rho\)</span> by direct application of the above formulae:</p></li>
-<li><p>Now achieve this using a Poisson model. For that we first combine
-the group-specific numbers into pertinent vectors and specify a factor to represent the contrast between the exposed and the unexposed group</p></li>
+<li>Calculate the incidence rates in the two groups, their ratio, and the CI of the true hazard ratio <span class="math inline">\(\rho\)</span> by direct application of the above formulae:</li>
 </ul>
+<div class="sourceCode" id="cb392"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb392-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb392-1" tabindex="-1"></a>D0 <span class="ot">&lt;-</span> <span class="dv">15</span></span>
+<span id="cb392-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb392-2" tabindex="-1"></a>D1 <span class="ot">&lt;-</span> <span class="dv">28</span></span>
+<span id="cb392-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb392-3" tabindex="-1"></a>Y0 <span class="ot">&lt;-</span> <span class="fl">5.532</span></span>
+<span id="cb392-4"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb392-4" tabindex="-1"></a>Y1 <span class="ot">&lt;-</span> <span class="fl">4.783</span></span></code></pre></div>
+<ul>
+<li>Now achieve this using a Poisson model. For that we first combine
+the group-specific numbers into pertinent vectors and specify a factor to represent the contrast between the exposed and the unexposed group</li>
+</ul>
+<div class="sourceCode" id="cb393"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb393-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb393-1" tabindex="-1"></a>D <span class="ot">&lt;-</span> <span class="fu">c</span>(D0, D1)</span>
+<span id="cb393-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb393-2" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="fu">c</span>(Y0, Y1)</span>
+<span id="cb393-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb393-3" tabindex="-1"></a>expos <span class="ot">&lt;-</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">1</span></span>
+<span id="cb393-4"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb393-4" tabindex="-1"></a>mm <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(D, Y) <span class="sc">~</span> <span class="fu">factor</span>(expos), <span class="at">family =</span> <span class="fu">poisreg</span>(<span class="at">link =</span> log))</span></code></pre></div>
 <p>What do the parameters mean in this model?</p>
 <ul>
 <li>You can extract the estimation results for exponentiated parameters in two ways, as before:</li>
 </ul>
+<div class="sourceCode" id="cb394"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb394-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb394-1" tabindex="-1"></a><span class="fu">ci.exp</span>(mm)</span>
+<span id="cb394-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb394-2" tabindex="-1"></a><span class="fu">ci.lin</span>(mm, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="dv">5</span><span class="sc">:</span><span class="dv">7</span>]</span></code></pre></div>
 </div>
 <div id="analysis-of-rate-difference" class="section level2 hasAnchor" number="6.6">
 <h2><span class="header-section-number">6.6</span> Analysis of rate difference<a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#analysis-of-rate-difference" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -448,10 +490,21 @@ Its variance is just the sum of the variances of the two rates
 <!-- (since the latter are  based on independent samples): -->
 <span class="math display">\[ var(RD) = var(\widehat\lambda_1 ) + var( \widehat\lambda_0 ) =  D_1/Y_1^2 + D_0/Y_0^2 \]</span></p>
 <ul>
-<li><p>Use this formula to compute the point estimate of the rate difference <span class="math inline">\(\lambda\)</span> and a 95% confidence interval for it:</p></li>
-<li><p>Verify that this is the confidence interval you get when you fit
-an additive model (obtained by identity link) with exposure as a factor:</p></li>
+<li>Use this formula to compute the point estimate of the rate difference <span class="math inline">\(\lambda\)</span> and a 95% confidence interval for it:</li>
 </ul>
+<div class="sourceCode" id="cb395"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb395-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb395-1" tabindex="-1"></a>R0 <span class="ot">&lt;-</span> D0 <span class="sc">/</span> Y0</span>
+<span id="cb395-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb395-2" tabindex="-1"></a>R1 <span class="ot">&lt;-</span> D1 <span class="sc">/</span> Y1</span>
+<span id="cb395-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb395-3" tabindex="-1"></a>RD <span class="ot">&lt;-</span> <span class="fu">diff</span>(D <span class="sc">/</span> Y)</span>
+<span id="cb395-4"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb395-4" tabindex="-1"></a>SED <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">sum</span>(D <span class="sc">/</span> Y<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb395-5"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb395-5" tabindex="-1"></a><span class="fu">c</span>(R1, R0, RD, SED, RD <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">*</span> <span class="fl">1.96</span> <span class="sc">*</span> SED)</span></code></pre></div>
+<ul>
+<li>Verify that this is the confidence interval you get when you fit
+an additive model (obtained by identity link) with exposure as a factor:</li>
+</ul>
+<div class="sourceCode" id="cb396"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb396-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb396-1" tabindex="-1"></a>ma <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(D, Y) <span class="sc">~</span> <span class="fu">factor</span>(expos),</span>
+<span id="cb396-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb396-2" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">poisreg</span>(<span class="at">link =</span> identity)</span>
+<span id="cb396-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb396-3" tabindex="-1"></a>)</span>
+<span id="cb396-4"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb396-4" tabindex="-1"></a><span class="fu">ci.lin</span>(ma)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">6</span>)]</span></code></pre></div>
 </div>
 <div id="binary-regression" class="section level2 hasAnchor" number="6.7">
 <h2><span class="header-section-number">6.7</span> Binary regression<a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#binary-regression" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -459,17 +512,45 @@ an additive model (obtained by identity link) with exposure as a factor:</p></li
 in 500 singleton births in a London Hospital. Indicator (lowbw) for birth weight less than 2500 g. Data available from the Epi package. Factors of interest are
 maternal hypertension (hyp), mother’s age at birth over 35 years and sex of the baby.</p>
 <p>Load the <code>Epi</code> package and the data set and look at its content</p>
+<div class="sourceCode" id="cb397"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb397-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb397-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb397-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb397-2" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
+<span id="cb397-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb397-3" tabindex="-1"></a><span class="fu">data</span>(births)</span>
+<span id="cb397-4"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb397-4" tabindex="-1"></a><span class="fu">str</span>(births)</span></code></pre></div>
 <ul>
-<li><p>Because all variables are numeric we need first to do a little housekeeping.
+<li>Because all variables are numeric we need first to do a little housekeeping.
 Two of them are directly converted into factors,
 and categorical versions are created of two continuous variables by function <code>cut()</code>.
-<!-- Also, express birth weights in kilograms --></p></li>
-<li><p>Cross tabulate (dplyr) counts of children by hypertension and low birth weight.
-calculate (mutate) proportions of low birth weigth children by hypertension.</p></li>
-<li><p>Estimate relative risk of low birth weight for mothers with hypertension compared to those without using binary regression.</p></li>
-<li><p>Adjust relative risk of low birth and hypertension with the sex of children</p></li>
-<li><p>Adjust relative risk of low birth and hypertension with the sex of children and mother beeing over 35 years.</p></li>
+<!-- Also, express birth weights in kilograms --></li>
 </ul>
+<div class="sourceCode" id="cb398"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb398-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb398-1" tabindex="-1"></a>births<span class="sc">$</span>hyp <span class="ot">&lt;-</span> <span class="fu">factor</span>(births<span class="sc">$</span>hyp, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;normal&quot;</span>, <span class="st">&quot;hyper&quot;</span>))</span>
+<span id="cb398-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb398-2" tabindex="-1"></a>births<span class="sc">$</span>sex <span class="ot">&lt;-</span> <span class="fu">factor</span>(births<span class="sc">$</span>sex, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>))</span>
+<span id="cb398-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb398-3" tabindex="-1"></a>births<span class="sc">$</span>gest4 <span class="ot">&lt;-</span> <span class="fu">cut</span>(births<span class="sc">$</span>gestwks,</span>
+<span id="cb398-4"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb398-4" tabindex="-1"></a>  <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">35</span>, <span class="dv">37</span>, <span class="dv">39</span>, <span class="dv">45</span>), <span class="at">right =</span> <span class="cn">FALSE</span></span>
+<span id="cb398-5"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb398-5" tabindex="-1"></a>)</span>
+<span id="cb398-6"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb398-6" tabindex="-1"></a>births<span class="sc">$</span>maged <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(births<span class="sc">$</span>matage <span class="sc">&lt;</span> <span class="dv">35</span>, <span class="dv">0</span>, <span class="dv">1</span>)</span></code></pre></div>
+<ul>
+<li>Cross tabulate (dplyr) counts of children by hypertension and low birth weight.
+calculate (mutate) proportions of low birth weigth children by hypertension.</li>
+</ul>
+<div class="sourceCode" id="cb399"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb399-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb399-1" tabindex="-1"></a>births <span class="sc">%&gt;%</span></span>
+<span id="cb399-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb399-2" tabindex="-1"></a>  <span class="fu">count</span>(hyp, lowbw) <span class="sc">%&gt;%</span></span>
+<span id="cb399-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb399-3" tabindex="-1"></a>  <span class="fu">group_by</span>(hyp) <span class="sc">%&gt;%</span> <span class="co"># now required with changes to dplyr::count()</span></span>
+<span id="cb399-4"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb399-4" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> <span class="fu">prop.table</span>(n))</span></code></pre></div>
+<ul>
+<li>Estimate relative risk of low birth weight for mothers with hypertension compared to those without using binary regression.</li>
+</ul>
+<div class="sourceCode" id="cb400"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb400-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb400-1" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">glm</span>(lowbw <span class="sc">~</span> hyp, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> log), <span class="at">data =</span> births)</span>
+<span id="cb400-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb400-2" tabindex="-1"></a><span class="fu">ci.exp</span>(m)</span></code></pre></div>
+<ul>
+<li>Adjust relative risk of low birth and hypertension with the sex of children</li>
+</ul>
+<div class="sourceCode" id="cb401"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb401-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb401-1" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">glm</span>(lowbw <span class="sc">~</span> sex <span class="sc">+</span> hyp, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> log), <span class="at">data =</span> births)</span>
+<span id="cb401-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb401-2" tabindex="-1"></a><span class="fu">ci.exp</span>(m)</span></code></pre></div>
+<ul>
+<li>Adjust relative risk of low birth and hypertension with the sex of children and mother beeing over 35 years.</li>
+</ul>
+<div class="sourceCode" id="cb402"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb402-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb402-1" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">glm</span>(lowbw <span class="sc">~</span> maged <span class="sc">+</span> sex <span class="sc">+</span> hyp, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> log), <span class="at">data =</span> births)</span>
+<span id="cb402-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb402-2" tabindex="-1"></a><span class="fu">ci.exp</span>(m)</span></code></pre></div>
 </div>
 <div id="optionalhomework-hand-calculations-and-calculations-using-matrix-tools" class="section level2 hasAnchor" number="6.8">
 <h2><span class="header-section-number">6.8</span> Optional/Homework: Hand calculations and calculations using matrix tools<a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#optionalhomework-hand-calculations-and-calculations-using-matrix-tools" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -478,19 +559,48 @@ calculate (mutate) proportions of low birth weigth children by hypertension.</p>
 </blockquote>
 <p>First some basic hand calculations.</p>
 <ul>
-<li><p>Suppose <span class="math inline">\(15\)</span> outcome events are observed during <span class="math inline">\(5532\)</span> person-years in a given study cohort.
+<li>Suppose <span class="math inline">\(15\)</span> outcome events are observed during <span class="math inline">\(5532\)</span> person-years in a given study cohort.
 Let’s use R as a simple desk calculator to estimate the underlying hazard rate <span class="math inline">\(\lambda\)</span> (in 1000
 person-years; therefore 5.532) and to get the first version of an approximate confidence
-interval:</p></li>
-<li><p>Compute now the approximate confidence interval using the method
-based on log-transformation and compare the result with that in the previous item.</p></li>
-<li><p>Calculate the incidence rates in the two groups, their ratio, and the<br />
-CI of the true hazard ratio <span class="math inline">\(\rho\)</span> by direct application of the above formulae:</p></li>
-<li><p>Explore the function <code>ci.mat()</code>, which lets you use
+interval:</li>
+</ul>
+<div class="sourceCode" id="cb403"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb403-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb403-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
+<span id="cb403-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb403-2" tabindex="-1"></a><span class="fu">options</span>(<span class="at">digits =</span> <span class="dv">4</span>) <span class="co">#  to cut down decimal points in the output</span></span></code></pre></div>
+<div class="sourceCode" id="cb404"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb404-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb404-1" tabindex="-1"></a>D <span class="ot">&lt;-</span> <span class="dv">15</span></span>
+<span id="cb404-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb404-2" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="fl">5.532</span> <span class="co"># thousands of years!</span></span>
+<span id="cb404-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb404-3" tabindex="-1"></a>rate <span class="ot">&lt;-</span> D <span class="sc">/</span> Y</span>
+<span id="cb404-4"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb404-4" tabindex="-1"></a>SE.rate <span class="ot">&lt;-</span> rate <span class="sc">/</span> <span class="fu">sqrt</span>(D)</span>
+<span id="cb404-5"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb404-5" tabindex="-1"></a><span class="fu">c</span>(rate, SE.rate, rate <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.96</span>, <span class="fl">1.96</span>) <span class="sc">*</span> SE.rate)</span></code></pre></div>
+<ul>
+<li>Compute now the approximate confidence interval using the method
+based on log-transformation and compare the result with that in the previous item.</li>
+</ul>
+<div class="sourceCode" id="cb405"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb405-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb405-1" tabindex="-1"></a>SE.logr <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">sqrt</span>(D)</span>
+<span id="cb405-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb405-2" tabindex="-1"></a>EF <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fl">1.96</span> <span class="sc">*</span> SE.logr)</span>
+<span id="cb405-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb405-3" tabindex="-1"></a><span class="fu">c</span>(<span class="fu">log</span>(rate), SE.logr)</span>
+<span id="cb405-4"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb405-4" tabindex="-1"></a><span class="fu">c</span>(rate, EF, rate <span class="sc">/</span> EF, rate <span class="sc">*</span> EF)</span></code></pre></div>
+<ul>
+<li>Calculate the incidence rates in the two groups, their ratio, and the<br />
+CI of the true hazard ratio <span class="math inline">\(\rho\)</span> by direct application of the above formulae:</li>
+</ul>
+<div class="sourceCode" id="cb406"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb406-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb406-1" tabindex="-1"></a>D0 <span class="ot">&lt;-</span> <span class="dv">15</span></span>
+<span id="cb406-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb406-2" tabindex="-1"></a>D1 <span class="ot">&lt;-</span> <span class="dv">28</span></span>
+<span id="cb406-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb406-3" tabindex="-1"></a>Y0 <span class="ot">&lt;-</span> <span class="fl">5.532</span></span>
+<span id="cb406-4"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb406-4" tabindex="-1"></a>Y1 <span class="ot">&lt;-</span> <span class="fl">4.783</span></span>
+<span id="cb406-5"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb406-5" tabindex="-1"></a>R1 <span class="ot">&lt;-</span> D1 <span class="sc">/</span> Y1</span>
+<span id="cb406-6"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb406-6" tabindex="-1"></a>R0 <span class="ot">&lt;-</span> D0 <span class="sc">/</span> Y0</span>
+<span id="cb406-7"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb406-7" tabindex="-1"></a>RR <span class="ot">&lt;-</span> R1 <span class="sc">/</span> R0</span>
+<span id="cb406-8"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb406-8" tabindex="-1"></a>SE.lrr <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">/</span> D0 <span class="sc">+</span> <span class="dv">1</span> <span class="sc">/</span> D1)</span>
+<span id="cb406-9"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb406-9" tabindex="-1"></a>EF <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fl">1.96</span> <span class="sc">*</span> SE.lrr)</span>
+<span id="cb406-10"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb406-10" tabindex="-1"></a><span class="fu">c</span>(R1, R0, RR, RR <span class="sc">/</span> EF, RR <span class="sc">*</span> EF)</span></code></pre></div>
+<ul>
+<li>Explore the function <code>ci.mat()</code>, which lets you use
 matrix multiplication (operator <code>'%*%'</code>
 in R) to produce a confidence interval from an estimate and its
-standard error (or CIs from whole columns of estimates and SEs):</p></li>
+standard error (or CIs from whole columns of estimates and SEs):</li>
 </ul>
+<div class="sourceCode" id="cb407"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb407-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb407-1" tabindex="-1"></a>ci.mat</span>
+<span id="cb407-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb407-2" tabindex="-1"></a><span class="fu">ci.mat</span>()</span></code></pre></div>
 <p>As you see, this function returns a <span class="math inline">\(2\times 3\)</span> matrix (2 rows, 3 columns) containing familiar numbers.</p>
 <ul>
 <li>When you combine the single rate and its standard error into
@@ -500,29 +610,63 @@ a <span class="math inline">\(1\times 3\)</span> matrix containing the point est
 confidence limit.</li>
 </ul>
 <p>Apply this method to the single rate calculations in 1.6.1, first creating the <span class="math inline">\(1 \times 2\)</span> matrix and then performing the matrix multiplication.</p>
+<div class="sourceCode" id="cb408"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb408-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb408-1" tabindex="-1"></a>rateandSE <span class="ot">&lt;-</span> <span class="fu">c</span>(rate, SE.rate)</span>
+<span id="cb408-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb408-2" tabindex="-1"></a>rateandSE</span>
+<span id="cb408-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb408-3" tabindex="-1"></a>rateandSE <span class="sc">%*%</span> <span class="fu">ci.mat</span>()</span></code></pre></div>
 <ul>
-<li><p>When the confidence interval is based on the log-rate and its
+<li>When the confidence interval is based on the log-rate and its
 standard error, the result is obtained by appropriate application of
-the exp-function on the pertinent matrix product</p></li>
-<li><p>For computing the rate ratio and its CI as in 1.6.5, matrix
+the exp-function on the pertinent matrix product</li>
+</ul>
+<div class="sourceCode" id="cb409"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb409-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb409-1" tabindex="-1"></a>lograndSE <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">log</span>(rate), SE.logr)</span>
+<span id="cb409-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb409-2" tabindex="-1"></a>lograndSE</span>
+<span id="cb409-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb409-3" tabindex="-1"></a><span class="fu">exp</span>(lograndSE <span class="sc">%*%</span> <span class="fu">ci.mat</span>())</span></code></pre></div>
+<ul>
+<li>For computing the rate ratio and its CI as in 1.6.5, matrix
 multiplication with <code>ci.mat()</code> should give the same result as
-there:</p></li>
-<li><p>The main argument in function <code>ci.mat()</code> is <code>alpha</code>,
+there:</li>
+</ul>
+<div class="sourceCode" id="cb410"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb410-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb410-1" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">c</span>(<span class="fu">log</span>(RR), SE.lrr) <span class="sc">%*%</span> <span class="fu">ci.mat</span>())</span></code></pre></div>
+<ul>
+<li>The main argument in function <code>ci.mat()</code> is <code>alpha</code>,
 which sets the confidence level: <span class="math inline">\(1 - \alpha\)</span>. The default value is
 <code>alpha = 0.05</code>, corresponding to the level <span class="math inline">\(1 - 0.05\)</span> = 95%.
 If you wish to get the confidence interval for the rate ratio at
 the 90% level (= <span class="math inline">\(1-0.1\)</span>), for instance, you may proceed as
-follows:</p></li>
-<li><p>Now achieve this using a Poisson model. For that we first combine
-the group-specific numbers into pertinent vectors and specify a factor to represent the contrast between the exposed and the unexposed group</p></li>
-<li><p>Look again to the model used to analyse the rate ratio in. Often one would like to get simultaneously both
+follows:</li>
+</ul>
+<div class="sourceCode" id="cb411"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb411-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb411-1" tabindex="-1"></a><span class="fu">ci.mat</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>)</span>
+<span id="cb411-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb411-2" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">c</span>(<span class="fu">log</span>(RR), SE.lrr) <span class="sc">%*%</span> <span class="fu">ci.mat</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>))</span></code></pre></div>
+<ul>
+<li>Now achieve this using a Poisson model. For that we first combine
+the group-specific numbers into pertinent vectors and specify a factor to represent the contrast between the exposed and the unexposed group</li>
+</ul>
+<div class="sourceCode" id="cb412"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb412-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb412-1" tabindex="-1"></a>D <span class="ot">&lt;-</span> <span class="fu">c</span>(D0, D1)</span>
+<span id="cb412-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb412-2" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="fu">c</span>(Y0, Y1)</span>
+<span id="cb412-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb412-3" tabindex="-1"></a>expos <span class="ot">&lt;-</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">1</span></span></code></pre></div>
+<ul>
+<li>Look again to the model used to analyse the rate ratio in. Often one would like to get simultaneously both
 the rates and the ratio between them. This can be achieved in one go
 using the <em>contrast matrix</em> argument <code>ctr.mat</code> to
-<code>ci.lin()</code> or <code>ci.exp()</code>. Try:</p></li>
-<li><p>Use the same machinery to the additive model to get the rates
-and the rate-difference in one go. Note that the annotation of the
-resulting estimates are via the column-names of the contrast matrix.</p></li>
+<code>ci.lin()</code> or <code>ci.exp()</code>. Try:</li>
 </ul>
+<div class="sourceCode" id="cb413"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb413-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb413-1" tabindex="-1"></a>CM <span class="ot">&lt;-</span> <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb413-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb413-2" tabindex="-1"></a><span class="fu">rownames</span>(CM) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;rate 0&quot;</span>, <span class="st">&quot;rate 1&quot;</span>, <span class="st">&quot;RR 1 vs. 0&quot;</span>)</span>
+<span id="cb413-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb413-3" tabindex="-1"></a>CM</span>
+<span id="cb413-4"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb413-4" tabindex="-1"></a>mm <span class="ot">&lt;-</span> <span class="fu">glm</span>(D <span class="sc">~</span> <span class="fu">factor</span>(expos),</span>
+<span id="cb413-5"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb413-5" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">poisson</span>(<span class="at">link =</span> log), <span class="at">offset =</span> <span class="fu">log</span>(Y)</span>
+<span id="cb413-6"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb413-6" tabindex="-1"></a>)</span>
+<span id="cb413-7"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb413-7" tabindex="-1"></a><span class="fu">ci.exp</span>(mm, <span class="at">ctr.mat =</span> CM)</span></code></pre></div>
+<ul>
+<li>Use the same machinery to the additive model to get the rates
+and the rate-difference in one go. Note that the annotation of the
+resulting estimates are via the column-names of the contrast matrix.</li>
+</ul>
+<div class="sourceCode" id="cb414"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb414-1"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb414-1" tabindex="-1"></a><span class="fu">rownames</span>(CM) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;rate 0&quot;</span>, <span class="st">&quot;rate 1&quot;</span>, <span class="st">&quot;RD 1 vs. 0&quot;</span>)</span>
+<span id="cb414-2"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb414-2" tabindex="-1"></a>ma <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(D, Y) <span class="sc">~</span> <span class="fu">factor</span>(expos),</span>
+<span id="cb414-3"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb414-3" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">poisreg</span>(<span class="at">link =</span> identity)</span>
+<span id="cb414-4"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb414-4" tabindex="-1"></a>)</span>
+<span id="cb414-5"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#cb414-5" tabindex="-1"></a><span class="fu">ci.lin</span>(ma, <span class="at">ctr.mat =</span> CM)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">6</span>)]</span></code></pre></div>
 
 </div>
 </div>
