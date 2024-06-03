@@ -1,4 +1,5 @@
 \documentclass[12pt,dvipsnames,t,aspectratio=169]{beamer}
+\setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{footline}[frame number]
 %\usepackage{pgfpages}
 %\pgfpagesuselayout{4 on 1}[a4paper,border shrink=5mm,landscape]
@@ -7,7 +8,7 @@
 \title{Survival analysis with competing risks \newline }
 \author{Janne Pitk\"aniemi \newline \newline }
 \institute{Finnish Cancer Registry \newline Tampere University \newline
-\normalsize Statistical Practice in Epidemiology (2023, Tartu) }
+\normalsize Statistical Practice in Epidemiology (2024, Lyon) }
 \date{}
 
 
@@ -287,21 +288,18 @@ with covariates \texttt{x1} and \texttt{x2}.
 
 
 <<read,echo=FALSE,eval=TRUE>>=
-#setwd("C:/Users/janne.pitkaniemi/SPE2018")
-#orca<-download.file(
-#  url = 'https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/oralca2.txt',
-#  destfile = 'oralca2.txt'
-#)
 
 orca <-  read.table(file = 'https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/oralca2.txt', header = TRUE, sep = " ",row.names = 1 )
 library(survival)
 library(Epi)
+cB8  <- c("#000000", "#E69F00", "#56B4E9", "#009E73", 
+          "#F0E442", "#0072B2", "#D55E00", "#CC79A7") #colors chosen
 @
 
 {\scriptsize
 <<or1, echo=TRUE,eval=TRUE>>=
-orca$suob <- Surv(orca$time, 1*(orca$event > 0) )
-orca$suob[1:7]   #  + indicates censored observation
+suob <- Surv(orca$time, 1*(orca$event > 0) )
+suob[1:7]   #  + indicates censored observation
 @
 }
 
@@ -327,11 +325,11 @@ summary(km1)     #  detailed KM-estimate
 
 <<km,echo=FALSE,eval=TRUE,fig=TRUE,height=4>>=
 par(mfcol=c(1,1))
-plot(survfit(orca$suob~orca$sex), ylab="Proportion",xlab="Time since diagnosis (years)",lwd=c(2,1.5,1.5,2,1.5,1.5),lty=c(1,3,3,1,3,3),conf.int = T,col=c("red","blue"),main="Estimated survival (95% CI)")
+plot(survfit(suob~orca$sex), ylab="Proportion",xlab="Time since diagnosis (years)",lwd=c(2,1.5,1.5,2,1.5,1.5),lty=c(1,3,3,1,3,3),conf.int = T,col=c("#CC79A7","#56B4E9"),main="Estimated survival (95% CI)")
 text(3,0.9,"KM for S(t)")
 legend(x=10, y=1,
             c("Female","Male"),
-            col=c("red","blue"), lty=1:1,lwd=c(2,2))
+            col=c("#CC79A7","#56B4E9"), lty=1:1,lwd=c(2,2))
 @
 
 
@@ -688,16 +686,16 @@ lines(km2$time,1-km2$surv,main = "Cancer death",lty=c(2),type="s")
 
 stackedCIF(cif1,xlim=c(0,20),main="Stacked CIF",
            col = c("black"),
-           fill=c("blue","green","red"))
-text( 5, 0.10, "Oral ca death ", pos = 4)
-text( 4, 0.45, " Other death ", pos = 4)
-text( 1, 0.80, " Alive ", pos = 4)
+           fill=c("#56B4E9","#009E73","#CC79A7"))
+text( 10, 0.10, "Oral ca death ", pos = 4)
+text( 10, 0.5, " Other death ", pos = 4)
+text( 10, 0.90, " Alive ", pos = 4)
 
 index15<-which(floor(cif1$time)==15)[1]-1
  abline(v=15,lty=3)
 text(17.5,0.9,paste(round(cif1$pstate[index15,1],2.2)),cex=1.2)
 text(17.5,0.1,paste(round(cif1$pstate[index15,2],2.2)),cex=1.2)
-text(17.5,0.6,paste(round(cif1$pstate[index15,3],2.2)),cex=1.2)
+text(17.5,0.5,paste(round(cif1$pstate[index15,3],2.2)),cex=1.2)
 # 
 
 @
@@ -714,12 +712,12 @@ text(17.5,0.6,paste(round(cif1$pstate[index15,3],2.2)),cex=1.2)
 <<plotcif2, echo=FALSE,eval=TRUE,fig=TRUE,width=12,height=7>>=
 par(mfrow=c(1,2),lwd=2.5)
 cif1 <- survfit( Surv(orca$time, orca$event, type="mstate")~sex,data=orca)
-plotCIF(cif1, 1, main = "CIF for cancer death",lty=c(2,1),col=c("red","blue"),ylim=c(0,0.6))
+plotCIF(cif1, 1, main = "CIF for cancer death",lty=c(2,1),col=c("#CC79A7","#56B4E9"),ylim=c(0,0.6))
 legend(x=10, y=1,
             c("Female","Male"),
-            col=c("red","blue"), lty=2:1,lwd=c(2,2))
+            col=c("#CC79A7","#56B4E9"), lty=2:1,lwd=c(2,2))
 
-plotCIF(cif1, 2, main = "CIF for other death",lty=c(2,1),col=c("red","blue"),ylim=c(0,0.6))
+plotCIF(cif1, 2, main = "CIF for other death",lty=c(2,1),col=c("#CC79A7","#56B4E9"),ylim=c(0,0.6))
 @
 
 CIF for cancer higher in women (chance?) but for other causes
