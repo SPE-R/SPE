@@ -20,7 +20,7 @@ PDFINCLUDES = \
 	poisson-logistic/SPE-Poisson-Logistic-Regression.pdf \
 	linmodels/lm.pdf \
 	splines/splines.pdf \
-	causal/spe2023-CIlect-kf.pdf \
+	causal/spe2024-CIlect-kf.pdf \
 	graphics_advanced/Graphics.pdf \
 	Survival_competing_risk/Survival_competing_risk.pdf \
 	time-rep/time-rep.pdf \
