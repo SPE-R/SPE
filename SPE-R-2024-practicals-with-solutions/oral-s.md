@@ -501,7 +501,7 @@ put the two cumulative incidence curves in one graph but stacked upon one anothe
 the lower curve is for the cancer deaths and the upper curve is for total mortality,
 and the vertical difference between the two curves describes the
 cumulative mortality from other causes. You can also add some colours for the different zones: 
-<<<<<<< HEAD
+
 
 ``` r
 par(mfrow=c(1,1),xaxs="i", yaxs="i") # make plot start 0,0
