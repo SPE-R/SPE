@@ -110,21 +110,17 @@ Y1 <- 4.783
 
 
 ## ----eval=FALSE---------------------------------------------------------------
-## births2<-births
-## births2$lowbw<-factor(2-births2$lowbw,labels=c("Yes","No"))
-## births2$hyp<-factor(2-as.numeric(births2$hyp),labels=c("Hypertensive","Normal"))
-## twoby2(births2$hyp,births2$lowbw)
-## 
-## 
-
-
-## ----eval=FALSE---------------------------------------------------------------
-## m <- glm(lowbw ~ hyp, family = binomial(link = "identity"), data = births)
-## round(ci.lin(m),3)[,c(1,5:6)]
-
-
-## ----eval=FALSE---------------------------------------------------------------
 ## m <- glm(lowbw ~ hyp, family = binomial(link = log), data = births)
+## ci.exp(m)
+
+
+## ----eval=FALSE---------------------------------------------------------------
+## m <- glm(lowbw ~ sex + hyp, family = binomial(link = log), data = births)
+## ci.exp(m)
+
+
+## ----eval=FALSE---------------------------------------------------------------
+## m <- glm(lowbw ~ maged + sex + hyp, family = binomial(link = log), data = births)
 ## ci.exp(m)
 
 
