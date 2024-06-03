@@ -54,7 +54,7 @@ if (!("dagitty" %in% installed.packages())){
 library(dagitty)
 
 
-## ----dagitty2, echo = TRUE, message = FALSE, fig.show=FALSE, results=FALSE----
+## ----dagitty2, echo = TRUE, message = FALSE, fig.show=FALSE,results=FALSE, fig.keep='none'----
 g <- dagitty("dag {
     C <- S -> Y -> U -> D
     C -> Z <- Y
@@ -66,7 +66,7 @@ g <- dagitty("dag {
 plot(g)
 
 
-## ----dagitty3, echo=TRUE, warning=FALSE, message=FALSE------------------------
+## ----dagitty3, echo=TRUE, warning=FALSE, message=FALSE, fig.show=TRUE, fig.width=4, fig.height=3----
 coordinates(g) <- 
   list(
     x = 
@@ -115,6 +115,45 @@ paths(bg, "BEER", "WEIGHT")
 
 ## ----dagitty8, echo=FALSE-----------------------------------------------------
 adjustmentSets(bg, exposure = "BEER", outcome = "WEIGHT")
+
+
+## ----threedags, echo=TRUE, fig.width=8, fig.height=3, fig.show=TRUE-----------
+par(mfrow=c(1,3))
+g1 <- dagitty("dag {
+	U -> Z -> Y 
+	U -> X
+	W -> Y
+	Q -> W -> X
+	Q -> Y
+	}")
+g2 <- dagitty("dag {
+	U -> Z -> Y -> W 
+	U -> X -> W 
+	Q -> W
+	Q -> Y
+	}")
+g3 <- dagitty("dag {
+	U -> Z -> Y 
+	U -> X -> W  -> Y
+	Q -> W
+	Q -> Y
+	}")
+coord <- 
+  list( x = c(X=1, U = 1.3, W = 2, Z = 2.3, Q = 2.7, Y=3), 
+        y = c(U=1,   Z=1.3, X=2, Y=2,   W=2.7,  Q=3)
+  )
+coordinates(g1)<-coordinates(g2)<-coordinates(g3)<-coord
+plot(g1)
+title("(a)")
+plot(g2)
+title("(b)")
+plot(g3)
+title("(c)")
+
+
+## ----gendata, echo=TRUE, results=TRUE-----------------------------------------
+source("gendata.r")
+head(dat)
 
 
 ## ----mrdat1, echo=TRUE--------------------------------------------------------
