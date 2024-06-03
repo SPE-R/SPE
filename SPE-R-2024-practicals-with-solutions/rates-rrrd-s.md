@@ -1,8 +1,3 @@
----
-output:
-  pdf_document: default
-  html_document: default
----
 
 
 
@@ -165,8 +160,8 @@ $$ var(RD) = var(\widehat\lambda_1 ) + var( \widehat\lambda_0 ) =  D_1/Y_1^2 + D
 ## Binary regression
 
 Explore the factors associated with risk of low birth weight 
-in 500 singleton births in a London Hospital. Indicator (lowbw) for birth weight less than 2500 g. Data available from the Epi package. Factor of interest is
-maternal hypertension (hyp).
+in 500 singleton births in a London Hospital. Indicator (lowbw) for birth weight less than 2500 g. Data available from the Epi package. Factors of interest are
+maternal hypertension (hyp), mother's age at birth over 35 years and sex of the baby.
 
 Load the `Epi` package and the data set and look at its content
 
@@ -179,31 +174,21 @@ and categorical versions are created of two continuous variables by function `cu
 
 
 -  Cross tabulate (dplyr) counts of children by hypertension and low birth weight. 
-calculate (mutate) proportions of low birth weight children by hypertension.
-
-
--  Estimate *relative risk* of low birth weight for mothers with hypertension compared to those without using *twoby2()-function*.
-
-
--  Estimate *risk diffrence* of low birth weight for mothers with hypertension compared to those without using *binary regression*.
-
-
--  Estimate *relative risk* of low birth weight for mothers with hypertension compared to those without using *binary regression*.
-
-
-<!-- -  Adjust relative risk of low birth and hypertension with the sex of children -->
-<!-- ```{r eval=FALSE} -->
-<!-- m <- glm(lowbw ~ sex + hyp, family = binomial(link = log), data = births) -->
-<!-- ci.exp(m) -->
-<!-- ``` -->
+calculate (mutate) proportions of low birth weigth children by hypertension.
 
 
 
-<!-- -  Adjust relative risk of low birth and hypertension with the sex of children and mother beeing over 35 years. -->
-<!-- ```{r eval=FALSE} -->
-<!-- m <- glm(lowbw ~ maged + sex + hyp, family = binomial(link = log), data = births) -->
-<!-- ci.exp(m) -->
-<!-- ``` -->
+-  Estimate relative risk of low birth weight for mothers with hypertension compared to those without using binary regression.
+
+
+
+-  Adjust relative risk of low birth and hypertension with the sex of children
+
+
+
+
+-  Adjust relative risk of low birth and hypertension with the sex of children and mother beeing over 35 years.
+
 
 
 ## Optional/Homework: Hand calculations and calculations using matrix tools
