@@ -150,7 +150,7 @@ To define valid causal contrasts, we \puna{counterfactual} (what-if) thinking is
 \begin{block}{Counterfactual outcomes}
 \begin{itemize}
 \item Suppose $Y$ is the outcome of interest and  $X$ is a binary exposure (for simplicity), thus $X=1$ for exposed and $X=0$ for unexposed individuals.
-\item Define $Y^1=Y(X=1)$ and $Y^0=Y(X=0)$  as individual's \sini{potential (counterfactual)} outcomes if this individual's exposure level $X$ were \sini{set} to 1 or 0, respectively. 
+\item Define $Y^1=Y^{X=1}$ and $Y^0=Y^{X=0}$  as individual's \sini{potential (counterfactual)} outcomes if this individual's exposure level $X$ were \sini{set} to 1 or 0, respectively. 
 \item For a particular individual, either $Y^1$ or $Y^0$ can be observed at any moment. 
 \item Consistency: 
 $$\text{if} \quad X_i=x, \quad \text{then} \quad Y_i^x=Y_i^X=Y_i$$
@@ -233,7 +233,7 @@ This condition is, however, rarely satisfied.
 		\item \alert<1>{Randomized trials}: probably the easiest setting to imagine $Y^X$ for different $X$. \\[0.3cm]
 		\item \alert<2>{``Actionable'' exposures}: smoking level, vegetable consumption, \ldots -- potential interventions may alter exposure levels in future.\\[0.3cm]
 		\item \alert<3>{Non-actionable exposures}: e.g genotypes. It is difficult to ask \emph{``What if I had different genes?''}. Still useful concept to formalize genetic effects (heritability, attributable risk). \\[0.3cm]
-		\item \alert<4>{Combinations}: With X-- a behavioral intervention level, Z--smoking level and Y--a disease outcome, one could formalize the effect of intervention on outcome by using $Y^{X, Z(X)}$
+		\item \alert<4>{Combinations}: With X-- a behavioral intervention level, Z-- smoking level after intervention and Y--a disease outcome, one could formalize the effect of intervention on outcome by using $Y^{X, Z(X)}$
 	\end{itemize}
 \end{frame}
 
@@ -255,7 +255,7 @@ This condition is, however, rarely satisfied.
 \begin{frame}
 	\frametitle{Does adjustment for covariates help?}
 	Adjustment for confounders is helpful, if:
-	$$Y^x \not\indep X, \quad  \text{but } \quad Y^x \not\indep X | Z,$$ (\sini{conditional exchangeability}), implying 
+	$$Y^x \not\indep X, \quad  \text{but } \quad Y^x \indep X | Z,$$ (\sini{conditional exchangeability}), implying 
 	$$E(Y^x) \ne E(Y|X=x), \quad \text{but } \
 	E(Y^x|Z) = E(Y|X=x, Z=z),$$
 	for a set of covariates $Z$. \\
@@ -326,7 +326,7 @@ $X_1$ is a parent of $X_2$ and $X_3$; $X_4$ is a child of $X_2$ and $X_3$. $X_1$
 
 \begin{frame}
 	\frametitle{``Classical'' confounding}
-	Third factors  Z influence both, X and Y \\
+	There are  \sini{common causes} (confounders) $Z$ that have an effect on both, X and Y.  \\
 	\includegraphics[width=4cm]{conf1}\\
 	Also called as \alert{backdoor path} between $X$ and $Y$. \\
 	
@@ -344,18 +344,18 @@ $$X \not\indep Y \; \hspace{0.5cm}  X \indep Y|Z$$
 \mbox{ } \\
 	\includegraphics[width=4cm]{conf1}
 	\mbox{}\\[0.5cm]
-Assume:
-$$X= b_{0x} + b_{zx}Z + \varepsilon_x, \ \E(\varepsilon_x|Z)=0 $$  
-$$ Y= b_{0y} + b_{zy}Z + \varepsilon_y, \ \E(\varepsilon_y|Z, X)=0. $$
+Assuming linear associations:
+$$ X = b_{0x} + b_{zx}Z  + \varepsilon_x, \ \E(\varepsilon_x|Z)=0 $$  
+$$ Y = b_{0y} + b_{zy}Z + \varepsilon_y, \ \E(\varepsilon_y|Z, X)=0. $$
 \end{column}
 \begin{column}{7cm}
-Now: 
-$\E(Y|X) = b_{0y} + b_{zy}\E(Z|X). $ \\[0.2cm]
-If  $b_{zx} \ne 0$, then also  $r_{zx} \ne 0$ and so 
-$$ \E(Z|X) =  b_{0z}+ b_{xz}X, \mbox{ where }b_{xz} \ne 0$$. 
-We see that:
-$$\E(Y|X) = b_{0y}^* + b_{xz}b_{zy}X. $$
-
+If $b_{zx} \ne 0$, then the correlation $\rho(Z,X)\ne 0$, and also: 
+\sini{$$ \E(Z|X) =  b_{0z}+ b_{xz}X, \mbox{ where }b_{xz} \ne 0$$} 
+ %$\E(Y|X) = b_{0y} + b_{zy}\E(Z|X). $ \\[0.2cm]
+%If  $b_{zx} \ne 0$, then also  $r_{zx} \ne 0$ and so 
+We see that $Y$ is associated with $X$, as now:
+$$\E(Y|X) =b_{0y} + b_{zy}\sini{\E(Z|X)} = b_{0y}^* + b_{zy}\sini{b_{xz}X}, $$
+with $b_{xz}b_{zy} = b_{xy} \ne 0$.
 \begin{block}{}\alert{One should adjust the analysis for $Z$, by fitting a regression model for $Y$ with covariates
 	$X$  and $Z$.} 
 There is a causal effect between $X$ and $Y$, if the effect of $X$ is present in such model. \end{block}
@@ -375,12 +375,10 @@ There is a causal effect between $X$ and $Y$, if the effect of $X$ is present in
 	\pause
 	\begin{itemize}
 		\item 
-	\alert{Don't adjust for $Z$},  if you are interested in the \alert{total effect} of $X$ on $Y$  
-\item \alert{Do adjust for $Z$},  if you are interested in the \alert{direct effect} of $X$ on $Y$ 
-\item Adjusted analysis is valid only when the $Z$-$Y$ association is unconfounded! 
-\end{itemize}
-	
-
+		\alert{Don't adjust for $Z$},  if you are interested in the \alert{total effect} of $X$ on $Y$  
+		\item \alert{Do adjust for $Z$},  if you are interested in the \alert{direct effect} of $X$ on $Y$ 
+		\item Adjusted analysis is valid only when the $Z$-$Y$ association is unconfounded! 
+	\end{itemize}
 \end{frame}
 
 
@@ -480,9 +478,22 @@ R package \textit{dagitty} is useful for such tasks.
 
 \begin{frame}
 \frametitle{Example: mediation with confounding}
+\begin{columns}
+	\begin{column}{6cm}
+\mbox{ }\\[-1cm]
 \includegraphics[width=6cm]{mediation_conf}\\[-0.3cm]
 Paths:
-$X \rightarrow Z \rightarrow Y$ (open) and $X \rightarrow Z \leftarrow W \rightarrow Y$ (closed). \\[0.3cm]
+$X \rightarrow Z \rightarrow Y$ (open) and $X \rightarrow Z \leftarrow W \rightarrow Y$ (closed).
+	\end{column}
+	\begin{column}{6cm}
+		\begin{block}{Example}
+			$X$: a genetic factor (SNP or a polygenic score) \\
+			$Y$: Type 2 Diabetes \\
+			$W$: Body Mass index (BMI) 
+		\end{block}
+	\end{column}
+\end{columns}
+\mbox{ }\\[0.5cm]
 \begin{itemize}
 	\item The total effect of $X$ on $Y$ is estimable without any adjustment.
 	\item For direct effect you need to adjust for $Z$, but that would open the closed path -- to block that, you also need to adjust for $W$. 
