@@ -7910,6 +7910,8 @@ Sources of inspiration: \href{https://doi.org/10.1002/sim.7628}{Luque Fernandez,
 \href{https://doi.org/10.1002/sim.9234}{Smith et al.~(2022)} \emph{Stat Med}
 2022;41(2):407-432.
 
+\section{Introduction}\label{introduction-3}
+
 We shall illustrate with simulated data the estimation of causal effects
 of a binary exposure \(X\) when the outcome \(Y\) is also binary, and there
 is a set of four covariates \(Z = (Z_1, Z_2, Z_3, Z_4)\). As a background
@@ -7938,7 +7940,8 @@ Description
 \end{longtable}
 
 For simplicity, covariates \(Z_3\) and \(Z_4\) are treated as continuous
-variables in the models. The assumed causal diagram is shown below.
+variables in the models. The assumed causal diagram
+is drawn using \texttt{dagitty} and is shown below.
 
 \includegraphics{SPE-R-2024-practicals_files/figure-latex/dagitty-1.pdf}
 
@@ -7950,7 +7953,7 @@ where \(Z\) is the vector of relevant
 covariates.
 
 The same principle is applied in expressing the conditional
-probability of \(X=1\) given \(Z=z\):
+probability of \(X=1\), i.e.~being exposed, given \(Z=z\):
 \[ E(X|Z=z) = P(X=1|Z=z). \]
 The fitted or predicted probabilities
 of \(Y=1\) are denoted as fitted \(\widehat{Y}\) or predicted values
@@ -7968,8 +7971,9 @@ The true model assumed for the dependence of exposure \(X\) on covariates:
 assumed true model for the outcome is
 \[ E(Y|X=x, Z_1 = z_1, \dots, Z_4 = z_4) =
            \text{expit}(-1 + x - 0.1z_1 + 0.35z_2 + 0.25z_3 +
-                 0.20z_4 + 0.15z_2z_4) \] Note that \(X\) does not depend
-on \(Z_1\), and that in both models there is a product term \(Z_2 Z_4\),
+                 0.20z_4 + 0.15z_2z_4) \]
+Note that \(X\) does not depend on \(Z_1\), and that in both models
+there is a product term \(Z_2 Z_4\),
 the effect of which appears weaker for the outcome model.
 
 \section{Control of confounding}\label{control-of-confounding}
@@ -8092,9 +8096,9 @@ the effect of which appears weaker for the outcome model.
 \NormalTok{  OR }\OtherTok{\textless{}{-}}\NormalTok{ (mu1 }\SpecialCharTok{/}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ mu1)) }\SpecialCharTok{/}\NormalTok{ (mu0 }\SpecialCharTok{/}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ mu0))}
   \FunctionTok{return}\NormalTok{(}\FunctionTok{c}\NormalTok{(mu1, mu0, }\AttributeTok{RD =}\NormalTok{ RD, }\AttributeTok{RR =}\NormalTok{ RR, }\AttributeTok{OR =}\NormalTok{ OR))}
 \NormalTok{\}}
-\NormalTok{Ey1 }\OtherTok{\textless{}{-}} \FunctionTok{with}\NormalTok{(dd, }\FunctionTok{sum}\NormalTok{(y }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{\&}\NormalTok{ x }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(x }\SpecialCharTok{==} \DecValTok{1}\NormalTok{))}
-\NormalTok{Ey0 }\OtherTok{\textless{}{-}} \FunctionTok{with}\NormalTok{(dd, }\FunctionTok{sum}\NormalTok{(y }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{\&}\NormalTok{ x }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(x }\SpecialCharTok{==} \DecValTok{0}\NormalTok{))}
-\FunctionTok{round}\NormalTok{(}\FunctionTok{Contr}\NormalTok{(Ey1, Ey0), }\DecValTok{4}\NormalTok{)}
+\NormalTok{Ey1fact }\OtherTok{\textless{}{-}} \FunctionTok{with}\NormalTok{(dd, }\FunctionTok{sum}\NormalTok{(y }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{\&}\NormalTok{ x }\SpecialCharTok{==} \DecValTok{1}\NormalTok{) }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(x }\SpecialCharTok{==} \DecValTok{1}\NormalTok{))}
+\NormalTok{Ey0fact }\OtherTok{\textless{}{-}} \FunctionTok{with}\NormalTok{(dd, }\FunctionTok{sum}\NormalTok{(y }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{\&}\NormalTok{ x }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(x }\SpecialCharTok{==} \DecValTok{0}\NormalTok{))}
+\FunctionTok{round}\NormalTok{(}\FunctionTok{Contr}\NormalTok{(Ey1fact, Ey0fact), }\DecValTok{4}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8106,7 +8110,7 @@ radiotherapy only as compared with those receiving chemotherapy, too?
 \setcounter{enumi}{1}
 \tightlist
 \item
-  Compute now first the \textbf{counterfactual} or
+  Compute now the true \textbf{counterfactual} or
   \textbf{potential risks} of death
   \[ E(Y_i^{X_i=x}) = P(Y_i^{X_i=x}=1) = \pi_i^{X_i=x} \]
   for each
@@ -8141,7 +8145,7 @@ radiotherapy only as compared with those receiving chemotherapy, too?
 \setcounter{enumi}{2}
 \tightlist
 \item
-  Compare the associational contrasts computed in in
+  Compare the associational contrasts computed in
   item 4.1 with the
   causal contrasts in item 4.2. What do you conclude about
   confoundedness of the associational contrasts?
@@ -8219,13 +8223,14 @@ confidence intervals in such a big population.
 \setcounter{enumi}{2}
 \tightlist
 \item
-  Applying the method of standardization or
-  g-formula compute now the
+  Applying the method of \textbf{standardization} or
+  \textbf{g-formula} compute now the
   point estimates
   \[ \widehat{E}_g(Y^{X=x}) =
    \frac{1}{n} \sum_{i=1}^n \widetilde{Y}_i^{X_i=x}, \quad x=0,1. \]
   of the two counterfactual risks \(E(Y^{X=1}) = \pi^1\) and
-  \(E(Y^{X=0})=\pi^0\) as well as the marginal causal contrasts
+  \(E(Y^{X=0})=\pi^0\) as well as\\
+  those of the marginal causal contrasts
 \end{enumerate}
 
 \begin{Shaded}
@@ -8270,10 +8275,8 @@ the logistic model. Which one is closer to 1?
 \FunctionTok{summary}\NormalTok{(mY.std)}
 \FunctionTok{round}\NormalTok{(}\FunctionTok{summary}\NormalTok{(mY.std, }\AttributeTok{contrast =} \StringTok{"difference"}\NormalTok{, }\AttributeTok{reference =} \DecValTok{0}\NormalTok{)}\SpecialCharTok{$}\NormalTok{est.table, }\DecValTok{4}\NormalTok{)}
 \FunctionTok{round}\NormalTok{(}\FunctionTok{summary}\NormalTok{(mY.std, }\AttributeTok{contrast =} \StringTok{"ratio"}\NormalTok{, }\AttributeTok{reference =} \DecValTok{0}\NormalTok{)}\SpecialCharTok{$}\NormalTok{est.table, }\DecValTok{4}\NormalTok{)}
-\FunctionTok{round}\NormalTok{(}\FunctionTok{summary}\NormalTok{(mY.std,}
-  \AttributeTok{transform =} \StringTok{"odds"}\NormalTok{,}
-  \AttributeTok{contrast =} \StringTok{"ratio"}\NormalTok{, }\AttributeTok{reference =} \DecValTok{0}
-\NormalTok{)}\SpecialCharTok{$}\NormalTok{est.table, }\DecValTok{4}\NormalTok{)}
+\FunctionTok{round}\NormalTok{(}\FunctionTok{summary}\NormalTok{(mY.std, }\AttributeTok{transform =} \StringTok{"odds"}\NormalTok{, }
+              \AttributeTok{contrast =} \StringTok{"ratio"}\NormalTok{, }\AttributeTok{reference =} \DecValTok{0}\NormalTok{)}\SpecialCharTok{$}\NormalTok{est.table, }\DecValTok{4}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8399,23 +8402,26 @@ How different are the distributions? Are they sufficiently overlapping?
 \end{Highlighting}
 \end{Shaded}
 
-These estimates seem to be somewhat downward biased when comparing to
-true values. Could this be because of omitting the relatively strong
+These estimates seem to be somewhat downward biased when
+comparing to
+true values. Could this be because of omitting
+the relatively strong
 product term effect of \(Z_2\) and \(Z_4\)?
 
 \section{\texorpdfstring{Improving IPW estimation and using R package \texttt{PSweight}}{Improving IPW estimation and using R package PSweight}}\label{improving-ipw-estimation-and-using-r-package-psweight}
 
 We now try to improve IPW-estimation by a richer exposure
 model. In
-computations we shall utilize the R package \texttt{PSweight} (see \href{https://cran.r-project.org/web/packages/PSweight/vignettes/vignette.pdf}{PSweight
+computations we shall utilize the R package
+\texttt{PSweight} (see \href{https://cran.r-project.org/web/packages/PSweight/vignettes/vignette.pdf}{PSweight
 vignette}).
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  First, we compute the weights from a more
-  flexible exposure model
+  First, we compute the propensity scores
+  and weights from a more flexible exposure model,
   which contains all pairwise product terms
   of the parents of \(X\).
   According to the causal diagram, \(Z_1\) is
@@ -8423,18 +8429,19 @@ vignette}).
   is left out. The exposure model is
   specified and the weights are
   obtained as follows using function
-  \texttt{SumStat()}:
+  \texttt{SumStat()} in \texttt{PSweight}:
 \end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{mX2 }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(x }\SpecialCharTok{\textasciitilde{}}\NormalTok{ (z2 }\SpecialCharTok{+}\NormalTok{ z3 }\SpecialCharTok{+}\NormalTok{ z4)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{, }\AttributeTok{family =}\NormalTok{ binomial, }\AttributeTok{data =}\NormalTok{ dd)}
 \FunctionTok{round}\NormalTok{(}\FunctionTok{ci.lin}\NormalTok{(mX2, }\AttributeTok{Exp =} \ConstantTok{TRUE}\NormalTok{)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{)], }\DecValTok{3}\NormalTok{)}
-\NormalTok{psw }\OtherTok{\textless{}{-}} \FunctionTok{SumStat}\NormalTok{(}
+\NormalTok{psw2 }\OtherTok{\textless{}{-}} \FunctionTok{SumStat}\NormalTok{(}
   \AttributeTok{ps.formula =}\NormalTok{ mX2}\SpecialCharTok{$}\NormalTok{formula, }\AttributeTok{data =}\NormalTok{ dd,}
   \AttributeTok{weight =} \FunctionTok{c}\NormalTok{(}\StringTok{"IPW"}\NormalTok{, }\StringTok{"treated"}\NormalTok{, }\StringTok{"overlap"}\NormalTok{)}
 \NormalTok{)}
-\NormalTok{dd}\SpecialCharTok{$}\NormalTok{PS2 }\OtherTok{\textless{}{-}}\NormalTok{ psw}\SpecialCharTok{$}\NormalTok{propensity[, }\DecValTok{2}\NormalTok{] }\CommentTok{\# propensity scores extracted}
+\NormalTok{dd}\SpecialCharTok{$}\NormalTok{PS2 }\OtherTok{\textless{}{-}}\NormalTok{ psw2}\SpecialCharTok{$}\NormalTok{propensity[, }\DecValTok{2}\NormalTok{] }
+\NormalTok{dd}\SpecialCharTok{$}\NormalTok{w2 }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(dd}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{==} \DecValTok{1}\NormalTok{, }\DecValTok{1} \SpecialCharTok{/}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{PS2, }\DecValTok{1} \SpecialCharTok{/}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{PS2)) }
 \FunctionTok{plot}\NormalTok{(}\FunctionTok{density}\NormalTok{(dd}\SpecialCharTok{$}\NormalTok{PS2[dd}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{==} \DecValTok{0}\NormalTok{]), }\AttributeTok{lty =} \DecValTok{2}\NormalTok{)}
 \FunctionTok{lines}\NormalTok{(}\FunctionTok{density}\NormalTok{(dd}\SpecialCharTok{$}\NormalTok{PS2[dd}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{==} \DecValTok{1}\NormalTok{]), }\AttributeTok{lty =} \DecValTok{1}\NormalTok{)}
 \end{Highlighting}
@@ -8460,7 +8467,7 @@ contrasts, like ``average treatment effect among the treated''
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{plot}\NormalTok{(psw, }\AttributeTok{type =} \StringTok{"balance"}\NormalTok{, }\AttributeTok{metric =} \StringTok{"PSD"}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(psw2, }\AttributeTok{type =} \StringTok{"balance"}\NormalTok{, }\AttributeTok{metric =} \StringTok{"PSD"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8479,12 +8486,12 @@ these measures for given weights are less than 0.1.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{ipwest }\OtherTok{\textless{}{-}} \FunctionTok{PSweight}\NormalTok{(}\AttributeTok{ps.formula =}\NormalTok{ mX2, }\AttributeTok{yname =} \StringTok{"y"}\NormalTok{, }\AttributeTok{data =}\NormalTok{ dd, }\AttributeTok{weight =} \StringTok{"IPW"}\NormalTok{)}
-\NormalTok{ipwest}
-\FunctionTok{summary}\NormalTok{(ipwest)}
-\NormalTok{(logRR.ipw }\OtherTok{\textless{}{-}} \FunctionTok{summary}\NormalTok{(ipwest, }\AttributeTok{type =} \StringTok{"RR"}\NormalTok{))}
-\FunctionTok{round}\NormalTok{(}\FunctionTok{exp}\NormalTok{(logRR.ipw}\SpecialCharTok{$}\NormalTok{estimates[}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{5}\NormalTok{)]), }\DecValTok{3}\NormalTok{)}
-\FunctionTok{round}\NormalTok{(}\FunctionTok{exp}\NormalTok{(}\FunctionTok{summary}\NormalTok{(ipwest, }\AttributeTok{type =} \StringTok{"OR"}\NormalTok{)}\SpecialCharTok{$}\NormalTok{estimates[}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{5}\NormalTok{)]), }\DecValTok{3}\NormalTok{)}
+\NormalTok{ipw2est }\OtherTok{\textless{}{-}} \FunctionTok{PSweight}\NormalTok{(}\AttributeTok{ps.formula =}\NormalTok{ mX2, }\AttributeTok{yname =} \StringTok{"y"}\NormalTok{, }\AttributeTok{data =}\NormalTok{ dd, }\AttributeTok{weight =} \StringTok{"IPW"}\NormalTok{)}
+\NormalTok{ipw2est}
+\FunctionTok{summary}\NormalTok{(ipw2est)}
+\NormalTok{(logRR.ipw2 }\OtherTok{\textless{}{-}} \FunctionTok{summary}\NormalTok{(ipw2est, }\AttributeTok{type =} \StringTok{"RR"}\NormalTok{))}
+\FunctionTok{round}\NormalTok{(}\FunctionTok{exp}\NormalTok{(logRR.ipw2}\SpecialCharTok{$}\NormalTok{estimates[}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{5}\NormalTok{)]), }\DecValTok{3}\NormalTok{)}
+\FunctionTok{round}\NormalTok{(}\FunctionTok{exp}\NormalTok{(}\FunctionTok{summary}\NormalTok{(ipw2est, }\AttributeTok{type =} \StringTok{"OR"}\NormalTok{)}\SpecialCharTok{$}\NormalTok{estimates[}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{5}\NormalTok{)]), }\DecValTok{3}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8583,33 +8590,42 @@ Compare the results here with those obtained by
 g-formula in item 8.1
 and with the true contrasts above.
 
-\section{Augmented IPW}\label{augmented-ipw}
+\section{Double robust estimation by augmented IPW}\label{double-robust-estimation-by-augmented-ipw}
 
 Let us attempt to correct the estimates by a \textbf{double
 robust} (DR) approach
 called \textbf{augmented IPW estimation} (AIPW), which
 combines the g-formula and
-the IPW approach. The AIPW-estimator can be expressed in two ways:
+the IPW approach. The classical
+AIPW-estimator can be expressed in two ways:
 either an IPW-corrected g-formula estimator, or a g-corrected
 IPW-estimator.
 
 \[
 \begin{aligned}
- \widehat{E}_a(Y^{X=x}) & = \widehat{E}_g(Y^{X=x}) +
-   \frac{1}{n} \sum_{i=1}^n \frac{ {\mathbf 1}_{\{X_i=x\}} W_i ( Y_i - \widetilde{Y}_i^{X_i=x} ) }
-   {\sum_{i=1}^n {\mathbf 1}_{\{X_i=x\}} W_i} \\
-       & =   \widehat{E}_w(Y^{X=x}) -
-    \frac{1}{n} \sum_{i=1}^n \left[ \frac{ {\mathbf 1}_{\{X_i=x\}} W_i }
-            {\sum_{i=1}^n {\mathbf 1}_{\{X_i=x\}} W_i } - 1 \right] \widetilde{Y}_i^{X_i=x}.
+ \widehat{E}_a(Y^{X=x}) 
+       & = \widehat{E}_g(Y^{X=x}) +
+\frac{1}{n} \sum_{i=1}^n  {\mathbf 1}_{\{X_i=x\}} W_i 
+                   ( Y_i - \widetilde{Y}_i^{X_i=x} )   \\
+       & = \widehat{E}_w(Y^{X=x}) +
+\frac{1}{n} \sum_{i=1}^n ( 1 - {\mathbf 1}_{\{X_i=x\}} W_i ) 
+                      \widetilde{Y}_i^{X_i=x}.
 \end{aligned}
 \]
 
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  We shall first combine the results from the slightly
+  misspecified outcome model with those from the more
+  misspecified exposure model.
+\end{enumerate}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{EY1pot.a }\OtherTok{\textless{}{-}}\NormalTok{ EY1pot.g }\SpecialCharTok{+} \FunctionTok{mean}\NormalTok{(dd}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{*}\NormalTok{ (dd}\SpecialCharTok{$}\NormalTok{y }\SpecialCharTok{{-}}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{yp1) }\SpecialCharTok{*}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{w }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(dd}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{*}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{w))}
-\DocumentationTok{\#\#  or   EY1.w {-} mean( ( ( dd$x*dd$w /sum(dd$x*dd$w) ) {-} 1 )*dd$yp1 )}
-\NormalTok{EY0pot.a }\OtherTok{\textless{}{-}}\NormalTok{ EY0pot.g }\SpecialCharTok{+} \FunctionTok{mean}\NormalTok{((}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{x) }\SpecialCharTok{*}\NormalTok{ (dd}\SpecialCharTok{$}\NormalTok{y }\SpecialCharTok{{-}}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{yp0) }\SpecialCharTok{*}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{w }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{((}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{x) }\SpecialCharTok{*}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{w))}
-\DocumentationTok{\#\#  or   EY0.w {-} mean( ( ( (1{-}dd$x)*dd$w/sum((1{-}dd$x)*dd$w) ) {-} 1 )*dd$yp0 )}
+\NormalTok{EY1pot.a }\OtherTok{\textless{}{-}}\NormalTok{ EY1pot.g }\SpecialCharTok{+} \FunctionTok{mean}\NormalTok{( }\DecValTok{1}\SpecialCharTok{*}\NormalTok{(dd}\SpecialCharTok{$}\NormalTok{x}\SpecialCharTok{==}\DecValTok{1}\NormalTok{) }\SpecialCharTok{*}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{w }\SpecialCharTok{*}\NormalTok{ (dd}\SpecialCharTok{$}\NormalTok{y }\SpecialCharTok{{-}}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{yp1) )}
+\NormalTok{EY0pot.a }\OtherTok{\textless{}{-}}\NormalTok{ EY0pot.g }\SpecialCharTok{+} \FunctionTok{mean}\NormalTok{( }\DecValTok{1}\SpecialCharTok{*}\NormalTok{(dd}\SpecialCharTok{$}\NormalTok{x}\SpecialCharTok{==}\DecValTok{0}\NormalTok{) }\SpecialCharTok{*}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{w }\SpecialCharTok{*}\NormalTok{ (dd}\SpecialCharTok{$}\NormalTok{y }\SpecialCharTok{{-}}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{yp0) )}
 \FunctionTok{round}\NormalTok{(}\FunctionTok{Contr}\NormalTok{(EY1pot.a, EY0pot.a), }\DecValTok{4}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -8617,21 +8633,52 @@ IPW-estimator.
 Compare these results with those obtained by g-formula and by
 non-augmented IPW method. Was augmentation successful?
 
-\section{Targeted maximum likelihood estimation (TMLE)}\label{targeted-maximum-likelihood-estimation-tmle}
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Let us then look, how close we get when combining the results
+  from the slightly misspecified outcome model with the correct
+  exposure model using the alternative AIPW-formula
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{EY1pot.w2 }\OtherTok{\textless{}{-}}\NormalTok{ ipw2est}\SpecialCharTok{$}\NormalTok{muhat[}\DecValTok{2}\NormalTok{]}
+\NormalTok{EY0pot.w2 }\OtherTok{\textless{}{-}}\NormalTok{ ipw2est}\SpecialCharTok{$}\NormalTok{muhat[}\DecValTok{1}\NormalTok{]}
+\NormalTok{EY1pot.a2 }\OtherTok{\textless{}{-}}\NormalTok{ EY1pot.w2 }\SpecialCharTok{+} \FunctionTok{mean}\NormalTok{( (}\DecValTok{1} \SpecialCharTok{{-}} \DecValTok{1}\SpecialCharTok{*}\NormalTok{(dd}\SpecialCharTok{$}\NormalTok{x}\SpecialCharTok{==}\DecValTok{1}\NormalTok{) }\SpecialCharTok{*}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{w2) }\SpecialCharTok{*}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{yp1 )}
+\NormalTok{EY0pot.a2 }\OtherTok{\textless{}{-}}\NormalTok{ EY0pot.w2 }\SpecialCharTok{+} \FunctionTok{mean}\NormalTok{( (}\DecValTok{1} \SpecialCharTok{{-}} \DecValTok{1}\SpecialCharTok{*}\NormalTok{(dd}\SpecialCharTok{$}\NormalTok{x}\SpecialCharTok{==}\DecValTok{0}\NormalTok{) }\SpecialCharTok{*}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{w2) }\SpecialCharTok{*}\NormalTok{ dd}\SpecialCharTok{$}\NormalTok{yp0 )}
+\FunctionTok{round}\NormalTok{(}\FunctionTok{Contr}\NormalTok{(EY1pot.a2, EY0pot.a2), }\DecValTok{4}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Compare the results with previous ones.
+How successful was augmentation now?
+
+AIPW-estimates and confidence
+intervals for the causal contrasts of interest can
+be obtained, for instance, using \texttt{PSweight} by adding
+the model formula of the outcome model
+as the value for the argument \texttt{out.formula}.
+
+\section{Double robust, targeted maximum likelihood estimation (TMLE)}\label{double-robust-targeted-maximum-likelihood-estimation-tmle}
 
 We now consider now another double robust approach,
 known as \textbf{targeted
 maximum likelihood estimation} (TMLE).
 It also corrects the estimator
-obtained from the outcome model by elements that are derived from the exposure model. See \href{https://doi.org/10.1093/aje/kww165}{Schuler and Rose
-(2017)} for more details
+obtained from the outcome model by elements that are derived from the exposure model. The corrections are, though, not as
+intuitive as those in AIPW. See \href{https://doi.org/10.1093/aje/kww165}{Schuler and Rose
+(2017)} for more details.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
   The first step is to utilize the propensity scores
-  obtained above and define the ``clever covariates''
+  obtained above for the correct exposure model
+  and define the ``clever covariates''
 \end{enumerate}
 
 \begin{Shaded}
@@ -8653,9 +8700,8 @@ obtained from the outcome model by elements that are derived from the exposure m
   the previously fitted linear predictor
   \(\widehat{\eta}_i = \text{logit}(\widehat Y_i)\)
   from the original
-  outcome model \texttt{mY} as an offset term.
-  Moreover, the intercept is
-  removed.
+  outcome model \texttt{mY} as an offset term; see item 5.2.
+  Moreover, the intercept is removed.
 \end{enumerate}
 
 \begin{Shaded}
@@ -8688,12 +8734,13 @@ obtained from the outcome model by elements that are derived from the exposure m
 \end{Highlighting}
 \end{Shaded}
 
-\begin{itemize}
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
 \tightlist
 \item
-\end{itemize}
-
-Estimates of the causal contrasts:
+  Estimates of the causal contrasts:
+\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8705,96 +8752,44 @@ Estimates of the causal contrasts:
 
 Compare these with previous results and with the true values.
 
-\section{TMLE with SuperLearner}\label{tmle-with-superlearner}
+\section{\texorpdfstring{Double robust estimation with \texttt{AIPW} and \texttt{tmle} packages}{Double robust estimation with AIPW and tmle packages}}\label{double-robust-estimation-with-aipw-and-tmle-packages}
 
-Let us finally apply some fashionable tools
-of \emph{statistical learning}, aka
-``machine learning'', using the
-package \texttt{SuperLearner} to fit flexible
-models for both exposure and outcome.
-As this method is computationally
-much more demanding, we illustrate its use by a
-sample of 2000 subjects only.
+It may be difficult to specify
+conventional generalized linear models
+or even generalized additive
+models for exposure and outcome which are
+sufficiently realistic, yet which do not suffer from overfitting.
+Modern approaches of \textbf{statistical learning}, aka
+``machine learning'' provide tools for flexible modelling,
+which may be used to reduce the risk of misspecification,
+if thoughtfully applied.
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  A simple random sample of \(n=2000\) is drawn from the population.
-\end{enumerate}
+There are a few R packages in which some general
+algorithmic approaches for supervised learning
+are implemented for estimating causal parameters.
+For instance, package \texttt{AIPW}
+(see \href{https://doi.org/10.1093/aje/kwab207}{Zhong et al., 2021})
+utilizes
+several learning algorithms for exposure and outcome modelling
+and then performs AIPW estimation of the
+parameters of interest coupled with
+calculation of confidence intervals. Package \texttt{tmle}
+(see \href{https://ehsanx.github.io/TMLEworkshop/}{Karim and Frank, 2021})
+performs same tasks but uses the TMLE approach
+in estimation.
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(SuperLearner)}
-\FunctionTok{library}\NormalTok{(tmle)}
-\FunctionTok{set.seed}\NormalTok{(}\DecValTok{7622}\NormalTok{)}
-\NormalTok{n }\OtherTok{\textless{}{-}} \DecValTok{2000}
-\NormalTok{sampind }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(N, n)}
-\NormalTok{samp }\OtherTok{\textless{}{-}}\NormalTok{ dd[sampind, ]}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{1}
-\tightlist
-\item
-  The algorithms to be used in this exercise are chosen
-\end{enumerate}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{SL.library }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}
-  \StringTok{"SL.glm"}\NormalTok{, }\StringTok{"SL.step"}\NormalTok{, }\StringTok{"SL.step.interaction"}\NormalTok{,}
-  \StringTok{"SL.glm.interaction"}\NormalTok{, }\StringTok{"SL.gam"}\NormalTok{,}
-  \StringTok{"SL.randomForest"}\NormalTok{, }\StringTok{"SL.rpart"}
-\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{2}
-\tightlist
-\item
-  Function \texttt{tmle()} computes estimates of the causal
-  contrasts of interest. Argument \texttt{A} is for the exposure
-  variable, and argument \texttt{W} contains the confounders. --
-  The run can take a while \ldots{}
-\end{enumerate}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{tmlest }\OtherTok{\textless{}{-}} \FunctionTok{tmle}\NormalTok{(}
-  \AttributeTok{Y =}\NormalTok{ samp}\SpecialCharTok{$}\NormalTok{y, }\AttributeTok{A =}\NormalTok{ samp}\SpecialCharTok{$}\NormalTok{x, }\AttributeTok{W =}\NormalTok{ samp[, }\FunctionTok{c}\NormalTok{(}\StringTok{"z1"}\NormalTok{, }\StringTok{"z2"}\NormalTok{, }\StringTok{"z3"}\NormalTok{, }\StringTok{"z4"}\NormalTok{)],}
-  \AttributeTok{family =} \StringTok{"binomial"}\NormalTok{, }\AttributeTok{Q.SL.library =}\NormalTok{ SL.library,}
-  \AttributeTok{g.SL.library =}\NormalTok{ SL.library}
-\NormalTok{)}
-\FunctionTok{summary}\NormalTok{(tmlest)}
-\end{Highlighting}
-\end{Shaded}
-
-Let us take a closer look at the results.
-In the beginning are reported
-the fractions by which the separate algorithms contribute to the
-combined algorithm. After that are given estimates of the causal
-contrasts together with their estimated variances and 95\%
-confidence intervals. The variance of each contrast
-(on log-scale for RR and OR) is
-estimated as the variance of the empirical influence curve
-divided by \(n\), the number of i.i.d. units of observation.
-Furthermore, causal risk
-differences are estimated also for those factually exposed and
-unexposed, respectively.
-
-Note that because this analysis was based on sample data, the estimates
-are most probably deviating from the true values because of pure random
-error. Therefore it is not possible to assess the magnitude of a
-possible bias from a single sample.
-
-\textbf{Homework.} When you have more time, try to run \texttt{tmle} on as large
-sample as is possible and compare its results with previous ones
-computed for the whole target population.
+Both \texttt{AIPW} and \texttt{tmle} lean on the
+\texttt{SuperLearner} package, which uses multiple learning
+algorithms (e.g.~GLM, GAM, Random Forest, Recursive Partitioning,
+Gradient Boosting, etc.) for constructing
+predictions of the counterfactual quantities, and
+then creates an optimal weighted average of those models,
+aka an ``ensemble''. These algorithms are computationally
+highly intensive. Fitting models with only 3 or 4
+covariates as in this practical
+on our target cohort of 500,000 subjects
+would take hours on an ordinary laptop. With a study population
+of 5000 it takes several minutes.
 
 \chapter{Time-dependent variables and multiple states}\label{time-dependent-variables-and-multiple-states}
 
@@ -9693,29 +9688,31 @@ occurrence rate of remission itself.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{ lex.id  per  age  tfi lex.dur lex.Cst   lex.Xst id sex  dob  doe cens}
-\NormalTok{      1 2000 50.0 0.00    6.37     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{      2 2000 50.0 0.00    2.77     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{      3 2000 50.0 0.00    4.56     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{      4 2000 50.0 0.00    8.35     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{      5 2000 50.0 0.00    4.21     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{      6 2000 50.0 0.00    5.46     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{      7 2000 50.0 0.00    1.99     NRA       Rem NA   M 1950 2000 2020}
-\NormalTok{      7 2002 52.0 1.99   18.01     Rem       Rem NA   M 1950 2000 2020}
-\NormalTok{      8 2000 50.0 0.00    3.97     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{      9 2000 50.0 0.00    4.75     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{     10 2000 50.0 0.00    5.68     NRA      ESRD NA   M 1950 2000 2020}
-\NormalTok{     11 2000 50.0 0.00    3.71     NRA      ESRD NA   F 1950 2000 2020}
-\NormalTok{     12 2000 50.0 0.00    4.76     NRA       Rem NA   F 1950 2000 2020}
-\NormalTok{     12 2005 54.8 4.76    9.92     Rem ESRD(Rem) NA   F 1950 2000 2020}
-\NormalTok{     13 2000 50.0 0.00    5.67     NRA      ESRD NA   F 1950 2000 2020}
-\NormalTok{     14 2000 50.0 0.00    5.86     NRA      ESRD NA   F 1950 2000 2020}
-\NormalTok{     15 2000 50.0 0.00   10.21     NRA      ESRD NA   F 1950 2000 2020}
-\NormalTok{     16 2000 50.0 0.00    0.49     NRA       Rem NA   F 1950 2000 2020}
-\NormalTok{     16 2000 50.5 0.49    1.83     Rem ESRD(Rem) NA   F 1950 2000 2020}
-\NormalTok{     17 2000 50.0 0.00    6.45     NRA      ESRD NA   F 1950 2000 2020}
-\NormalTok{     18 2000 50.0 0.00    0.82     NRA      ESRD NA   F 1950 2000 2020}
-\NormalTok{     19 2000 50.0 0.00    1.27     NRA      ESRD NA   F 1950 2000 2020}
-\NormalTok{     20 2000 50.0 0.00   12.64     NRA      ESRD NA   F 1950 2000 2020}
+\NormalTok{      1 2000 50.0 0.00    2.97     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{      2 2000 50.0 0.00    0.44     NRA       Rem NA   M 1950 2000 2020}
+\NormalTok{      2 2000 50.4 0.44   12.00     Rem ESRD(Rem) NA   M 1950 2000 2020}
+\NormalTok{      3 2000 50.0 0.00   10.63     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{      4 2000 50.0 0.00   10.60     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{      5 2000 50.0 0.00   14.29     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{      6 2000 50.0 0.00    3.00     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{      7 2000 50.0 0.00   20.00     NRA       NRA NA   M 1950 2000 2020}
+\NormalTok{      8 2000 50.0 0.00   11.21     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{      9 2000 50.0 0.00   15.42     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{     10 2000 50.0 0.00    9.74     NRA      ESRD NA   M 1950 2000 2020}
+\NormalTok{     11 2000 50.0 0.00   12.24     NRA      ESRD NA   F 1950 2000 2020}
+\NormalTok{     12 2000 50.0 0.00    8.18     NRA      ESRD NA   F 1950 2000 2020}
+\NormalTok{     13 2000 50.0 0.00    4.78     NRA      ESRD NA   F 1950 2000 2020}
+\NormalTok{     14 2000 50.0 0.00    1.23     NRA       Rem NA   F 1950 2000 2020}
+\NormalTok{     14 2001 51.2 1.23    6.32     Rem ESRD(Rem) NA   F 1950 2000 2020}
+\NormalTok{     15 2000 50.0 0.00   14.64     NRA      ESRD NA   F 1950 2000 2020}
+\NormalTok{     16 2000 50.0 0.00    2.51     NRA       Rem NA   F 1950 2000 2020}
+\NormalTok{     16 2003 52.5 2.51    4.66     Rem ESRD(Rem) NA   F 1950 2000 2020}
+\NormalTok{     17 2000 50.0 0.00    0.38     NRA       Rem NA   F 1950 2000 2020}
+\NormalTok{     17 2000 50.4 0.38   10.51     Rem ESRD(Rem) NA   F 1950 2000 2020}
+\NormalTok{     18 2000 50.0 0.00    6.73     NRA      ESRD NA   F 1950 2000 2020}
+\NormalTok{     19 2000 50.0 0.00    0.09     NRA       Rem NA   F 1950 2000 2020}
+\NormalTok{     19 2000 50.1 0.09    6.74     Rem ESRD(Rem) NA   F 1950 2000 2020}
+\NormalTok{     20 2000 50.0 0.00    4.24     NRA      ESRD NA   F 1950 2000 2020}
 \end{Highlighting}
 \end{Shaded}
 
@@ -9732,18 +9729,18 @@ occurrence rate of remission itself.
 \NormalTok{Transitions:}
 \NormalTok{     To}
 \NormalTok{From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{  NRA   0   1    9         0        10       10       48.1        10}
-\NormalTok{  Rem   0   1    0         0         1        0       18.0         1}
-\NormalTok{  Sum   0   2    9         0        11       10       66.1        10}
+\NormalTok{  NRA   1   1    8         0        10        9       98.3        10}
+\NormalTok{  Rem   0   0    0         1         1        1       12.0         1}
+\NormalTok{  Sum   1   1    8         1        11       10      110.3        10}
 
 \NormalTok{$F}
 
 \NormalTok{Transitions:}
 \NormalTok{     To}
 \NormalTok{From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{  NRA   0   2    8         0        10       10       51.9        10}
-\NormalTok{  Rem   0   0    0         2         2        2       11.8         2}
-\NormalTok{  Sum   0   2    8         2        12       12       63.6        10}
+\NormalTok{  NRA   0   4    6         0        10       10       55.0        10}
+\NormalTok{  Rem   0   0    0         4         4        4       28.2         4}
+\NormalTok{  Sum   0   4    6         4        14       14       83.2        10}
 \end{Highlighting}
 \end{Shaded}
 
@@ -9762,7 +9759,7 @@ occurrence rate of remission itself.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{   user  system elapsed }
-\NormalTok{   2.70    3.19    2.09 }
+\NormalTok{   2.49    3.12    1.96 }
 \end{Highlighting}
 \end{Shaded}
 
@@ -9779,18 +9776,18 @@ occurrence rate of remission itself.
 \NormalTok{Transitions:}
 \NormalTok{     To}
 \NormalTok{From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{  NRA  46  78  376         0       500      454       2708       500}
-\NormalTok{  Rem   0  51    0        27        78       27        569        78}
-\NormalTok{  Sum  46 129  376        27       578      481       3277       500}
+\NormalTok{  NRA  30  72  398         0       500      470       2721       500}
+\NormalTok{  Rem   0  35    0        37        72       37        415        72}
+\NormalTok{  Sum  30 107  398        37       572      507       3136       500}
 
 \NormalTok{$F}
 
 \NormalTok{Transitions:}
 \NormalTok{     To}
 \NormalTok{From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{  NRA  27 168  305         0       500      473       2482       500}
-\NormalTok{  Rem   0  96    0        72       168       72       1093       168}
-\NormalTok{  Sum  27 264  305        72       668      545       3574       500}
+\NormalTok{  NRA  32 143  325         0       500      468       2358       500}
+\NormalTok{  Rem   0  89    0        54       143       54       1023       143}
+\NormalTok{  Sum  32 232  325        54       643      522       3380       500}
 \end{Highlighting}
 \end{Shaded}
 
@@ -9817,20 +9814,20 @@ occurrence rate of remission itself.
 \NormalTok{      State}
 \NormalTok{when   NRA Rem ESRD ESRD(Rem)}
 \NormalTok{  50   500   0    0         0}
-\NormalTok{  50.1 497   1    2         0}
-\NormalTok{  50.2 492   5    3         0}
-\NormalTok{  50.3 489   8    3         0}
-\NormalTok{  50.4 478  19    3         0}
-\NormalTok{  50.5 471  24    5         0}
-\NormalTok{  50.6 467  26    7         0}
-\NormalTok{  50.7 465  27    8         0}
-\NormalTok{  50.8 461  29   10         0}
-\NormalTok{  50.9 453  32   15         0}
-\NormalTok{  51   447  35   18         0}
-\NormalTok{  51.1 441  36   23         0}
-\NormalTok{  51.2 433  41   26         0}
-\NormalTok{  51.3 427  44   29         0}
-\NormalTok{  51.4 425  44   31         0}
+\NormalTok{  50.1 493   3    4         0}
+\NormalTok{  50.2 488   6    6         0}
+\NormalTok{  50.3 483   8    9         0}
+\NormalTok{  50.4 471  15   14         0}
+\NormalTok{  50.5 466  16   18         0}
+\NormalTok{  50.6 458  20   22         0}
+\NormalTok{  50.7 452  22   26         0}
+\NormalTok{  50.8 448  25   27         0}
+\NormalTok{  50.9 443  29   28         0}
+\NormalTok{  51   439  32   29         0}
+\NormalTok{  51.1 429  35   36         0}
+\NormalTok{  51.2 420  37   43         0}
+\NormalTok{  51.3 417  39   43         1}
+\NormalTok{  51.4 413  41   45         1}
 \end{Highlighting}
 \end{Shaded}
 
@@ -9853,11 +9850,11 @@ occurrence rate of remission itself.
 \NormalTok{      State}
 \NormalTok{when     Rem   NRA ESRD ESRD(Rem)}
 \NormalTok{  50   0.000 1.000    1         1}
-\NormalTok{  50.1 0.002 0.996    1         1}
-\NormalTok{  50.2 0.010 0.994    1         1}
-\NormalTok{  50.3 0.016 0.994    1         1}
-\NormalTok{  50.4 0.038 0.994    1         1}
-\NormalTok{  50.5 0.048 0.990    1         1}
+\NormalTok{  50.1 0.006 0.992    1         1}
+\NormalTok{  50.2 0.012 0.988    1         1}
+\NormalTok{  50.3 0.016 0.982    1         1}
+\NormalTok{  50.4 0.030 0.972    1         1}
+\NormalTok{  50.5 0.032 0.964    1         1}
 \end{Highlighting}
 \end{Shaded}
 
@@ -9871,12 +9868,12 @@ occurrence rate of remission itself.
 \begin{Highlighting}[]
 \NormalTok{      State}
 \NormalTok{when     Rem   NRA  ESRD ESRD(Rem)}
-\NormalTok{  59.5 0.226 0.352 0.898         1}
-\NormalTok{  59.6 0.222 0.348 0.894         1}
-\NormalTok{  59.7 0.224 0.346 0.894         1}
-\NormalTok{  59.8 0.222 0.338 0.892         1}
-\NormalTok{  59.9 0.220 0.334 0.890         1}
-\NormalTok{  60   0.222 0.330 0.890         1}
+\NormalTok{  59.5 0.200 0.312 0.926         1}
+\NormalTok{  59.6 0.198 0.308 0.924         1}
+\NormalTok{  59.7 0.198 0.306 0.924         1}
+\NormalTok{  59.8 0.194 0.302 0.920         1}
+\NormalTok{  59.9 0.196 0.300 0.918         1}
+\NormalTok{  60   0.196 0.298 0.918         1}
 \end{Highlighting}
 \end{Shaded}
 
