@@ -44,6 +44,7 @@ During the practical session, the following list of `R`the packages will be requ
 - renv
 - rmarkdown
 - sem
+- splines
 - stdReg
 - SuperLearner
 - survival
@@ -53,7 +54,7 @@ During the practical session, the following list of `R`the packages will be requ
 
 which can be installed with the following command:
 
-install.packages(c('bookdown', 'cowplot', 'cranly', 'dagitty', 'Epi', 'foreign', 'ggplot2', 'grid', 'knitr', 'mgcv', 'popEpi', 'PSweight', 'purrr', 'renv', 'rmarkdown', 'sem', 'stdReg', 'SuperLearner', 'survival', 'tidyverse', 'tmle', 'tools'))
+install.packages(c('bookdown', 'cowplot', 'cranly', 'dagitty', 'Epi', 'foreign', 'ggplot2', 'grid', 'knitr', 'mgcv', 'popEpi', 'PSweight', 'purrr', 'renv', 'rmarkdown', 'sem', 'splines', 'stdReg', 'SuperLearner', 'survival', 'tidyverse', 'tmle', 'tools'))
 
 ---
 This page have been automatically generated. Do not modify
