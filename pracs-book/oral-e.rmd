@@ -67,11 +67,11 @@ summary(orca)
 a single outcome.
 First, construct a *survival object* `orca$suob` from
 the event variable and the follow-up time using function `Surv()`.
-Look at the structure and summary of `!orca$suob!` .
+Look at the structure and summary of `suob` .
 ```{r Survobject, echo=T,eval=TRUE}
 suob <- Surv(orca$time, 1 * (orca$event > 0))
-str(orca$suob)
-summary(orca$suob)
+str(suob)
+summary(suob)
 ```
 
 -  Create a `survfit` object `s.all`, which does the
@@ -83,7 +83,6 @@ s.all <- survfit(suob ~ 1, data = orca)
 
 See the structure of this object and apply `print()` method on it, too.
 Look at the results; what do you find?
-% Try also `summary()` and see the outcome.
 ```{r surv2, echo=T,eval=TRUE}
 s.all
 str(s.all)
@@ -98,7 +97,7 @@ for a conventional illustration of the survival experience in the whole patient 
  Alternatively, instead of graphing survival proportions,
 one can draw a curve describing their complements: the cumulative mortality proportions. This curve is drawn together with the survival curve as the
  result of the second command line below.
-
+ 
 ```{r survcdf1, echo=TRUE, fig=TRUE, height=6, width=7,eval=TRUE}
 plot(s.all,main="KM estimate of the survival
      and cum. mortality proportions",
@@ -173,17 +172,17 @@ stat.table(list(sex, agegr), list(count(), percent(agegr)),
 Male patients are clearly younger than females in these data.
 
 Now, plot Kaplan--Meier curves jointly classified by sex and age.
-
+  
 ```{r cdfsexage, echo=TRUE, fig=TRUE, height=6, width=7,eval=TRUE}
 s.agrx <- survfit(suob ~ agegr + sex, data=orca)
 par(mfrow=c(1,1))
 plot(s.agrx, fun="event", main="Cumulative mortality (KM) by age and sex",xlab="Time since oral cancer diagnosis (years)",ylab="Cum. mortality",mark.time=F, xlim = c(0,15), lwd=2,
-             col=rep(c(cB8[7], cB8[6]),3), lty=c(2,2, 1,1, 5,5), pch=c(1,1,2,2,4,4), xaxs="i",yaxs="i")
+             col=rep(c(cB8[7], cB8[6]),3), lty=c(2,2, 1,1, 5,5),
+     xaxs="i",yaxs="i")
 legend(12,0.35, legend=c("(0,55] Female "," (0,55] Male",
                        "(55,75] Female "," (55,75] Male",
                        "(75,95] Female "," (75,95] Male" ),
-       col=rep(c(cB8[7], cB8[6]),3), lty=c(2,2, 1,1, 5,5),
-       pch=c(1,1,2,2,4,4),cex=0.65)
+       col=rep(c(cB8[7], cB8[6]),3), lty=c(2,2, 1,1, 5,5),cex=0.65)
 ```
 
 In each age band the mortality curve for males is on a higher level
@@ -262,7 +261,7 @@ put the two cumulative incidence curves in one graph but stacked upon one anothe
 the lower curve is for the cancer deaths and the upper curve is for total mortality,
 and the vertical difference between the two curves describes the
 cumulative mortality from other causes. You can also add some colours for the different zones: 
-
+  
 ```{r stackedcif1, echo=TRUE, fig=TRUE, eval=TRUE}
 par(mfrow=c(1,1),xaxs="i", yaxs="i") # make plot start 0,0
 stackedCIF(cif1,xlim=c(0,20),
