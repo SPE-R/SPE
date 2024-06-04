@@ -31,6 +31,7 @@ conclude the true association structure.
 -  Sketch a DAG (not necessarily with R) to see, how should one generate the data
 -  Suppose the actual effect sizes are following:
 
+-  People who drink beer weigh on average $2kg$ more than those who don't.
 -  The probability of beer-drinking is 0.2 for females and 0.7 for males
 -  Men weigh on average $10kg$ more than women.
 -  One kg difference in body weight corresponds in
@@ -147,7 +148,7 @@ plot(g)
 
 Let's look at all possible paths from $C$ to $D$:
 ```{r dagitty4, echo=TRUE}
-paths(g, "C", "D")
+paths(g, "C", "D")$paths
 ```
 As you see, one path contains a collider and is therefore a *closed* path and the others are *open*.   
 
@@ -230,33 +231,11 @@ title("(c)")
 Now, the following script generates a dataset:
 
 ```{r gendata, echo=TRUE, results=TRUE}
-source("data/gendata.r")
+source("gendata.r")
 head(dat)
 ```
 
 *Exercise:* Using linear models, try to identify, which of the three DAGs has been used to generate the data.  
-
-```{r gendata, echo=TRUE, results=TRUE}
-adjustmentSets(g1,"X","Y", effect="direct")
-summary(lm(Y~X+W+Z,data=dat))
-# no X effect: this DAG is possible
-
-adjustmentSets(g2,"X","Y", effect="direct")
-summary(lm(Y~X+Z,data=dat))
-# X effect is significant: this DAG is not likely
-
-adjustmentSets(g3,"X","Y", effect="direct")
-summary(lm(Y~X+Q+W+Z,data=dat))
-# no X effect: this DAG is possible
-
-adjustmentSets(g1,"Z","W")
-summary(lm(W~Z,data=dat))
-# no Z effect: this DAG is possible
-
-adjustmentSets(g3,"Z","W")
-summary(lm(W~Z+X,data=dat))
-# significant Z effect: this DAG is possible
-```
 
 If you have made your decision, you may check the script 'gendata.r' to see, whether your guess was right. 
 
