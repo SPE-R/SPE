@@ -53,4 +53,4 @@ compiled in PDF format. Theses PDF files will be combined in a single file for t
 
 [misc](https://github.com/SPE-R/SPE/tree/master/misc) contains miscellaneous documents:
 
-- [SPE git quick statr guide](https://github.com/SPE-R/SPE/tree/master/misc/SPE_git-quick_start.md): coulpe of instructions to setup and use git on SPE repository
+- [SPE git quick start guide](https://github.com/SPE-R/SPE/tree/master/misc/SPE_git-quick_start.md): couple of instructions to setup and use git on SPE repository
