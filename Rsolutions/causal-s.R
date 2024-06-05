@@ -84,7 +84,7 @@ plot(g)
 
 
 ## ----dagitty4, echo=TRUE------------------------------------------------------
-paths(g, "C", "D")$paths
+paths(g, "C", "D")
 
 
 ## ----dagitty5, echo=TRUE------------------------------------------------------
@@ -154,6 +154,28 @@ title("(c)")
 ## ----gendata, echo=TRUE, results=TRUE-----------------------------------------
 source("data/gendata.r")
 head(dat)
+
+
+## ----adjust, echo=TRUE, results=TRUE------------------------------------------
+adjustmentSets(g1,"X","Y", effect="direct")
+summary(lm(Y~X+W+Z,data=dat))
+# no X effect: this DAG is possible
+
+adjustmentSets(g2,"X","Y", effect="direct")
+summary(lm(Y~X+Z,data=dat))
+# X effect is significant: this DAG is not likely
+
+adjustmentSets(g3,"X","Y", effect="direct")
+summary(lm(Y~X+Q+W+Z,data=dat))
+# no X effect: this DAG is possible
+
+adjustmentSets(g1,"Z","W")
+summary(lm(W~Z,data=dat))
+# no Z effect: this DAG is possible
+
+adjustmentSets(g3,"Z","W")
+summary(lm(W~Z+X,data=dat))
+# significant Z effect: this DAG is possible
 
 
 ## ----mrdat1, echo=TRUE--------------------------------------------------------

@@ -21,8 +21,8 @@ summary(orca)
 
 ## ----Survobject, echo=T,eval=TRUE---------------------------------------------
 suob <- Surv(orca$time, 1 * (orca$event > 0))
-str(orca$suob)
-summary(orca$suob)
+str(suob)
+summary(suob)
 
 
 ## ----surv1, echo=T,eval=TRUE--------------------------------------------------
@@ -70,12 +70,12 @@ stat.table(list(sex, agegr), list(count(), percent(agegr)),
 s.agrx <- survfit(suob ~ agegr + sex, data=orca)
 par(mfrow=c(1,1))
 plot(s.agrx, fun="event", main="Cumulative mortality (KM) by age and sex",xlab="Time since oral cancer diagnosis (years)",ylab="Cum. mortality",mark.time=F, xlim = c(0,15), lwd=2,
-             col=rep(c(cB8[7], cB8[6]),3), lty=c(2,2, 1,1, 5,5), pch=c(1,1,2,2,4,4), xaxs="i",yaxs="i")
+             col=rep(c(cB8[7], cB8[6]),3), lty=c(2,2, 1,1, 5,5),
+     xaxs="i",yaxs="i")
 legend(12,0.35, legend=c("(0,55] Female "," (0,55] Male",
                        "(55,75] Female "," (55,75] Male",
                        "(75,95] Female "," (75,95] Male" ),
-       col=rep(c(cB8[7], cB8[6]),3), lty=c(2,2, 1,1, 5,5),
-       pch=c(1,1,2,2,4,4),cex=0.65)
+       col=rep(c(cB8[7], cB8[6]),3), lty=c(2,2, 1,1, 5,5),cex=0.65)
 
 
 ## ----cif1a, echo=T,eval=TRUE--------------------------------------------------
