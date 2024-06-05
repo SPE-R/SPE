@@ -43,7 +43,7 @@
 |              |                                 |
 |--------------|----------------------------------------------------------------------------------------|
 |9:00 - 9:30 | Recap of yesterday's practical |
-|9:30 - 10:30 | [Causal inference 1: basic concepts](https://github.com/SPE-R/SPE/blob/gh-spe-material/lectures/spe2023-CIlect-kf.pdf) (KF)|
+|9:30 - 10:30 | [Causal inference 1: basic concepts](https://github.com/SPE-R/SPE/blob/gh-spe-material/lectures/spe2024-CIlect-kf.pdf) (KF)|
 |10:30 - 11:00 | Tea break|
 |11:00 - 13:00 | [Practical: Causal inference](https://spe-r.github.io/SPE/SPE-R-2024-practicals/causal-inference.html)|
 |13:00 - 14:00 | Lunch |
