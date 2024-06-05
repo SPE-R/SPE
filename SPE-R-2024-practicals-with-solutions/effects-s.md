@@ -171,7 +171,7 @@ with(births, t.test(bweight ~ hyp, var.equal = TRUE))
 ##             3198.904             2768.208
 ```
 The $P$-value refers to the test
-of the  null hypothesis that there is no effect of `shyp` on birth weight
+of the  null hypothesis that there is no effect of `hyp` on birth weight
  (somewhat implausible null hypothesis in itself!). 
  However, `t.test()` does not provide
 the point estimate for the effect of `hyp`; only the test result and a confidence interval. -- The estimated effect of `hyp` on birth weight, 
