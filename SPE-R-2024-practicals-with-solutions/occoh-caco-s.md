@@ -201,6 +201,7 @@ points(oc.lex, pch = c(NA, 16)[oc.lex$lex.Xst + 1])
 ```
 
 ![](occoh-caco-s_files/figure-epub3/plotlexis-1.png)<!-- -->
+
 -  As age is here the main time axis, 
 we shall graphically illustrate the **study base**, *i.e.* 
 the follow-up lines and outcome events, 
@@ -279,6 +280,7 @@ of `entry` and `exit` which specify the time at risk along the
 main time scale (here age), and the outcome variable to be given 
 in the `fail` argument. The number of controls per case
 is set to be two, and the additional matching factor is given. 
+
 - After setting the RNG seed (with your own number), 
 make a call of this function and see
 the structure of the resulting data frame `cactrl` 
@@ -319,15 +321,16 @@ data frame from the help page of function `ccwc()`.
 
 - Now we shall start  collecting data on the 
 risk factors for the cases and their
-matched controls, including determination of the total cholesterol levels from the frozen sera! The storehouse of the risk factor measurements for 
+matched controls, including determination of the total cholesterol 
+levels from the frozen sera! The storehouse of the risk factor measurements for 
 the whole cohort is file `occoh-Xdata.txt`. It contains
 values of the following variables.
 
 | Variable  | Description                                 |
 | :-------  | :------------------------------------------ |
 | `id`      | identification number, the same as in `occoh.txt` |
-| `smok`.   | cigarette smoking with categories; 1: `never`, 2: `former`, 3: `1-14/d`, 4: `15+/d` |
-| `sbp`.    | systolic blood pressure (mmHg) |
+| `smok`    | cigarette smoking with categories; 1: `never`, 2: `former`, 3: `1-14/d`, 4: `15+/d` |
+| `sbp`     | systolic blood pressure (mmHg) |
 | `tchol`   | total cholesterol level (mmol/l) |
 
 
@@ -654,8 +657,8 @@ round(HRcc, 3)
 ##  1.000  1.081  2.006  2.211
 ```
 Do these estimates resemble those obtained from nested case-control data?
-- 
-To estimate the rate ratios associated with smoking and adjusted for the
+
+- To estimate the rate ratios associated with smoking and adjusted for the
 other risk factors we now fit the pertinent Cox model 
 applying the method of *weighted partial likelihood* as 
 presented by Ling & Ying (1993) and Barlow (1994).
@@ -695,10 +698,9 @@ summary(cch.LY)
 Finally, suppose the investigators after all could afford to collect the
 data on risk factors from the storehouse for the whole cohort.
 
-
-- 
-Let us form the data frame corresponding to the full cohort design
+- Let us form the data frame corresponding to the full cohort design
 and convert again smoking to be categorical.
+
 
 ``` r
 oc.full <- merge(oc.lex, ocX[, c("id", "smok", "tchol", "sbp")],
@@ -747,8 +749,7 @@ round(HRcoh, 3)
 ```
 
 
-- 
-Fit now the ordinary Cox model to the full cohort. There is no need
+- Fit now the ordinary Cox model to the full cohort. There is no need
 to employ extra tricks upon the ordinary `coxph()` fit.
 
 
@@ -787,8 +788,7 @@ summary(cox.coh)
 ## Score (logrank) test = 43.29  on 5 df,   p=3e-08
 ```
 
-- 
-Lastly, a comparison of the point estimates and standard errors between 
+- Lastly, a comparison of the point estimates and standard errors between 
 the different designs, including variants of analysis for the case-cohort design, can be performed.
 
 
@@ -835,8 +835,6 @@ the standard errors from the NCC and CC
 
 
 ## Further exercises and homework
-
-
 
 - If you have time, you could run both the NCC study and CC study 
 again but now with a larger control group or subcohort;
