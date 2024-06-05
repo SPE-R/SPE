@@ -444,136 +444,136 @@ the cursor to the point at which you wish to have the  box for *Oral ca. death*,
 If you are not happy with the outcome, run the command line again and repeat the necessary mouse moves and clicks.
 
 
-## Optional: Poisson regression as an alternative to Cox model
+<!-- ## Optional: Poisson regression as an alternative to Cox model -->
 
-It can be shown that the Cox model with an unspecified form for the
-baseline hazard $\lambda_0(t)$ is mathematically equivalent
-to the following kind of Poisson regression model.
-Time is treated as a categorical factor with
-a dense division of the time axis
-into disjoint intervals or *timebands* such that
-only one outcome event occurs in each timeband.
-The model formula contains this time factor plus the desired
-explanatory terms.
+<!-- It can be shown that the Cox model with an unspecified form for the -->
+<!-- baseline hazard $\lambda_0(t)$ is mathematically equivalent -->
+<!-- to the following kind of Poisson regression model. -->
+<!-- Time is treated as a categorical factor with -->
+<!-- a dense division of the time axis -->
+<!-- into disjoint intervals or *timebands* such that -->
+<!-- only one outcome event occurs in each timeband. -->
+<!-- The model formula contains this time factor plus the desired -->
+<!-- explanatory terms. -->
 
-A sufficient division of time axis is obtained by
-first setting the break points
-between adjacent timebands to be those time points at which an outcome event has been observed to occur. Then,
-the pertinent `lexis` object is created
-and after that it will be split according to those breakpoints.
-Finally, the Poisson regression model is fitted
-on the splitted `lexis` object using function `glm()` with appropriate specifications.
+<!-- A sufficient division of time axis is obtained by -->
+<!-- first setting the break points -->
+<!-- between adjacent timebands to be those time points at which an outcome event has been observed to occur. Then, -->
+<!-- the pertinent `lexis` object is created -->
+<!-- and after that it will be split according to those breakpoints. -->
+<!-- Finally, the Poisson regression model is fitted -->
+<!-- on the splitted `lexis` object using function `glm()` with appropriate specifications. -->
 
-We shall now demonstrate the numerical equivalence of the Cox model
-`m2haz1` for oral cancer mortality that was fitted above,
- and the corresponding Poisson regression.
-
-
+<!-- We shall now demonstrate the numerical equivalence of the Cox model -->
+<!-- `m2haz1` for oral cancer mortality that was fitted above, -->
+<!--  and the corresponding Poisson regression. -->
 
 
--  First we form the necessary `lexis` object by just taking
- the relevant subset of the already available `orca.lex` object.
- Upon that the three-level stage factor `st3` is created
- as above.
- 
-```{r split, echo=T,eval=TRUE}
-orca2.lex <- subset(orca.lex, stage != "unkn")
-orca2.lex$st3 <- Relevel(orca2.lex$stage, list(1:2, 3, 4:5))
-levels(orca2.lex$st3) <- c("I-II", "III", "IV")
-```
- Then, the break points of time axis are taken from
- the sorted event times, and the `lexis` object is
- split by those breakpoints. The `timeband` factor
- is defined according to the splitted survival times
- stored in variable `stime`.
-
-```{r split b, echo=T,eval=TRUE}
-cuts <- sort(orca2.lex$time[orca2.lex$event == 1])
-orca2.spl <- 
-  splitLexis(orca2.lex, br = cuts, time.scale = "stime")
-orca2.spl$timeband <- as.factor(orca2.spl$stime)
-```
-
-As a result we now have an expanded
- `lexis` object in which each subject has several rows;
- as many rows as there are such timebands
- during which he/she is still at risk.
- The outcome status `lex.Xst` has value 0 in all those
- timebands, over which the subject stays alive, but assumes
- the value 1 or 2 at his/her last interval ending at the time of death.
- -- See now the structure of the splitted object.
-
-```{r strsplit, echo=T,eval=TRUE}
-str(orca2.spl)
-head(orca2.spl)
-```
 
 
--  We are ready to fit the desired Poisson model for oral cancer death
-as the outcome. The splitted person-years are contained in `lex.dur`,
-and the explanatory variables are the same as in model `m2haz1`.
--- This fitting may take some time ....
-```{r poisson, echo=T,eval=TRUE}
-m2pois1 <- glm(
-  1 * (lex.Xst == "Oral ca. death") ~
-    -1 + timeband + sex + I((age - 65) / 10) + st3,
-  family = poisson, offset = log(lex.dur), data = orca2.spl
-)
-```
-We shall display the estimation results graphically for the baseline hazard (per 1000 person-years)  and numerically for the rate ratios associated with the covariates.
-Before doing that it is useful to count the length `ntb` of the
- block occupied by baseline hazard in the whole vector of estimated parameters.
-However, owing to how the splitting to timebands was done, the last regression
-coefficient is necessarily
-zero and better be omitted when displaying the results. Also, as each timeband
-is quantitatively
-named accoding to its leftmost point, it is good to compute the midpoint values `tbmid`
-for the timebands
-```{r poissonresults, echo=T, fig=T,eval=TRUE}
-tb <- as.numeric(levels(orca2.spl$timeband))
-ntb <- length(tb)
-tbmid <- (tb[-ntb] + tb[-1]) / 2 # midpoints of the intervals
-round(ci.exp(m2pois1), 3)
-par(mfrow = c(1, 1))
-plot(tbmid, 1000 * exp(coef(m2pois1)[1:(ntb - 1)]),
-  ylim = c(5, 3000), log = "xy", type = "l"
-)
-```
+<!-- -  First we form the necessary `lexis` object by just taking -->
+<!--  the relevant subset of the already available `orca.lex` object. -->
+<!--  Upon that the three-level stage factor `st3` is created -->
+<!--  as above. -->
 
-Compare the regression coefficients and their error margins
-to those model `m2haz1`. Do you find any differences?
-How does the estimated baseline hazard look like?
+<!-- ```{r split, echo=T,eval=TRUE} -->
+<!-- orca2.lex <- subset(orca.lex, stage != "unkn") -->
+<!-- orca2.lex$st3 <- Relevel(orca2.lex$stage, list(1:2, 3, 4:5)) -->
+<!-- levels(orca2.lex$st3) <- c("I-II", "III", "IV") -->
+<!-- ``` -->
+<!--  Then, the break points of time axis are taken from -->
+<!--  the sorted event times, and the `lexis` object is -->
+<!--  split by those breakpoints. The `timeband` factor -->
+<!--  is defined according to the splitted survival times -->
+<!--  stored in variable `stime`. -->
 
--  The estimated baseline looks quite ragged when based on 71 separate
-parameters. A smoothed estimate may be obtained by spline modelling using the tools
-contained in package `splines` (see the practical of Saturday 25 May afternoon).
-With the following code you will be able to fit a
-reasonable spline model for the baseline hazard and
-draw the estimated curve (together with a band of the 95%
-confidence limits about the fitted values).
-From the same model you should also obtain quite familiar results for the
-rate ratios of interest.
-```{r poissonspline, echo=T, fig=T,eval=TRUE}
-library(splines)
-m2pspli <- 
-  update(
-    m2pois1, 
-    . ~ ns(stime, df = 6, intercept = FALSE) +
-      sex + I((age - 65) / 10) + st3)
-round(ci.exp(m2pspli), 3)
-news <- data.frame(
-  stime = seq(0, 25, length = 301), 
-  lex.dur = 1000, 
-  sex = "Female",
-  age = 65, 
-  st3 = "I-II"
-)
-blhaz <- 
-  predict(m2pspli, newdata = news, se.fit = TRUE, type = "link")
-blh95 <- cbind(blhaz$fit, blhaz$se.fit) %*% ci.mat()
-par(mfrow = c(1, 1))
-matplot(news$stime, exp(blh95),
-  type = "l", lty = c(1, 1, 1), lwd = c(2, 1, 1),
-  col = rep("black", 3), log = "xy", ylim = c(5, 3000)
-)
-```
+<!-- ```{r split b, echo=T,eval=TRUE} -->
+<!-- cuts <- sort(orca2.lex$time[orca2.lex$event == 1]) -->
+<!-- orca2.spl <-  -->
+<!--   splitLexis(orca2.lex, br = cuts, time.scale = "stime") -->
+<!-- orca2.spl$timeband <- as.factor(orca2.spl$stime) -->
+<!-- ``` -->
+
+<!-- As a result we now have an expanded -->
+<!--  `lexis` object in which each subject has several rows; -->
+<!--  as many rows as there are such timebands -->
+<!--  during which he/she is still at risk. -->
+<!--  The outcome status `lex.Xst` has value 0 in all those -->
+<!--  timebands, over which the subject stays alive, but assumes -->
+<!--  the value 1 or 2 at his/her last interval ending at the time of death. -->
+<!--  -- See now the structure of the splitted object. -->
+
+<!-- ```{r strsplit, echo=T,eval=TRUE} -->
+<!-- str(orca2.spl) -->
+<!-- head(orca2.spl) -->
+<!-- ``` -->
+
+
+<!-- -  We are ready to fit the desired Poisson model for oral cancer death -->
+<!-- as the outcome. The splitted person-years are contained in `lex.dur`, -->
+<!-- and the explanatory variables are the same as in model `m2haz1`. -->
+<!-- -- This fitting may take some time .... -->
+<!-- ```{r poisson, echo=T,eval=TRUE} -->
+<!-- m2pois1 <- glm( -->
+<!--   1 * (lex.Xst == "Oral ca. death") ~ -->
+<!--     -1 + timeband + sex + I((age - 65) / 10) + st3, -->
+<!--   family = poisson, offset = log(lex.dur), data = orca2.spl -->
+<!-- ) -->
+<!-- ``` -->
+<!-- We shall display the estimation results graphically for the baseline hazard (per 1000 person-years)  and numerically for the rate ratios associated with the covariates. -->
+<!-- Before doing that it is useful to count the length `ntb` of the -->
+<!--  block occupied by baseline hazard in the whole vector of estimated parameters. -->
+<!-- However, owing to how the splitting to timebands was done, the last regression -->
+<!-- coefficient is necessarily -->
+<!-- zero and better be omitted when displaying the results. Also, as each timeband -->
+<!-- is quantitatively -->
+<!-- named accoding to its leftmost point, it is good to compute the midpoint values `tbmid` -->
+<!-- for the timebands -->
+<!-- ```{r poissonresults, echo=T, fig=T,eval=TRUE} -->
+<!-- tb <- as.numeric(levels(orca2.spl$timeband)) -->
+<!-- ntb <- length(tb) -->
+<!-- tbmid <- (tb[-ntb] + tb[-1]) / 2 # midpoints of the intervals -->
+<!-- round(ci.exp(m2pois1), 3) -->
+<!-- par(mfrow = c(1, 1)) -->
+<!-- plot(tbmid, 1000 * exp(coef(m2pois1)[1:(ntb - 1)]), -->
+<!--   ylim = c(5, 3000), log = "xy", type = "l" -->
+<!-- ) -->
+<!-- ``` -->
+
+<!-- Compare the regression coefficients and their error margins -->
+<!-- to those model `m2haz1`. Do you find any differences? -->
+<!-- How does the estimated baseline hazard look like? -->
+
+<!-- -  The estimated baseline looks quite ragged when based on 71 separate -->
+<!-- parameters. A smoothed estimate may be obtained by spline modelling using the tools -->
+<!-- contained in package mgcv With the following code you will be able to fit a -->
+<!-- reasonable spline model for the baseline hazard and -->
+<!-- draw the estimated curve (together with a band of the 95% -->
+<!-- confidence limits about the fitted values). -->
+<!-- From the same model you should also obtain quite familiar results for the -->
+<!-- rate ratios of interest. -->
+
+<!-- ```{r poissonspline, echo=T, fig=T,eval=TRUE} -->
+<!-- library(mgcv) -->
+<!-- m2pspli <-  -->
+<!--   update( -->
+<!--     m2pois1,  -->
+<!--     . ~ gam(s(stime) + sex + I((age - 65) / 10) + st3)) -->
+<!-- plot(m2pspli,pages=1,type=seWithMean=T) -->
+<!-- #round(ci.exp(m2pspli), 3) -->
+<!-- #news <- data.frame( -->
+<!-- #  stime = seq(0, 25, length = 301),  -->
+<!-- #  lex.dur = 1000,  -->
+<!-- #  sex = "Female", -->
+<!-- #  age = 65,  -->
+<!-- #  st3 = "I-II" -->
+<!-- #) -->
+<!-- # blhaz <-  -->
+<!-- #   predict(m2pspli, newdata = news, se.fit = TRUE, type = "link") -->
+<!-- # blh95 <- cbind(blhaz$fit, blhaz$se.fit) %*% ci.mat() -->
+<!-- # par(mfrow = c(1, 1)) -->
+<!-- # matplot(news$stime, exp(blh95), -->
+<!-- #   type = "l", lty = c(1, 1, 1), lwd = c(2, 1, 1), -->
+<!-- #   col = rep("black", 3), log = "xy", ylim = c(5, 3000) -->
+<!-- # ) -->
+<!-- ``` -->

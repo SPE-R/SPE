@@ -189,15 +189,6 @@ m2haz2 <- coxph( Surv( time, event==2)  ~ sex + I((age-65)/10) + st3 , data=orca
 round( ci.exp(m2haz2 ), 4)
 cox.zph(m2haz2)
 
-###################################################
-#library(cmprsk)
-#attach(orca2)
-#m2fg1 <- crr(time, event, cov1 = model.matrix(m2), failcode=1)
-#summary(m2fg1, Exp=T)
-
-###################################################
-#m2fg2 <- crr(time, event, cov1 = model.matrix(m2), failcode=2)
-#summary(m2fg2, Exp=T)
 
 ###################################################
 orca.lex <- Lexis(exit = list(stime = time),
@@ -206,47 +197,47 @@ orca.lex <- Lexis(exit = list(stime = time),
                   data = orca)
 summary(orca.lex)
 
-###################################################
-# Optional
-orca2.lex <- subset(orca.lex, stage != "unkn" )
-orca2.lex$st3 <- Relevel( orca2$stage, list(1:2, 3, 4:5) )
-levels(orca2.lex$st3) = c("I-II", "III", "IV")
-
-###################################################
-cuts <- sort(orca2$time[orca2$event==1])
-orca2.spl <- splitLexis( orca2.lex, br = cuts, time.scale="stime" )
-orca2.spl$timeband <- as.factor(orca2.spl$stime)
-table(orca2.spl$timeband)
-###################################################
-str(orca2.spl)
-print.data.frame(orca2.spl)
-
-###################################################
-m2pois1 <- glm( 1*(lex.Xst=="Oral ca. death")  ~
-      -1 + timeband + sex + I((age-65)/10) + st3,
-      family=poisson, offset = log(lex.dur), data = orca2.spl)
-
-###################################################
-tb <- as.numeric(levels(orca2.spl$timeband)) ; ntb <- length(tb)
-tbmid <- (tb[-ntb] + tb[-1])/2   # midpoints of the intervals
-round( ci.exp(m2pois1 ), 3)
-par(mfrow=c(1,1))
-plot( tbmid, 1000*exp(coef(m2pois1)[1:(ntb-1)]),
-            ylim=c(5,3000), log = "xy", type = "l")
-
-###################################################
-library(splines)
-m2pspli <- update(m2pois1, . ~  ns(stime, df = 6, intercept = F) +
-        sex + I((age-65)/10) + st3)
-round( ci.exp( m2pspli ), 3)
-news <- data.frame( stime = seq(0,25, length=301), lex.dur = 1000, sex = "Female",
-                    age = 65, st3 = "I-II")
-blhaz <- predict(m2pspli, newdata = news, se.fit = T, type = "link")
-blh95 <- cbind(blhaz$fit, blhaz$se.fit) %*% ci.mat()
-par(mfrow=c(1,1))
-matplot( news$stime, exp(blh95), type = "l", lty = c(1,1,1), lwd = c(2,1,1) ,
-      col = rep("black", 3),  log = "xy", ylim = c(5,3000)  )
-
+# ###################################################
+# # Optional
+# orca2.lex <- subset(orca.lex, stage != "unkn" )
+# orca2.lex$st3 <- Relevel( orca2$stage, list(1:2, 3, 4:5) )
+# levels(orca2.lex$st3) = c("I-II", "III", "IV")
+# 
+# ###################################################
+# cuts <- sort(orca2$time[orca2$event==1])
+# orca2.spl <- splitLexis( orca2.lex, br = cuts, time.scale="stime" )
+# orca2.spl$timeband <- as.factor(orca2.spl$stime)
+# table(orca2.spl$timeband)
+# ###################################################
+# str(orca2.spl)
+# print.data.frame(orca2.spl)
+# 
+# ###################################################
+# m2pois1 <- glm( 1*(lex.Xst=="Oral ca. death")  ~
+#       -1 + timeband + sex + I((age-65)/10) + st3,
+#       family=poisson, offset = log(lex.dur), data = orca2.spl)
+# 
+# ###################################################
+# tb <- as.numeric(levels(orca2.spl$timeband)) ; ntb <- length(tb)
+# tbmid <- (tb[-ntb] + tb[-1])/2   # midpoints of the intervals
+# round( ci.exp(m2pois1 ), 3)
+# par(mfrow=c(1,1))
+# plot( tbmid, 1000*exp(coef(m2pois1)[1:(ntb-1)]),
+#             ylim=c(5,3000), log = "xy", type = "l")
+# 
+# ###################################################
+# library(splines)
+# m2pspli <- update(m2pois1, . ~  ns(stime, df = 6, intercept = F) +
+#         sex + I((age-65)/10) + st3)
+# round( ci.exp( m2pspli ), 3)
+# news <- data.frame( stime = seq(0,25, length=301), lex.dur = 1000, sex = "Female",
+#                     age = 65, st3 = "I-II")
+# blhaz <- predict(m2pspli, newdata = news, se.fit = T, type = "link")
+# blh95 <- cbind(blhaz$fit, blhaz$se.fit) %*% ci.mat()
+# par(mfrow=c(1,1))
+# matplot( news$stime, exp(blh95), type = "l", lty = c(1,1,1), lwd = c(2,1,1) ,
+#       col = rep("black", 3),  log = "xy", ylim = c(5,3000)  )
+# 
 
 
 
