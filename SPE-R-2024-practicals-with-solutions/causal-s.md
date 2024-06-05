@@ -26,7 +26,6 @@ conclude the true association structure.
 -  Sketch a DAG (not necessarily with R) to see, how should one generate the data
 -  Suppose the actual effect sizes are following:
 
--  People who drink beer weigh on average $2kg$ more than those who don't.
 -  The probability of beer-drinking is 0.2 for females and 0.7 for males
 -  Men weigh on average $10kg$ more than women.
 -  One kg difference in body weight corresponds in
@@ -129,7 +128,7 @@ plot(g)
 Let's look at all possible paths from $C$ to $D$:
 
 ``` r
-paths(g, "C", "D")$paths
+paths(g, "C", "D")
 ```
 As you see, one path contains a collider and is therefore a *closed* path and the others are *open*.   
 
@@ -217,6 +216,193 @@ head(dat)
 ```
 
 *Exercise:* Using linear models, try to identify, which of the three DAGs has been used to generate the data.  
+
+
+``` r
+adjustmentSets(g1,"X","Y", effect="direct")
+```
+
+```
+## { W, Z }
+## { U, W }
+```
+
+``` r
+summary(lm(Y~X+W+Z,data=dat))
+```
+
+```
+## 
+## Call:
+## lm(formula = Y ~ X + W + Z, data = dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.9888 -0.7441  0.0096  0.7657  3.5928 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  0.033168   0.024551   1.351    0.177    
+## X           -0.001691   0.014877  -0.114    0.909    
+## W           -2.599607   0.031987 -81.270   <2e-16 ***
+## Z            1.014166   0.021197  47.846   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1.097 on 1996 degrees of freedom
+## Multiple R-squared:  0.9686,	Adjusted R-squared:  0.9686 
+## F-statistic: 2.054e+04 on 3 and 1996 DF,  p-value: < 2.2e-16
+```
+
+``` r
+# no X effect: this DAG is possible
+
+adjustmentSets(g2,"X","Y", effect="direct")
+```
+
+```
+## { Z }
+## { U }
+```
+
+``` r
+summary(lm(Y~X+Z,data=dat))
+```
+
+```
+## 
+## Call:
+## lm(formula = Y ~ X + Z, data = dat)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -7.480 -1.568 -0.107  1.580  8.730 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  0.10067    0.05092   1.977   0.0482 *  
+## X            1.13137    0.01077 105.040   <2e-16 ***
+## Z            2.38032    0.02680  88.830   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.277 on 1997 degrees of freedom
+## Multiple R-squared:  0.8648,	Adjusted R-squared:  0.8647 
+## F-statistic:  6387 on 2 and 1997 DF,  p-value: < 2.2e-16
+```
+
+``` r
+# X effect is significant: this DAG is not likely
+
+adjustmentSets(g3,"X","Y", effect="direct")
+```
+
+```
+## { Q, W, Z }
+## { Q, U, W }
+```
+
+``` r
+summary(lm(Y~X+Q+W+Z,data=dat))
+```
+
+```
+## 
+## Call:
+## lm(formula = Y ~ X + Q + W + Z, data = dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.7210 -0.6425  0.0031  0.6596  3.1985 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  0.019576   0.022168   0.883    0.377    
+## X           -0.006038   0.013429  -0.450    0.653    
+## Q            1.071881   0.050242  21.335   <2e-16 ***
+## W           -3.033392   0.035312 -85.903   <2e-16 ***
+## Z            1.003544   0.019138  52.437   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.9903 on 1995 degrees of freedom
+## Multiple R-squared:  0.9745,	Adjusted R-squared:  0.9744 
+## F-statistic: 1.902e+04 on 4 and 1995 DF,  p-value: < 2.2e-16
+```
+
+``` r
+# no X effect: this DAG is possible
+
+adjustmentSets(g1,"Z","W")
+```
+
+```
+##  {}
+```
+
+``` r
+summary(lm(W~Z,data=dat))
+```
+
+```
+## 
+## Call:
+## lm(formula = W ~ Z, data = dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -9.5057 -1.5539  0.0044  1.4534  8.0072 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)
+## (Intercept) -0.02154    0.04919  -0.438    0.661
+## Z            0.01908    0.02238   0.852    0.394
+## 
+## Residual standard error: 2.2 on 1998 degrees of freedom
+## Multiple R-squared:  0.0003635,	Adjusted R-squared:  -0.0001368 
+## F-statistic: 0.7266 on 1 and 1998 DF,  p-value: 0.3941
+```
+
+``` r
+# no Z effect: this DAG is possible
+
+adjustmentSets(g3,"Z","W")
+```
+
+```
+## { X }
+## { U }
+```
+
+``` r
+summary(lm(W~Z+X,data=dat))
+```
+
+```
+## 
+## Call:
+## lm(formula = W ~ Z + X, data = dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -2.5471 -0.4981  0.0016  0.5336  2.3622 
+## 
+## Coefficients:
+##              Estimate Std. Error  t value Pr(>|t|)    
+## (Intercept) -0.025965   0.017165   -1.513    0.131    
+## Z           -0.525522   0.009033  -58.178   <2e-16 ***
+## X           -0.435859   0.003631 -120.044   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.7676 on 1997 degrees of freedom
+## Multiple R-squared:  0.8783,	Adjusted R-squared:  0.8782 
+## F-statistic:  7208 on 2 and 1997 DF,  p-value: < 2.2e-16
+```
+
+``` r
+# significant Z effect: this DAG is possible
+```
 
 If you have made your decision, you may check the script 'gendata.r' to see, whether your guess was right. 
 

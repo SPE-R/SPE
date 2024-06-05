@@ -102,24 +102,33 @@ summary(orca)
 a single outcome.
 First, construct a *survival object* `orca$suob` from
 the event variable and the follow-up time using function `Surv()`.
-Look at the structure and summary of `!orca$suob!` .
+Look at the structure and summary of `suob` .
 
 ``` r
 suob <- Surv(orca$time, 1 * (orca$event > 0))
-str(orca$suob)
+str(suob)
 ```
 
 ```
-##  NULL
+##  'Surv' num [1:338, 1:2]  5.081+  0.419   7.915   2.480   2.500   0.167   5.925+  1.503  13.333   7.666+ ...
+##  - attr(*, "dimnames")=List of 2
+##   ..$ : NULL
+##   ..$ : chr [1:2] "time" "status"
+##  - attr(*, "type")= chr "right"
 ```
 
 ``` r
-summary(orca$suob)
+summary(suob)
 ```
 
 ```
-## Length  Class   Mode 
-##      0   NULL   NULL
+##       time           status     
+##  Min.   : 0.09   Min.   :0.000  
+##  1st Qu.: 1.33   1st Qu.:0.000  
+##  Median : 3.87   Median :1.000  
+##  Mean   : 5.66   Mean   :0.678  
+##  3rd Qu.: 8.42   3rd Qu.:1.000  
+##  Max.   :23.26   Max.   :1.000
 ```
 
 -  Create a `survfit` object `s.all`, which does the
@@ -132,7 +141,6 @@ s.all <- survfit(suob ~ 1, data = orca)
 
 See the structure of this object and apply `print()` method on it, too.
 Look at the results; what do you find?
-% Try also `summary()` and see the outcome.
 
 ``` r
 s.all
@@ -179,7 +187,7 @@ for a conventional illustration of the survival experience in the whole patient 
  Alternatively, instead of graphing survival proportions,
 one can draw a curve describing their complements: the cumulative mortality proportions. This curve is drawn together with the survival curve as the
  result of the second command line below.
-
+ 
 
 ``` r
 plot(s.all,main="KM estimate of the survival
@@ -285,18 +293,18 @@ stat.table(list(sex, agegr), list(count(), percent(agegr)),
 Male patients are clearly younger than females in these data.
 
 Now, plot Kaplan--Meier curves jointly classified by sex and age.
-
+  
 
 ``` r
 s.agrx <- survfit(suob ~ agegr + sex, data=orca)
 par(mfrow=c(1,1))
 plot(s.agrx, fun="event", main="Cumulative mortality (KM) by age and sex",xlab="Time since oral cancer diagnosis (years)",ylab="Cum. mortality",mark.time=F, xlim = c(0,15), lwd=2,
-             col=rep(c(cB8[7], cB8[6]),3), lty=c(2,2, 1,1, 5,5), pch=c(1,1,2,2,4,4), xaxs="i",yaxs="i")
+             col=rep(c(cB8[7], cB8[6]),3), lty=c(2,2, 1,1, 5,5),
+     xaxs="i",yaxs="i")
 legend(12,0.35, legend=c("(0,55] Female "," (0,55] Male",
                        "(55,75] Female "," (55,75] Male",
                        "(75,95] Female "," (75,95] Male" ),
-       col=rep(c(cB8[7], cB8[6]),3), lty=c(2,2, 1,1, 5,5),
-       pch=c(1,1,2,2,4,4),cex=0.65)
+       col=rep(c(cB8[7], cB8[6]),3), lty=c(2,2, 1,1, 5,5),cex=0.65)
 ```
 
 ![](oral-s_files/figure-epub3/cdfsexage-1.png)<!-- -->
@@ -501,7 +509,7 @@ put the two cumulative incidence curves in one graph but stacked upon one anothe
 the lower curve is for the cancer deaths and the upper curve is for total mortality,
 and the vertical difference between the two curves describes the
 cumulative mortality from other causes. You can also add some colours for the different zones: 
-
+  
 
 ``` r
 par(mfrow=c(1,1),xaxs="i", yaxs="i") # make plot start 0,0

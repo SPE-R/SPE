@@ -437,42 +437,42 @@ to include covariate
 <ol style="list-style-type: decimal">
 <li>Load the necessary packages.</li>
 </ol>
-<div class="sourceCode" id="cb729"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb729-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb729-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
-<span id="cb729-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb729-2" tabindex="-1"></a><span class="fu">library</span>(stdReg)</span>
-<span id="cb729-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb729-3" tabindex="-1"></a><span class="fu">library</span>(PSweight)</span></code></pre></div>
+<div class="sourceCode" id="cb750"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb750-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb750-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
+<span id="cb750-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb750-2" tabindex="-1"></a><span class="fu">library</span>(stdReg)</span>
+<span id="cb750-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb750-3" tabindex="-1"></a><span class="fu">library</span>(PSweight)</span></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li>Define two R-functions, which compute the expected values
 for the exposure and those for the outcome based on the assumed
 true exposure model and the true outcome model, respectively.</li>
 </ol>
-<div class="sourceCode" id="cb730"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb730-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb730-1" tabindex="-1"></a>EX <span class="ot">&lt;-</span> <span class="cf">function</span>(z2, z3, z4) {</span>
-<span id="cb730-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb730-2" tabindex="-1"></a>  <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">5</span> <span class="sc">+</span> <span class="fl">0.05</span> <span class="sc">*</span> z2 <span class="sc">+</span> <span class="fl">0.25</span> <span class="sc">*</span> z3 <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> z4 <span class="sc">+</span> <span class="fl">0.4</span> <span class="sc">*</span> z2 <span class="sc">*</span> z4)</span>
-<span id="cb730-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb730-3" tabindex="-1"></a>}</span>
-<span id="cb730-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb730-4" tabindex="-1"></a>EY <span class="ot">&lt;-</span> <span class="cf">function</span>(x, z1, z2, z3, z4) {</span>
-<span id="cb730-5"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb730-5" tabindex="-1"></a>  <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> x <span class="sc">-</span> <span class="fl">0.1</span> <span class="sc">*</span> z1 <span class="sc">+</span> <span class="fl">0.35</span> <span class="sc">*</span> z2 <span class="sc">+</span> <span class="fl">0.25</span> <span class="sc">*</span> z3 <span class="sc">+</span></span>
-<span id="cb730-6"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb730-6" tabindex="-1"></a>    <span class="fl">0.20</span> <span class="sc">*</span> z4 <span class="sc">+</span> <span class="fl">0.15</span> <span class="sc">*</span> z2 <span class="sc">*</span> z4)</span>
-<span id="cb730-7"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb730-7" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb751"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb751-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb751-1" tabindex="-1"></a>EX <span class="ot">&lt;-</span> <span class="cf">function</span>(z2, z3, z4) {</span>
+<span id="cb751-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb751-2" tabindex="-1"></a>  <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">5</span> <span class="sc">+</span> <span class="fl">0.05</span> <span class="sc">*</span> z2 <span class="sc">+</span> <span class="fl">0.25</span> <span class="sc">*</span> z3 <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> z4 <span class="sc">+</span> <span class="fl">0.4</span> <span class="sc">*</span> z2 <span class="sc">*</span> z4)</span>
+<span id="cb751-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb751-3" tabindex="-1"></a>}</span>
+<span id="cb751-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb751-4" tabindex="-1"></a>EY <span class="ot">&lt;-</span> <span class="cf">function</span>(x, z1, z2, z3, z4) {</span>
+<span id="cb751-5"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb751-5" tabindex="-1"></a>  <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> x <span class="sc">-</span> <span class="fl">0.1</span> <span class="sc">*</span> z1 <span class="sc">+</span> <span class="fl">0.35</span> <span class="sc">*</span> z2 <span class="sc">+</span> <span class="fl">0.25</span> <span class="sc">*</span> z3 <span class="sc">+</span></span>
+<span id="cb751-6"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb751-6" tabindex="-1"></a>    <span class="fl">0.20</span> <span class="sc">*</span> z4 <span class="sc">+</span> <span class="fl">0.15</span> <span class="sc">*</span> z2 <span class="sc">*</span> z4)</span>
+<span id="cb751-7"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb751-7" tabindex="-1"></a>}</span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
 <li>Define the function for the generation of data by
 simulating random values from pertinent probability
 distributions based on the given assumptions.</li>
 </ol>
-<div class="sourceCode" id="cb731"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb731-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb731-1" tabindex="-1"></a>genData <span class="ot">&lt;-</span> <span class="cf">function</span>(N) {</span>
-<span id="cb731-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb731-2" tabindex="-1"></a>  z1 <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.5</span>) <span class="co"># Bern(0.5)</span></span>
-<span id="cb731-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb731-3" tabindex="-1"></a>  z2 <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.65</span>) <span class="co"># Bern(0.65)</span></span>
-<span id="cb731-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb731-4" tabindex="-1"></a>  z3 <span class="ot">&lt;-</span> <span class="fu">trunc</span>(<span class="fu">runif</span>(N, <span class="at">min =</span> <span class="dv">1</span>, <span class="at">max =</span> <span class="dv">5</span>), <span class="at">digits =</span> <span class="dv">0</span>) <span class="co"># DiscUnif(1,4)</span></span>
-<span id="cb731-5"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb731-5" tabindex="-1"></a>  z4 <span class="ot">&lt;-</span> <span class="fu">trunc</span>(<span class="fu">runif</span>(N, <span class="at">min =</span> <span class="dv">1</span>, <span class="at">max =</span> <span class="dv">6</span>), <span class="at">digits =</span> <span class="dv">0</span>) <span class="co"># DiscUnif(1,5)</span></span>
-<span id="cb731-6"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb731-6" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fu">EX</span>(z2, z3, z4))</span>
-<span id="cb731-7"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb731-7" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fu">EY</span>(x, z1, z2, z3, z4))</span>
-<span id="cb731-8"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb731-8" tabindex="-1"></a>  <span class="fu">data.frame</span>(z1, z2, z3, z4, x, y)</span>
-<span id="cb731-9"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb731-9" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb752"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb752-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb752-1" tabindex="-1"></a>genData <span class="ot">&lt;-</span> <span class="cf">function</span>(N) {</span>
+<span id="cb752-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb752-2" tabindex="-1"></a>  z1 <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.5</span>) <span class="co"># Bern(0.5)</span></span>
+<span id="cb752-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb752-3" tabindex="-1"></a>  z2 <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.65</span>) <span class="co"># Bern(0.65)</span></span>
+<span id="cb752-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb752-4" tabindex="-1"></a>  z3 <span class="ot">&lt;-</span> <span class="fu">trunc</span>(<span class="fu">runif</span>(N, <span class="at">min =</span> <span class="dv">1</span>, <span class="at">max =</span> <span class="dv">5</span>), <span class="at">digits =</span> <span class="dv">0</span>) <span class="co"># DiscUnif(1,4)</span></span>
+<span id="cb752-5"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb752-5" tabindex="-1"></a>  z4 <span class="ot">&lt;-</span> <span class="fu">trunc</span>(<span class="fu">runif</span>(N, <span class="at">min =</span> <span class="dv">1</span>, <span class="at">max =</span> <span class="dv">6</span>), <span class="at">digits =</span> <span class="dv">0</span>) <span class="co"># DiscUnif(1,5)</span></span>
+<span id="cb752-6"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb752-6" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fu">EX</span>(z2, z3, z4))</span>
+<span id="cb752-7"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb752-7" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fu">EY</span>(x, z1, z2, z3, z4))</span>
+<span id="cb752-8"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb752-8" tabindex="-1"></a>  <span class="fu">data.frame</span>(z1, z2, z3, z4, x, y)</span>
+<span id="cb752-9"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb752-9" tabindex="-1"></a>}</span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
 <li>Generate a data frame <code>dd</code> for a big target population of
 500000 subjects</li>
 </ol>
-<div class="sourceCode" id="cb732"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb732-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb732-1" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">500000</span></span>
-<span id="cb732-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb732-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">7777</span>)</span>
-<span id="cb732-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb732-3" tabindex="-1"></a>dd <span class="ot">&lt;-</span> <span class="fu">genData</span>(N)</span></code></pre></div>
+<div class="sourceCode" id="cb753"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb753-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb753-1" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">500000</span></span>
+<span id="cb753-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb753-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">7777</span>)</span>
+<span id="cb753-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb753-3" tabindex="-1"></a>dd <span class="ot">&lt;-</span> <span class="fu">genData</span>(N)</span></code></pre></div>
 </div>
 <div id="factual-and-counterfactual-risks---associational-and-causal-contrasts" class="section level2 hasAnchor" number="14.4">
 <h2><span class="header-section-number">14.4</span> Factual and counterfactual risks - associational and causal contrasts<a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#factual-and-counterfactual-risks---associational-and-causal-contrasts" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -484,15 +484,15 @@ in the whole target population, as well as their
 associational contrasts: risk difference, risk ratio, and odds
 ratio. Before that define a useful function</li>
 </ol>
-<div class="sourceCode" id="cb733"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb733-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb733-1" tabindex="-1"></a>Contr <span class="ot">&lt;-</span> <span class="cf">function</span>(mu1, mu0) {</span>
-<span id="cb733-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb733-2" tabindex="-1"></a>  RD <span class="ot">&lt;-</span> mu1 <span class="sc">-</span> mu0</span>
-<span id="cb733-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb733-3" tabindex="-1"></a>  RR <span class="ot">&lt;-</span> mu1 <span class="sc">/</span> mu0</span>
-<span id="cb733-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb733-4" tabindex="-1"></a>  OR <span class="ot">&lt;-</span> (mu1 <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> mu1)) <span class="sc">/</span> (mu0 <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> mu0))</span>
-<span id="cb733-5"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb733-5" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">c</span>(mu1, mu0, <span class="at">RD =</span> RD, <span class="at">RR =</span> RR, <span class="at">OR =</span> OR))</span>
-<span id="cb733-6"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb733-6" tabindex="-1"></a>}</span>
-<span id="cb733-7"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb733-7" tabindex="-1"></a>Ey1fact <span class="ot">&lt;-</span> <span class="fu">with</span>(dd, <span class="fu">sum</span>(y <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> x <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="fu">sum</span>(x <span class="sc">==</span> <span class="dv">1</span>))</span>
-<span id="cb733-8"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb733-8" tabindex="-1"></a>Ey0fact <span class="ot">&lt;-</span> <span class="fu">with</span>(dd, <span class="fu">sum</span>(y <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> x <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">/</span> <span class="fu">sum</span>(x <span class="sc">==</span> <span class="dv">0</span>))</span>
-<span id="cb733-9"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb733-9" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(Ey1fact, Ey0fact), <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb754"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb754-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb754-1" tabindex="-1"></a>Contr <span class="ot">&lt;-</span> <span class="cf">function</span>(mu1, mu0) {</span>
+<span id="cb754-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb754-2" tabindex="-1"></a>  RD <span class="ot">&lt;-</span> mu1 <span class="sc">-</span> mu0</span>
+<span id="cb754-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb754-3" tabindex="-1"></a>  RR <span class="ot">&lt;-</span> mu1 <span class="sc">/</span> mu0</span>
+<span id="cb754-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb754-4" tabindex="-1"></a>  OR <span class="ot">&lt;-</span> (mu1 <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> mu1)) <span class="sc">/</span> (mu0 <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> mu0))</span>
+<span id="cb754-5"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb754-5" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">c</span>(mu1, mu0, <span class="at">RD =</span> RD, <span class="at">RR =</span> RR, <span class="at">OR =</span> OR))</span>
+<span id="cb754-6"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb754-6" tabindex="-1"></a>}</span>
+<span id="cb754-7"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb754-7" tabindex="-1"></a>Ey1fact <span class="ot">&lt;-</span> <span class="fu">with</span>(dd, <span class="fu">sum</span>(y <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> x <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="fu">sum</span>(x <span class="sc">==</span> <span class="dv">1</span>))</span>
+<span id="cb754-8"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb754-8" tabindex="-1"></a>Ey0fact <span class="ot">&lt;-</span> <span class="fu">with</span>(dd, <span class="fu">sum</span>(y <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> x <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">/</span> <span class="fu">sum</span>(x <span class="sc">==</span> <span class="dv">0</span>))</span>
+<span id="cb754-9"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb754-9" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(Ey1fact, Ey0fact), <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>##                   RD     RR     OR 
 ## 0.8949 0.6288 0.2661 1.4232 5.0286</code></pre>
 <p>How much bigger is the risk of death of those factually exposed to
@@ -515,13 +515,13 @@ for the effect of <span class="math inline">\(X\)</span>:
 \end{aligned}
 \]</span></li>
 </ol>
-<div class="sourceCode" id="cb735"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb735-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb735-1" tabindex="-1"></a>dd <span class="ot">&lt;-</span> <span class="fu">transform</span>(dd,</span>
-<span id="cb735-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb735-2" tabindex="-1"></a>  <span class="at">EY1.ind =</span> <span class="fu">EY</span>(<span class="at">x =</span> <span class="dv">1</span>, z1, z2, z3, z4),</span>
-<span id="cb735-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb735-3" tabindex="-1"></a>  <span class="at">EY0.ind =</span> <span class="fu">EY</span>(<span class="at">x =</span> <span class="dv">0</span>, z1, z2, z3, z4)</span>
-<span id="cb735-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb735-4" tabindex="-1"></a>)</span>
-<span id="cb735-5"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb735-5" tabindex="-1"></a>EY1pot <span class="ot">&lt;-</span> <span class="fu">mean</span>(dd<span class="sc">$</span>EY1.ind)</span>
-<span id="cb735-6"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb735-6" tabindex="-1"></a>EY0pot <span class="ot">&lt;-</span> <span class="fu">mean</span>(dd<span class="sc">$</span>EY0.ind)</span>
-<span id="cb735-7"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb735-7" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot, EY0pot), <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb756"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb756-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb756-1" tabindex="-1"></a>dd <span class="ot">&lt;-</span> <span class="fu">transform</span>(dd,</span>
+<span id="cb756-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb756-2" tabindex="-1"></a>  <span class="at">EY1.ind =</span> <span class="fu">EY</span>(<span class="at">x =</span> <span class="dv">1</span>, z1, z2, z3, z4),</span>
+<span id="cb756-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb756-3" tabindex="-1"></a>  <span class="at">EY0.ind =</span> <span class="fu">EY</span>(<span class="at">x =</span> <span class="dv">0</span>, z1, z2, z3, z4)</span>
+<span id="cb756-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb756-4" tabindex="-1"></a>)</span>
+<span id="cb756-5"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb756-5" tabindex="-1"></a>EY1pot <span class="ot">&lt;-</span> <span class="fu">mean</span>(dd<span class="sc">$</span>EY1.ind)</span>
+<span id="cb756-6"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb756-6" tabindex="-1"></a>EY0pot <span class="ot">&lt;-</span> <span class="fu">mean</span>(dd<span class="sc">$</span>EY0.ind)</span>
+<span id="cb756-7"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb756-7" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot, EY0pot), <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>##                   RD     RR     OR 
 ## 0.8273 0.6530 0.1743 1.2670 2.5462</code></pre>
 <ol start="3" style="list-style-type: decimal">
@@ -559,8 +559,8 @@ target population using function <code>glm()</code>
 <!-- % estimate of the possible bias due to misspecification of the outcome -->
 <!-- % model --></li>
 </ol>
-<div class="sourceCode" id="cb737"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb737-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb737-1" tabindex="-1"></a>mY <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> x <span class="sc">+</span> z1 <span class="sc">+</span> z2 <span class="sc">+</span> z3 <span class="sc">+</span> z4, <span class="at">family =</span> binomial, <span class="at">data =</span> dd)</span>
-<span id="cb737-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb737-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(mY, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>)], <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb758"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb758-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb758-1" tabindex="-1"></a>mY <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> x <span class="sc">+</span> z1 <span class="sc">+</span> z2 <span class="sc">+</span> z3 <span class="sc">+</span> z4, <span class="at">family =</span> binomial, <span class="at">data =</span> dd)</span>
+<span id="cb758-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb758-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(mY, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>)], <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##             Estimate exp(Est.)
 ## (Intercept)   -1.240     0.289
 ## x              1.052     2.863
@@ -578,15 +578,15 @@ confidence intervals in such a big population.</p>
 separately, keeping the individual values of the
 <span class="math inline">\(Z\)</span>-variables as they are.</li>
 </ol>
-<div class="sourceCode" id="cb739"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb739-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb739-1" tabindex="-1"></a>dd<span class="sc">$</span>yh <span class="ot">&lt;-</span> <span class="fu">predict</span>(mY, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>) <span class="co">#  fitted values</span></span>
-<span id="cb739-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb739-2" tabindex="-1"></a>dd<span class="sc">$</span>yp1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(mY, <span class="at">newdata =</span> <span class="fu">data.frame</span>(</span>
-<span id="cb739-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb739-3" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">rep</span>(<span class="dv">1</span>, N), <span class="co"># x=1</span></span>
-<span id="cb739-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb739-4" tabindex="-1"></a>  dd[, <span class="fu">c</span>(<span class="st">&quot;z1&quot;</span>, <span class="st">&quot;z2&quot;</span>, <span class="st">&quot;z3&quot;</span>, <span class="st">&quot;z4&quot;</span>)]</span>
-<span id="cb739-5"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb739-5" tabindex="-1"></a>), <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
-<span id="cb739-6"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb739-6" tabindex="-1"></a>dd<span class="sc">$</span>yp0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(mY, <span class="at">newdata =</span> <span class="fu">data.frame</span>(</span>
-<span id="cb739-7"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb739-7" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">rep</span>(<span class="dv">0</span>, N), <span class="co"># x=0</span></span>
-<span id="cb739-8"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb739-8" tabindex="-1"></a>  dd[, <span class="fu">c</span>(<span class="st">&quot;z1&quot;</span>, <span class="st">&quot;z2&quot;</span>, <span class="st">&quot;z3&quot;</span>, <span class="st">&quot;z4&quot;</span>)]</span>
-<span id="cb739-9"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb739-9" tabindex="-1"></a>), <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb760"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb760-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb760-1" tabindex="-1"></a>dd<span class="sc">$</span>yh <span class="ot">&lt;-</span> <span class="fu">predict</span>(mY, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>) <span class="co">#  fitted values</span></span>
+<span id="cb760-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb760-2" tabindex="-1"></a>dd<span class="sc">$</span>yp1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(mY, <span class="at">newdata =</span> <span class="fu">data.frame</span>(</span>
+<span id="cb760-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb760-3" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">rep</span>(<span class="dv">1</span>, N), <span class="co"># x=1</span></span>
+<span id="cb760-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb760-4" tabindex="-1"></a>  dd[, <span class="fu">c</span>(<span class="st">&quot;z1&quot;</span>, <span class="st">&quot;z2&quot;</span>, <span class="st">&quot;z3&quot;</span>, <span class="st">&quot;z4&quot;</span>)]</span>
+<span id="cb760-5"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb760-5" tabindex="-1"></a>), <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb760-6"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb760-6" tabindex="-1"></a>dd<span class="sc">$</span>yp0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(mY, <span class="at">newdata =</span> <span class="fu">data.frame</span>(</span>
+<span id="cb760-7"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb760-7" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">rep</span>(<span class="dv">0</span>, N), <span class="co"># x=0</span></span>
+<span id="cb760-8"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb760-8" tabindex="-1"></a>  dd[, <span class="fu">c</span>(<span class="st">&quot;z1&quot;</span>, <span class="st">&quot;z2&quot;</span>, <span class="st">&quot;z3&quot;</span>, <span class="st">&quot;z4&quot;</span>)]</span>
+<span id="cb760-9"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb760-9" tabindex="-1"></a>), <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
 <li>Applying the method of <strong>standardization</strong> or
 <strong>g-formula</strong> compute now the
@@ -597,9 +597,9 @@ of the two counterfactual risks <span class="math inline">\(E(Y^{X=1}) = \pi^1\)
 <span class="math inline">\(E(Y^{X=0})=\pi^0\)</span> as well as<br />
 those of the marginal causal contrasts</li>
 </ol>
-<div class="sourceCode" id="cb740"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb740-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb740-1" tabindex="-1"></a>EY1pot.g <span class="ot">&lt;-</span> <span class="fu">mean</span>(dd<span class="sc">$</span>yp1)</span>
-<span id="cb740-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb740-2" tabindex="-1"></a>EY0pot.g <span class="ot">&lt;-</span> <span class="fu">mean</span>(dd<span class="sc">$</span>yp0)</span>
-<span id="cb740-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb740-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot.g, EY0pot.g), <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb761"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb761-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb761-1" tabindex="-1"></a>EY1pot.g <span class="ot">&lt;-</span> <span class="fu">mean</span>(dd<span class="sc">$</span>yp1)</span>
+<span id="cb761-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb761-2" tabindex="-1"></a>EY0pot.g <span class="ot">&lt;-</span> <span class="fu">mean</span>(dd<span class="sc">$</span>yp0)</span>
+<span id="cb761-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb761-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot.g, EY0pot.g), <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>##                   RD     RR     OR 
 ## 0.8330 0.6508 0.1822 1.2800 2.6763</code></pre>
 <p>The marginal expectations <span class="math inline">\(E_Z[E(X=x, Z)]\)</span> taken over the
@@ -623,8 +623,8 @@ the logistic model. Which one is closer to 1?</p>
 in package <code>stdReg</code>
 (see <a href="https://doi.org/10.1007/s10654-016-0157-3">Sjölander 2016</a>)</li>
 </ol>
-<div class="sourceCode" id="cb742"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb742-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb742-1" tabindex="-1"></a>mY.std <span class="ot">&lt;-</span> <span class="fu">stdGlm</span>(<span class="at">fit =</span> mY, <span class="at">data =</span> dd, <span class="at">X =</span> <span class="st">&quot;x&quot;</span>)</span>
-<span id="cb742-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb742-2" tabindex="-1"></a><span class="fu">summary</span>(mY.std)</span></code></pre></div>
+<div class="sourceCode" id="cb763"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb763-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb763-1" tabindex="-1"></a>mY.std <span class="ot">&lt;-</span> <span class="fu">stdGlm</span>(<span class="at">fit =</span> mY, <span class="at">data =</span> dd, <span class="at">X =</span> <span class="st">&quot;x&quot;</span>)</span>
+<span id="cb763-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb763-2" tabindex="-1"></a><span class="fu">summary</span>(mY.std)</span></code></pre></div>
 <pre><code>## 
 ## Formula: y ~ x + z1 + z2 + z3 + z4
 ## Family: binomial 
@@ -634,16 +634,16 @@ in package <code>stdReg</code>
 ##   Estimate Std. Error lower 0.95 upper 0.95
 ## 0    0.651   0.000733      0.649      0.652
 ## 1    0.833   0.001562      0.830      0.836</code></pre>
-<div class="sourceCode" id="cb744"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb744-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb744-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(mY.std, <span class="at">contrast =</span> <span class="st">&quot;difference&quot;</span>, <span class="at">reference =</span> <span class="dv">0</span>)<span class="sc">$</span>est.table, <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb765"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb765-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb765-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(mY.std, <span class="at">contrast =</span> <span class="st">&quot;difference&quot;</span>, <span class="at">reference =</span> <span class="dv">0</span>)<span class="sc">$</span>est.table, <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>##   Estimate Std. Error lower 0.95 upper 0.95
 ## 0   0.0000     0.0000     0.0000     0.0000
 ## 1   0.1822     0.0017     0.1788     0.1856</code></pre>
-<div class="sourceCode" id="cb746"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb746-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb746-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(mY.std, <span class="at">contrast =</span> <span class="st">&quot;ratio&quot;</span>, <span class="at">reference =</span> <span class="dv">0</span>)<span class="sc">$</span>est.table, <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb767"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb767-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb767-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(mY.std, <span class="at">contrast =</span> <span class="st">&quot;ratio&quot;</span>, <span class="at">reference =</span> <span class="dv">0</span>)<span class="sc">$</span>est.table, <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>##   Estimate Std. Error lower 0.95 upper 0.95
 ## 0     1.00     0.0000     1.0000     1.0000
 ## 1     1.28     0.0028     1.2745     1.2855</code></pre>
-<div class="sourceCode" id="cb748"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb748-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb748-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(mY.std, <span class="at">transform =</span> <span class="st">&quot;odds&quot;</span>, </span>
-<span id="cb748-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb748-2" tabindex="-1"></a>              <span class="at">contrast =</span> <span class="st">&quot;ratio&quot;</span>, <span class="at">reference =</span> <span class="dv">0</span>)<span class="sc">$</span>est.table, <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb769"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb769-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb769-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(mY.std, <span class="at">transform =</span> <span class="st">&quot;odds&quot;</span>, </span>
+<span id="cb769-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb769-2" tabindex="-1"></a>              <span class="at">contrast =</span> <span class="st">&quot;ratio&quot;</span>, <span class="at">reference =</span> <span class="dv">0</span>)<span class="sc">$</span>est.table, <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>##   Estimate Std. Error lower 0.95 upper 0.95
 ## 0   1.0000     0.0000     1.0000     1.0000
 ## 1   2.6763     0.0315     2.6146     2.7379</code></pre>
@@ -680,10 +680,10 @@ p_i = E(X_i| Z_{1i} = z_{1i}, \dots, Z_{4i} = z_{4i})
    \gamma_3 z_{i3} + \gamma_4 z_{4i} ), \quad i=1, \dots N
 \]</span></li>
 </ol>
-<div class="sourceCode" id="cb750"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb750-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb750-1" tabindex="-1"></a>mX <span class="ot">&lt;-</span> <span class="fu">glm</span>(x <span class="sc">~</span> z1 <span class="sc">+</span> z2 <span class="sc">+</span> z3 <span class="sc">+</span> z4,</span>
-<span id="cb750-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb750-2" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> logit), <span class="at">data =</span> dd</span>
-<span id="cb750-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb750-3" tabindex="-1"></a>)</span>
-<span id="cb750-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb750-4" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(mX, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>)], <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb771"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb771-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb771-1" tabindex="-1"></a>mX <span class="ot">&lt;-</span> <span class="fu">glm</span>(x <span class="sc">~</span> z1 <span class="sc">+</span> z2 <span class="sc">+</span> z3 <span class="sc">+</span> z4,</span>
+<span id="cb771-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb771-2" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> logit), <span class="at">data =</span> dd</span>
+<span id="cb771-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb771-3" tabindex="-1"></a>)</span>
+<span id="cb771-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb771-4" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(mX, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>)], <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>##             Estimate exp(Est.)
 ## (Intercept)  -6.3031    0.0018
 ## z1           -0.0161    0.9840
@@ -697,12 +697,12 @@ belonging to exposure group 1:
 <span class="math inline">\(\text{PS}_i = \widehat{p_i}\)</span>, and
 compare their distribution between the two groups.</li>
 </ol>
-<div class="sourceCode" id="cb752"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb752-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb752-1" tabindex="-1"></a>dd<span class="sc">$</span>PS <span class="ot">&lt;-</span> <span class="fu">predict</span>(mX, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
-<span id="cb752-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb752-2" tabindex="-1"></a><span class="fu">summary</span>(dd<span class="sc">$</span>PS)</span></code></pre></div>
+<div class="sourceCode" id="cb773"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb773-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb773-1" tabindex="-1"></a>dd<span class="sc">$</span>PS <span class="ot">&lt;-</span> <span class="fu">predict</span>(mX, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb773-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb773-2" tabindex="-1"></a><span class="fu">summary</span>(dd<span class="sc">$</span>PS)</span></code></pre></div>
 <pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
 ## 0.005256 0.041532 0.112765 0.172440 0.248554 0.613993</code></pre>
-<div class="sourceCode" id="cb754"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb754-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb754-1" tabindex="-1"></a><span class="fu">with</span>(<span class="fu">subset</span>(dd, x <span class="sc">==</span> <span class="dv">0</span>), <span class="fu">plot</span>(<span class="fu">density</span>(PS), <span class="at">lty =</span> <span class="dv">2</span>))</span>
-<span id="cb754-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb754-2" tabindex="-1"></a><span class="fu">with</span>(<span class="fu">subset</span>(dd, x <span class="sc">==</span> <span class="dv">1</span>), <span class="fu">lines</span>(<span class="fu">density</span>(PS), <span class="at">lty =</span> <span class="dv">1</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb775"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb775-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb775-1" tabindex="-1"></a><span class="fu">with</span>(<span class="fu">subset</span>(dd, x <span class="sc">==</span> <span class="dv">0</span>), <span class="fu">plot</span>(<span class="fu">density</span>(PS), <span class="at">lty =</span> <span class="dv">2</span>))</span>
+<span id="cb775-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb775-2" tabindex="-1"></a><span class="fu">with</span>(<span class="fu">subset</span>(dd, x <span class="sc">==</span> <span class="dv">1</span>), <span class="fu">lines</span>(<span class="fu">density</span>(PS), <span class="at">lty =</span> <span class="dv">1</span>))</span></code></pre></div>
 <p>How different are the distributions? Are they sufficiently overlapping?</p>
 <ol start="3" style="list-style-type: decimal">
 <li>Compute the weights
@@ -716,8 +716,8 @@ Look at the sum as well as
 the distribution summary of the weights in the exposure groups. The
 sum of weights should be close to <span class="math inline">\(N\)</span> in both groups.</li>
 </ol>
-<div class="sourceCode" id="cb755"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb755-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb755-1" tabindex="-1"></a>dd<span class="sc">$</span>w <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(dd<span class="sc">$</span>x <span class="sc">==</span> <span class="dv">1</span>, <span class="dv">1</span> <span class="sc">/</span> dd<span class="sc">$</span>PS, <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> dd<span class="sc">$</span>PS))</span>
-<span id="cb755-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb755-2" tabindex="-1"></a><span class="fu">with</span>(dd, <span class="fu">tapply</span>(w, x, sum))</span></code></pre></div>
+<div class="sourceCode" id="cb776"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb776-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb776-1" tabindex="-1"></a>dd<span class="sc">$</span>w <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(dd<span class="sc">$</span>x <span class="sc">==</span> <span class="dv">1</span>, <span class="dv">1</span> <span class="sc">/</span> dd<span class="sc">$</span>PS, <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> dd<span class="sc">$</span>PS))</span>
+<span id="cb776-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb776-2" tabindex="-1"></a><span class="fu">with</span>(dd, <span class="fu">tapply</span>(w, x, sum))</span></code></pre></div>
 <pre><code>##        0        1 
 ## 498880.5 565237.5</code></pre>
 <ol start="4" style="list-style-type: decimal">
@@ -735,9 +735,9 @@ and their causal contrasts, for instance
   \frac{ \sum_{i=1}^n (1-X_i) W_i Y_i }{\sum_{i=1}^n (1-X_i) W_i}
 \]</span></li>
 </ol>
-<div class="sourceCode" id="cb757"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb757-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb757-1" tabindex="-1"></a>EY1pot.w <span class="ot">&lt;-</span> <span class="fu">sum</span>(dd<span class="sc">$</span>x <span class="sc">*</span> dd<span class="sc">$</span>w <span class="sc">*</span> dd<span class="sc">$</span>y) <span class="sc">/</span> <span class="fu">sum</span>(dd<span class="sc">$</span>x <span class="sc">*</span> dd<span class="sc">$</span>w)</span>
-<span id="cb757-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb757-2" tabindex="-1"></a>EY0pot.w <span class="ot">&lt;-</span> <span class="fu">sum</span>((<span class="dv">1</span> <span class="sc">-</span> dd<span class="sc">$</span>x) <span class="sc">*</span> dd<span class="sc">$</span>w <span class="sc">*</span> dd<span class="sc">$</span>y) <span class="sc">/</span> <span class="fu">sum</span>((<span class="dv">1</span> <span class="sc">-</span> dd<span class="sc">$</span>x) <span class="sc">*</span> dd<span class="sc">$</span>w)</span>
-<span id="cb757-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb757-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot.w, EY0pot.w), <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb778"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb778-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb778-1" tabindex="-1"></a>EY1pot.w <span class="ot">&lt;-</span> <span class="fu">sum</span>(dd<span class="sc">$</span>x <span class="sc">*</span> dd<span class="sc">$</span>w <span class="sc">*</span> dd<span class="sc">$</span>y) <span class="sc">/</span> <span class="fu">sum</span>(dd<span class="sc">$</span>x <span class="sc">*</span> dd<span class="sc">$</span>w)</span>
+<span id="cb778-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb778-2" tabindex="-1"></a>EY0pot.w <span class="ot">&lt;-</span> <span class="fu">sum</span>((<span class="dv">1</span> <span class="sc">-</span> dd<span class="sc">$</span>x) <span class="sc">*</span> dd<span class="sc">$</span>w <span class="sc">*</span> dd<span class="sc">$</span>y) <span class="sc">/</span> <span class="fu">sum</span>((<span class="dv">1</span> <span class="sc">-</span> dd<span class="sc">$</span>x) <span class="sc">*</span> dd<span class="sc">$</span>w)</span>
+<span id="cb778-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb778-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot.w, EY0pot.w), <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>##                   RD     RR     OR 
 ## 0.8037 0.6519 0.1518 1.2329 2.1868</code></pre>
 <p>These estimates seem to be somewhat downward biased when
@@ -765,8 +765,8 @@ specified and the weights are
 obtained as follows using function
 <code>SumStat()</code> in <code>PSweight</code>:</li>
 </ol>
-<div class="sourceCode" id="cb759"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb759-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb759-1" tabindex="-1"></a>mX2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(x <span class="sc">~</span> (z2 <span class="sc">+</span> z3 <span class="sc">+</span> z4)<span class="sc">^</span><span class="dv">2</span>, <span class="at">family =</span> binomial, <span class="at">data =</span> dd)</span>
-<span id="cb759-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb759-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(mX2, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>)], <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb780"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb780-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb780-1" tabindex="-1"></a>mX2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(x <span class="sc">~</span> (z2 <span class="sc">+</span> z3 <span class="sc">+</span> z4)<span class="sc">^</span><span class="dv">2</span>, <span class="at">family =</span> binomial, <span class="at">data =</span> dd)</span>
+<span id="cb780-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb780-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(mX2, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>)], <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##             Estimate exp(Est.)
 ## (Intercept)   -5.085     0.006
 ## z2             0.143     1.154
@@ -775,14 +775,14 @@ obtained as follows using function
 ## z2:z3         -0.003     0.997
 ## z2:z4          0.376     1.456
 ## z3:z4          0.001     1.001</code></pre>
-<div class="sourceCode" id="cb761"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb761-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb761-1" tabindex="-1"></a>psw2 <span class="ot">&lt;-</span> <span class="fu">SumStat</span>(</span>
-<span id="cb761-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb761-2" tabindex="-1"></a>  <span class="at">ps.formula =</span> mX2<span class="sc">$</span>formula, <span class="at">data =</span> dd,</span>
-<span id="cb761-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb761-3" tabindex="-1"></a>  <span class="at">weight =</span> <span class="fu">c</span>(<span class="st">&quot;IPW&quot;</span>, <span class="st">&quot;treated&quot;</span>, <span class="st">&quot;overlap&quot;</span>)</span>
-<span id="cb761-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb761-4" tabindex="-1"></a>)</span>
-<span id="cb761-5"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb761-5" tabindex="-1"></a>dd<span class="sc">$</span>PS2 <span class="ot">&lt;-</span> psw2<span class="sc">$</span>propensity[, <span class="dv">2</span>] </span>
-<span id="cb761-6"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb761-6" tabindex="-1"></a>dd<span class="sc">$</span>w2 <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(dd<span class="sc">$</span>x <span class="sc">==</span> <span class="dv">1</span>, <span class="dv">1</span> <span class="sc">/</span> dd<span class="sc">$</span>PS2, <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> dd<span class="sc">$</span>PS2)) </span>
-<span id="cb761-7"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb761-7" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(dd<span class="sc">$</span>PS2[dd<span class="sc">$</span>x <span class="sc">==</span> <span class="dv">0</span>]), <span class="at">lty =</span> <span class="dv">2</span>)</span>
-<span id="cb761-8"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb761-8" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(dd<span class="sc">$</span>PS2[dd<span class="sc">$</span>x <span class="sc">==</span> <span class="dv">1</span>]), <span class="at">lty =</span> <span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb782"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb782-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb782-1" tabindex="-1"></a>psw2 <span class="ot">&lt;-</span> <span class="fu">SumStat</span>(</span>
+<span id="cb782-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb782-2" tabindex="-1"></a>  <span class="at">ps.formula =</span> mX2<span class="sc">$</span>formula, <span class="at">data =</span> dd,</span>
+<span id="cb782-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb782-3" tabindex="-1"></a>  <span class="at">weight =</span> <span class="fu">c</span>(<span class="st">&quot;IPW&quot;</span>, <span class="st">&quot;treated&quot;</span>, <span class="st">&quot;overlap&quot;</span>)</span>
+<span id="cb782-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb782-4" tabindex="-1"></a>)</span>
+<span id="cb782-5"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb782-5" tabindex="-1"></a>dd<span class="sc">$</span>PS2 <span class="ot">&lt;-</span> psw2<span class="sc">$</span>propensity[, <span class="dv">2</span>] </span>
+<span id="cb782-6"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb782-6" tabindex="-1"></a>dd<span class="sc">$</span>w2 <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(dd<span class="sc">$</span>x <span class="sc">==</span> <span class="dv">1</span>, <span class="dv">1</span> <span class="sc">/</span> dd<span class="sc">$</span>PS2, <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> dd<span class="sc">$</span>PS2)) </span>
+<span id="cb782-7"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb782-7" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(dd<span class="sc">$</span>PS2[dd<span class="sc">$</span>x <span class="sc">==</span> <span class="dv">0</span>]), <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb782-8"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb782-8" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(dd<span class="sc">$</span>PS2[dd<span class="sc">$</span>x <span class="sc">==</span> <span class="dv">1</span>]), <span class="at">lty =</span> <span class="dv">1</span>)</span></code></pre></div>
 <p>Note that apart from ordinary IPW, other types of
 weights can also also
 obtained. These are relevant when estimating other
@@ -795,7 +795,7 @@ contrasts, like “average treatment effect among the treated”
 properties of the distribution and to check the balance
 of the propensity scores, for instance</li>
 </ol>
-<div class="sourceCode" id="cb762"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb762-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb762-1" tabindex="-1"></a><span class="fu">plot</span>(psw2, <span class="at">type =</span> <span class="st">&quot;balance&quot;</span>, <span class="at">metric =</span> <span class="st">&quot;PSD&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb783"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb783-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb783-1" tabindex="-1"></a><span class="fu">plot</span>(psw2, <span class="at">type =</span> <span class="st">&quot;balance&quot;</span>, <span class="at">metric =</span> <span class="st">&quot;PSD&quot;</span>)</span></code></pre></div>
 <p>It is desirable that the horisontal values of
 these measures for given weights are less than 0.1.</p>
 <ol start="3" style="list-style-type: decimal">
@@ -803,13 +803,13 @@ these measures for given weights are less than 0.1.</p>
 contrasts, the summary method provides the results
 on the log-scale; therefore <span class="math inline">\(\exp\)</span>-transformation</li>
 </ol>
-<div class="sourceCode" id="cb763"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb763-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb763-1" tabindex="-1"></a>ipw2est <span class="ot">&lt;-</span> <span class="fu">PSweight</span>(<span class="at">ps.formula =</span> mX2, <span class="at">yname =</span> <span class="st">&quot;y&quot;</span>, <span class="at">data =</span> dd, <span class="at">weight =</span> <span class="st">&quot;IPW&quot;</span>)</span>
-<span id="cb763-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb763-2" tabindex="-1"></a>ipw2est</span></code></pre></div>
+<div class="sourceCode" id="cb784"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb784-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb784-1" tabindex="-1"></a>ipw2est <span class="ot">&lt;-</span> <span class="fu">PSweight</span>(<span class="at">ps.formula =</span> mX2, <span class="at">yname =</span> <span class="st">&quot;y&quot;</span>, <span class="at">data =</span> dd, <span class="at">weight =</span> <span class="st">&quot;IPW&quot;</span>)</span>
+<span id="cb784-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb784-2" tabindex="-1"></a>ipw2est</span></code></pre></div>
 <pre><code>## Original group value:  0, 1 
 ## 
 ## Point estimate: 
 ## 0.6526, 0.8255</code></pre>
-<div class="sourceCode" id="cb765"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb765-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb765-1" tabindex="-1"></a><span class="fu">summary</span>(ipw2est)</span></code></pre></div>
+<div class="sourceCode" id="cb786"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb786-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb786-1" tabindex="-1"></a><span class="fu">summary</span>(ipw2est)</span></code></pre></div>
 <pre><code>## 
 ## Closed-form inference: 
 ## 
@@ -823,7 +823,7 @@ on the log-scale; therefore <span class="math inline">\(\exp\)</span>-transforma
 ## Contrast 1 0.1729179 0.0025636 0.1678934 0.17794 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<div class="sourceCode" id="cb767"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb767-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb767-1" tabindex="-1"></a>(logRR.ipw2 <span class="ot">&lt;-</span> <span class="fu">summary</span>(ipw2est, <span class="at">type =</span> <span class="st">&quot;RR&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb788"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb788-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb788-1" tabindex="-1"></a>(logRR.ipw2 <span class="ot">&lt;-</span> <span class="fu">summary</span>(ipw2est, <span class="at">type =</span> <span class="st">&quot;RR&quot;</span>))</span></code></pre></div>
 <pre><code>## 
 ## Closed-form inference: 
 ## 
@@ -838,9 +838,9 @@ on the log-scale; therefore <span class="math inline">\(\exp\)</span>-transforma
 ## Contrast 1 0.2350512 0.0031789 0.2288207 0.24128 &lt; 2.2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<div class="sourceCode" id="cb769"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb769-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb769-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">exp</span>(logRR.ipw2<span class="sc">$</span>estimates[<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">5</span>)]), <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb790"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb790-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb790-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">exp</span>(logRR.ipw2<span class="sc">$</span>estimates[<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">5</span>)]), <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## [1] 1.265 1.257 1.273</code></pre>
-<div class="sourceCode" id="cb771"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb771-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb771-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">summary</span>(ipw2est, <span class="at">type =</span> <span class="st">&quot;OR&quot;</span>)<span class="sc">$</span>estimates[<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">5</span>)]), <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb792"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb792-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb792-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">summary</span>(ipw2est, <span class="at">type =</span> <span class="st">&quot;OR&quot;</span>)<span class="sc">$</span>estimates[<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">5</span>)]), <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## [1] 2.519 2.434 2.606</code></pre>
 <p>Compare these with the previous IPW estimate as
 well as the true values. Have we obtained nearly unbiased results?</p>
@@ -873,9 +873,9 @@ distribution of
 <span class="math inline">\(Z\)</span> in the exposed subset of the target population.
 The risks and their
 contrasts are estimated from the fit of the outcome model:</p>
-<div class="sourceCode" id="cb773"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb773-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb773-1" tabindex="-1"></a>EY1att.g <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">subset</span>(dd, x <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">$</span>yp1)</span>
-<span id="cb773-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb773-2" tabindex="-1"></a>EY0att.g <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">subset</span>(dd, x <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">$</span>yp0)</span>
-<span id="cb773-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb773-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1att.g, EY0att.g), <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb794"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb794-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb794-1" tabindex="-1"></a>EY1att.g <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">subset</span>(dd, x <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">$</span>yp1)</span>
+<span id="cb794-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb794-2" tabindex="-1"></a>EY0att.g <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">subset</span>(dd, x <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">$</span>yp0)</span>
+<span id="cb794-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb794-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1att.g, EY0att.g), <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>##                   RD     RR     OR 
 ## 0.8949 0.7560 0.1389 1.1837 2.7488</code></pre>
 <p>Compare the results here with those for the whole target population. What do you observe?</p>
@@ -887,9 +887,9 @@ the exposed or among the whole population?</p></li>
 exposed based on the true model are similarly obtained
 from the quantities in item 4.2 above:</p></li>
 </ol>
-<div class="sourceCode" id="cb775"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb775-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb775-1" tabindex="-1"></a>EY1att <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">subset</span>(dd, x <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">$</span>EY1.ind)</span>
-<span id="cb775-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb775-2" tabindex="-1"></a>EY0att <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">subset</span>(dd, x <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">$</span>EY0.ind)</span>
-<span id="cb775-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb775-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1att, EY0att), <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb796"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb796-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb796-1" tabindex="-1"></a>EY1att <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">subset</span>(dd, x <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">$</span>EY1.ind)</span>
+<span id="cb796-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb796-2" tabindex="-1"></a>EY0att <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">subset</span>(dd, x <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">$</span>EY0.ind)</span>
+<span id="cb796-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb796-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1att, EY0att), <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>##                   RD     RR     OR 
 ## 0.8955 0.7680 0.1275 1.1661 2.5896</code></pre>
 <p>Compare the estimates in the previous item with the
@@ -901,18 +901,18 @@ approach, then the weights are <span class="math inline">\(W_i = 1\)</span> for 
 <span class="math inline">\(W_i = \text{PS}_i/(1-\text{PS}_i)\)</span> for the unexposed.
 Call again <code>PSweight</code> but with another choice of weight:</li>
 </ol>
-<div class="sourceCode" id="cb777"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb777-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb777-1" tabindex="-1"></a>psatt <span class="ot">&lt;-</span> <span class="fu">PSweight</span>(<span class="at">ps.formula =</span> mX2, <span class="at">yname =</span> <span class="st">&quot;y&quot;</span>, <span class="at">data =</span> dd, <span class="at">weight =</span> <span class="st">&quot;treated&quot;</span>)</span>
-<span id="cb777-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb777-2" tabindex="-1"></a>psatt</span></code></pre></div>
+<div class="sourceCode" id="cb798"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb798-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb798-1" tabindex="-1"></a>psatt <span class="ot">&lt;-</span> <span class="fu">PSweight</span>(<span class="at">ps.formula =</span> mX2, <span class="at">yname =</span> <span class="st">&quot;y&quot;</span>, <span class="at">data =</span> dd, <span class="at">weight =</span> <span class="st">&quot;treated&quot;</span>)</span>
+<span id="cb798-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb798-2" tabindex="-1"></a>psatt</span></code></pre></div>
 <pre><code>## Original group value:  0, 1 
 ## Treatment group value:  1 
 ## 
 ## Point estimate: 
 ## 0.7667, 0.8949</code></pre>
-<div class="sourceCode" id="cb779"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb779-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb779-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(psatt)<span class="sc">$</span>estimates[<span class="dv">1</span>], <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb800"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb800-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb800-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(psatt)<span class="sc">$</span>estimates[<span class="dv">1</span>], <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>## [1] 0.1282</code></pre>
-<div class="sourceCode" id="cb781"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb781-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb781-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">summary</span>(psatt, <span class="at">type =</span> <span class="st">&quot;RR&quot;</span>)<span class="sc">$</span>estimates[<span class="dv">1</span>]), <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb802"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb802-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb802-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">summary</span>(psatt, <span class="at">type =</span> <span class="st">&quot;RR&quot;</span>)<span class="sc">$</span>estimates[<span class="dv">1</span>]), <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## [1] 1.167</code></pre>
-<div class="sourceCode" id="cb783"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb783-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb783-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">summary</span>(psatt, <span class="at">type =</span> <span class="st">&quot;OR&quot;</span>)<span class="sc">$</span>estimates[<span class="dv">1</span>]), <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb804"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb804-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb804-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">summary</span>(psatt, <span class="at">type =</span> <span class="st">&quot;OR&quot;</span>)<span class="sc">$</span>estimates[<span class="dv">1</span>]), <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>## [1] 2.592</code></pre>
 <p>Compare the results here with those obtained by
 g-formula in item 8.1
@@ -944,9 +944,9 @@ IPW-estimator.</p>
 misspecified outcome model with those from the more
 misspecified exposure model.</li>
 </ol>
-<div class="sourceCode" id="cb785"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb785-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb785-1" tabindex="-1"></a>EY1pot.a <span class="ot">&lt;-</span> EY1pot.g <span class="sc">+</span> <span class="fu">mean</span>( <span class="dv">1</span><span class="sc">*</span>(dd<span class="sc">$</span>x<span class="sc">==</span><span class="dv">1</span>) <span class="sc">*</span> dd<span class="sc">$</span>w <span class="sc">*</span> (dd<span class="sc">$</span>y <span class="sc">-</span> dd<span class="sc">$</span>yp1) )</span>
-<span id="cb785-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb785-2" tabindex="-1"></a>EY0pot.a <span class="ot">&lt;-</span> EY0pot.g <span class="sc">+</span> <span class="fu">mean</span>( <span class="dv">1</span><span class="sc">*</span>(dd<span class="sc">$</span>x<span class="sc">==</span><span class="dv">0</span>) <span class="sc">*</span> dd<span class="sc">$</span>w <span class="sc">*</span> (dd<span class="sc">$</span>y <span class="sc">-</span> dd<span class="sc">$</span>yp0) )</span>
-<span id="cb785-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb785-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot.a, EY0pot.a), <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb806"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb806-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb806-1" tabindex="-1"></a>EY1pot.a <span class="ot">&lt;-</span> EY1pot.g <span class="sc">+</span> <span class="fu">mean</span>( <span class="dv">1</span><span class="sc">*</span>(dd<span class="sc">$</span>x<span class="sc">==</span><span class="dv">1</span>) <span class="sc">*</span> dd<span class="sc">$</span>w <span class="sc">*</span> (dd<span class="sc">$</span>y <span class="sc">-</span> dd<span class="sc">$</span>yp1) )</span>
+<span id="cb806-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb806-2" tabindex="-1"></a>EY0pot.a <span class="ot">&lt;-</span> EY0pot.g <span class="sc">+</span> <span class="fu">mean</span>( <span class="dv">1</span><span class="sc">*</span>(dd<span class="sc">$</span>x<span class="sc">==</span><span class="dv">0</span>) <span class="sc">*</span> dd<span class="sc">$</span>w <span class="sc">*</span> (dd<span class="sc">$</span>y <span class="sc">-</span> dd<span class="sc">$</span>yp0) )</span>
+<span id="cb806-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb806-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot.a, EY0pot.a), <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>##                   RD     RR     OR 
 ## 0.8241 0.6523 0.1718 1.2634 2.4972</code></pre>
 <p>Compare these results with those obtained by g-formula and by
@@ -956,11 +956,11 @@ non-augmented IPW method. Was augmentation successful?</p>
 from the slightly misspecified outcome model with the correct
 exposure model using the alternative AIPW-formula</li>
 </ol>
-<div class="sourceCode" id="cb787"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb787-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb787-1" tabindex="-1"></a>EY1pot.w2 <span class="ot">&lt;-</span> ipw2est<span class="sc">$</span>muhat[<span class="dv">2</span>]</span>
-<span id="cb787-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb787-2" tabindex="-1"></a>EY0pot.w2 <span class="ot">&lt;-</span> ipw2est<span class="sc">$</span>muhat[<span class="dv">1</span>]</span>
-<span id="cb787-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb787-3" tabindex="-1"></a>EY1pot.a2 <span class="ot">&lt;-</span> EY1pot.w2 <span class="sc">+</span> <span class="fu">mean</span>( (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span><span class="sc">*</span>(dd<span class="sc">$</span>x<span class="sc">==</span><span class="dv">1</span>) <span class="sc">*</span> dd<span class="sc">$</span>w2) <span class="sc">*</span> dd<span class="sc">$</span>yp1 )</span>
-<span id="cb787-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb787-4" tabindex="-1"></a>EY0pot.a2 <span class="ot">&lt;-</span> EY0pot.w2 <span class="sc">+</span> <span class="fu">mean</span>( (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span><span class="sc">*</span>(dd<span class="sc">$</span>x<span class="sc">==</span><span class="dv">0</span>) <span class="sc">*</span> dd<span class="sc">$</span>w2) <span class="sc">*</span> dd<span class="sc">$</span>yp0 )</span>
-<span id="cb787-5"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb787-5" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot.a2, EY0pot.a2), <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb808"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb808-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb808-1" tabindex="-1"></a>EY1pot.w2 <span class="ot">&lt;-</span> ipw2est<span class="sc">$</span>muhat[<span class="dv">2</span>]</span>
+<span id="cb808-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb808-2" tabindex="-1"></a>EY0pot.w2 <span class="ot">&lt;-</span> ipw2est<span class="sc">$</span>muhat[<span class="dv">1</span>]</span>
+<span id="cb808-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb808-3" tabindex="-1"></a>EY1pot.a2 <span class="ot">&lt;-</span> EY1pot.w2 <span class="sc">+</span> <span class="fu">mean</span>( (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span><span class="sc">*</span>(dd<span class="sc">$</span>x<span class="sc">==</span><span class="dv">1</span>) <span class="sc">*</span> dd<span class="sc">$</span>w2) <span class="sc">*</span> dd<span class="sc">$</span>yp1 )</span>
+<span id="cb808-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb808-4" tabindex="-1"></a>EY0pot.a2 <span class="ot">&lt;-</span> EY0pot.w2 <span class="sc">+</span> <span class="fu">mean</span>( (<span class="dv">1</span> <span class="sc">-</span> <span class="dv">1</span><span class="sc">*</span>(dd<span class="sc">$</span>x<span class="sc">==</span><span class="dv">0</span>) <span class="sc">*</span> dd<span class="sc">$</span>w2) <span class="sc">*</span> dd<span class="sc">$</span>yp0 )</span>
+<span id="cb808-5"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb808-5" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot.a2, EY0pot.a2), <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>##      1      0   RD.1   RR.1   OR.1 
 ## 0.8261 0.6526 0.1735 1.2658 2.5285</code></pre>
 <p>Compare the results with previous ones.
@@ -985,8 +985,8 @@ intuitive as those in AIPW. See <a href="https://doi.org/10.1093/aje/kww165">Sch
 obtained above for the correct exposure model
 and define the “clever covariates”</li>
 </ol>
-<div class="sourceCode" id="cb789"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb789-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb789-1" tabindex="-1"></a>dd<span class="sc">$</span>H1 <span class="ot">&lt;-</span> dd<span class="sc">$</span>x <span class="sc">/</span> dd<span class="sc">$</span>PS2</span>
-<span id="cb789-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb789-2" tabindex="-1"></a>dd<span class="sc">$</span>H0 <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> dd<span class="sc">$</span>x) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> dd<span class="sc">$</span>PS2)</span></code></pre></div>
+<div class="sourceCode" id="cb810"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb810-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb810-1" tabindex="-1"></a>dd<span class="sc">$</span>H1 <span class="ot">&lt;-</span> dd<span class="sc">$</span>x <span class="sc">/</span> dd<span class="sc">$</span>PS2</span>
+<span id="cb810-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb810-2" tabindex="-1"></a>dd<span class="sc">$</span>H0 <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> dd<span class="sc">$</span>x) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> dd<span class="sc">$</span>PS2)</span></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
 <li>Then, a working model is fitted for the outcome,
 in which the clever
@@ -998,11 +998,11 @@ from the original
 outcome model <code>mY</code> as an offset term; see item 5.2.
 Moreover, the intercept is removed.</li>
 </ol>
-<div class="sourceCode" id="cb790"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb790-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb790-1" tabindex="-1"></a>epsmod <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> H0 <span class="sc">+</span> H1 <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">qlogis</span>(yh)),</span>
-<span id="cb790-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb790-2" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> logit), <span class="at">data =</span> dd</span>
-<span id="cb790-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb790-3" tabindex="-1"></a>)</span>
-<span id="cb790-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb790-4" tabindex="-1"></a>eps <span class="ot">&lt;-</span> <span class="fu">coef</span>(epsmod)</span>
-<span id="cb790-5"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb790-5" tabindex="-1"></a>eps</span></code></pre></div>
+<div class="sourceCode" id="cb811"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb811-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb811-1" tabindex="-1"></a>epsmod <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> H0 <span class="sc">+</span> H1 <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">qlogis</span>(yh)),</span>
+<span id="cb811-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb811-2" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> logit), <span class="at">data =</span> dd</span>
+<span id="cb811-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb811-3" tabindex="-1"></a>)</span>
+<span id="cb811-4"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb811-4" tabindex="-1"></a>eps <span class="ot">&lt;-</span> <span class="fu">coef</span>(epsmod)</span>
+<span id="cb811-5"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb811-5" tabindex="-1"></a>eps</span></code></pre></div>
 <pre><code>##           H0           H1 
 ##  0.007197951 -0.002859654</code></pre>
 <ol start="3" style="list-style-type: decimal">
@@ -1013,14 +1013,14 @@ the original outcome model are now corrected by the estimated
 coefficients of the clever covariates, and the corrected
 predictions are returned to the original scale.</li>
 </ol>
-<div class="sourceCode" id="cb792"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb792-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb792-1" tabindex="-1"></a>ypred0.H <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(dd<span class="sc">$</span>yp0) <span class="sc">+</span> eps[<span class="dv">1</span>] <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> dd<span class="sc">$</span>PS2))</span>
-<span id="cb792-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb792-2" tabindex="-1"></a>ypred1.H <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(dd<span class="sc">$</span>yp1) <span class="sc">+</span> eps[<span class="dv">2</span>] <span class="sc">/</span> dd<span class="sc">$</span>PS2)</span></code></pre></div>
+<div class="sourceCode" id="cb813"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb813-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb813-1" tabindex="-1"></a>ypred0.H <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(dd<span class="sc">$</span>yp0) <span class="sc">+</span> eps[<span class="dv">1</span>] <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> dd<span class="sc">$</span>PS2))</span>
+<span id="cb813-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb813-2" tabindex="-1"></a>ypred1.H <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(dd<span class="sc">$</span>yp1) <span class="sc">+</span> eps[<span class="dv">2</span>] <span class="sc">/</span> dd<span class="sc">$</span>PS2)</span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
 <li>Estimates of the causal contrasts:</li>
 </ol>
-<div class="sourceCode" id="cb793"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb793-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb793-1" tabindex="-1"></a>EY0pot.t <span class="ot">&lt;-</span> <span class="fu">mean</span>(ypred0.H)</span>
-<span id="cb793-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb793-2" tabindex="-1"></a>EY1pot.t <span class="ot">&lt;-</span> <span class="fu">mean</span>(ypred1.H)</span>
-<span id="cb793-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb793-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot.t, EY0pot.t), <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb814"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb814-1"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb814-1" tabindex="-1"></a>EY0pot.t <span class="ot">&lt;-</span> <span class="fu">mean</span>(ypred0.H)</span>
+<span id="cb814-2"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb814-2" tabindex="-1"></a>EY1pot.t <span class="ot">&lt;-</span> <span class="fu">mean</span>(ypred1.H)</span>
+<span id="cb814-3"><a href="causal-inference-2-model-based-estimation-of-causal-estimands.html#cb814-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot.t, EY0pot.t), <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>##                   RD     RR     OR 
 ## 0.8246 0.6526 0.1720 1.2635 2.5020</code></pre>
 <p>Compare these with previous results and with the true values.</p>

@@ -339,12 +339,12 @@ based on the dataset <code>DMlate</code>, a random sample of 10,000
 patients from the Danish Diabetes Register (scrambeled dates), all
 with date of diagnosis after 1994.</p>
 <p>Start by loading the relevant packages:</p>
-<div class="sourceCode" id="cb602"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb602-1"><a href="time-splitting-time-scales-and-smr.html#cb602-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
-<span id="cb602-2"><a href="time-splitting-time-scales-and-smr.html#cb602-2" tabindex="-1"></a><span class="fu">library</span>(popEpi)</span>
-<span id="cb602-3"><a href="time-splitting-time-scales-and-smr.html#cb602-3" tabindex="-1"></a><span class="fu">library</span>(mgcv)</span></code></pre></div>
+<div class="sourceCode" id="cb623"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb623-1"><a href="time-splitting-time-scales-and-smr.html#cb623-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
+<span id="cb623-2"><a href="time-splitting-time-scales-and-smr.html#cb623-2" tabindex="-1"></a><span class="fu">library</span>(popEpi)</span>
+<span id="cb623-3"><a href="time-splitting-time-scales-and-smr.html#cb623-3" tabindex="-1"></a><span class="fu">library</span>(mgcv)</span></code></pre></div>
 <pre><code>Loading required package: nlme</code></pre>
 <pre><code>This is mgcv 1.9-1. For overview type &#39;help(&quot;mgcv-package&quot;)&#39;.</code></pre>
-<div class="sourceCode" id="cb605"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb605-1"><a href="time-splitting-time-scales-and-smr.html#cb605-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div>
+<div class="sourceCode" id="cb626"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb626-1"><a href="time-splitting-time-scales-and-smr.html#cb626-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div>
 <pre><code>── Attaching core tidyverse packages ────────────────────────────────── tidyverse 2.0.0 ──
 ✔ dplyr     1.1.4     ✔ readr     2.1.5
 ✔ forcats   1.0.0     ✔ stringr   1.5.1
@@ -358,8 +358,8 @@ with date of diagnosis after 1994.</p>
 ✖ dplyr::lag()         masks stats::lag()
 ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
 <p>Then load the data and take a look at the data:</p>
-<div class="sourceCode" id="cb608"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb608-1"><a href="time-splitting-time-scales-and-smr.html#cb608-1" tabindex="-1"></a><span class="fu">data</span>(DMlate)</span>
-<span id="cb608-2"><a href="time-splitting-time-scales-and-smr.html#cb608-2" tabindex="-1"></a><span class="fu">str</span>(DMlate)</span></code></pre></div>
+<div class="sourceCode" id="cb629"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb629-1"><a href="time-splitting-time-scales-and-smr.html#cb629-1" tabindex="-1"></a><span class="fu">data</span>(DMlate)</span>
+<span id="cb629-2"><a href="time-splitting-time-scales-and-smr.html#cb629-2" tabindex="-1"></a><span class="fu">str</span>(DMlate)</span></code></pre></div>
 <pre><code>&#39;data.frame&#39;:   10000 obs. of  7 variables:
  $ sex  : Factor w/ 2 levels &quot;M&quot;,&quot;F&quot;: 2 1 2 2 1 2 1 1 2 1 ...
  $ dobth: num  1940 1939 1918 1965 1933 ...
@@ -370,19 +370,19 @@ with date of diagnosis after 1994.</p>
  $ dox  : num  2010 2010 2010 2010 2010 ...</code></pre>
 <p>You can get a more detailed explanation of the data by referring to
 the help page:</p>
-<div class="sourceCode" id="cb610"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb610-1"><a href="time-splitting-time-scales-and-smr.html#cb610-1" tabindex="-1"></a>?DMlate</span></code></pre></div>
+<div class="sourceCode" id="cb631"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb631-1"><a href="time-splitting-time-scales-and-smr.html#cb631-1" tabindex="-1"></a>?DMlate</span></code></pre></div>
 <ol style="list-style-type: decimal">
 <li><p>Set up the dataset as a <code>Lexis</code> object with age, calendar
 time and duration of diabetes as timescales, and date of death as
 event. Make sure that you know what each of the arguments to
 <code>Lexis</code> mean:</p>
-<div class="sourceCode" id="cb611"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb611-1"><a href="time-splitting-time-scales-and-smr.html#cb611-1" tabindex="-1"></a>LL <span class="ot">&lt;-</span> <span class="fu">Lexis</span>(<span class="at">entry =</span> <span class="fu">list</span>(<span class="at">A =</span> dodm <span class="sc">-</span> dobth, </span>
-<span id="cb611-2"><a href="time-splitting-time-scales-and-smr.html#cb611-2" tabindex="-1"></a>                         <span class="at">P =</span> dodm, </span>
-<span id="cb611-3"><a href="time-splitting-time-scales-and-smr.html#cb611-3" tabindex="-1"></a>                       <span class="at">dur =</span> <span class="dv">0</span>),</span>
-<span id="cb611-4"><a href="time-splitting-time-scales-and-smr.html#cb611-4" tabindex="-1"></a>             <span class="at">exit =</span> <span class="fu">list</span>(<span class="at">P =</span> dox),</span>
-<span id="cb611-5"><a href="time-splitting-time-scales-and-smr.html#cb611-5" tabindex="-1"></a>      <span class="at">exit.status =</span> <span class="fu">factor</span>(<span class="sc">!</span><span class="fu">is.na</span>(dodth), </span>
-<span id="cb611-6"><a href="time-splitting-time-scales-and-smr.html#cb611-6" tabindex="-1"></a>                           <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;Alive&quot;</span>, <span class="st">&quot;Dead&quot;</span>)),</span>
-<span id="cb611-7"><a href="time-splitting-time-scales-and-smr.html#cb611-7" tabindex="-1"></a>             <span class="at">data =</span> DMlate)</span></code></pre></div>
+<div class="sourceCode" id="cb632"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb632-1"><a href="time-splitting-time-scales-and-smr.html#cb632-1" tabindex="-1"></a>LL <span class="ot">&lt;-</span> <span class="fu">Lexis</span>(<span class="at">entry =</span> <span class="fu">list</span>(<span class="at">A =</span> dodm <span class="sc">-</span> dobth, </span>
+<span id="cb632-2"><a href="time-splitting-time-scales-and-smr.html#cb632-2" tabindex="-1"></a>                         <span class="at">P =</span> dodm, </span>
+<span id="cb632-3"><a href="time-splitting-time-scales-and-smr.html#cb632-3" tabindex="-1"></a>                       <span class="at">dur =</span> <span class="dv">0</span>),</span>
+<span id="cb632-4"><a href="time-splitting-time-scales-and-smr.html#cb632-4" tabindex="-1"></a>             <span class="at">exit =</span> <span class="fu">list</span>(<span class="at">P =</span> dox),</span>
+<span id="cb632-5"><a href="time-splitting-time-scales-and-smr.html#cb632-5" tabindex="-1"></a>      <span class="at">exit.status =</span> <span class="fu">factor</span>(<span class="sc">!</span><span class="fu">is.na</span>(dodth), </span>
+<span id="cb632-6"><a href="time-splitting-time-scales-and-smr.html#cb632-6" tabindex="-1"></a>                           <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;Alive&quot;</span>, <span class="st">&quot;Dead&quot;</span>)),</span>
+<span id="cb632-7"><a href="time-splitting-time-scales-and-smr.html#cb632-7" tabindex="-1"></a>             <span class="at">data =</span> DMlate)</span></code></pre></div>
 <pre><code>NOTE: entry.status has been set to &quot;Alive&quot; for all.
 NOTE: Dropping  4  rows with duration of follow up &lt; tol</code></pre>
 <p>Take a look at the first few lines of the resulting dataset, for
@@ -390,14 +390,14 @@ example using <code>head()</code>.</p></li>
 <li><p>Get an overview of the mortality by using <code>stat.table</code>
 to tabulate no. deaths, person-years (<code>lex.dur</code>) and the
 crude mortality rate by sex. Try:</p>
-<div class="sourceCode" id="cb613"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb613-1"><a href="time-splitting-time-scales-and-smr.html#cb613-1" tabindex="-1"></a><span class="fu">stat.table</span>(sex,</span>
-<span id="cb613-2"><a href="time-splitting-time-scales-and-smr.html#cb613-2" tabindex="-1"></a>           <span class="fu">list</span>(<span class="at">D =</span> <span class="fu">sum</span>(lex.Xst <span class="sc">==</span> <span class="st">&quot;Dead&quot;</span>),</span>
-<span id="cb613-3"><a href="time-splitting-time-scales-and-smr.html#cb613-3" tabindex="-1"></a>                <span class="at">Y =</span> <span class="fu">sum</span>(lex.dur),</span>
-<span id="cb613-4"><a href="time-splitting-time-scales-and-smr.html#cb613-4" tabindex="-1"></a>             <span class="at">rate =</span> <span class="fu">ratio</span>(lex.Xst <span class="sc">==</span> <span class="st">&quot;Dead&quot;</span>, </span>
-<span id="cb613-5"><a href="time-splitting-time-scales-and-smr.html#cb613-5" tabindex="-1"></a>                          lex.dur, </span>
-<span id="cb613-6"><a href="time-splitting-time-scales-and-smr.html#cb613-6" tabindex="-1"></a>                          <span class="dv">1000</span>)),</span>
-<span id="cb613-7"><a href="time-splitting-time-scales-and-smr.html#cb613-7" tabindex="-1"></a>          <span class="at">margins =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb613-8"><a href="time-splitting-time-scales-and-smr.html#cb613-8" tabindex="-1"></a>             <span class="at">data =</span> LL)</span></code></pre></div>
+<div class="sourceCode" id="cb634"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb634-1"><a href="time-splitting-time-scales-and-smr.html#cb634-1" tabindex="-1"></a><span class="fu">stat.table</span>(sex,</span>
+<span id="cb634-2"><a href="time-splitting-time-scales-and-smr.html#cb634-2" tabindex="-1"></a>           <span class="fu">list</span>(<span class="at">D =</span> <span class="fu">sum</span>(lex.Xst <span class="sc">==</span> <span class="st">&quot;Dead&quot;</span>),</span>
+<span id="cb634-3"><a href="time-splitting-time-scales-and-smr.html#cb634-3" tabindex="-1"></a>                <span class="at">Y =</span> <span class="fu">sum</span>(lex.dur),</span>
+<span id="cb634-4"><a href="time-splitting-time-scales-and-smr.html#cb634-4" tabindex="-1"></a>             <span class="at">rate =</span> <span class="fu">ratio</span>(lex.Xst <span class="sc">==</span> <span class="st">&quot;Dead&quot;</span>, </span>
+<span id="cb634-5"><a href="time-splitting-time-scales-and-smr.html#cb634-5" tabindex="-1"></a>                          lex.dur, </span>
+<span id="cb634-6"><a href="time-splitting-time-scales-and-smr.html#cb634-6" tabindex="-1"></a>                          <span class="dv">1000</span>)),</span>
+<span id="cb634-7"><a href="time-splitting-time-scales-and-smr.html#cb634-7" tabindex="-1"></a>          <span class="at">margins =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb634-8"><a href="time-splitting-time-scales-and-smr.html#cb634-8" tabindex="-1"></a>             <span class="at">data =</span> LL)</span></code></pre></div>
 <pre><code> --------------------------------- 
  sex           D        Y    rate  
  --------------------------------- 
@@ -406,11 +406,11 @@ crude mortality rate by sex. Try:</p>
 
  Total   2499.00 54273.27   46.04  
  --------------------------------- </code></pre>
-<div class="sourceCode" id="cb615"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb615-1"><a href="time-splitting-time-scales-and-smr.html#cb615-1" tabindex="-1"></a><span class="co"># stat.table is more versatile than xtabs:</span></span>
-<span id="cb615-2"><a href="time-splitting-time-scales-and-smr.html#cb615-2" tabindex="-1"></a><span class="fu">xtabs</span>(<span class="fu">cbind</span>(<span class="at">D =</span> lex.Xst <span class="sc">==</span> <span class="st">&quot;Dead&quot;</span>,</span>
-<span id="cb615-3"><a href="time-splitting-time-scales-and-smr.html#cb615-3" tabindex="-1"></a>            <span class="at">Y =</span> lex.dur) </span>
-<span id="cb615-4"><a href="time-splitting-time-scales-and-smr.html#cb615-4" tabindex="-1"></a>      <span class="sc">~</span> sex, </span>
-<span id="cb615-5"><a href="time-splitting-time-scales-and-smr.html#cb615-5" tabindex="-1"></a>      <span class="at">data =</span> LL)</span></code></pre></div>
+<div class="sourceCode" id="cb636"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb636-1"><a href="time-splitting-time-scales-and-smr.html#cb636-1" tabindex="-1"></a><span class="co"># stat.table is more versatile than xtabs:</span></span>
+<span id="cb636-2"><a href="time-splitting-time-scales-and-smr.html#cb636-2" tabindex="-1"></a><span class="fu">xtabs</span>(<span class="fu">cbind</span>(<span class="at">D =</span> lex.Xst <span class="sc">==</span> <span class="st">&quot;Dead&quot;</span>,</span>
+<span id="cb636-3"><a href="time-splitting-time-scales-and-smr.html#cb636-3" tabindex="-1"></a>            <span class="at">Y =</span> lex.dur) </span>
+<span id="cb636-4"><a href="time-splitting-time-scales-and-smr.html#cb636-4" tabindex="-1"></a>      <span class="sc">~</span> sex, </span>
+<span id="cb636-5"><a href="time-splitting-time-scales-and-smr.html#cb636-5" tabindex="-1"></a>      <span class="at">data =</span> LL)</span></code></pre></div>
 <pre><code>
 sex        D        Y
   M  1343.00 27614.21
@@ -425,10 +425,10 @@ time-scales at the left endpoint of the intervals.</p>
 <code>popEpi</code> package) to split the follow-up along the
 age-axis in sutiable intervals (here set to 1/2 year, but really
 immaterial as long as it is small):</p>
-<div class="sourceCode" id="cb617"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb617-1"><a href="time-splitting-time-scales-and-smr.html#cb617-1" tabindex="-1"></a>SL <span class="ot">&lt;-</span> <span class="fu">splitLexis</span>(LL, </span>
-<span id="cb617-2"><a href="time-splitting-time-scales-and-smr.html#cb617-2" tabindex="-1"></a>                 <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">125</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">2</span>), </span>
-<span id="cb617-3"><a href="time-splitting-time-scales-and-smr.html#cb617-3" tabindex="-1"></a>             <span class="at">time.scale =</span> <span class="st">&quot;A&quot;</span>)</span>
-<span id="cb617-4"><a href="time-splitting-time-scales-and-smr.html#cb617-4" tabindex="-1"></a><span class="fu">summary</span>(SL)</span></code></pre></div>
+<div class="sourceCode" id="cb638"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb638-1"><a href="time-splitting-time-scales-and-smr.html#cb638-1" tabindex="-1"></a>SL <span class="ot">&lt;-</span> <span class="fu">splitLexis</span>(LL, </span>
+<span id="cb638-2"><a href="time-splitting-time-scales-and-smr.html#cb638-2" tabindex="-1"></a>                 <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">125</span>, <span class="dv">1</span> <span class="sc">/</span> <span class="dv">2</span>), </span>
+<span id="cb638-3"><a href="time-splitting-time-scales-and-smr.html#cb638-3" tabindex="-1"></a>             <span class="at">time.scale =</span> <span class="st">&quot;A&quot;</span>)</span>
+<span id="cb638-4"><a href="time-splitting-time-scales-and-smr.html#cb638-4" tabindex="-1"></a><span class="fu">summary</span>(SL)</span></code></pre></div>
 <pre><code>
 Transitions:
      To
@@ -443,18 +443,18 @@ Compare to the original <code>Lexis</code>-dataset.</p></li>
 <li><p>Now estimate age-specific mortality curves for men and
 women separately, using splines as implemented in <code>gam</code>.
 We use <code>k = 20</code> to be sure to catch any irregularities by age.</p>
-<div class="sourceCode" id="cb619"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb619-1"><a href="time-splitting-time-scales-and-smr.html#cb619-1" tabindex="-1"></a>r.m <span class="ot">&lt;-</span> mgcv<span class="sc">::</span><span class="fu">gam</span>(<span class="fu">cbind</span>(lex.Xst <span class="sc">==</span> <span class="st">&quot;Dead&quot;</span>, lex.dur) <span class="sc">~</span> <span class="fu">s</span>(A, <span class="at">k =</span> <span class="dv">20</span>),</span>
-<span id="cb619-2"><a href="time-splitting-time-scales-and-smr.html#cb619-2" tabindex="-1"></a>                 <span class="at">family =</span> poisreg,</span>
-<span id="cb619-3"><a href="time-splitting-time-scales-and-smr.html#cb619-3" tabindex="-1"></a>                   <span class="at">data =</span> <span class="fu">subset</span>(SL, sex <span class="sc">==</span> <span class="st">&quot;M&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb640"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb640-1"><a href="time-splitting-time-scales-and-smr.html#cb640-1" tabindex="-1"></a>r.m <span class="ot">&lt;-</span> mgcv<span class="sc">::</span><span class="fu">gam</span>(<span class="fu">cbind</span>(lex.Xst <span class="sc">==</span> <span class="st">&quot;Dead&quot;</span>, lex.dur) <span class="sc">~</span> <span class="fu">s</span>(A, <span class="at">k =</span> <span class="dv">20</span>),</span>
+<span id="cb640-2"><a href="time-splitting-time-scales-and-smr.html#cb640-2" tabindex="-1"></a>                 <span class="at">family =</span> poisreg,</span>
+<span id="cb640-3"><a href="time-splitting-time-scales-and-smr.html#cb640-3" tabindex="-1"></a>                   <span class="at">data =</span> <span class="fu">subset</span>(SL, sex <span class="sc">==</span> <span class="st">&quot;M&quot;</span>))</span></code></pre></div>
 <p>Make sure you understand all the components on this modeling statement.
 Fit the same model for women.</p>
 <p>There is a convenient wrapper for this, exploiting the <code>Lexis</code>
 structure of data, but which does not have an update</p>
-<div class="sourceCode" id="cb620"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb620-1"><a href="time-splitting-time-scales-and-smr.html#cb620-1" tabindex="-1"></a>r.m <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(<span class="fu">subset</span>(SL, sex <span class="sc">==</span> <span class="st">&quot;M&quot;</span>), <span class="sc">~</span> <span class="fu">s</span>(A, <span class="at">k =</span> <span class="dv">20</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb641"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb641-1"><a href="time-splitting-time-scales-and-smr.html#cb641-1" tabindex="-1"></a>r.m <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(<span class="fu">subset</span>(SL, sex <span class="sc">==</span> <span class="st">&quot;M&quot;</span>), <span class="sc">~</span> <span class="fu">s</span>(A, <span class="at">k =</span> <span class="dv">20</span>))</span></code></pre></div>
 <pre><code>mgcv::gam Poisson analysis of Lexis object subset(SL, sex == &quot;M&quot;) with log link:
 Rates for the transition:
 Alive-&gt;Dead</code></pre>
-<div class="sourceCode" id="cb622"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb622-1"><a href="time-splitting-time-scales-and-smr.html#cb622-1" tabindex="-1"></a>r.f <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(<span class="fu">subset</span>(SL, sex <span class="sc">==</span> <span class="st">&quot;F&quot;</span>), <span class="sc">~</span> <span class="fu">s</span>(A, <span class="at">k =</span> <span class="dv">20</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb643"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb643-1"><a href="time-splitting-time-scales-and-smr.html#cb643-1" tabindex="-1"></a>r.f <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(<span class="fu">subset</span>(SL, sex <span class="sc">==</span> <span class="st">&quot;F&quot;</span>), <span class="sc">~</span> <span class="fu">s</span>(A, <span class="at">k =</span> <span class="dv">20</span>))</span></code></pre></div>
 <pre><code>mgcv::gam Poisson analysis of Lexis object subset(SL, sex == &quot;F&quot;) with log link:
 Rates for the transition:
 Alive-&gt;Dead</code></pre></li>
@@ -464,32 +464,32 @@ limits for these.</p>
 <p><code>glm.Lexis</code> and <code>gam.Lexis</code> use the <code>poisreg</code> family that will return
 the rates in the (inverse) units in which the person-years were
 given; that is the units in which <code>lex.dur</code> is recorded.</p>
-<div class="sourceCode" id="cb624"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb624-1"><a href="time-splitting-time-scales-and-smr.html#cb624-1" tabindex="-1"></a>nd <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="fu">seq</span>(<span class="dv">20</span>, <span class="dv">90</span>, <span class="fl">0.5</span>))</span>
-<span id="cb624-2"><a href="time-splitting-time-scales-and-smr.html#cb624-2" tabindex="-1"></a>p.m <span class="ot">&lt;-</span> <span class="fu">ci.pred</span>(r.m, <span class="at">newdata =</span> nd)</span>
-<span id="cb624-3"><a href="time-splitting-time-scales-and-smr.html#cb624-3" tabindex="-1"></a>p.f <span class="ot">&lt;-</span> <span class="fu">ci.pred</span>(r.f, <span class="at">newdata =</span> nd)</span>
-<span id="cb624-4"><a href="time-splitting-time-scales-and-smr.html#cb624-4" tabindex="-1"></a><span class="fu">str</span>(p.m)</span></code></pre></div>
+<div class="sourceCode" id="cb645"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb645-1"><a href="time-splitting-time-scales-and-smr.html#cb645-1" tabindex="-1"></a>nd <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="fu">seq</span>(<span class="dv">20</span>, <span class="dv">90</span>, <span class="fl">0.5</span>))</span>
+<span id="cb645-2"><a href="time-splitting-time-scales-and-smr.html#cb645-2" tabindex="-1"></a>p.m <span class="ot">&lt;-</span> <span class="fu">ci.pred</span>(r.m, <span class="at">newdata =</span> nd)</span>
+<span id="cb645-3"><a href="time-splitting-time-scales-and-smr.html#cb645-3" tabindex="-1"></a>p.f <span class="ot">&lt;-</span> <span class="fu">ci.pred</span>(r.f, <span class="at">newdata =</span> nd)</span>
+<span id="cb645-4"><a href="time-splitting-time-scales-and-smr.html#cb645-4" tabindex="-1"></a><span class="fu">str</span>(p.m)</span></code></pre></div>
 <pre><code> num [1:141, 1:3] 0.00132 0.00137 0.00142 0.00147 0.00152 ...
  - attr(*, &quot;dimnames&quot;)=List of 2
   ..$ : chr [1:141] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
   ..$ : chr [1:3] &quot;Estimate&quot; &quot;2.5%&quot; &quot;97.5%&quot;</code></pre></li>
 <li><p>Plot the predicted rates for men and women together - using for
 example <code>matplot</code> or <code>matshade</code>.</p>
-<div class="sourceCode" id="cb626"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb626-1"><a href="time-splitting-time-scales-and-smr.html#cb626-1" tabindex="-1"></a>    <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">3.5</span>,<span class="fl">3.5</span>,<span class="dv">1</span>,<span class="dv">1</span>),</span>
-<span id="cb626-2"><a href="time-splitting-time-scales-and-smr.html#cb626-2" tabindex="-1"></a>        <span class="at">mgp =</span> <span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">0</span>) <span class="sc">/</span> <span class="fl">1.6</span>,</span>
-<span id="cb626-3"><a href="time-splitting-time-scales-and-smr.html#cb626-3" tabindex="-1"></a>        <span class="at">las =</span> <span class="dv">1</span>,</span>
-<span id="cb626-4"><a href="time-splitting-time-scales-and-smr.html#cb626-4" tabindex="-1"></a>        <span class="at">bty =</span> <span class="st">&quot;n&quot;</span>, </span>
-<span id="cb626-5"><a href="time-splitting-time-scales-and-smr.html#cb626-5" tabindex="-1"></a>       <span class="at">lend =</span> <span class="st">&quot;butt&quot;</span>)</span>
-<span id="cb626-6"><a href="time-splitting-time-scales-and-smr.html#cb626-6" tabindex="-1"></a><span class="fu">matplot</span>(nd<span class="sc">$</span>A, <span class="fu">cbind</span>(p.m, p.f) <span class="sc">*</span> <span class="dv">1000</span>,</span>
-<span id="cb626-7"><a href="time-splitting-time-scales-and-smr.html#cb626-7" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&quot;l&quot;</span>,</span>
-<span id="cb626-8"><a href="time-splitting-time-scales-and-smr.html#cb626-8" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">each =</span> <span class="dv">3</span>),</span>
-<span id="cb626-9"><a href="time-splitting-time-scales-and-smr.html#cb626-9" tabindex="-1"></a>         <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
-<span id="cb626-10"><a href="time-splitting-time-scales-and-smr.html#cb626-10" tabindex="-1"></a>         <span class="at">lty =</span> <span class="dv">1</span>,</span>
-<span id="cb626-11"><a href="time-splitting-time-scales-and-smr.html#cb626-11" tabindex="-1"></a>         <span class="at">log =</span> <span class="st">&quot;y&quot;</span>, <span class="at">yaxt =</span> <span class="st">&quot;n&quot;</span>,</span>
-<span id="cb626-12"><a href="time-splitting-time-scales-and-smr.html#cb626-12" tabindex="-1"></a>        <span class="at">xlab =</span> <span class="st">&quot;Age&quot;</span>, </span>
-<span id="cb626-13"><a href="time-splitting-time-scales-and-smr.html#cb626-13" tabindex="-1"></a>        <span class="at">ylab =</span> <span class="st">&quot;Mortality per 1000 PY&quot;</span>)</span>
-<span id="cb626-14"><a href="time-splitting-time-scales-and-smr.html#cb626-14" tabindex="-1"></a><span class="fu">axis</span>(<span class="at">side =</span> <span class="dv">2</span>, </span>
-<span id="cb626-15"><a href="time-splitting-time-scales-and-smr.html#cb626-15" tabindex="-1"></a>     <span class="at">at =</span> ll <span class="ot">&lt;-</span> <span class="fu">outer</span>( <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>), <span class="sc">-</span><span class="dv">1</span><span class="sc">:</span><span class="dv">1</span>, <span class="cf">function</span>(x,y) x <span class="sc">*</span> <span class="dv">10</span><span class="sc">^</span>y),</span>
-<span id="cb626-16"><a href="time-splitting-time-scales-and-smr.html#cb626-16" tabindex="-1"></a>     <span class="at">labels =</span> ll)</span></code></pre></div>
+<div class="sourceCode" id="cb647"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb647-1"><a href="time-splitting-time-scales-and-smr.html#cb647-1" tabindex="-1"></a>    <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">3.5</span>,<span class="fl">3.5</span>,<span class="dv">1</span>,<span class="dv">1</span>),</span>
+<span id="cb647-2"><a href="time-splitting-time-scales-and-smr.html#cb647-2" tabindex="-1"></a>        <span class="at">mgp =</span> <span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">0</span>) <span class="sc">/</span> <span class="fl">1.6</span>,</span>
+<span id="cb647-3"><a href="time-splitting-time-scales-and-smr.html#cb647-3" tabindex="-1"></a>        <span class="at">las =</span> <span class="dv">1</span>,</span>
+<span id="cb647-4"><a href="time-splitting-time-scales-and-smr.html#cb647-4" tabindex="-1"></a>        <span class="at">bty =</span> <span class="st">&quot;n&quot;</span>, </span>
+<span id="cb647-5"><a href="time-splitting-time-scales-and-smr.html#cb647-5" tabindex="-1"></a>       <span class="at">lend =</span> <span class="st">&quot;butt&quot;</span>)</span>
+<span id="cb647-6"><a href="time-splitting-time-scales-and-smr.html#cb647-6" tabindex="-1"></a><span class="fu">matplot</span>(nd<span class="sc">$</span>A, <span class="fu">cbind</span>(p.m, p.f) <span class="sc">*</span> <span class="dv">1000</span>,</span>
+<span id="cb647-7"><a href="time-splitting-time-scales-and-smr.html#cb647-7" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&quot;l&quot;</span>,</span>
+<span id="cb647-8"><a href="time-splitting-time-scales-and-smr.html#cb647-8" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">each =</span> <span class="dv">3</span>),</span>
+<span id="cb647-9"><a href="time-splitting-time-scales-and-smr.html#cb647-9" tabindex="-1"></a>         <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb647-10"><a href="time-splitting-time-scales-and-smr.html#cb647-10" tabindex="-1"></a>         <span class="at">lty =</span> <span class="dv">1</span>,</span>
+<span id="cb647-11"><a href="time-splitting-time-scales-and-smr.html#cb647-11" tabindex="-1"></a>         <span class="at">log =</span> <span class="st">&quot;y&quot;</span>, <span class="at">yaxt =</span> <span class="st">&quot;n&quot;</span>,</span>
+<span id="cb647-12"><a href="time-splitting-time-scales-and-smr.html#cb647-12" tabindex="-1"></a>        <span class="at">xlab =</span> <span class="st">&quot;Age&quot;</span>, </span>
+<span id="cb647-13"><a href="time-splitting-time-scales-and-smr.html#cb647-13" tabindex="-1"></a>        <span class="at">ylab =</span> <span class="st">&quot;Mortality per 1000 PY&quot;</span>)</span>
+<span id="cb647-14"><a href="time-splitting-time-scales-and-smr.html#cb647-14" tabindex="-1"></a><span class="fu">axis</span>(<span class="at">side =</span> <span class="dv">2</span>, </span>
+<span id="cb647-15"><a href="time-splitting-time-scales-and-smr.html#cb647-15" tabindex="-1"></a>     <span class="at">at =</span> ll <span class="ot">&lt;-</span> <span class="fu">outer</span>( <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>), <span class="sc">-</span><span class="dv">1</span><span class="sc">:</span><span class="dv">1</span>, <span class="cf">function</span>(x,y) x <span class="sc">*</span> <span class="dv">10</span><span class="sc">^</span>y),</span>
+<span id="cb647-16"><a href="time-splitting-time-scales-and-smr.html#cb647-16" tabindex="-1"></a>     <span class="at">labels =</span> ll)</span></code></pre></div>
 <p><img src="DMDK-s_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <h2 id="further-time-scales-period-and-duration" class="hasAnchor">Further time scales: period and duration<a href="time-splitting-time-scales-and-smr.html#further-time-scales-period-and-duration" class="anchor-section" aria-label="Anchor link to header"></a></h2></li>
 <li><p>We now want to model the mortality rates among diabetes patients
@@ -499,14 +499,14 @@ cubic splines instead of thin plate (<code>"tp"</code>) splines which is
 the default.</p>
 <p>As before specify the model exploiting the <code>Lexis</code> class
 of the dataset, try:</p>
-<div class="sourceCode" id="cb627"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb627-1"><a href="time-splitting-time-scales-and-smr.html#cb627-1" tabindex="-1"></a>Mcr <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(<span class="fu">subset</span>(SL, sex <span class="sc">==</span> <span class="st">&quot;M&quot;</span>),</span>
-<span id="cb627-2"><a href="time-splitting-time-scales-and-smr.html#cb627-2" tabindex="-1"></a>                 <span class="sc">~</span> <span class="fu">s</span>(A, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
-<span id="cb627-3"><a href="time-splitting-time-scales-and-smr.html#cb627-3" tabindex="-1"></a>                   <span class="fu">s</span>(P, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
-<span id="cb627-4"><a href="time-splitting-time-scales-and-smr.html#cb627-4" tabindex="-1"></a>                 <span class="fu">s</span>(dur, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb648"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb648-1"><a href="time-splitting-time-scales-and-smr.html#cb648-1" tabindex="-1"></a>Mcr <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(<span class="fu">subset</span>(SL, sex <span class="sc">==</span> <span class="st">&quot;M&quot;</span>),</span>
+<span id="cb648-2"><a href="time-splitting-time-scales-and-smr.html#cb648-2" tabindex="-1"></a>                 <span class="sc">~</span> <span class="fu">s</span>(A, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
+<span id="cb648-3"><a href="time-splitting-time-scales-and-smr.html#cb648-3" tabindex="-1"></a>                   <span class="fu">s</span>(P, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
+<span id="cb648-4"><a href="time-splitting-time-scales-and-smr.html#cb648-4" tabindex="-1"></a>                 <span class="fu">s</span>(dur, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>))</span></code></pre></div>
 <pre><code>mgcv::gam Poisson analysis of Lexis object subset(SL, sex == &quot;M&quot;) with log link:
 Rates for the transition:
 Alive-&gt;Dead</code></pre>
-<div class="sourceCode" id="cb629"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb629-1"><a href="time-splitting-time-scales-and-smr.html#cb629-1" tabindex="-1"></a><span class="fu">summary</span>(Mcr)</span></code></pre></div>
+<div class="sourceCode" id="cb650"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb650-1"><a href="time-splitting-time-scales-and-smr.html#cb650-1" tabindex="-1"></a><span class="fu">summary</span>(Mcr)</span></code></pre></div>
 <pre><code>
 Family: poisson 
 Link function: log 
@@ -529,14 +529,14 @@ s(dur) 7.586  8.384   74.46  &lt; 2e-16
 R-sq.(adj) =  0.00333   Deviance explained = 9.87%
 UBRE = -0.8054  Scale est. = 1         n = 60347</code></pre>
 <p>Fit the same model for women as well. Are the models reasonably fitting?</p>
-<div class="sourceCode" id="cb631"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb631-1"><a href="time-splitting-time-scales-and-smr.html#cb631-1" tabindex="-1"></a>Fcr <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(<span class="fu">subset</span>(SL, sex <span class="sc">==</span> <span class="st">&quot;F&quot;</span>),</span>
-<span id="cb631-2"><a href="time-splitting-time-scales-and-smr.html#cb631-2" tabindex="-1"></a>                 <span class="sc">~</span> <span class="fu">s</span>(A, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
-<span id="cb631-3"><a href="time-splitting-time-scales-and-smr.html#cb631-3" tabindex="-1"></a>                   <span class="fu">s</span>(P, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
-<span id="cb631-4"><a href="time-splitting-time-scales-and-smr.html#cb631-4" tabindex="-1"></a>                 <span class="fu">s</span>(dur, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb652"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb652-1"><a href="time-splitting-time-scales-and-smr.html#cb652-1" tabindex="-1"></a>Fcr <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(<span class="fu">subset</span>(SL, sex <span class="sc">==</span> <span class="st">&quot;F&quot;</span>),</span>
+<span id="cb652-2"><a href="time-splitting-time-scales-and-smr.html#cb652-2" tabindex="-1"></a>                 <span class="sc">~</span> <span class="fu">s</span>(A, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
+<span id="cb652-3"><a href="time-splitting-time-scales-and-smr.html#cb652-3" tabindex="-1"></a>                   <span class="fu">s</span>(P, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
+<span id="cb652-4"><a href="time-splitting-time-scales-and-smr.html#cb652-4" tabindex="-1"></a>                 <span class="fu">s</span>(dur, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>))</span></code></pre></div>
 <pre><code>mgcv::gam Poisson analysis of Lexis object subset(SL, sex == &quot;F&quot;) with log link:
 Rates for the transition:
 Alive-&gt;Dead</code></pre>
-<div class="sourceCode" id="cb633"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb633-1"><a href="time-splitting-time-scales-and-smr.html#cb633-1" tabindex="-1"></a><span class="fu">summary</span>(Fcr)</span></code></pre></div>
+<div class="sourceCode" id="cb654"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb654-1"><a href="time-splitting-time-scales-and-smr.html#cb654-1" tabindex="-1"></a><span class="fu">summary</span>(Fcr)</span></code></pre></div>
 <pre><code>
 Family: poisson 
 Link function: log 
@@ -562,18 +562,18 @@ UBRE = -0.82405  Scale est. = 1         n = 58126</code></pre></li>
 <code>gam</code> objects. Remember that there are three effects
 estimated, so it is useful set up a multi-panel display, and for
 the sake of comparability to set ylim to the same for men and women:</p>
-<div class="sourceCode" id="cb635"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb635-1"><a href="time-splitting-time-scales-and-smr.html#cb635-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>))</span>
-<span id="cb635-2"><a href="time-splitting-time-scales-and-smr.html#cb635-2" tabindex="-1"></a><span class="fu">plot</span>(Mcr, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>))</span>
-<span id="cb635-3"><a href="time-splitting-time-scales-and-smr.html#cb635-3" tabindex="-1"></a><span class="fu">plot</span>(Fcr, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb656"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb656-1"><a href="time-splitting-time-scales-and-smr.html#cb656-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>))</span>
+<span id="cb656-2"><a href="time-splitting-time-scales-and-smr.html#cb656-2" tabindex="-1"></a><span class="fu">plot</span>(Mcr, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>))</span>
+<span id="cb656-3"><a href="time-splitting-time-scales-and-smr.html#cb656-3" tabindex="-1"></a><span class="fu">plot</span>(Fcr, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>))</span></code></pre></div>
 <p><img src="DMDK-s_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
-<div class="sourceCode" id="cb636"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb636-1"><a href="time-splitting-time-scales-and-smr.html#cb636-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfcol =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">2</span>))</span>
-<span id="cb636-2"><a href="time-splitting-time-scales-and-smr.html#cb636-2" tabindex="-1"></a><span class="fu">plot</span>(Mcr, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>))</span>
-<span id="cb636-3"><a href="time-splitting-time-scales-and-smr.html#cb636-3" tabindex="-1"></a><span class="fu">plot</span>(Fcr, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb657"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb657-1"><a href="time-splitting-time-scales-and-smr.html#cb657-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfcol =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">2</span>))</span>
+<span id="cb657-2"><a href="time-splitting-time-scales-and-smr.html#cb657-2" tabindex="-1"></a><span class="fu">plot</span>(Mcr, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>))</span>
+<span id="cb657-3"><a href="time-splitting-time-scales-and-smr.html#cb657-3" tabindex="-1"></a><span class="fu">plot</span>(Fcr, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="dv">3</span>))</span></code></pre></div>
 <p><img src="DMDK-s_files/figure-html/unnamed-chunk-16-1.png" width="672" />
 What is the absolute scale for these effects?</p></li>
 <li><p>Compare the fit of the naive model with just age and the
 three-factor models, using <code>anova</code>, e.g.:</p>
-<div class="sourceCode" id="cb637"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb637-1"><a href="time-splitting-time-scales-and-smr.html#cb637-1" tabindex="-1"></a><span class="fu">anova</span>(Mcr, r.m, <span class="at">test =</span> <span class="st">&quot;Chisq&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb658"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb658-1"><a href="time-splitting-time-scales-and-smr.html#cb658-1" tabindex="-1"></a><span class="fu">anova</span>(Mcr, r.m, <span class="at">test =</span> <span class="st">&quot;Chisq&quot;</span>)</span></code></pre></div>
 <pre><code>Analysis of Deviance Table
 
 Model 1: cbind(trt(Lx$lex.Cst, Lx$lex.Xst) %in% trnam, Lx$lex.dur) ~ s(A, 
@@ -598,11 +598,11 @@ for separate years of diagnosis.
 This is most easily done using the <code>ci.pred</code> function with
 the <code>newdata =</code> argument. So a person diagnosed in age 50 in
 1995 will have a mortality measured in cases per 1000 PY as:</p>
-<div class="sourceCode" id="cb639"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb639-1"><a href="time-splitting-time-scales-and-smr.html#cb639-1" tabindex="-1"></a>pts <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">12</span>, <span class="dv">1</span><span class="sc">/</span><span class="dv">4</span>)</span>
-<span id="cb639-2"><a href="time-splitting-time-scales-and-smr.html#cb639-2" tabindex="-1"></a>nd <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">50</span>   <span class="sc">+</span> pts, </span>
-<span id="cb639-3"><a href="time-splitting-time-scales-and-smr.html#cb639-3" tabindex="-1"></a>                 <span class="at">P =</span> <span class="dv">1995</span> <span class="sc">+</span> pts, </span>
-<span id="cb639-4"><a href="time-splitting-time-scales-and-smr.html#cb639-4" tabindex="-1"></a>               <span class="at">dur =</span>        pts)</span>
-<span id="cb639-5"><a href="time-splitting-time-scales-and-smr.html#cb639-5" tabindex="-1"></a>m.pr <span class="ot">&lt;-</span> <span class="fu">ci.pred</span>(Mcr, <span class="at">newdata =</span> nd)</span></code></pre></div>
+<div class="sourceCode" id="cb660"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb660-1"><a href="time-splitting-time-scales-and-smr.html#cb660-1" tabindex="-1"></a>pts <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">12</span>, <span class="dv">1</span><span class="sc">/</span><span class="dv">4</span>)</span>
+<span id="cb660-2"><a href="time-splitting-time-scales-and-smr.html#cb660-2" tabindex="-1"></a>nd <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">A =</span> <span class="dv">50</span>   <span class="sc">+</span> pts, </span>
+<span id="cb660-3"><a href="time-splitting-time-scales-and-smr.html#cb660-3" tabindex="-1"></a>                 <span class="at">P =</span> <span class="dv">1995</span> <span class="sc">+</span> pts, </span>
+<span id="cb660-4"><a href="time-splitting-time-scales-and-smr.html#cb660-4" tabindex="-1"></a>               <span class="at">dur =</span>        pts)</span>
+<span id="cb660-5"><a href="time-splitting-time-scales-and-smr.html#cb660-5" tabindex="-1"></a>m.pr <span class="ot">&lt;-</span> <span class="fu">ci.pred</span>(Mcr, <span class="at">newdata =</span> nd)</span></code></pre></div>
 <p>Note that because we used <code>gam.Lexis</code> which uses
 the <code>poisreg</code> family we need not specify <code>lex.dur</code> as a
 variable in the prediction data frame <code>nd</code>. Predictions will
@@ -611,20 +611,20 @@ be rates in the same units as <code>lex.dur</code> (well, the inverse).</p>
 construct prediction of mortality for men and women diagnosed in a
 range of ages, say 50, 60, 70, and plot these together in the same
 graph:</p>
-<div class="sourceCode" id="cb640"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb640-1"><a href="time-splitting-time-scales-and-smr.html#cb640-1" tabindex="-1"></a><span class="fu">cbind</span>(nd, <span class="fu">ci.pred</span>(Mcr, <span class="at">newdata =</span> nd))[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,]</span></code></pre></div></li>
+<div class="sourceCode" id="cb661"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb661-1"><a href="time-splitting-time-scales-and-smr.html#cb661-1" tabindex="-1"></a><span class="fu">cbind</span>(nd, <span class="fu">ci.pred</span>(Mcr, <span class="at">newdata =</span> nd))[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>,]</span></code></pre></div></li>
 <li><p>From figure it seems that the duration effect is
 over-modeled, so refit constraining the d.f. to 5:</p>
-<div class="sourceCode" id="cb641"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb641-1"><a href="time-splitting-time-scales-and-smr.html#cb641-1" tabindex="-1"></a>Mcr <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(<span class="fu">subset</span>(SL, sex <span class="sc">==</span> <span class="st">&quot;M&quot;</span>),</span>
-<span id="cb641-2"><a href="time-splitting-time-scales-and-smr.html#cb641-2" tabindex="-1"></a>                 <span class="sc">~</span> <span class="fu">s</span>(A, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
-<span id="cb641-3"><a href="time-splitting-time-scales-and-smr.html#cb641-3" tabindex="-1"></a>                   <span class="fu">s</span>(P, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
-<span id="cb641-4"><a href="time-splitting-time-scales-and-smr.html#cb641-4" tabindex="-1"></a>                 <span class="fu">s</span>(dur, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">5</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb662"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb662-1"><a href="time-splitting-time-scales-and-smr.html#cb662-1" tabindex="-1"></a>Mcr <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(<span class="fu">subset</span>(SL, sex <span class="sc">==</span> <span class="st">&quot;M&quot;</span>),</span>
+<span id="cb662-2"><a href="time-splitting-time-scales-and-smr.html#cb662-2" tabindex="-1"></a>                 <span class="sc">~</span> <span class="fu">s</span>(A, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
+<span id="cb662-3"><a href="time-splitting-time-scales-and-smr.html#cb662-3" tabindex="-1"></a>                   <span class="fu">s</span>(P, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
+<span id="cb662-4"><a href="time-splitting-time-scales-and-smr.html#cb662-4" tabindex="-1"></a>                 <span class="fu">s</span>(dur, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">5</span>))</span></code></pre></div>
 <pre><code>mgcv::gam Poisson analysis of Lexis object subset(SL, sex == &quot;M&quot;) with log link:
 Rates for the transition:
 Alive-&gt;Dead</code></pre>
-<div class="sourceCode" id="cb643"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb643-1"><a href="time-splitting-time-scales-and-smr.html#cb643-1" tabindex="-1"></a>Fcr <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(<span class="fu">subset</span>(SL, sex <span class="sc">==</span> <span class="st">&quot;F&quot;</span>),</span>
-<span id="cb643-2"><a href="time-splitting-time-scales-and-smr.html#cb643-2" tabindex="-1"></a>                 <span class="sc">~</span> <span class="fu">s</span>(A, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
-<span id="cb643-3"><a href="time-splitting-time-scales-and-smr.html#cb643-3" tabindex="-1"></a>                   <span class="fu">s</span>(P, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
-<span id="cb643-4"><a href="time-splitting-time-scales-and-smr.html#cb643-4" tabindex="-1"></a>                 <span class="fu">s</span>(dur, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">5</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb664"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb664-1"><a href="time-splitting-time-scales-and-smr.html#cb664-1" tabindex="-1"></a>Fcr <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(<span class="fu">subset</span>(SL, sex <span class="sc">==</span> <span class="st">&quot;F&quot;</span>),</span>
+<span id="cb664-2"><a href="time-splitting-time-scales-and-smr.html#cb664-2" tabindex="-1"></a>                 <span class="sc">~</span> <span class="fu">s</span>(A, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
+<span id="cb664-3"><a href="time-splitting-time-scales-and-smr.html#cb664-3" tabindex="-1"></a>                   <span class="fu">s</span>(P, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
+<span id="cb664-4"><a href="time-splitting-time-scales-and-smr.html#cb664-4" tabindex="-1"></a>                 <span class="fu">s</span>(dur, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">5</span>))</span></code></pre></div>
 <pre><code>mgcv::gam Poisson analysis of Lexis object subset(SL, sex == &quot;F&quot;) with log link:
 Rates for the transition:
 Alive-&gt;Dead</code></pre>
@@ -664,7 +664,7 @@ we split the follow-up in 6 month intervals).</p>
 transform the sex variable in <code>M.dk</code> to a factor, and must
 for each follow-up interval in the <code>SL</code> data have an age and
 a period variable that can be used in merging with the population data.</p>
-<div class="sourceCode" id="cb645"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb645-1"><a href="time-splitting-time-scales-and-smr.html#cb645-1" tabindex="-1"></a><span class="fu">str</span>(SL)</span></code></pre></div>
+<div class="sourceCode" id="cb666"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb666-1"><a href="time-splitting-time-scales-and-smr.html#cb666-1" tabindex="-1"></a><span class="fu">str</span>(SL)</span></code></pre></div>
 <pre><code>Classes &#39;Lexis&#39; and &#39;data.frame&#39;:   118473 obs. of  14 variables:
  $ lex.id : int  1 1 1 1 1 1 1 1 1 1 ...
  $ A      : num  58.7 59 59.5 60 60.5 ...
@@ -686,10 +686,10 @@ a period variable that can be used in merging with the population data.</p>
   ..$ dur: NULL
  - attr(*, &quot;time.scales&quot;)= chr [1:3] &quot;A&quot; &quot;P&quot; &quot;dur&quot;
  - attr(*, &quot;time.since&quot;)= chr [1:3] &quot;&quot; &quot;&quot; &quot;&quot;</code></pre>
-<div class="sourceCode" id="cb647"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb647-1"><a href="time-splitting-time-scales-and-smr.html#cb647-1" tabindex="-1"></a>SL<span class="sc">$</span>Am <span class="ot">&lt;-</span> <span class="fu">floor</span>(SL<span class="sc">$</span>A <span class="sc">+</span> <span class="fl">0.25</span>)</span>
-<span id="cb647-2"><a href="time-splitting-time-scales-and-smr.html#cb647-2" tabindex="-1"></a>SL<span class="sc">$</span>Pm <span class="ot">&lt;-</span> <span class="fu">floor</span>(SL<span class="sc">$</span>P <span class="sc">+</span> <span class="fl">0.25</span>)</span>
-<span id="cb647-3"><a href="time-splitting-time-scales-and-smr.html#cb647-3" tabindex="-1"></a><span class="fu">data</span>(M.dk)</span>
-<span id="cb647-4"><a href="time-splitting-time-scales-and-smr.html#cb647-4" tabindex="-1"></a><span class="fu">str</span>(M.dk)</span></code></pre></div>
+<div class="sourceCode" id="cb668"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb668-1"><a href="time-splitting-time-scales-and-smr.html#cb668-1" tabindex="-1"></a>SL<span class="sc">$</span>Am <span class="ot">&lt;-</span> <span class="fu">floor</span>(SL<span class="sc">$</span>A <span class="sc">+</span> <span class="fl">0.25</span>)</span>
+<span id="cb668-2"><a href="time-splitting-time-scales-and-smr.html#cb668-2" tabindex="-1"></a>SL<span class="sc">$</span>Pm <span class="ot">&lt;-</span> <span class="fu">floor</span>(SL<span class="sc">$</span>P <span class="sc">+</span> <span class="fl">0.25</span>)</span>
+<span id="cb668-3"><a href="time-splitting-time-scales-and-smr.html#cb668-3" tabindex="-1"></a><span class="fu">data</span>(M.dk)</span>
+<span id="cb668-4"><a href="time-splitting-time-scales-and-smr.html#cb668-4" tabindex="-1"></a><span class="fu">str</span>(M.dk)</span></code></pre></div>
 <pre><code>&#39;data.frame&#39;:   7800 obs. of  6 variables:
  $ A   : num  0 0 0 0 0 0 0 0 0 0 ...
  $ sex : num  1 2 1 2 1 2 1 2 1 2 ...
@@ -698,11 +698,11 @@ a period variable that can be used in merging with the population data.</p>
  $ Y   : num  35963 34383 36099 34652 34965 ...
  $ rate: num  12.76 8.81 12.05 8.97 11.58 ...
  - attr(*, &quot;Contents&quot;)= chr &quot;Number of deaths and risk time in Denmark&quot;</code></pre>
-<div class="sourceCode" id="cb649"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb649-1"><a href="time-splitting-time-scales-and-smr.html#cb649-1" tabindex="-1"></a>M.dk <span class="ot">&lt;-</span> <span class="fu">transform</span>(M.dk,</span>
-<span id="cb649-2"><a href="time-splitting-time-scales-and-smr.html#cb649-2" tabindex="-1"></a>                  <span class="at">Am =</span> A,</span>
-<span id="cb649-3"><a href="time-splitting-time-scales-and-smr.html#cb649-3" tabindex="-1"></a>                  <span class="at">Pm =</span> P,</span>
-<span id="cb649-4"><a href="time-splitting-time-scales-and-smr.html#cb649-4" tabindex="-1"></a>                 <span class="at">sex =</span> <span class="fu">factor</span>(sex, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>)))</span>
-<span id="cb649-5"><a href="time-splitting-time-scales-and-smr.html#cb649-5" tabindex="-1"></a><span class="fu">str</span>(M.dk)</span></code></pre></div>
+<div class="sourceCode" id="cb670"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb670-1"><a href="time-splitting-time-scales-and-smr.html#cb670-1" tabindex="-1"></a>M.dk <span class="ot">&lt;-</span> <span class="fu">transform</span>(M.dk,</span>
+<span id="cb670-2"><a href="time-splitting-time-scales-and-smr.html#cb670-2" tabindex="-1"></a>                  <span class="at">Am =</span> A,</span>
+<span id="cb670-3"><a href="time-splitting-time-scales-and-smr.html#cb670-3" tabindex="-1"></a>                  <span class="at">Pm =</span> P,</span>
+<span id="cb670-4"><a href="time-splitting-time-scales-and-smr.html#cb670-4" tabindex="-1"></a>                 <span class="at">sex =</span> <span class="fu">factor</span>(sex, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>)))</span>
+<span id="cb670-5"><a href="time-splitting-time-scales-and-smr.html#cb670-5" tabindex="-1"></a><span class="fu">str</span>(M.dk)</span></code></pre></div>
 <pre><code>&#39;data.frame&#39;:   7800 obs. of  8 variables:
  $ A   : num  0 0 0 0 0 0 0 0 0 0 ...
  $ sex : Factor w/ 2 levels &quot;M&quot;,&quot;F&quot;: 1 2 1 2 1 2 1 2 1 2 ...
@@ -715,11 +715,11 @@ a period variable that can be used in merging with the population data.</p>
 <p>Then match the rates from <code>M.dk</code> into <code>SL</code>;
 <code>sex</code>, <code>Am</code> and <code>Pm</code> are the common variables,
 and therefore the match is on these variables:</p>
-<div class="sourceCode" id="cb651"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb651-1"><a href="time-splitting-time-scales-and-smr.html#cb651-1" tabindex="-1"></a>SLr <span class="ot">&lt;-</span> <span class="fu">merge</span>(SL, </span>
-<span id="cb651-2"><a href="time-splitting-time-scales-and-smr.html#cb651-2" tabindex="-1"></a>             M.dk[, <span class="fu">c</span>(<span class="st">&quot;sex&quot;</span>, <span class="st">&quot;Am&quot;</span>, <span class="st">&quot;Pm&quot;</span>, <span class="st">&quot;rate&quot;</span>)])</span>
-<span id="cb651-3"><a href="time-splitting-time-scales-and-smr.html#cb651-3" tabindex="-1"></a><span class="fu">dim</span>(SL)</span></code></pre></div>
+<div class="sourceCode" id="cb672"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb672-1"><a href="time-splitting-time-scales-and-smr.html#cb672-1" tabindex="-1"></a>SLr <span class="ot">&lt;-</span> <span class="fu">merge</span>(SL, </span>
+<span id="cb672-2"><a href="time-splitting-time-scales-and-smr.html#cb672-2" tabindex="-1"></a>             M.dk[, <span class="fu">c</span>(<span class="st">&quot;sex&quot;</span>, <span class="st">&quot;Am&quot;</span>, <span class="st">&quot;Pm&quot;</span>, <span class="st">&quot;rate&quot;</span>)])</span>
+<span id="cb672-3"><a href="time-splitting-time-scales-and-smr.html#cb672-3" tabindex="-1"></a><span class="fu">dim</span>(SL)</span></code></pre></div>
 <pre><code>[1] 118473     16</code></pre>
-<div class="sourceCode" id="cb653"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb653-1"><a href="time-splitting-time-scales-and-smr.html#cb653-1" tabindex="-1"></a><span class="fu">dim</span>(SLr)</span></code></pre></div>
+<div class="sourceCode" id="cb674"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb674-1"><a href="time-splitting-time-scales-and-smr.html#cb674-1" tabindex="-1"></a><span class="fu">dim</span>(SLr)</span></code></pre></div>
 <pre><code>[1] 118454     17</code></pre>
 <p>This merge (remember to <code>?merge</code>!) only takes rows that have
 information from both datasets, hence the slightly fewer rows in
@@ -735,11 +735,11 @@ to make a table of observed, expected and the ratio (SMR) by age
 log-expected as offset to derive the SMR (and c.i.).
 Some of the population mortality rates are 0, so you need to exclude
 those records from the analysis.</p>
-<div class="sourceCode" id="cb655"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb655-1"><a href="time-splitting-time-scales-and-smr.html#cb655-1" tabindex="-1"></a>msmr <span class="ot">&lt;-</span> <span class="fu">glm</span>((lex.Xst <span class="sc">==</span> <span class="st">&quot;Dead&quot;</span>) <span class="sc">~</span> sex <span class="sc">-</span> <span class="dv">1</span>,</span>
-<span id="cb655-2"><a href="time-splitting-time-scales-and-smr.html#cb655-2" tabindex="-1"></a>            <span class="at">offset =</span> <span class="fu">log</span>(E),</span>
-<span id="cb655-3"><a href="time-splitting-time-scales-and-smr.html#cb655-3" tabindex="-1"></a>            <span class="at">family =</span> poisson,</span>
-<span id="cb655-4"><a href="time-splitting-time-scales-and-smr.html#cb655-4" tabindex="-1"></a>              <span class="at">data =</span> <span class="fu">subset</span>(SLr, E <span class="sc">&gt;</span> <span class="dv">0</span>))</span>
-<span id="cb655-5"><a href="time-splitting-time-scales-and-smr.html#cb655-5" tabindex="-1"></a><span class="fu">ci.exp</span>(msmr)</span></code></pre></div>
+<div class="sourceCode" id="cb676"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb676-1"><a href="time-splitting-time-scales-and-smr.html#cb676-1" tabindex="-1"></a>msmr <span class="ot">&lt;-</span> <span class="fu">glm</span>((lex.Xst <span class="sc">==</span> <span class="st">&quot;Dead&quot;</span>) <span class="sc">~</span> sex <span class="sc">-</span> <span class="dv">1</span>,</span>
+<span id="cb676-2"><a href="time-splitting-time-scales-and-smr.html#cb676-2" tabindex="-1"></a>            <span class="at">offset =</span> <span class="fu">log</span>(E),</span>
+<span id="cb676-3"><a href="time-splitting-time-scales-and-smr.html#cb676-3" tabindex="-1"></a>            <span class="at">family =</span> poisson,</span>
+<span id="cb676-4"><a href="time-splitting-time-scales-and-smr.html#cb676-4" tabindex="-1"></a>              <span class="at">data =</span> <span class="fu">subset</span>(SLr, E <span class="sc">&gt;</span> <span class="dv">0</span>))</span>
+<span id="cb676-5"><a href="time-splitting-time-scales-and-smr.html#cb676-5" tabindex="-1"></a><span class="fu">ci.exp</span>(msmr)</span></code></pre></div>
 <pre><code>     exp(Est.)     2.5%    97.5%
 sexM  1.685699 1.597881 1.778344
 sexF  1.541922 1.455442 1.633540</code></pre>
@@ -747,23 +747,23 @@ sexF  1.541922 1.455442 1.633540</code></pre>
 <ul>
 <li>The same model can be fitted a bit simpler by the <code>poisreg</code> family, try:</li>
 </ul>
-<div class="sourceCode" id="cb657"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb657-1"><a href="time-splitting-time-scales-and-smr.html#cb657-1" tabindex="-1"></a>msmr <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(lex.Xst <span class="sc">==</span> <span class="st">&quot;Dead&quot;</span>, E) <span class="sc">~</span> sex <span class="sc">-</span> <span class="dv">1</span>, </span>
-<span id="cb657-2"><a href="time-splitting-time-scales-and-smr.html#cb657-2" tabindex="-1"></a>            <span class="at">family =</span> poisreg,</span>
-<span id="cb657-3"><a href="time-splitting-time-scales-and-smr.html#cb657-3" tabindex="-1"></a>              <span class="at">data =</span> <span class="fu">subset</span>(SLr, E <span class="sc">&gt;</span> <span class="dv">0</span>))</span>
-<span id="cb657-4"><a href="time-splitting-time-scales-and-smr.html#cb657-4" tabindex="-1"></a><span class="fu">ci.exp</span>(msmr)</span></code></pre></div>
+<div class="sourceCode" id="cb678"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb678-1"><a href="time-splitting-time-scales-and-smr.html#cb678-1" tabindex="-1"></a>msmr <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(lex.Xst <span class="sc">==</span> <span class="st">&quot;Dead&quot;</span>, E) <span class="sc">~</span> sex <span class="sc">-</span> <span class="dv">1</span>, </span>
+<span id="cb678-2"><a href="time-splitting-time-scales-and-smr.html#cb678-2" tabindex="-1"></a>            <span class="at">family =</span> poisreg,</span>
+<span id="cb678-3"><a href="time-splitting-time-scales-and-smr.html#cb678-3" tabindex="-1"></a>              <span class="at">data =</span> <span class="fu">subset</span>(SLr, E <span class="sc">&gt;</span> <span class="dv">0</span>))</span>
+<span id="cb678-4"><a href="time-splitting-time-scales-and-smr.html#cb678-4" tabindex="-1"></a><span class="fu">ci.exp</span>(msmr)</span></code></pre></div>
 <pre><code>     exp(Est.)     2.5%    97.5%
 sexM  1.685699 1.597881 1.778344
 sexF  1.541922 1.455441 1.633541</code></pre>
 <p>We can assess the ratios of SMRs between men and women by using the
 <code>ctr.mat</code> argument which should be a matrix:</p>
-<div class="sourceCode" id="cb659"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb659-1"><a href="time-splitting-time-scales-and-smr.html#cb659-1" tabindex="-1"></a>(CM <span class="ot">&lt;-</span> <span class="fu">rbind</span>(<span class="at">M =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>),</span>
-<span id="cb659-2"><a href="time-splitting-time-scales-and-smr.html#cb659-2" tabindex="-1"></a>             <span class="at">W =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
-<span id="cb659-3"><a href="time-splitting-time-scales-and-smr.html#cb659-3" tabindex="-1"></a>         <span class="st">&quot;M/F&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>)))</span></code></pre></div>
+<div class="sourceCode" id="cb680"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb680-1"><a href="time-splitting-time-scales-and-smr.html#cb680-1" tabindex="-1"></a>(CM <span class="ot">&lt;-</span> <span class="fu">rbind</span>(<span class="at">M =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb680-2"><a href="time-splitting-time-scales-and-smr.html#cb680-2" tabindex="-1"></a>             <span class="at">W =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb680-3"><a href="time-splitting-time-scales-and-smr.html#cb680-3" tabindex="-1"></a>         <span class="st">&quot;M/F&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>)))</span></code></pre></div>
 <pre><code>    [,1] [,2]
 M      1    0
 W      0    1
 M/F    1   -1</code></pre>
-<div class="sourceCode" id="cb661"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb661-1"><a href="time-splitting-time-scales-and-smr.html#cb661-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(msmr, <span class="at">ctr.mat =</span> CM), <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb682"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb682-1"><a href="time-splitting-time-scales-and-smr.html#cb682-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(msmr, <span class="at">ctr.mat =</span> CM), <span class="dv">2</span>)</span></code></pre></div>
 <pre><code>    exp(Est.) 2.5% 97.5%
 M        1.69 1.60  1.78
 W        1.54 1.46  1.63
@@ -783,13 +783,13 @@ fitting models for the rates, you need to use <code>gam</code> with
 the <code>poisreg</code> family. And remember to exclude those units
 where no deaths in the population occur (that is where the
 population mortality rate is 0).</p>
-<div class="sourceCode" id="cb663"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb663-1"><a href="time-splitting-time-scales-and-smr.html#cb663-1" tabindex="-1"></a>Msmr <span class="ot">&lt;-</span> <span class="fu">gam</span>(<span class="fu">cbind</span>(lex.Xst <span class="sc">==</span> <span class="st">&quot;Dead&quot;</span>, E) </span>
-<span id="cb663-2"><a href="time-splitting-time-scales-and-smr.html#cb663-2" tabindex="-1"></a>            <span class="sc">~</span> <span class="fu">s</span>(  A, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb663-3"><a href="time-splitting-time-scales-and-smr.html#cb663-3" tabindex="-1"></a>              <span class="fu">s</span>(  P, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb663-4"><a href="time-splitting-time-scales-and-smr.html#cb663-4" tabindex="-1"></a>              <span class="fu">s</span>(dur, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">5</span>),</span>
-<span id="cb663-5"><a href="time-splitting-time-scales-and-smr.html#cb663-5" tabindex="-1"></a>            <span class="at">family =</span> poisreg,</span>
-<span id="cb663-6"><a href="time-splitting-time-scales-and-smr.html#cb663-6" tabindex="-1"></a>              <span class="at">data =</span> <span class="fu">subset</span>(SLr, E <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> sex <span class="sc">==</span> <span class="st">&quot;M&quot;</span>))</span>
-<span id="cb663-7"><a href="time-splitting-time-scales-and-smr.html#cb663-7" tabindex="-1"></a><span class="fu">ci.exp</span>(Msmr)</span></code></pre></div>
+<div class="sourceCode" id="cb684"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb684-1"><a href="time-splitting-time-scales-and-smr.html#cb684-1" tabindex="-1"></a>Msmr <span class="ot">&lt;-</span> <span class="fu">gam</span>(<span class="fu">cbind</span>(lex.Xst <span class="sc">==</span> <span class="st">&quot;Dead&quot;</span>, E) </span>
+<span id="cb684-2"><a href="time-splitting-time-scales-and-smr.html#cb684-2" tabindex="-1"></a>            <span class="sc">~</span> <span class="fu">s</span>(  A, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb684-3"><a href="time-splitting-time-scales-and-smr.html#cb684-3" tabindex="-1"></a>              <span class="fu">s</span>(  P, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb684-4"><a href="time-splitting-time-scales-and-smr.html#cb684-4" tabindex="-1"></a>              <span class="fu">s</span>(dur, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">5</span>),</span>
+<span id="cb684-5"><a href="time-splitting-time-scales-and-smr.html#cb684-5" tabindex="-1"></a>            <span class="at">family =</span> poisreg,</span>
+<span id="cb684-6"><a href="time-splitting-time-scales-and-smr.html#cb684-6" tabindex="-1"></a>              <span class="at">data =</span> <span class="fu">subset</span>(SLr, E <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> sex <span class="sc">==</span> <span class="st">&quot;M&quot;</span>))</span>
+<span id="cb684-7"><a href="time-splitting-time-scales-and-smr.html#cb684-7" tabindex="-1"></a><span class="fu">ci.exp</span>(Msmr)</span></code></pre></div>
 <pre><code>            exp(Est.)      2.5%     97.5%
 (Intercept) 2.1667053 2.0001046 2.3471833
 s(A).1      0.5960527 0.5181962 0.6856068
@@ -804,17 +804,17 @@ s(dur).1    0.6581828 0.5769629 0.7508362
 s(dur).2    0.8446645 0.7613599 0.9370838
 s(dur).3    0.7830215 0.6916313 0.8864877
 s(dur).4    1.8176744 1.1041338 2.9923368</code></pre>
-<div class="sourceCode" id="cb665"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb665-1"><a href="time-splitting-time-scales-and-smr.html#cb665-1" tabindex="-1"></a>Fsmr <span class="ot">&lt;-</span> <span class="fu">update</span>(Msmr, <span class="at">data =</span> <span class="fu">subset</span>(SLr, E <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> sex <span class="sc">==</span> <span class="st">&quot;F&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb686"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb686-1"><a href="time-splitting-time-scales-and-smr.html#cb686-1" tabindex="-1"></a>Fsmr <span class="ot">&lt;-</span> <span class="fu">update</span>(Msmr, <span class="at">data =</span> <span class="fu">subset</span>(SLr, E <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;</span> sex <span class="sc">==</span> <span class="st">&quot;F&quot;</span>))</span></code></pre></div>
 <p>Plot the estimated smooth effects for both men and women using
 e.g. <code>plot.gam</code>. What do you see?</p></li>
 <li><p>Plot the predicted SMRs from the models for men and women
 diagnosed in ages 50, 60 and 70 as you did for the rates. What do
 you see?</p>
-<div class="sourceCode" id="cb666"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb666-1"><a href="time-splitting-time-scales-and-smr.html#cb666-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</span>
-<span id="cb666-2"><a href="time-splitting-time-scales-and-smr.html#cb666-2" tabindex="-1"></a>n50 <span class="ot">&lt;-</span> nd</span>
-<span id="cb666-3"><a href="time-splitting-time-scales-and-smr.html#cb666-3" tabindex="-1"></a>n60 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(n50, <span class="at">A =</span> A <span class="sc">+</span> <span class="dv">10</span>)</span>
-<span id="cb666-4"><a href="time-splitting-time-scales-and-smr.html#cb666-4" tabindex="-1"></a>n70 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(n50, <span class="at">A =</span> A <span class="sc">+</span> <span class="dv">20</span>)</span>
-<span id="cb666-5"><a href="time-splitting-time-scales-and-smr.html#cb666-5" tabindex="-1"></a><span class="fu">head</span>(n70)</span></code></pre></div>
+<div class="sourceCode" id="cb687"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb687-1"><a href="time-splitting-time-scales-and-smr.html#cb687-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb687-2"><a href="time-splitting-time-scales-and-smr.html#cb687-2" tabindex="-1"></a>n50 <span class="ot">&lt;-</span> nd</span>
+<span id="cb687-3"><a href="time-splitting-time-scales-and-smr.html#cb687-3" tabindex="-1"></a>n60 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(n50, <span class="at">A =</span> A <span class="sc">+</span> <span class="dv">10</span>)</span>
+<span id="cb687-4"><a href="time-splitting-time-scales-and-smr.html#cb687-4" tabindex="-1"></a>n70 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(n50, <span class="at">A =</span> A <span class="sc">+</span> <span class="dv">20</span>)</span>
+<span id="cb687-5"><a href="time-splitting-time-scales-and-smr.html#cb687-5" tabindex="-1"></a><span class="fu">head</span>(n70)</span></code></pre></div>
 <pre><code>      A       P  dur
 1 70.00 1995.00 0.00
 2 70.25 1995.25 0.25
@@ -822,18 +822,18 @@ you see?</p>
 4 70.75 1995.75 0.75
 5 71.00 1996.00 1.00
 6 71.25 1996.25 1.25</code></pre>
-<div class="sourceCode" id="cb668"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb668-1"><a href="time-splitting-time-scales-and-smr.html#cb668-1" tabindex="-1"></a><span class="fu">matshade</span>(n50<span class="sc">$</span>A, <span class="fu">cbind</span>(<span class="fu">ci.pred</span>(Msmr, n50),</span>
-<span id="cb668-2"><a href="time-splitting-time-scales-and-smr.html#cb668-2" tabindex="-1"></a>                      <span class="fu">ci.pred</span>(Fsmr, n50)), <span class="at">plot =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb668-3"><a href="time-splitting-time-scales-and-smr.html#cb668-3" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">lwd =</span> <span class="dv">3</span>,</span>
-<span id="cb668-4"><a href="time-splitting-time-scales-and-smr.html#cb668-4" tabindex="-1"></a>         <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">5</span>), <span class="at">log  =</span> <span class="st">&quot;y&quot;</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">80</span>))</span>
-<span id="cb668-5"><a href="time-splitting-time-scales-and-smr.html#cb668-5" tabindex="-1"></a><span class="fu">matshade</span>(n60<span class="sc">$</span>A, <span class="fu">cbind</span>(<span class="fu">ci.pred</span>(Msmr, n60),</span>
-<span id="cb668-6"><a href="time-splitting-time-scales-and-smr.html#cb668-6" tabindex="-1"></a>                      <span class="fu">ci.pred</span>(Fsmr, n60)),</span>
-<span id="cb668-7"><a href="time-splitting-time-scales-and-smr.html#cb668-7" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">lwd =</span> <span class="dv">3</span>)</span>
-<span id="cb668-8"><a href="time-splitting-time-scales-and-smr.html#cb668-8" tabindex="-1"></a><span class="fu">matshade</span>(n70<span class="sc">$</span>A, <span class="fu">cbind</span>(<span class="fu">ci.pred</span>(Msmr, n70),</span>
-<span id="cb668-9"><a href="time-splitting-time-scales-and-smr.html#cb668-9" tabindex="-1"></a>                      <span class="fu">ci.pred</span>(Fsmr, n70)),</span>
-<span id="cb668-10"><a href="time-splitting-time-scales-and-smr.html#cb668-10" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">lwd =</span> <span class="dv">3</span>)</span>
-<span id="cb668-11"><a href="time-splitting-time-scales-and-smr.html#cb668-11" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">1</span>)</span>
-<span id="cb668-12"><a href="time-splitting-time-scales-and-smr.html#cb668-12" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">50</span> <span class="sc">+</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">lty =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">&quot;gray&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb689"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb689-1"><a href="time-splitting-time-scales-and-smr.html#cb689-1" tabindex="-1"></a><span class="fu">matshade</span>(n50<span class="sc">$</span>A, <span class="fu">cbind</span>(<span class="fu">ci.pred</span>(Msmr, n50),</span>
+<span id="cb689-2"><a href="time-splitting-time-scales-and-smr.html#cb689-2" tabindex="-1"></a>                      <span class="fu">ci.pred</span>(Fsmr, n50)), <span class="at">plot =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb689-3"><a href="time-splitting-time-scales-and-smr.html#cb689-3" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">lwd =</span> <span class="dv">3</span>,</span>
+<span id="cb689-4"><a href="time-splitting-time-scales-and-smr.html#cb689-4" tabindex="-1"></a>         <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">5</span>), <span class="at">log  =</span> <span class="st">&quot;y&quot;</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">80</span>))</span>
+<span id="cb689-5"><a href="time-splitting-time-scales-and-smr.html#cb689-5" tabindex="-1"></a><span class="fu">matshade</span>(n60<span class="sc">$</span>A, <span class="fu">cbind</span>(<span class="fu">ci.pred</span>(Msmr, n60),</span>
+<span id="cb689-6"><a href="time-splitting-time-scales-and-smr.html#cb689-6" tabindex="-1"></a>                      <span class="fu">ci.pred</span>(Fsmr, n60)),</span>
+<span id="cb689-7"><a href="time-splitting-time-scales-and-smr.html#cb689-7" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">lwd =</span> <span class="dv">3</span>)</span>
+<span id="cb689-8"><a href="time-splitting-time-scales-and-smr.html#cb689-8" tabindex="-1"></a><span class="fu">matshade</span>(n70<span class="sc">$</span>A, <span class="fu">cbind</span>(<span class="fu">ci.pred</span>(Msmr, n70),</span>
+<span id="cb689-9"><a href="time-splitting-time-scales-and-smr.html#cb689-9" tabindex="-1"></a>                      <span class="fu">ci.pred</span>(Fsmr, n70)),</span>
+<span id="cb689-10"><a href="time-splitting-time-scales-and-smr.html#cb689-10" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">lwd =</span> <span class="dv">3</span>)</span>
+<span id="cb689-11"><a href="time-splitting-time-scales-and-smr.html#cb689-11" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">1</span>)</span>
+<span id="cb689-12"><a href="time-splitting-time-scales-and-smr.html#cb689-12" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">50</span> <span class="sc">+</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">lty =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">&quot;gray&quot;</span>)</span></code></pre></div>
 <p><img src="DMDK-s_files/figure-html/unnamed-chunk-27-1.png" width="672" />
 Describe the shapes of the curves. What aspects of the shapes are
 induced by the model ?</p></li>
@@ -842,13 +842,13 @@ separate linear effects of age and date of follow-up for each
 sex, and a smooth effect of duration common for both sexes,
 giving an estimate of the change in SMR by age and calendar
 time.</p>
-<div class="sourceCode" id="cb669"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb669-1"><a href="time-splitting-time-scales-and-smr.html#cb669-1" tabindex="-1"></a>Bsmr <span class="ot">&lt;-</span> <span class="fu">gam</span>(<span class="fu">cbind</span>(lex.Xst <span class="sc">==</span> <span class="st">&quot;Dead&quot;</span>, E) </span>
-<span id="cb669-2"><a href="time-splitting-time-scales-and-smr.html#cb669-2" tabindex="-1"></a>            <span class="sc">~</span> sex <span class="sc">/</span> A <span class="sc">+</span></span>
-<span id="cb669-3"><a href="time-splitting-time-scales-and-smr.html#cb669-3" tabindex="-1"></a>              sex <span class="sc">/</span> P <span class="sc">+</span></span>
-<span id="cb669-4"><a href="time-splitting-time-scales-and-smr.html#cb669-4" tabindex="-1"></a>              <span class="fu">s</span>(dur, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">5</span>),</span>
-<span id="cb669-5"><a href="time-splitting-time-scales-and-smr.html#cb669-5" tabindex="-1"></a>            <span class="at">family =</span> poisreg,</span>
-<span id="cb669-6"><a href="time-splitting-time-scales-and-smr.html#cb669-6" tabindex="-1"></a>              <span class="at">data =</span> <span class="fu">subset</span>(SLr, E <span class="sc">&gt;</span> <span class="dv">0</span>))</span>
-<span id="cb669-7"><a href="time-splitting-time-scales-and-smr.html#cb669-7" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(Bsmr)[<span class="sc">-</span><span class="dv">1</span>,], <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb690"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb690-1"><a href="time-splitting-time-scales-and-smr.html#cb690-1" tabindex="-1"></a>Bsmr <span class="ot">&lt;-</span> <span class="fu">gam</span>(<span class="fu">cbind</span>(lex.Xst <span class="sc">==</span> <span class="st">&quot;Dead&quot;</span>, E) </span>
+<span id="cb690-2"><a href="time-splitting-time-scales-and-smr.html#cb690-2" tabindex="-1"></a>            <span class="sc">~</span> sex <span class="sc">/</span> A <span class="sc">+</span></span>
+<span id="cb690-3"><a href="time-splitting-time-scales-and-smr.html#cb690-3" tabindex="-1"></a>              sex <span class="sc">/</span> P <span class="sc">+</span></span>
+<span id="cb690-4"><a href="time-splitting-time-scales-and-smr.html#cb690-4" tabindex="-1"></a>              <span class="fu">s</span>(dur, <span class="at">bs =</span> <span class="st">&quot;cr&quot;</span>, <span class="at">k =</span> <span class="dv">5</span>),</span>
+<span id="cb690-5"><a href="time-splitting-time-scales-and-smr.html#cb690-5" tabindex="-1"></a>            <span class="at">family =</span> poisreg,</span>
+<span id="cb690-6"><a href="time-splitting-time-scales-and-smr.html#cb690-6" tabindex="-1"></a>              <span class="at">data =</span> <span class="fu">subset</span>(SLr, E <span class="sc">&gt;</span> <span class="dv">0</span>))</span>
+<span id="cb690-7"><a href="time-splitting-time-scales-and-smr.html#cb690-7" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(Bsmr)[<span class="sc">-</span><span class="dv">1</span>,], <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>         exp(Est.)  2.5%        97.5%
 sexF     52149.525 0.000 2.375788e+23
 sexM:A       0.981 0.977 9.860000e-01
@@ -864,24 +864,24 @@ calendar year?</p>
 <p>What is the meaning of the <code>sexF</code> parameter?</p></li>
 <li><p>Use your previous code to plot the predicted mortality from this
 model too. Are the predicted SMR curves credible?</p>
-<div class="sourceCode" id="cb671"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb671-1"><a href="time-splitting-time-scales-and-smr.html#cb671-1" tabindex="-1"></a>m50 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(n50, <span class="at">sex =</span> <span class="st">&quot;M&quot;</span>)</span>
-<span id="cb671-2"><a href="time-splitting-time-scales-and-smr.html#cb671-2" tabindex="-1"></a>f50 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(n50, <span class="at">sex =</span> <span class="st">&quot;F&quot;</span>)</span>
-<span id="cb671-3"><a href="time-splitting-time-scales-and-smr.html#cb671-3" tabindex="-1"></a>m60 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(m50, <span class="at">A =</span> A <span class="sc">+</span> <span class="dv">10</span>)</span>
-<span id="cb671-4"><a href="time-splitting-time-scales-and-smr.html#cb671-4" tabindex="-1"></a>f60 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(f50, <span class="at">A =</span> A <span class="sc">+</span> <span class="dv">10</span>)</span>
-<span id="cb671-5"><a href="time-splitting-time-scales-and-smr.html#cb671-5" tabindex="-1"></a>m70 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(m50, <span class="at">A =</span> A <span class="sc">+</span> <span class="dv">20</span>)</span>
-<span id="cb671-6"><a href="time-splitting-time-scales-and-smr.html#cb671-6" tabindex="-1"></a>f70 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(f50, <span class="at">A =</span> A <span class="sc">+</span> <span class="dv">20</span>)</span>
-<span id="cb671-7"><a href="time-splitting-time-scales-and-smr.html#cb671-7" tabindex="-1"></a><span class="fu">matshade</span>(n50<span class="sc">$</span>A, <span class="fu">cbind</span>(<span class="fu">ci.pred</span>(Bsmr, m50),</span>
-<span id="cb671-8"><a href="time-splitting-time-scales-and-smr.html#cb671-8" tabindex="-1"></a>                      <span class="fu">ci.pred</span>(Bsmr, f50)), <span class="at">plot =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb671-9"><a href="time-splitting-time-scales-and-smr.html#cb671-9" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">lwd =</span> <span class="dv">3</span>,</span>
-<span id="cb671-10"><a href="time-splitting-time-scales-and-smr.html#cb671-10" tabindex="-1"></a>         <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">5</span>), <span class="at">log  =</span> <span class="st">&quot;y&quot;</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">80</span>))</span>
-<span id="cb671-11"><a href="time-splitting-time-scales-and-smr.html#cb671-11" tabindex="-1"></a><span class="fu">matshade</span>(n60<span class="sc">$</span>A, <span class="fu">cbind</span>(<span class="fu">ci.pred</span>(Bsmr, m60),</span>
-<span id="cb671-12"><a href="time-splitting-time-scales-and-smr.html#cb671-12" tabindex="-1"></a>                      <span class="fu">ci.pred</span>(Bsmr, f60)),</span>
-<span id="cb671-13"><a href="time-splitting-time-scales-and-smr.html#cb671-13" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">lwd =</span> <span class="dv">3</span>)</span>
-<span id="cb671-14"><a href="time-splitting-time-scales-and-smr.html#cb671-14" tabindex="-1"></a><span class="fu">matshade</span>(n70<span class="sc">$</span>A, <span class="fu">cbind</span>(<span class="fu">ci.pred</span>(Bsmr, m70),</span>
-<span id="cb671-15"><a href="time-splitting-time-scales-and-smr.html#cb671-15" tabindex="-1"></a>                      <span class="fu">ci.pred</span>(Bsmr, f70)),</span>
-<span id="cb671-16"><a href="time-splitting-time-scales-and-smr.html#cb671-16" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">lwd =</span> <span class="dv">3</span>)</span>
-<span id="cb671-17"><a href="time-splitting-time-scales-and-smr.html#cb671-17" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">1</span>)</span>
-<span id="cb671-18"><a href="time-splitting-time-scales-and-smr.html#cb671-18" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">lty =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">&quot;gray&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb692"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb692-1"><a href="time-splitting-time-scales-and-smr.html#cb692-1" tabindex="-1"></a>m50 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(n50, <span class="at">sex =</span> <span class="st">&quot;M&quot;</span>)</span>
+<span id="cb692-2"><a href="time-splitting-time-scales-and-smr.html#cb692-2" tabindex="-1"></a>f50 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(n50, <span class="at">sex =</span> <span class="st">&quot;F&quot;</span>)</span>
+<span id="cb692-3"><a href="time-splitting-time-scales-and-smr.html#cb692-3" tabindex="-1"></a>m60 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(m50, <span class="at">A =</span> A <span class="sc">+</span> <span class="dv">10</span>)</span>
+<span id="cb692-4"><a href="time-splitting-time-scales-and-smr.html#cb692-4" tabindex="-1"></a>f60 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(f50, <span class="at">A =</span> A <span class="sc">+</span> <span class="dv">10</span>)</span>
+<span id="cb692-5"><a href="time-splitting-time-scales-and-smr.html#cb692-5" tabindex="-1"></a>m70 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(m50, <span class="at">A =</span> A <span class="sc">+</span> <span class="dv">20</span>)</span>
+<span id="cb692-6"><a href="time-splitting-time-scales-and-smr.html#cb692-6" tabindex="-1"></a>f70 <span class="ot">&lt;-</span> <span class="fu">mutate</span>(f50, <span class="at">A =</span> A <span class="sc">+</span> <span class="dv">20</span>)</span>
+<span id="cb692-7"><a href="time-splitting-time-scales-and-smr.html#cb692-7" tabindex="-1"></a><span class="fu">matshade</span>(n50<span class="sc">$</span>A, <span class="fu">cbind</span>(<span class="fu">ci.pred</span>(Bsmr, m50),</span>
+<span id="cb692-8"><a href="time-splitting-time-scales-and-smr.html#cb692-8" tabindex="-1"></a>                      <span class="fu">ci.pred</span>(Bsmr, f50)), <span class="at">plot =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb692-9"><a href="time-splitting-time-scales-and-smr.html#cb692-9" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">lwd =</span> <span class="dv">3</span>,</span>
+<span id="cb692-10"><a href="time-splitting-time-scales-and-smr.html#cb692-10" tabindex="-1"></a>         <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">5</span>), <span class="at">log  =</span> <span class="st">&quot;y&quot;</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">80</span>))</span>
+<span id="cb692-11"><a href="time-splitting-time-scales-and-smr.html#cb692-11" tabindex="-1"></a><span class="fu">matshade</span>(n60<span class="sc">$</span>A, <span class="fu">cbind</span>(<span class="fu">ci.pred</span>(Bsmr, m60),</span>
+<span id="cb692-12"><a href="time-splitting-time-scales-and-smr.html#cb692-12" tabindex="-1"></a>                      <span class="fu">ci.pred</span>(Bsmr, f60)),</span>
+<span id="cb692-13"><a href="time-splitting-time-scales-and-smr.html#cb692-13" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">lwd =</span> <span class="dv">3</span>)</span>
+<span id="cb692-14"><a href="time-splitting-time-scales-and-smr.html#cb692-14" tabindex="-1"></a><span class="fu">matshade</span>(n70<span class="sc">$</span>A, <span class="fu">cbind</span>(<span class="fu">ci.pred</span>(Bsmr, m70),</span>
+<span id="cb692-15"><a href="time-splitting-time-scales-and-smr.html#cb692-15" tabindex="-1"></a>                      <span class="fu">ci.pred</span>(Bsmr, f70)),</span>
+<span id="cb692-16"><a href="time-splitting-time-scales-and-smr.html#cb692-16" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">lwd =</span> <span class="dv">3</span>)</span>
+<span id="cb692-17"><a href="time-splitting-time-scales-and-smr.html#cb692-17" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">1</span>)</span>
+<span id="cb692-18"><a href="time-splitting-time-scales-and-smr.html#cb692-18" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">lty =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">&quot;gray&quot;</span>)</span></code></pre></div>
 <p><img src="DMDK-s_files/figure-html/unnamed-chunk-29-1.png" width="672" />
 What is your conclusion about SMR for diabetes patients relative to the
 general popuation?</p></li>

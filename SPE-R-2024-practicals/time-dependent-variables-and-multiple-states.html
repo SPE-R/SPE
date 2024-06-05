@@ -395,15 +395,15 @@ the study at death or kidney failure (dialysis or transplant).</p>
 using <code>read.dta</code> from the <code>foreign</code> package (which is
 part of the standard <code>R</code>-distribution). At the same time, convert
 <code>sex</code> to a proper factor. Choose where to read the dataset.</p>
-<div class="sourceCode" id="cb428"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb428-1"><a href="time-dependent-variables-and-multiple-states.html#cb428-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
-<span id="cb428-2"><a href="time-dependent-variables-and-multiple-states.html#cb428-2" tabindex="-1"></a><span class="fu">library</span>(survival)</span>
-<span id="cb428-3"><a href="time-dependent-variables-and-multiple-states.html#cb428-3" tabindex="-1"></a><span class="fu">library</span>(mgcv)</span>
-<span id="cb428-4"><a href="time-dependent-variables-and-multiple-states.html#cb428-4" tabindex="-1"></a><span class="fu">library</span>(foreign)</span>
-<span id="cb428-5"><a href="time-dependent-variables-and-multiple-states.html#cb428-5" tabindex="-1"></a><span class="co"># renal &lt;- read.dta(</span></span>
-<span id="cb428-6"><a href="time-dependent-variables-and-multiple-states.html#cb428-6" tabindex="-1"></a><span class="co">#  &quot;https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/renal.dta&quot;)</span></span>
-<span id="cb428-7"><a href="time-dependent-variables-and-multiple-states.html#cb428-7" tabindex="-1"></a>renal <span class="ot">&lt;-</span> <span class="fu">read.dta</span>(<span class="st">&quot;http://BendixCarstensen.com/SPE/data/renal.dta&quot;</span>)</span>
-<span id="cb428-8"><a href="time-dependent-variables-and-multiple-states.html#cb428-8" tabindex="-1"></a>renal<span class="sc">$</span>sex <span class="ot">&lt;-</span> <span class="fu">factor</span>(renal<span class="sc">$</span>sex, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>))</span>
-<span id="cb428-9"><a href="time-dependent-variables-and-multiple-states.html#cb428-9" tabindex="-1"></a><span class="fu">head</span>(renal)</span></code></pre></div></li>
+<div class="sourceCode" id="cb449"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb449-1"><a href="time-dependent-variables-and-multiple-states.html#cb449-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
+<span id="cb449-2"><a href="time-dependent-variables-and-multiple-states.html#cb449-2" tabindex="-1"></a><span class="fu">library</span>(survival)</span>
+<span id="cb449-3"><a href="time-dependent-variables-and-multiple-states.html#cb449-3" tabindex="-1"></a><span class="fu">library</span>(mgcv)</span>
+<span id="cb449-4"><a href="time-dependent-variables-and-multiple-states.html#cb449-4" tabindex="-1"></a><span class="fu">library</span>(foreign)</span>
+<span id="cb449-5"><a href="time-dependent-variables-and-multiple-states.html#cb449-5" tabindex="-1"></a><span class="co"># renal &lt;- read.dta(</span></span>
+<span id="cb449-6"><a href="time-dependent-variables-and-multiple-states.html#cb449-6" tabindex="-1"></a><span class="co">#  &quot;https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/renal.dta&quot;)</span></span>
+<span id="cb449-7"><a href="time-dependent-variables-and-multiple-states.html#cb449-7" tabindex="-1"></a>renal <span class="ot">&lt;-</span> <span class="fu">read.dta</span>(<span class="st">&quot;http://BendixCarstensen.com/SPE/data/renal.dta&quot;</span>)</span>
+<span id="cb449-8"><a href="time-dependent-variables-and-multiple-states.html#cb449-8" tabindex="-1"></a>renal<span class="sc">$</span>sex <span class="ot">&lt;-</span> <span class="fu">factor</span>(renal<span class="sc">$</span>sex, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>))</span>
+<span id="cb449-9"><a href="time-dependent-variables-and-multiple-states.html#cb449-9" tabindex="-1"></a><span class="fu">head</span>(renal)</span></code></pre></div></li>
 <li><p>Use the <code>Lexis</code> function to declare the data as
 survival data with age, calendar time and time since entry into
 the study as timescales. Label any event <span class="math inline">\(&gt;0\)</span> as <em>ESRD</em>,
@@ -413,14 +413,14 @@ Note that you must make sure that the <em>alive</em> state (here
 <code>NRA</code>) is the first, as <code>Lexis</code> assumes that
 everyone starts in this state (unless of course
 <code>entry.status</code> is specified):</p>
-<div class="sourceCode" id="cb429"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb429-1"><a href="time-dependent-variables-and-multiple-states.html#cb429-1" tabindex="-1"></a>Lr <span class="ot">&lt;-</span> <span class="fu">Lexis</span>(<span class="at">entry =</span> <span class="fu">list</span>(<span class="at">per =</span> doe,</span>
-<span id="cb429-2"><a href="time-dependent-variables-and-multiple-states.html#cb429-2" tabindex="-1"></a>                         <span class="at">age =</span> doe <span class="sc">-</span> dob,</span>
-<span id="cb429-3"><a href="time-dependent-variables-and-multiple-states.html#cb429-3" tabindex="-1"></a>                         <span class="at">tfi =</span> <span class="dv">0</span>),</span>
-<span id="cb429-4"><a href="time-dependent-variables-and-multiple-states.html#cb429-4" tabindex="-1"></a>             <span class="at">exit =</span> <span class="fu">list</span>(<span class="at">per =</span> dox),</span>
-<span id="cb429-5"><a href="time-dependent-variables-and-multiple-states.html#cb429-5" tabindex="-1"></a>      <span class="at">exit.status =</span> <span class="fu">factor</span>(event <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;NRA&quot;</span>, <span class="st">&quot;ESRD&quot;</span>)),</span>
-<span id="cb429-6"><a href="time-dependent-variables-and-multiple-states.html#cb429-6" tabindex="-1"></a>             <span class="at">data =</span> renal)</span></code></pre></div>
+<div class="sourceCode" id="cb450"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb450-1"><a href="time-dependent-variables-and-multiple-states.html#cb450-1" tabindex="-1"></a>Lr <span class="ot">&lt;-</span> <span class="fu">Lexis</span>(<span class="at">entry =</span> <span class="fu">list</span>(<span class="at">per =</span> doe,</span>
+<span id="cb450-2"><a href="time-dependent-variables-and-multiple-states.html#cb450-2" tabindex="-1"></a>                         <span class="at">age =</span> doe <span class="sc">-</span> dob,</span>
+<span id="cb450-3"><a href="time-dependent-variables-and-multiple-states.html#cb450-3" tabindex="-1"></a>                         <span class="at">tfi =</span> <span class="dv">0</span>),</span>
+<span id="cb450-4"><a href="time-dependent-variables-and-multiple-states.html#cb450-4" tabindex="-1"></a>             <span class="at">exit =</span> <span class="fu">list</span>(<span class="at">per =</span> dox),</span>
+<span id="cb450-5"><a href="time-dependent-variables-and-multiple-states.html#cb450-5" tabindex="-1"></a>      <span class="at">exit.status =</span> <span class="fu">factor</span>(event <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;NRA&quot;</span>, <span class="st">&quot;ESRD&quot;</span>)),</span>
+<span id="cb450-6"><a href="time-dependent-variables-and-multiple-states.html#cb450-6" tabindex="-1"></a>             <span class="at">data =</span> renal)</span></code></pre></div>
 <pre class="custom-output"><code>NOTE: entry.status has been set to &quot;NRA&quot; for all.</code></pre>
-<div class="sourceCode" id="cb431"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb431-1"><a href="time-dependent-variables-and-multiple-states.html#cb431-1" tabindex="-1"></a><span class="fu">str</span>(Lr)</span></code></pre></div>
+<div class="sourceCode" id="cb452"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb452-1"><a href="time-dependent-variables-and-multiple-states.html#cb452-1" tabindex="-1"></a><span class="fu">str</span>(Lr)</span></code></pre></div>
 <pre class="custom-output"><code>Classes &#39;Lexis&#39; and &#39;data.frame&#39;:   125 obs. of  14 variables:
  $ per    : num  1996 1990 1988 1995 1988 ...
  $ age    : num  28.1 30.2 25.8 44.5 26.6 ...
@@ -442,7 +442,7 @@ everyone starts in this state (unless of course
   ..$ per: NULL
   ..$ age: NULL
   ..$ tfi: NULL</code></pre>
-<div class="sourceCode" id="cb433"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb433-1"><a href="time-dependent-variables-and-multiple-states.html#cb433-1" tabindex="-1"></a><span class="fu">summary</span>(Lr)</span></code></pre></div>
+<div class="sourceCode" id="cb454"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb454-1"><a href="time-dependent-variables-and-multiple-states.html#cb454-1" tabindex="-1"></a><span class="fu">summary</span>(Lr)</span></code></pre></div>
 <pre class="custom-output"><code>
 Transitions:
      To
@@ -451,24 +451,24 @@ From  NRA ESRD  Records:  Events: Risk time:  Persons:
 <p>Make sure you know what the variables in <code>Lr</code> stand for.</p></li>
 <li><p>Visualize the follow-up in a Lexis-diagram, by using the
 <code>plot</code> method for <code>Lexis</code> objects.</p>
-<div class="sourceCode" id="cb435"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb435-1"><a href="time-dependent-variables-and-multiple-states.html#cb435-1" tabindex="-1"></a><span class="fu">plot</span>(Lr, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">lwd =</span> <span class="dv">3</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb436"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb436-1"><a href="time-dependent-variables-and-multiple-states.html#cb436-1" tabindex="-1"></a><span class="fu">subset</span>(Lr, age <span class="sc">&lt;</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb456"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb456-1"><a href="time-dependent-variables-and-multiple-states.html#cb456-1" tabindex="-1"></a><span class="fu">plot</span>(Lr, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">lwd =</span> <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb457"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb457-1"><a href="time-dependent-variables-and-multiple-states.html#cb457-1" tabindex="-1"></a><span class="fu">subset</span>(Lr, age <span class="sc">&lt;</span> <span class="dv">0</span>)</span></code></pre></div>
 <pre class="custom-output"><code> lex.id  per   age tfi lex.dur lex.Cst lex.Xst  id sex  dob  doe dor  dox event
      88 1989 -38.8   0     3.5     NRA    ESRD 586   M 2028 1989  NA 1993     1</code></pre>
 <p>What is wrong here? List the data for the person with negative entry age.</p></li>
 <li><p>Correct the data and make a new plot, for example by:</p>
-<div class="sourceCode" id="cb438"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb438-1"><a href="time-dependent-variables-and-multiple-states.html#cb438-1" tabindex="-1"></a>Lr <span class="ot">&lt;-</span> <span class="fu">transform</span>(Lr, <span class="at">age =</span> <span class="fu">ifelse</span>(dob <span class="sc">&gt;</span> <span class="dv">2000</span>, age <span class="sc">+</span> <span class="dv">100</span>, age),</span>
-<span id="cb438-2"><a href="time-dependent-variables-and-multiple-states.html#cb438-2" tabindex="-1"></a>                    <span class="at">dob =</span> <span class="fu">ifelse</span>(dob <span class="sc">&gt;</span> <span class="dv">2000</span>, dob <span class="sc">-</span> <span class="dv">100</span>, dob))</span>
-<span id="cb438-3"><a href="time-dependent-variables-and-multiple-states.html#cb438-3" tabindex="-1"></a><span class="fu">subset</span>(Lr, id <span class="sc">==</span> <span class="dv">586</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb459"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb459-1"><a href="time-dependent-variables-and-multiple-states.html#cb459-1" tabindex="-1"></a>Lr <span class="ot">&lt;-</span> <span class="fu">transform</span>(Lr, <span class="at">age =</span> <span class="fu">ifelse</span>(dob <span class="sc">&gt;</span> <span class="dv">2000</span>, age <span class="sc">+</span> <span class="dv">100</span>, age),</span>
+<span id="cb459-2"><a href="time-dependent-variables-and-multiple-states.html#cb459-2" tabindex="-1"></a>                    <span class="at">dob =</span> <span class="fu">ifelse</span>(dob <span class="sc">&gt;</span> <span class="dv">2000</span>, dob <span class="sc">-</span> <span class="dv">100</span>, dob))</span>
+<span id="cb459-3"><a href="time-dependent-variables-and-multiple-states.html#cb459-3" tabindex="-1"></a><span class="fu">subset</span>(Lr, id <span class="sc">==</span> <span class="dv">586</span>)</span></code></pre></div>
 <pre class="custom-output"><code> lex.id  per  age tfi lex.dur lex.Cst lex.Xst  id sex  dob  doe dor  dox event
      88 1989 61.2   0     3.5     NRA    ESRD 586   M 1928 1989  NA 1993     1</code></pre>
-<div class="sourceCode" id="cb440"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb440-1"><a href="time-dependent-variables-and-multiple-states.html#cb440-1" tabindex="-1"></a><span class="fu">plot</span>(Lr, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">lwd =</span> <span class="dv">3</span>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb461"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb461-1"><a href="time-dependent-variables-and-multiple-states.html#cb461-1" tabindex="-1"></a><span class="fu">plot</span>(Lr, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">lwd =</span> <span class="dv">3</span>)</span></code></pre></div></li>
 <li><p>Now make a Cox-regression analysis of ESRD occurrence with
 the variables sex and age at entry into the study, using time
 since entry to the study as time scale.</p>
-<div class="sourceCode" id="cb441"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb441-1"><a href="time-dependent-variables-and-multiple-states.html#cb441-1" tabindex="-1"></a>mc <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(lex.dur, lex.Xst <span class="sc">==</span> <span class="st">&quot;ESRD&quot;</span>) </span>
-<span id="cb441-2"><a href="time-dependent-variables-and-multiple-states.html#cb441-2" tabindex="-1"></a>            <span class="sc">~</span> <span class="fu">I</span>(age <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> sex, <span class="at">data =</span> Lr)</span>
-<span id="cb441-3"><a href="time-dependent-variables-and-multiple-states.html#cb441-3" tabindex="-1"></a><span class="fu">summary</span>(mc)</span></code></pre></div>
+<div class="sourceCode" id="cb462"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb462-1"><a href="time-dependent-variables-and-multiple-states.html#cb462-1" tabindex="-1"></a>mc <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(lex.dur, lex.Xst <span class="sc">==</span> <span class="st">&quot;ESRD&quot;</span>) </span>
+<span id="cb462-2"><a href="time-dependent-variables-and-multiple-states.html#cb462-2" tabindex="-1"></a>            <span class="sc">~</span> <span class="fu">I</span>(age <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> sex, <span class="at">data =</span> Lr)</span>
+<span id="cb462-3"><a href="time-dependent-variables-and-multiple-states.html#cb462-3" tabindex="-1"></a><span class="fu">summary</span>(mc)</span></code></pre></div>
 <pre class="custom-output"><code>Call:
 coxph(formula = Surv(lex.dur, lex.Xst == &quot;ESRD&quot;) ~ I(age/10) + 
     sex, data = Lr)
@@ -507,11 +507,11 @@ or 1 according to whether the person had an event at <code>dox</code>.</li>
 Also use <code>split.state=TRUE</code> to
 have different ESRD states according to whether a person had had
 remission or not prioer to ESRD. The statement to do this is:</p>
-<div class="sourceCode" id="cb443"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb443-1"><a href="time-dependent-variables-and-multiple-states.html#cb443-1" tabindex="-1"></a>Lc <span class="ot">&lt;-</span> <span class="fu">cutLexis</span>(Lr, <span class="at">cut =</span> Lr<span class="sc">$</span>dor, <span class="co"># where to cut follow up</span></span>
-<span id="cb443-2"><a href="time-dependent-variables-and-multiple-states.html#cb443-2" tabindex="-1"></a>             <span class="at">timescale =</span> <span class="st">&quot;per&quot;</span>,  <span class="co"># what timescale are we referring to</span></span>
-<span id="cb443-3"><a href="time-dependent-variables-and-multiple-states.html#cb443-3" tabindex="-1"></a>             <span class="at">new.state =</span> <span class="st">&quot;Rem&quot;</span>,  <span class="co"># name of the new state</span></span>
-<span id="cb443-4"><a href="time-dependent-variables-and-multiple-states.html#cb443-4" tabindex="-1"></a>           <span class="at">split.state =</span> <span class="cn">TRUE</span>)   <span class="co"># different states depending on previous</span></span>
-<span id="cb443-5"><a href="time-dependent-variables-and-multiple-states.html#cb443-5" tabindex="-1"></a><span class="fu">summary</span>(Lc)</span></code></pre></div>
+<div class="sourceCode" id="cb464"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb464-1"><a href="time-dependent-variables-and-multiple-states.html#cb464-1" tabindex="-1"></a>Lc <span class="ot">&lt;-</span> <span class="fu">cutLexis</span>(Lr, <span class="at">cut =</span> Lr<span class="sc">$</span>dor, <span class="co"># where to cut follow up</span></span>
+<span id="cb464-2"><a href="time-dependent-variables-and-multiple-states.html#cb464-2" tabindex="-1"></a>             <span class="at">timescale =</span> <span class="st">&quot;per&quot;</span>,  <span class="co"># what timescale are we referring to</span></span>
+<span id="cb464-3"><a href="time-dependent-variables-and-multiple-states.html#cb464-3" tabindex="-1"></a>             <span class="at">new.state =</span> <span class="st">&quot;Rem&quot;</span>,  <span class="co"># name of the new state</span></span>
+<span id="cb464-4"><a href="time-dependent-variables-and-multiple-states.html#cb464-4" tabindex="-1"></a>           <span class="at">split.state =</span> <span class="cn">TRUE</span>)   <span class="co"># different states depending on previous</span></span>
+<span id="cb464-5"><a href="time-dependent-variables-and-multiple-states.html#cb464-5" tabindex="-1"></a><span class="fu">summary</span>(Lc)</span></code></pre></div>
 <pre class="custom-output"><code>
 Transitions:
      To
@@ -524,9 +524,9 @@ From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
 <li><p>Now show how the states are connected and the number of transitions
 between them by using <code>boxes</code>. This is an interactive command
 that requires you to click in the graph window:</p>
-<div class="sourceCode" id="cb445"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb445-1"><a href="time-dependent-variables-and-multiple-states.html#cb445-1" tabindex="-1"></a><span class="fu">boxes</span>(Lc)</span></code></pre></div>
+<div class="sourceCode" id="cb466"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb466-1"><a href="time-dependent-variables-and-multiple-states.html#cb466-1" tabindex="-1"></a><span class="fu">boxes</span>(Lc)</span></code></pre></div>
 <p>It has a couple of fancy arguments, try:</p>
-<div class="sourceCode" id="cb446"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb446-1"><a href="time-dependent-variables-and-multiple-states.html#cb446-1" tabindex="-1"></a><span class="fu">boxes</span>(Lc, <span class="at">boxpos =</span> <span class="cn">TRUE</span>, <span class="at">scale.R =</span> <span class="dv">100</span>, <span class="at">show.BE =</span> <span class="cn">TRUE</span>, <span class="at">hm =</span> <span class="fl">1.5</span>, <span class="at">wm =</span> <span class="fl">1.5</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb467"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb467-1"><a href="time-dependent-variables-and-multiple-states.html#cb467-1" tabindex="-1"></a><span class="fu">boxes</span>(Lc, <span class="at">boxpos =</span> <span class="cn">TRUE</span>, <span class="at">scale.R =</span> <span class="dv">100</span>, <span class="at">show.BE =</span> <span class="cn">TRUE</span>, <span class="at">hm =</span> <span class="fl">1.5</span>, <span class="at">wm =</span> <span class="fl">1.5</span>)</span></code></pre></div>
 <p>You may even be tempted to read the help page for
 <code>boxes.Lexis</code> …</p></li>
 <li><p>Plot a Lexis diagram where different coloring is
@@ -536,18 +536,18 @@ dataset, so you can index the coloring by <code>lex.Cst</code> and
 <code>lex.Xst</code> as appropriate — indexing by a factor corresponds
 to indexing by the <em>index number</em> of the factor levels, so you
 must be know which order the factor levels are in:</p>
-<div class="sourceCode" id="cb447"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb447-1"><a href="time-dependent-variables-and-multiple-states.html#cb447-1" tabindex="-1"></a><span class="fu">levels</span>(Lc) <span class="co"># names and order of states in lex.Cst and lex.Xst</span></span></code></pre></div>
+<div class="sourceCode" id="cb468"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb468-1"><a href="time-dependent-variables-and-multiple-states.html#cb468-1" tabindex="-1"></a><span class="fu">levels</span>(Lc) <span class="co"># names and order of states in lex.Cst and lex.Xst</span></span></code></pre></div>
 <pre class="custom-output"><code>[1] &quot;NRA&quot;       &quot;Rem&quot;       &quot;ESRD&quot;      &quot;ESRD(Rem)&quot;</code></pre>
-<div class="sourceCode" id="cb449"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb449-1"><a href="time-dependent-variables-and-multiple-states.html#cb449-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mai =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">/</span> <span class="dv">4</span>, <span class="at">mgp =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">0</span>) <span class="sc">/</span> <span class="fl">1.6</span>)</span>
-<span id="cb449-2"><a href="time-dependent-variables-and-multiple-states.html#cb449-2" tabindex="-1"></a><span class="fu">plot</span>(Lc, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;limegreen&quot;</span>)[Lc<span class="sc">$</span>lex.Cst],</span>
-<span id="cb449-3"><a href="time-dependent-variables-and-multiple-states.html#cb449-3" tabindex="-1"></a>        <span class="at">xlab =</span> <span class="st">&quot;Calendar time&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Age&quot;</span>,</span>
-<span id="cb449-4"><a href="time-dependent-variables-and-multiple-states.html#cb449-4" tabindex="-1"></a>         <span class="at">lwd =</span> <span class="dv">3</span>, <span class="at">grid =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">20</span> <span class="sc">*</span> <span class="dv">5</span>, <span class="at">las =</span> <span class="dv">1</span>,</span>
-<span id="cb449-5"><a href="time-dependent-variables-and-multiple-states.html#cb449-5" tabindex="-1"></a>        <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">1970</span>, <span class="dv">2010</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">70</span>), </span>
-<span id="cb449-6"><a href="time-dependent-variables-and-multiple-states.html#cb449-6" tabindex="-1"></a>        <span class="at">xaxs =</span> <span class="st">&quot;i&quot;</span>, <span class="at">yaxs =</span> <span class="st">&quot;i&quot;</span>)</span>
-<span id="cb449-7"><a href="time-dependent-variables-and-multiple-states.html#cb449-7" tabindex="-1"></a><span class="fu">points</span>(Lc, <span class="at">pch =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, <span class="dv">16</span>, <span class="dv">16</span>)[Lc<span class="sc">$</span>lex.Xst],</span>
-<span id="cb449-8"><a href="time-dependent-variables-and-multiple-states.html#cb449-8" tabindex="-1"></a>           <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;limegreen&quot;</span>, <span class="st">&quot;transparent&quot;</span>, <span class="st">&quot;transparent&quot;</span>)[Lc<span class="sc">$</span>lex.Cst])</span>
-<span id="cb449-9"><a href="time-dependent-variables-and-multiple-states.html#cb449-9" tabindex="-1"></a><span class="fu">points</span>(Lc, <span class="at">pch =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, <span class="dv">1</span>, <span class="dv">1</span>)[Lc<span class="sc">$</span>lex.Xst],</span>
-<span id="cb449-10"><a href="time-dependent-variables-and-multiple-states.html#cb449-10" tabindex="-1"></a>           <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div></li>
+<div class="sourceCode" id="cb470"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb470-1"><a href="time-dependent-variables-and-multiple-states.html#cb470-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mai =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">/</span> <span class="dv">4</span>, <span class="at">mgp =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">0</span>) <span class="sc">/</span> <span class="fl">1.6</span>)</span>
+<span id="cb470-2"><a href="time-dependent-variables-and-multiple-states.html#cb470-2" tabindex="-1"></a><span class="fu">plot</span>(Lc, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;limegreen&quot;</span>)[Lc<span class="sc">$</span>lex.Cst],</span>
+<span id="cb470-3"><a href="time-dependent-variables-and-multiple-states.html#cb470-3" tabindex="-1"></a>        <span class="at">xlab =</span> <span class="st">&quot;Calendar time&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Age&quot;</span>,</span>
+<span id="cb470-4"><a href="time-dependent-variables-and-multiple-states.html#cb470-4" tabindex="-1"></a>         <span class="at">lwd =</span> <span class="dv">3</span>, <span class="at">grid =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">20</span> <span class="sc">*</span> <span class="dv">5</span>, <span class="at">las =</span> <span class="dv">1</span>,</span>
+<span id="cb470-5"><a href="time-dependent-variables-and-multiple-states.html#cb470-5" tabindex="-1"></a>        <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">1970</span>, <span class="dv">2010</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">70</span>), </span>
+<span id="cb470-6"><a href="time-dependent-variables-and-multiple-states.html#cb470-6" tabindex="-1"></a>        <span class="at">xaxs =</span> <span class="st">&quot;i&quot;</span>, <span class="at">yaxs =</span> <span class="st">&quot;i&quot;</span>)</span>
+<span id="cb470-7"><a href="time-dependent-variables-and-multiple-states.html#cb470-7" tabindex="-1"></a><span class="fu">points</span>(Lc, <span class="at">pch =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, <span class="dv">16</span>, <span class="dv">16</span>)[Lc<span class="sc">$</span>lex.Xst],</span>
+<span id="cb470-8"><a href="time-dependent-variables-and-multiple-states.html#cb470-8" tabindex="-1"></a>           <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;limegreen&quot;</span>, <span class="st">&quot;transparent&quot;</span>, <span class="st">&quot;transparent&quot;</span>)[Lc<span class="sc">$</span>lex.Cst])</span>
+<span id="cb470-9"><a href="time-dependent-variables-and-multiple-states.html#cb470-9" tabindex="-1"></a><span class="fu">points</span>(Lc, <span class="at">pch =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, <span class="dv">1</span>, <span class="dv">1</span>)[Lc<span class="sc">$</span>lex.Xst],</span>
+<span id="cb470-10"><a href="time-dependent-variables-and-multiple-states.html#cb470-10" tabindex="-1"></a>           <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div></li>
 <li><p>Make a Cox-regression of mortality rates (i.e. endpoint <code>ESRD</code> or
 <code>ESRD(Rem)</code>) with sex, age at entry and remission as
 explanatory variables, using time since entry as timescale, and
@@ -555,15 +555,15 @@ include <code>lex.Cst</code> as time-dependent variable, and
 indicate that each record represents follow-up from
 <code>tfi</code> to <code>tfi+lex.dur</code>. Make sure that you know
 why what goes where here in the call to <code>coxph</code>.</p>
-<div class="sourceCode" id="cb450"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb450-1"><a href="time-dependent-variables-and-multiple-states.html#cb450-1" tabindex="-1"></a>(EP <span class="ot">&lt;-</span> <span class="fu">levels</span>(Lc)[<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>])           <span class="co"># define EndPoint states</span></span></code></pre></div>
+<div class="sourceCode" id="cb471"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb471-1"><a href="time-dependent-variables-and-multiple-states.html#cb471-1" tabindex="-1"></a>(EP <span class="ot">&lt;-</span> <span class="fu">levels</span>(Lc)[<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>])           <span class="co"># define EndPoint states</span></span></code></pre></div>
 <pre class="custom-output"><code>[1] &quot;ESRD&quot;      &quot;ESRD(Rem)&quot;</code></pre>
-<div class="sourceCode" id="cb452"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb452-1"><a href="time-dependent-variables-and-multiple-states.html#cb452-1" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(tfi,             <span class="co"># entry time</span></span>
-<span id="cb452-2"><a href="time-dependent-variables-and-multiple-states.html#cb452-2" tabindex="-1"></a>                 tfi <span class="sc">+</span> lex.dur,   <span class="co"># exit time</span></span>
-<span id="cb452-3"><a href="time-dependent-variables-and-multiple-states.html#cb452-3" tabindex="-1"></a>                 lex.Xst <span class="sc">%in%</span> EP) <span class="co"># event</span></span>
-<span id="cb452-4"><a href="time-dependent-variables-and-multiple-states.html#cb452-4" tabindex="-1"></a>            <span class="sc">~</span> sex <span class="sc">+</span> <span class="fu">I</span>((doe <span class="sc">-</span> dob <span class="sc">-</span> <span class="dv">50</span>) <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> <span class="co"># fixed covariates</span></span>
-<span id="cb452-5"><a href="time-dependent-variables-and-multiple-states.html#cb452-5" tabindex="-1"></a>              (lex.Cst <span class="sc">==</span> <span class="st">&quot;Rem&quot;</span>),              <span class="co"># time-dependent variable</span></span>
-<span id="cb452-6"><a href="time-dependent-variables-and-multiple-states.html#cb452-6" tabindex="-1"></a>            <span class="at">data =</span> Lc)</span>
-<span id="cb452-7"><a href="time-dependent-variables-and-multiple-states.html#cb452-7" tabindex="-1"></a><span class="fu">summary</span>(m1)</span></code></pre></div>
+<div class="sourceCode" id="cb473"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb473-1"><a href="time-dependent-variables-and-multiple-states.html#cb473-1" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(tfi,             <span class="co"># entry time</span></span>
+<span id="cb473-2"><a href="time-dependent-variables-and-multiple-states.html#cb473-2" tabindex="-1"></a>                 tfi <span class="sc">+</span> lex.dur,   <span class="co"># exit time</span></span>
+<span id="cb473-3"><a href="time-dependent-variables-and-multiple-states.html#cb473-3" tabindex="-1"></a>                 lex.Xst <span class="sc">%in%</span> EP) <span class="co"># event</span></span>
+<span id="cb473-4"><a href="time-dependent-variables-and-multiple-states.html#cb473-4" tabindex="-1"></a>            <span class="sc">~</span> sex <span class="sc">+</span> <span class="fu">I</span>((doe <span class="sc">-</span> dob <span class="sc">-</span> <span class="dv">50</span>) <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> <span class="co"># fixed covariates</span></span>
+<span id="cb473-5"><a href="time-dependent-variables-and-multiple-states.html#cb473-5" tabindex="-1"></a>              (lex.Cst <span class="sc">==</span> <span class="st">&quot;Rem&quot;</span>),              <span class="co"># time-dependent variable</span></span>
+<span id="cb473-6"><a href="time-dependent-variables-and-multiple-states.html#cb473-6" tabindex="-1"></a>            <span class="at">data =</span> Lc)</span>
+<span id="cb473-7"><a href="time-dependent-variables-and-multiple-states.html#cb473-7" tabindex="-1"></a><span class="fu">summary</span>(m1)</span></code></pre></div>
 <pre class="custom-output"><code>Call:
 coxph(formula = Surv(tfi, tfi + lex.dur, lex.Xst %in% EP) ~ sex + 
     I((doe - dob - 50)/10) + (lex.Cst == &quot;Rem&quot;), data = Lc)
@@ -596,8 +596,8 @@ need the <code>splines</code> and also the <code>mgcv</code> packages.</p></li>
 <li><p>Now split the follow-up time every month after entry, and verify
 that the number of events and risk time is the same as before and
 after the split:</p>
-<div class="sourceCode" id="cb454"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb454-1"><a href="time-dependent-variables-and-multiple-states.html#cb454-1" tabindex="-1"></a>sLc <span class="ot">&lt;-</span> <span class="fu">splitLexis</span>(Lc, <span class="st">&quot;tfi&quot;</span>, <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">30</span>, <span class="dv">1</span><span class="sc">/</span><span class="dv">12</span>))</span>
-<span id="cb454-2"><a href="time-dependent-variables-and-multiple-states.html#cb454-2" tabindex="-1"></a><span class="fu">summary</span>( Lc)</span></code></pre></div>
+<div class="sourceCode" id="cb475"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb475-1"><a href="time-dependent-variables-and-multiple-states.html#cb475-1" tabindex="-1"></a>sLc <span class="ot">&lt;-</span> <span class="fu">splitLexis</span>(Lc, <span class="st">&quot;tfi&quot;</span>, <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">30</span>, <span class="dv">1</span><span class="sc">/</span><span class="dv">12</span>))</span>
+<span id="cb475-2"><a href="time-dependent-variables-and-multiple-states.html#cb475-2" tabindex="-1"></a><span class="fu">summary</span>( Lc)</span></code></pre></div>
 <pre class="custom-output"><code>
 Transitions:
      To
@@ -605,7 +605,7 @@ From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
   NRA  24  29   69         0       122       98        825       122
   Rem   0  24    0         8        32        8        260        32
   Sum  24  53   69         8       154      106       1085       125</code></pre>
-<div class="sourceCode" id="cb456"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb456-1"><a href="time-dependent-variables-and-multiple-states.html#cb456-1" tabindex="-1"></a><span class="fu">summary</span>(sLc)</span></code></pre></div>
+<div class="sourceCode" id="cb477"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb477-1"><a href="time-dependent-variables-and-multiple-states.html#cb477-1" tabindex="-1"></a><span class="fu">summary</span>(sLc)</span></code></pre></div>
 <pre class="custom-output"><code>
 Transitions:
      To
@@ -619,15 +619,15 @@ matrix corresponding to a piece-wise cubic function, modeling the
 baseline hazard explicitly (think of the <code>Ns</code> terms as the
 baseline hazard that is not visible in the Cox-model). You
 can use the wrapper function <code>glm.Lexis</code></p>
-<div class="sourceCode" id="cb458"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb458-1"><a href="time-dependent-variables-and-multiple-states.html#cb458-1" tabindex="-1"></a>mp <span class="ot">&lt;-</span> <span class="fu">glm.Lexis</span>(sLc, </span>
-<span id="cb458-2"><a href="time-dependent-variables-and-multiple-states.html#cb458-2" tabindex="-1"></a>                <span class="sc">~</span> <span class="fu">Ns</span>(tfi, <span class="at">knots =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>)) <span class="sc">+</span></span>
-<span id="cb458-3"><a href="time-dependent-variables-and-multiple-states.html#cb458-3" tabindex="-1"></a>                  sex <span class="sc">+</span> <span class="fu">I</span>((doe <span class="sc">-</span> dob <span class="sc">-</span> <span class="dv">40</span>) <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> </span>
-<span id="cb458-4"><a href="time-dependent-variables-and-multiple-states.html#cb458-4" tabindex="-1"></a>                  <span class="fu">I</span>(lex.Cst <span class="sc">==</span> <span class="st">&quot;Rem&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb479"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb479-1"><a href="time-dependent-variables-and-multiple-states.html#cb479-1" tabindex="-1"></a>mp <span class="ot">&lt;-</span> <span class="fu">glm.Lexis</span>(sLc, </span>
+<span id="cb479-2"><a href="time-dependent-variables-and-multiple-states.html#cb479-2" tabindex="-1"></a>                <span class="sc">~</span> <span class="fu">Ns</span>(tfi, <span class="at">knots =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>)) <span class="sc">+</span></span>
+<span id="cb479-3"><a href="time-dependent-variables-and-multiple-states.html#cb479-3" tabindex="-1"></a>                  sex <span class="sc">+</span> <span class="fu">I</span>((doe <span class="sc">-</span> dob <span class="sc">-</span> <span class="dv">40</span>) <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> </span>
+<span id="cb479-4"><a href="time-dependent-variables-and-multiple-states.html#cb479-4" tabindex="-1"></a>                  <span class="fu">I</span>(lex.Cst <span class="sc">==</span> <span class="st">&quot;Rem&quot;</span>))</span></code></pre></div>
 <pre class="custom-output"><code>stats::glm Poisson analysis of Lexis object sLc with log link:
 Rates for transitions:
 NRA-&gt;ESRD
 Rem-&gt;ESRD(Rem)</code></pre>
-<div class="sourceCode" id="cb460"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb460-1"><a href="time-dependent-variables-and-multiple-states.html#cb460-1" tabindex="-1"></a><span class="fu">ci.exp</span>(mp)</span></code></pre></div>
+<div class="sourceCode" id="cb481"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb481-1"><a href="time-dependent-variables-and-multiple-states.html#cb481-1" tabindex="-1"></a><span class="fu">ci.exp</span>(mp)</span></code></pre></div>
 <pre class="custom-output"><code>                                 exp(Est.)    2.5%   97.5%
 (Intercept)                         0.0166 0.00396   0.070
 Ns(tfi, knots = c(0, 2, 5, 10))1    5.1892 1.94920  13.815
@@ -640,20 +640,20 @@ I(lex.Cst == &quot;Rem&quot;)TRUE             0.2793 0.13140   0.594</code></pre
 <li><p>Try instead using the <code>gam</code> function from the
 <code>mgcv</code> package. There is convenience wrapper for this for
 <code>Lexis</code> objects as well:</p>
-<div class="sourceCode" id="cb462"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb462-1"><a href="time-dependent-variables-and-multiple-states.html#cb462-1" tabindex="-1"></a>mx <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(sLc,</span>
-<span id="cb462-2"><a href="time-dependent-variables-and-multiple-states.html#cb462-2" tabindex="-1"></a>                <span class="sc">~</span> <span class="fu">s</span>(tfi, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span> </span>
-<span id="cb462-3"><a href="time-dependent-variables-and-multiple-states.html#cb462-3" tabindex="-1"></a>                  sex <span class="sc">+</span> <span class="fu">I</span>((doe <span class="sc">-</span> dob <span class="sc">-</span> <span class="dv">40</span>) <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> </span>
-<span id="cb462-4"><a href="time-dependent-variables-and-multiple-states.html#cb462-4" tabindex="-1"></a>                  <span class="fu">I</span>(lex.Cst <span class="sc">==</span> <span class="st">&quot;Rem&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb483"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb483-1"><a href="time-dependent-variables-and-multiple-states.html#cb483-1" tabindex="-1"></a>mx <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(sLc,</span>
+<span id="cb483-2"><a href="time-dependent-variables-and-multiple-states.html#cb483-2" tabindex="-1"></a>                <span class="sc">~</span> <span class="fu">s</span>(tfi, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span> </span>
+<span id="cb483-3"><a href="time-dependent-variables-and-multiple-states.html#cb483-3" tabindex="-1"></a>                  sex <span class="sc">+</span> <span class="fu">I</span>((doe <span class="sc">-</span> dob <span class="sc">-</span> <span class="dv">40</span>) <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> </span>
+<span id="cb483-4"><a href="time-dependent-variables-and-multiple-states.html#cb483-4" tabindex="-1"></a>                  <span class="fu">I</span>(lex.Cst <span class="sc">==</span> <span class="st">&quot;Rem&quot;</span>))</span></code></pre></div>
 <pre class="custom-output"><code>mgcv::gam Poisson analysis of Lexis object sLc with log link:
 Rates for transitions:
 NRA-&gt;ESRD
 Rem-&gt;ESRD(Rem)</code></pre>
-<div class="sourceCode" id="cb464"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb464-1"><a href="time-dependent-variables-and-multiple-states.html#cb464-1" tabindex="-1"></a><span class="fu">ci.exp</span>(mp, <span class="at">subset =</span> <span class="fu">c</span>(<span class="st">&quot;Cst&quot;</span>, <span class="st">&quot;doe&quot;</span>, <span class="st">&quot;sex&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb485"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb485-1"><a href="time-dependent-variables-and-multiple-states.html#cb485-1" tabindex="-1"></a><span class="fu">ci.exp</span>(mp, <span class="at">subset =</span> <span class="fu">c</span>(<span class="st">&quot;Cst&quot;</span>, <span class="st">&quot;doe&quot;</span>, <span class="st">&quot;sex&quot;</span>))</span></code></pre></div>
 <pre class="custom-output"><code>                        exp(Est.)  2.5% 97.5%
 I(lex.Cst == &quot;Rem&quot;)TRUE     0.279 0.131 0.594
 I((doe - dob - 40)/10)      1.701 1.301 2.224
 sexF                        0.918 0.536 1.570</code></pre>
-<div class="sourceCode" id="cb466"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb466-1"><a href="time-dependent-variables-and-multiple-states.html#cb466-1" tabindex="-1"></a><span class="fu">ci.exp</span>(mx, <span class="at">subset =</span> <span class="fu">c</span>(<span class="st">&quot;Cst&quot;</span>, <span class="st">&quot;doe&quot;</span>, <span class="st">&quot;sex&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb487"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb487-1"><a href="time-dependent-variables-and-multiple-states.html#cb487-1" tabindex="-1"></a><span class="fu">ci.exp</span>(mx, <span class="at">subset =</span> <span class="fu">c</span>(<span class="st">&quot;Cst&quot;</span>, <span class="st">&quot;doe&quot;</span>, <span class="st">&quot;sex&quot;</span>))</span></code></pre></div>
 <pre class="custom-output"><code>                        exp(Est.)  2.5% 97.5%
 I(lex.Cst == &quot;Rem&quot;)TRUE     0.278 0.131 0.592
 I((doe - dob - 40)/10)      1.699 1.300 2.222
@@ -662,17 +662,17 @@ sexF                        0.931 0.544 1.595</code></pre>
 approaches in terms of the regression parameters.</p></li>
 <li><p>Extract the regression parameters from the models using
 <code>ci.exp</code> and compare with the estimates from the Cox-model:</p>
-<div class="sourceCode" id="cb468"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb468-1"><a href="time-dependent-variables-and-multiple-states.html#cb468-1" tabindex="-1"></a><span class="fu">ci.exp</span>(mx, <span class="at">subset =</span> <span class="fu">c</span>(<span class="st">&quot;sex&quot;</span>, <span class="st">&quot;dob&quot;</span>, <span class="st">&quot;Cst&quot;</span>), <span class="at">pval =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb489"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb489-1"><a href="time-dependent-variables-and-multiple-states.html#cb489-1" tabindex="-1"></a><span class="fu">ci.exp</span>(mx, <span class="at">subset =</span> <span class="fu">c</span>(<span class="st">&quot;sex&quot;</span>, <span class="st">&quot;dob&quot;</span>, <span class="st">&quot;Cst&quot;</span>), <span class="at">pval =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <pre class="custom-output"><code>                        exp(Est.)  2.5% 97.5%        P
 sexF                        0.931 0.544 1.595 0.794539
 I((doe - dob - 40)/10)      1.699 1.300 2.222 0.000107
 I(lex.Cst == &quot;Rem&quot;)TRUE     0.278 0.131 0.592 0.000897</code></pre>
-<div class="sourceCode" id="cb470"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb470-1"><a href="time-dependent-variables-and-multiple-states.html#cb470-1" tabindex="-1"></a><span class="fu">ci.exp</span>(m1)</span></code></pre></div>
+<div class="sourceCode" id="cb491"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb491-1"><a href="time-dependent-variables-and-multiple-states.html#cb491-1" tabindex="-1"></a><span class="fu">ci.exp</span>(m1)</span></code></pre></div>
 <pre class="custom-output"><code>                       exp(Est.)  2.5% 97.5%
 sexF                       0.946 0.552 1.622
 I((doe - dob - 50)/10)     1.685 1.290 2.202
 lex.Cst == &quot;Rem&quot;TRUE       0.283 0.133 0.602</code></pre>
-<div class="sourceCode" id="cb472"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb472-1"><a href="time-dependent-variables-and-multiple-states.html#cb472-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(mp, <span class="at">subset =</span> <span class="fu">c</span>(<span class="st">&quot;sex&quot;</span>, <span class="st">&quot;dob&quot;</span>, <span class="st">&quot;Cst&quot;</span>)) <span class="sc">/</span> <span class="fu">ci.exp</span>(m1), <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb493"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb493-1"><a href="time-dependent-variables-and-multiple-states.html#cb493-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(mp, <span class="at">subset =</span> <span class="fu">c</span>(<span class="st">&quot;sex&quot;</span>, <span class="st">&quot;dob&quot;</span>, <span class="st">&quot;Cst&quot;</span>)) <span class="sc">/</span> <span class="fu">ci.exp</span>(m1), <span class="dv">2</span>)</span></code></pre></div>
 <pre class="custom-output"><code>                        exp(Est.) 2.5% 97.5%
 sexF                         0.97 0.97  0.97
 I((doe - dob - 40)/10)       1.01 1.01  1.01
@@ -686,7 +686,7 @@ they vary smoothly by time. No such restriction is made in the Cox
 model. The <code>gam</code> model optimizes the shape of the smoother by
 general cross-validation. Try to look at the shape of the
 estimated effect of <code>tfi</code>:</p>
-<div class="sourceCode" id="cb474"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb474-1"><a href="time-dependent-variables-and-multiple-states.html#cb474-1" tabindex="-1"></a><span class="fu">plot</span>(mx)</span></code></pre></div>
+<div class="sourceCode" id="cb495"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb495-1"><a href="time-dependent-variables-and-multiple-states.html#cb495-1" tabindex="-1"></a><span class="fu">plot</span>(mx)</span></code></pre></div>
 <p>Is this a useful plot?</p></li>
 <li><p>However, <code>plot</code> (well, <code>plot.gam</code>) does not give you the <em>absolute</em>
 level of the underlying rates because it bypasses the intercept. So
@@ -695,24 +695,24 @@ covariates, we set up a prediction data frame. Note that age
 in the model specification is entered as <code>doe-dob</code>, hence
 the prediction data frame must have these two variables and not
 the age, but it is only the difference that matters for the prediction:</p>
-<div class="sourceCode" id="cb475"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb475-1"><a href="time-dependent-variables-and-multiple-states.html#cb475-1" tabindex="-1"></a>nd <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">tfi =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">20</span>, <span class="fl">0.1</span>),</span>
-<span id="cb475-2"><a href="time-dependent-variables-and-multiple-states.html#cb475-2" tabindex="-1"></a>                 <span class="at">sex =</span> <span class="st">&quot;M&quot;</span>,</span>
-<span id="cb475-3"><a href="time-dependent-variables-and-multiple-states.html#cb475-3" tabindex="-1"></a>                 <span class="at">doe =</span> <span class="dv">1990</span>,</span>
-<span id="cb475-4"><a href="time-dependent-variables-and-multiple-states.html#cb475-4" tabindex="-1"></a>                 <span class="at">dob =</span> <span class="dv">1940</span>,</span>
-<span id="cb475-5"><a href="time-dependent-variables-and-multiple-states.html#cb475-5" tabindex="-1"></a>             <span class="at">lex.Cst =</span> <span class="st">&quot;NRA&quot;</span>)</span>
-<span id="cb475-6"><a href="time-dependent-variables-and-multiple-states.html#cb475-6" tabindex="-1"></a><span class="fu">str</span>(nd)</span></code></pre></div>
+<div class="sourceCode" id="cb496"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb496-1"><a href="time-dependent-variables-and-multiple-states.html#cb496-1" tabindex="-1"></a>nd <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">tfi =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">20</span>, <span class="fl">0.1</span>),</span>
+<span id="cb496-2"><a href="time-dependent-variables-and-multiple-states.html#cb496-2" tabindex="-1"></a>                 <span class="at">sex =</span> <span class="st">&quot;M&quot;</span>,</span>
+<span id="cb496-3"><a href="time-dependent-variables-and-multiple-states.html#cb496-3" tabindex="-1"></a>                 <span class="at">doe =</span> <span class="dv">1990</span>,</span>
+<span id="cb496-4"><a href="time-dependent-variables-and-multiple-states.html#cb496-4" tabindex="-1"></a>                 <span class="at">dob =</span> <span class="dv">1940</span>,</span>
+<span id="cb496-5"><a href="time-dependent-variables-and-multiple-states.html#cb496-5" tabindex="-1"></a>             <span class="at">lex.Cst =</span> <span class="st">&quot;NRA&quot;</span>)</span>
+<span id="cb496-6"><a href="time-dependent-variables-and-multiple-states.html#cb496-6" tabindex="-1"></a><span class="fu">str</span>(nd)</span></code></pre></div>
 <pre class="custom-output"><code>&#39;data.frame&#39;:   201 obs. of  5 variables:
  $ tfi    : num  0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 ...
  $ sex    : chr  &quot;M&quot; &quot;M&quot; &quot;M&quot; &quot;M&quot; ...
  $ doe    : num  1990 1990 1990 1990 1990 1990 1990 1990 1990 1990 ...
  $ dob    : num  1940 1940 1940 1940 1940 1940 1940 1940 1940 1940 ...
  $ lex.Cst: chr  &quot;NRA&quot; &quot;NRA&quot; &quot;NRA&quot; &quot;NRA&quot; ...</code></pre>
-<div class="sourceCode" id="cb477"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb477-1"><a href="time-dependent-variables-and-multiple-states.html#cb477-1" tabindex="-1"></a><span class="fu">matshade</span>(nd<span class="sc">$</span>tfi, <span class="fu">cbind</span>(<span class="fu">ci.pred</span>(mp, <span class="at">newdata =</span> nd),</span>
-<span id="cb477-2"><a href="time-dependent-variables-and-multiple-states.html#cb477-2" tabindex="-1"></a>                       <span class="fu">ci.pred</span>(mx, <span class="at">newdata =</span> nd)) <span class="sc">*</span> <span class="dv">100</span>,</span>
-<span id="cb477-3"><a href="time-dependent-variables-and-multiple-states.html#cb477-3" tabindex="-1"></a>         <span class="at">plot =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb477-4"><a href="time-dependent-variables-and-multiple-states.html#cb477-4" tabindex="-1"></a>         <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">lwd =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;forestgreen&quot;</span>),</span>
-<span id="cb477-5"><a href="time-dependent-variables-and-multiple-states.html#cb477-5" tabindex="-1"></a>         <span class="at">log =</span> <span class="st">&quot;y&quot;</span>, <span class="at">xlab =</span> <span class="st">&quot;Time since entry (years)&quot;</span>,</span>
-<span id="cb477-6"><a href="time-dependent-variables-and-multiple-states.html#cb477-6" tabindex="-1"></a>         <span class="at">ylab =</span> <span class="st">&quot;ESRD rate (per 100 PY) for 50 year old men&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb498"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb498-1"><a href="time-dependent-variables-and-multiple-states.html#cb498-1" tabindex="-1"></a><span class="fu">matshade</span>(nd<span class="sc">$</span>tfi, <span class="fu">cbind</span>(<span class="fu">ci.pred</span>(mp, <span class="at">newdata =</span> nd),</span>
+<span id="cb498-2"><a href="time-dependent-variables-and-multiple-states.html#cb498-2" tabindex="-1"></a>                       <span class="fu">ci.pred</span>(mx, <span class="at">newdata =</span> nd)) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb498-3"><a href="time-dependent-variables-and-multiple-states.html#cb498-3" tabindex="-1"></a>         <span class="at">plot =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb498-4"><a href="time-dependent-variables-and-multiple-states.html#cb498-4" tabindex="-1"></a>         <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">lwd =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;forestgreen&quot;</span>),</span>
+<span id="cb498-5"><a href="time-dependent-variables-and-multiple-states.html#cb498-5" tabindex="-1"></a>         <span class="at">log =</span> <span class="st">&quot;y&quot;</span>, <span class="at">xlab =</span> <span class="st">&quot;Time since entry (years)&quot;</span>,</span>
+<span id="cb498-6"><a href="time-dependent-variables-and-multiple-states.html#cb498-6" tabindex="-1"></a>         <span class="at">ylab =</span> <span class="st">&quot;ESRD rate (per 100 PY) for 50 year old men&quot;</span>)</span></code></pre></div>
 <p>Try to overlay with the corresponding prediction from the
 <code>glm</code> model using <code>Ns</code>.</p></li>
 </ol>
@@ -731,13 +731,13 @@ covariates in this model to only time since NRA and sex. Note
 that only the records that represent follow-up in the <code>NRA</code>
 state should be used; this is most easily done using the
 <code>gam.Lexis</code> function</p>
-<div class="sourceCode" id="cb479"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb479-1"><a href="time-dependent-variables-and-multiple-states.html#cb479-1" tabindex="-1"></a>mr <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(sLc, <span class="sc">~</span> <span class="fu">s</span>(tfi, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span> sex,</span>
-<span id="cb479-2"><a href="time-dependent-variables-and-multiple-states.html#cb479-2" tabindex="-1"></a>                     <span class="at">from =</span> <span class="st">&quot;NRA&quot;</span>,</span>
-<span id="cb479-3"><a href="time-dependent-variables-and-multiple-states.html#cb479-3" tabindex="-1"></a>                       <span class="at">to =</span> <span class="st">&quot;Rem&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb500"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb500-1"><a href="time-dependent-variables-and-multiple-states.html#cb500-1" tabindex="-1"></a>mr <span class="ot">&lt;-</span> <span class="fu">gam.Lexis</span>(sLc, <span class="sc">~</span> <span class="fu">s</span>(tfi, <span class="at">k =</span> <span class="dv">10</span>) <span class="sc">+</span> sex,</span>
+<span id="cb500-2"><a href="time-dependent-variables-and-multiple-states.html#cb500-2" tabindex="-1"></a>                     <span class="at">from =</span> <span class="st">&quot;NRA&quot;</span>,</span>
+<span id="cb500-3"><a href="time-dependent-variables-and-multiple-states.html#cb500-3" tabindex="-1"></a>                       <span class="at">to =</span> <span class="st">&quot;Rem&quot;</span>)</span></code></pre></div>
 <pre class="custom-output"><code>mgcv::gam Poisson analysis of Lexis object sLc with log link:
 Rates for the transition:
 NRA-&gt;Rem</code></pre>
-<div class="sourceCode" id="cb481"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb481-1"><a href="time-dependent-variables-and-multiple-states.html#cb481-1" tabindex="-1"></a><span class="fu">summary</span>(mr)</span></code></pre></div>
+<div class="sourceCode" id="cb502"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb502-1"><a href="time-dependent-variables-and-multiple-states.html#cb502-1" tabindex="-1"></a><span class="fu">summary</span>(mr)</span></code></pre></div>
 <pre class="custom-output"><code>
 Family: poisson 
 Link function: log 
@@ -757,7 +757,7 @@ s(tfi) 1.01   1.03   0.07    0.81
 
 R-sq.(adj) =  -5.65e-06   Deviance explained = 1.65%
 UBRE = -0.96024  Scale est. = 1         n = 9952</code></pre>
-<div class="sourceCode" id="cb483"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb483-1"><a href="time-dependent-variables-and-multiple-states.html#cb483-1" tabindex="-1"></a><span class="fu">ci.exp</span>(mr, <span class="at">pval =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb504"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb504-1"><a href="time-dependent-variables-and-multiple-states.html#cb504-1" tabindex="-1"></a><span class="fu">ci.exp</span>(mr, <span class="at">pval =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <pre class="custom-output"><code>            exp(Est.)   2.5%  97.5%        P
 (Intercept)    0.0247 0.0149 0.0409 1.25e-46
 sexF           2.6062 1.2550 5.4120 1.02e-02
@@ -793,8 +793,8 @@ order to carry over the <code>time.scales</code> and the
 <code>subset</code> to select columns, and <code>NULL</code> to select rows
 (see the example in the help file for <code>simLexis</code>):</li>
 </ul>
-<div class="sourceCode" id="cb485"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb485-1"><a href="time-dependent-variables-and-multiple-states.html#cb485-1" tabindex="-1"></a>inL <span class="ot">&lt;-</span> <span class="fu">subset</span>(sLc, <span class="at">select =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">11</span>)[<span class="cn">NULL</span>, ]</span>
-<span id="cb485-2"><a href="time-dependent-variables-and-multiple-states.html#cb485-2" tabindex="-1"></a><span class="fu">str</span>(inL)</span></code></pre></div>
+<div class="sourceCode" id="cb506"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb506-1"><a href="time-dependent-variables-and-multiple-states.html#cb506-1" tabindex="-1"></a>inL <span class="ot">&lt;-</span> <span class="fu">subset</span>(sLc, <span class="at">select =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">11</span>)[<span class="cn">NULL</span>, ]</span>
+<span id="cb506-2"><a href="time-dependent-variables-and-multiple-states.html#cb506-2" tabindex="-1"></a><span class="fu">str</span>(inL)</span></code></pre></div>
 <pre class="custom-output"><code>Classes &#39;Lexis&#39; and &#39;data.frame&#39;:   0 obs. of  11 variables:
  $ lex.id : int 
  $ per    : num 
@@ -813,25 +813,25 @@ order to carry over the <code>time.scales</code> and the
   ..$ per: NULL
   ..$ age: NULL
   ..$ tfi: num [1:361] 0 0.0833 0.1667 0.25 0.3333 ...</code></pre>
-<div class="sourceCode" id="cb487"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb487-1"><a href="time-dependent-variables-and-multiple-states.html#cb487-1" tabindex="-1"></a><span class="fu">timeScales</span>(inL)</span></code></pre></div>
+<div class="sourceCode" id="cb508"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb508-1"><a href="time-dependent-variables-and-multiple-states.html#cb508-1" tabindex="-1"></a><span class="fu">timeScales</span>(inL)</span></code></pre></div>
 <pre class="custom-output"><code>[1] &quot;per&quot; &quot;age&quot; &quot;tfi&quot;</code></pre>
-<div class="sourceCode" id="cb489"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb489-1"><a href="time-dependent-variables-and-multiple-states.html#cb489-1" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;lex.id&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb489-2"><a href="time-dependent-variables-and-multiple-states.html#cb489-2" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;per&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
-<span id="cb489-3"><a href="time-dependent-variables-and-multiple-states.html#cb489-3" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;age&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">50</span></span>
-<span id="cb489-4"><a href="time-dependent-variables-and-multiple-states.html#cb489-4" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;tfi&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb489-5"><a href="time-dependent-variables-and-multiple-states.html#cb489-5" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;lex.Cst&quot;</span>] <span class="ot">&lt;-</span> <span class="st">&quot;NRA&quot;</span></span>
-<span id="cb489-6"><a href="time-dependent-variables-and-multiple-states.html#cb489-6" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;lex.Xst&quot;</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb489-7"><a href="time-dependent-variables-and-multiple-states.html#cb489-7" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;lex.dur&quot;</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb489-8"><a href="time-dependent-variables-and-multiple-states.html#cb489-8" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;sex&quot;</span>] <span class="ot">&lt;-</span> <span class="st">&quot;M&quot;</span></span>
-<span id="cb489-9"><a href="time-dependent-variables-and-multiple-states.html#cb489-9" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;doe&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
-<span id="cb489-10"><a href="time-dependent-variables-and-multiple-states.html#cb489-10" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;dob&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">1950</span></span>
-<span id="cb489-11"><a href="time-dependent-variables-and-multiple-states.html#cb489-11" tabindex="-1"></a>inL <span class="ot">&lt;-</span> <span class="fu">rbind</span>(inL, inL)</span>
-<span id="cb489-12"><a href="time-dependent-variables-and-multiple-states.html#cb489-12" tabindex="-1"></a>inL[<span class="dv">2</span>, <span class="st">&quot;sex&quot;</span>] <span class="ot">&lt;-</span> <span class="st">&quot;F&quot;</span></span>
-<span id="cb489-13"><a href="time-dependent-variables-and-multiple-states.html#cb489-13" tabindex="-1"></a>inL</span></code></pre></div>
+<div class="sourceCode" id="cb510"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb510-1"><a href="time-dependent-variables-and-multiple-states.html#cb510-1" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;lex.id&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb510-2"><a href="time-dependent-variables-and-multiple-states.html#cb510-2" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;per&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
+<span id="cb510-3"><a href="time-dependent-variables-and-multiple-states.html#cb510-3" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;age&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb510-4"><a href="time-dependent-variables-and-multiple-states.html#cb510-4" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;tfi&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb510-5"><a href="time-dependent-variables-and-multiple-states.html#cb510-5" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;lex.Cst&quot;</span>] <span class="ot">&lt;-</span> <span class="st">&quot;NRA&quot;</span></span>
+<span id="cb510-6"><a href="time-dependent-variables-and-multiple-states.html#cb510-6" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;lex.Xst&quot;</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb510-7"><a href="time-dependent-variables-and-multiple-states.html#cb510-7" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;lex.dur&quot;</span>] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb510-8"><a href="time-dependent-variables-and-multiple-states.html#cb510-8" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;sex&quot;</span>] <span class="ot">&lt;-</span> <span class="st">&quot;M&quot;</span></span>
+<span id="cb510-9"><a href="time-dependent-variables-and-multiple-states.html#cb510-9" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;doe&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
+<span id="cb510-10"><a href="time-dependent-variables-and-multiple-states.html#cb510-10" tabindex="-1"></a>inL[<span class="dv">1</span>, <span class="st">&quot;dob&quot;</span>] <span class="ot">&lt;-</span> <span class="dv">1950</span></span>
+<span id="cb510-11"><a href="time-dependent-variables-and-multiple-states.html#cb510-11" tabindex="-1"></a>inL <span class="ot">&lt;-</span> <span class="fu">rbind</span>(inL, inL)</span>
+<span id="cb510-12"><a href="time-dependent-variables-and-multiple-states.html#cb510-12" tabindex="-1"></a>inL[<span class="dv">2</span>, <span class="st">&quot;sex&quot;</span>] <span class="ot">&lt;-</span> <span class="st">&quot;F&quot;</span></span>
+<span id="cb510-13"><a href="time-dependent-variables-and-multiple-states.html#cb510-13" tabindex="-1"></a>inL</span></code></pre></div>
 <pre class="custom-output"><code> lex.id  per age tfi lex.dur lex.Cst lex.Xst id sex  dob  doe
       1 2000  50   0      NA     NRA    &lt;NA&gt; NA   M 1950 2000
       1 2000  50   0      NA     NRA    &lt;NA&gt; NA   F 1950 2000</code></pre>
-<div class="sourceCode" id="cb491"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb491-1"><a href="time-dependent-variables-and-multiple-states.html#cb491-1" tabindex="-1"></a><span class="fu">str</span>(inL)</span></code></pre></div>
+<div class="sourceCode" id="cb512"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb512-1"><a href="time-dependent-variables-and-multiple-states.html#cb512-1" tabindex="-1"></a><span class="fu">str</span>(inL)</span></code></pre></div>
 <pre class="custom-output"><code>Classes &#39;Lexis&#39; and &#39;data.frame&#39;:   2 obs. of  11 variables:
  $ lex.id : num  1 1
  $ per    : num  2000 2000
@@ -856,13 +856,13 @@ a list with an element for each transient state (that is <code>NRA</code> and
 states that can be reached from the transient state. The content of
 the list will be <code>glm</code> objects, in this case the models we
 just fitted, describing the transition rates:</p>
-<div class="sourceCode" id="cb493"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb493-1"><a href="time-dependent-variables-and-multiple-states.html#cb493-1" tabindex="-1"></a>Tr <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">&quot;NRA&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;Rem&quot;</span>  <span class="ot">=</span> mr,</span>
-<span id="cb493-2"><a href="time-dependent-variables-and-multiple-states.html#cb493-2" tabindex="-1"></a>                        <span class="st">&quot;ESRD&quot;</span> <span class="ot">=</span> mx),</span>
-<span id="cb493-3"><a href="time-dependent-variables-and-multiple-states.html#cb493-3" tabindex="-1"></a>           <span class="st">&quot;Rem&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;ESRD(Rem)&quot;</span> <span class="ot">=</span> mx))</span></code></pre></div>
+<div class="sourceCode" id="cb514"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb514-1"><a href="time-dependent-variables-and-multiple-states.html#cb514-1" tabindex="-1"></a>Tr <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">&quot;NRA&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;Rem&quot;</span>  <span class="ot">=</span> mr,</span>
+<span id="cb514-2"><a href="time-dependent-variables-and-multiple-states.html#cb514-2" tabindex="-1"></a>                        <span class="st">&quot;ESRD&quot;</span> <span class="ot">=</span> mx),</span>
+<span id="cb514-3"><a href="time-dependent-variables-and-multiple-states.html#cb514-3" tabindex="-1"></a>           <span class="st">&quot;Rem&quot;</span> <span class="ot">=</span> <span class="fu">list</span>(<span class="st">&quot;ESRD(Rem)&quot;</span> <span class="ot">=</span> mx))</span></code></pre></div>
 <p>With this as input we can now generate a cohort, using <code>N=5</code>
 to simulate life course of 10 persons (5 for each set of starting values
 in <code>inL</code>):</p>
-<div class="sourceCode" id="cb494"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb494-1"><a href="time-dependent-variables-and-multiple-states.html#cb494-1" tabindex="-1"></a>(iL <span class="ot">&lt;-</span> <span class="fu">simLexis</span>(Tr, inL, <span class="at">N =</span> <span class="dv">10</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb515"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb515-1"><a href="time-dependent-variables-and-multiple-states.html#cb515-1" tabindex="-1"></a>(iL <span class="ot">&lt;-</span> <span class="fu">simLexis</span>(Tr, inL, <span class="at">N =</span> <span class="dv">10</span>))</span></code></pre></div>
 <pre class="custom-output"><code> lex.id  per  age  tfi lex.dur lex.Cst   lex.Xst id sex  dob  doe cens
       1 2000 50.0 0.00    2.97     NRA      ESRD NA   M 1950 2000 2020
       2 2000 50.0 0.00    0.44     NRA       Rem NA   M 1950 2000 2020
@@ -889,7 +889,7 @@ in <code>inL</code>):</p>
      19 2000 50.0 0.00    0.09     NRA       Rem NA   F 1950 2000 2020
      19 2000 50.1 0.09    6.74     Rem ESRD(Rem) NA   F 1950 2000 2020
      20 2000 50.0 0.00    4.24     NRA      ESRD NA   F 1950 2000 2020</code></pre>
-<div class="sourceCode" id="cb496"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb496-1"><a href="time-dependent-variables-and-multiple-states.html#cb496-1" tabindex="-1"></a><span class="fu">summary</span>(iL, <span class="at">by =</span> <span class="st">&quot;sex&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb517"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb517-1"><a href="time-dependent-variables-and-multiple-states.html#cb517-1" tabindex="-1"></a><span class="fu">summary</span>(iL, <span class="at">by =</span> <span class="st">&quot;sex&quot;</span>)</span></code></pre></div>
 <pre class="custom-output"><code>$M
 
 Transitions:
@@ -911,10 +911,10 @@ From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
 <li><p>Now generate the life course of, say, 5,000 persons, and look at the summary.
 The <code>system.time</code> command is just to tell you how long it
 took, you may want to start with 500 just to see how long that takes.</p>
-<div class="sourceCode" id="cb498"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb498-1"><a href="time-dependent-variables-and-multiple-states.html#cb498-1" tabindex="-1"></a><span class="fu">system.time</span>(sM <span class="ot">&lt;-</span> <span class="fu">simLexis</span>(Tr, inL, <span class="at">N =</span> <span class="dv">500</span>, <span class="at">t.range =</span> <span class="dv">12</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb519"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb519-1"><a href="time-dependent-variables-and-multiple-states.html#cb519-1" tabindex="-1"></a><span class="fu">system.time</span>(sM <span class="ot">&lt;-</span> <span class="fu">simLexis</span>(Tr, inL, <span class="at">N =</span> <span class="dv">500</span>, <span class="at">t.range =</span> <span class="dv">12</span>))</span></code></pre></div>
 <pre class="custom-output"><code>   user  system elapsed 
-   2.49    3.13    1.98 </code></pre>
-<div class="sourceCode" id="cb500"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb500-1"><a href="time-dependent-variables-and-multiple-states.html#cb500-1" tabindex="-1"></a><span class="fu">summary</span>(sM, <span class="at">by =</span> <span class="st">&quot;sex&quot;</span>)</span></code></pre></div>
+   2.52    3.11    1.98 </code></pre>
+<div class="sourceCode" id="cb521"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb521-1"><a href="time-dependent-variables-and-multiple-states.html#cb521-1" tabindex="-1"></a><span class="fu">summary</span>(sM, <span class="at">by =</span> <span class="st">&quot;sex&quot;</span>)</span></code></pre></div>
 <pre class="custom-output"><code>$M
 
 Transitions:
@@ -936,13 +936,13 @@ From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:
 <li><p>Now count how many persons are present in each state
 at each time for the first 10 years after entry (which is at age 50). This
 can be done by using <code>nState</code>. Try:</p>
-<div class="sourceCode" id="cb502"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb502-1"><a href="time-dependent-variables-and-multiple-states.html#cb502-1" tabindex="-1"></a>nStm <span class="ot">&lt;-</span> <span class="fu">nState</span>(<span class="fu">subset</span>(sM, sex <span class="sc">==</span> <span class="st">&quot;M&quot;</span>), <span class="at">time.scale =</span> <span class="st">&quot;age&quot;</span>, </span>
-<span id="cb502-2"><a href="time-dependent-variables-and-multiple-states.html#cb502-2" tabindex="-1"></a>               <span class="at">at =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="fl">0.1</span>), </span>
-<span id="cb502-3"><a href="time-dependent-variables-and-multiple-states.html#cb502-3" tabindex="-1"></a>             <span class="at">from =</span> <span class="dv">50</span>)</span>
-<span id="cb502-4"><a href="time-dependent-variables-and-multiple-states.html#cb502-4" tabindex="-1"></a>nStf <span class="ot">&lt;-</span> <span class="fu">nState</span>(<span class="fu">subset</span>(sM, sex <span class="sc">==</span> <span class="st">&quot;F&quot;</span>), <span class="at">time.scale =</span> <span class="st">&quot;age&quot;</span>, </span>
-<span id="cb502-5"><a href="time-dependent-variables-and-multiple-states.html#cb502-5" tabindex="-1"></a>               <span class="at">at =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="fl">0.1</span>), </span>
-<span id="cb502-6"><a href="time-dependent-variables-and-multiple-states.html#cb502-6" tabindex="-1"></a>             <span class="at">from =</span> <span class="dv">50</span>)</span>
-<span id="cb502-7"><a href="time-dependent-variables-and-multiple-states.html#cb502-7" tabindex="-1"></a><span class="fu">head</span>(nStf, <span class="dv">15</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb523"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb523-1"><a href="time-dependent-variables-and-multiple-states.html#cb523-1" tabindex="-1"></a>nStm <span class="ot">&lt;-</span> <span class="fu">nState</span>(<span class="fu">subset</span>(sM, sex <span class="sc">==</span> <span class="st">&quot;M&quot;</span>), <span class="at">time.scale =</span> <span class="st">&quot;age&quot;</span>, </span>
+<span id="cb523-2"><a href="time-dependent-variables-and-multiple-states.html#cb523-2" tabindex="-1"></a>               <span class="at">at =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="fl">0.1</span>), </span>
+<span id="cb523-3"><a href="time-dependent-variables-and-multiple-states.html#cb523-3" tabindex="-1"></a>             <span class="at">from =</span> <span class="dv">50</span>)</span>
+<span id="cb523-4"><a href="time-dependent-variables-and-multiple-states.html#cb523-4" tabindex="-1"></a>nStf <span class="ot">&lt;-</span> <span class="fu">nState</span>(<span class="fu">subset</span>(sM, sex <span class="sc">==</span> <span class="st">&quot;F&quot;</span>), <span class="at">time.scale =</span> <span class="st">&quot;age&quot;</span>, </span>
+<span id="cb523-5"><a href="time-dependent-variables-and-multiple-states.html#cb523-5" tabindex="-1"></a>               <span class="at">at =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="fl">0.1</span>), </span>
+<span id="cb523-6"><a href="time-dependent-variables-and-multiple-states.html#cb523-6" tabindex="-1"></a>             <span class="at">from =</span> <span class="dv">50</span>)</span>
+<span id="cb523-7"><a href="time-dependent-variables-and-multiple-states.html#cb523-7" tabindex="-1"></a><span class="fu">head</span>(nStf, <span class="dv">15</span>)</span></code></pre></div>
 <pre class="custom-output"><code>      State
 when   NRA Rem ESRD ESRD(Rem)
   50   500   0    0         0
@@ -964,9 +964,9 @@ when   NRA Rem ESRD ESRD(Rem)
 <li><p>With the counts of persons in each state at the
 designated time points (in <code>nStm</code>), compute the cumulative
 fraction over the states, arranged in order given by <code>perm</code>:</p>
-<div class="sourceCode" id="cb504"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb504-1"><a href="time-dependent-variables-and-multiple-states.html#cb504-1" tabindex="-1"></a>ppm <span class="ot">&lt;-</span> <span class="fu">pState</span>(nStm, <span class="at">perm =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>))</span>
-<span id="cb504-2"><a href="time-dependent-variables-and-multiple-states.html#cb504-2" tabindex="-1"></a>ppf <span class="ot">&lt;-</span> <span class="fu">pState</span>(nStf, <span class="at">perm =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>))</span>
-<span id="cb504-3"><a href="time-dependent-variables-and-multiple-states.html#cb504-3" tabindex="-1"></a><span class="fu">head</span>(ppf)</span></code></pre></div>
+<div class="sourceCode" id="cb525"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb525-1"><a href="time-dependent-variables-and-multiple-states.html#cb525-1" tabindex="-1"></a>ppm <span class="ot">&lt;-</span> <span class="fu">pState</span>(nStm, <span class="at">perm =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>))</span>
+<span id="cb525-2"><a href="time-dependent-variables-and-multiple-states.html#cb525-2" tabindex="-1"></a>ppf <span class="ot">&lt;-</span> <span class="fu">pState</span>(nStf, <span class="at">perm =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>))</span>
+<span id="cb525-3"><a href="time-dependent-variables-and-multiple-states.html#cb525-3" tabindex="-1"></a><span class="fu">head</span>(ppf)</span></code></pre></div>
 <pre class="custom-output"><code>      State
 when     Rem   NRA ESRD ESRD(Rem)
   50   0.000 1.000    1         1
@@ -975,7 +975,7 @@ when     Rem   NRA ESRD ESRD(Rem)
   50.3 0.016 0.982    1         1
   50.4 0.030 0.972    1         1
   50.5 0.032 0.964    1         1</code></pre>
-<div class="sourceCode" id="cb506"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb506-1"><a href="time-dependent-variables-and-multiple-states.html#cb506-1" tabindex="-1"></a><span class="fu">tail</span>(ppf)</span></code></pre></div>
+<div class="sourceCode" id="cb527"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb527-1"><a href="time-dependent-variables-and-multiple-states.html#cb527-1" tabindex="-1"></a><span class="fu">tail</span>(ppf)</span></code></pre></div>
 <pre class="custom-output"><code>      State
 when     Rem   NRA  ESRD ESRD(Rem)
   59.5 0.200 0.312 0.926         1
@@ -987,24 +987,24 @@ when     Rem   NRA  ESRD ESRD(Rem)
 <p>What do the entries in <code>ppf</code> represent?</p></li>
 <li><p>Try to plot the cumulative probabilities using the <code>plot</code> method
 for <code>pState</code> objects:</p>
-<div class="sourceCode" id="cb508"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb508-1"><a href="time-dependent-variables-and-multiple-states.html#cb508-1" tabindex="-1"></a><span class="fu">plot</span>(ppf)</span></code></pre></div>
+<div class="sourceCode" id="cb529"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb529-1"><a href="time-dependent-variables-and-multiple-states.html#cb529-1" tabindex="-1"></a><span class="fu">plot</span>(ppf)</span></code></pre></div>
 <p>Is this useful?</p></li>
 <li><p>Now try to improve the plot so that it is easier to read, and
 easier to compare between men and women, for example:</p>
-<div class="sourceCode" id="cb509"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb509-1"><a href="time-dependent-variables-and-multiple-states.html#cb509-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb509-2"><a href="time-dependent-variables-and-multiple-states.html#cb509-2" tabindex="-1"></a><span class="co"># Men</span></span>
-<span id="cb509-3"><a href="time-dependent-variables-and-multiple-states.html#cb509-3" tabindex="-1"></a><span class="fu">plot</span>(ppm, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;limegreen&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;#991111&quot;</span>, <span class="st">&quot;forestgreen&quot;</span>))</span>
-<span id="cb509-4"><a href="time-dependent-variables-and-multiple-states.html#cb509-4" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">as.numeric</span>(<span class="fu">rownames</span>(ppm)), ppm[, <span class="st">&quot;NRA&quot;</span>], <span class="at">lwd =</span> <span class="dv">2</span>)</span>
-<span id="cb509-5"><a href="time-dependent-variables-and-multiple-states.html#cb509-5" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">59.5</span>, <span class="fl">0.95</span>, <span class="st">&quot;Men&quot;</span>, <span class="at">adj =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">&quot;white&quot;</span>, <span class="at">font =</span> <span class="dv">2</span>, <span class="at">cex =</span> <span class="fl">1.2</span>)</span>
-<span id="cb509-6"><a href="time-dependent-variables-and-multiple-states.html#cb509-6" tabindex="-1"></a><span class="fu">axis</span>(<span class="at">side =</span> <span class="dv">4</span>, <span class="at">at =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">10</span> <span class="sc">/</span> <span class="dv">10</span>)</span>
-<span id="cb509-7"><a href="time-dependent-variables-and-multiple-states.html#cb509-7" tabindex="-1"></a><span class="fu">axis</span>(<span class="at">side =</span> <span class="dv">4</span>, <span class="at">at =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">99</span> <span class="sc">/</span> <span class="dv">100</span>, <span class="at">labels =</span> <span class="cn">NA</span>, <span class="at">tck =</span> <span class="sc">-</span><span class="fl">0.01</span>)</span>
-<span id="cb509-8"><a href="time-dependent-variables-and-multiple-states.html#cb509-8" tabindex="-1"></a><span class="co"># Women </span></span>
-<span id="cb509-9"><a href="time-dependent-variables-and-multiple-states.html#cb509-9" tabindex="-1"></a><span class="fu">plot</span>(ppf, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;limegreen&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;#991111&quot;</span>, <span class="st">&quot;forestgreen&quot;</span>),</span>
-<span id="cb509-10"><a href="time-dependent-variables-and-multiple-states.html#cb509-10" tabindex="-1"></a>          <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">60</span>, <span class="dv">50</span>)) <span class="co"># inverted x-axis</span></span>
-<span id="cb509-11"><a href="time-dependent-variables-and-multiple-states.html#cb509-11" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">as.numeric</span>(<span class="fu">rownames</span>(ppf)), ppf[, <span class="st">&quot;NRA&quot;</span>], <span class="at">lwd =</span> <span class="dv">2</span>)</span>
-<span id="cb509-12"><a href="time-dependent-variables-and-multiple-states.html#cb509-12" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">59.5</span>, <span class="fl">0.95</span>, <span class="st">&quot;Women&quot;</span>, <span class="at">adj =</span> <span class="dv">0</span>, <span class="at">col =</span> <span class="st">&quot;white&quot;</span>, <span class="at">font =</span> <span class="dv">2</span>, <span class="at">cex =</span> <span class="fl">1.2</span>)</span>
-<span id="cb509-13"><a href="time-dependent-variables-and-multiple-states.html#cb509-13" tabindex="-1"></a><span class="fu">axis</span>(<span class="at">side =</span> <span class="dv">2</span>, <span class="at">at =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">10</span> <span class="sc">/</span> <span class="dv">10</span>)</span>
-<span id="cb509-14"><a href="time-dependent-variables-and-multiple-states.html#cb509-14" tabindex="-1"></a><span class="fu">axis</span>(<span class="at">side =</span> <span class="dv">2</span>, <span class="at">at =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">99</span> <span class="sc">/</span> <span class="dv">100</span>, <span class="at">labels =</span> <span class="cn">NA</span>, <span class="at">tck =</span> <span class="sc">-</span><span class="fl">0.01</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb530"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb530-1"><a href="time-dependent-variables-and-multiple-states.html#cb530-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb530-2"><a href="time-dependent-variables-and-multiple-states.html#cb530-2" tabindex="-1"></a><span class="co"># Men</span></span>
+<span id="cb530-3"><a href="time-dependent-variables-and-multiple-states.html#cb530-3" tabindex="-1"></a><span class="fu">plot</span>(ppm, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;limegreen&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;#991111&quot;</span>, <span class="st">&quot;forestgreen&quot;</span>))</span>
+<span id="cb530-4"><a href="time-dependent-variables-and-multiple-states.html#cb530-4" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">as.numeric</span>(<span class="fu">rownames</span>(ppm)), ppm[, <span class="st">&quot;NRA&quot;</span>], <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb530-5"><a href="time-dependent-variables-and-multiple-states.html#cb530-5" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">59.5</span>, <span class="fl">0.95</span>, <span class="st">&quot;Men&quot;</span>, <span class="at">adj =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">&quot;white&quot;</span>, <span class="at">font =</span> <span class="dv">2</span>, <span class="at">cex =</span> <span class="fl">1.2</span>)</span>
+<span id="cb530-6"><a href="time-dependent-variables-and-multiple-states.html#cb530-6" tabindex="-1"></a><span class="fu">axis</span>(<span class="at">side =</span> <span class="dv">4</span>, <span class="at">at =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">10</span> <span class="sc">/</span> <span class="dv">10</span>)</span>
+<span id="cb530-7"><a href="time-dependent-variables-and-multiple-states.html#cb530-7" tabindex="-1"></a><span class="fu">axis</span>(<span class="at">side =</span> <span class="dv">4</span>, <span class="at">at =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">99</span> <span class="sc">/</span> <span class="dv">100</span>, <span class="at">labels =</span> <span class="cn">NA</span>, <span class="at">tck =</span> <span class="sc">-</span><span class="fl">0.01</span>)</span>
+<span id="cb530-8"><a href="time-dependent-variables-and-multiple-states.html#cb530-8" tabindex="-1"></a><span class="co"># Women </span></span>
+<span id="cb530-9"><a href="time-dependent-variables-and-multiple-states.html#cb530-9" tabindex="-1"></a><span class="fu">plot</span>(ppf, <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;limegreen&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;#991111&quot;</span>, <span class="st">&quot;forestgreen&quot;</span>),</span>
+<span id="cb530-10"><a href="time-dependent-variables-and-multiple-states.html#cb530-10" tabindex="-1"></a>          <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">60</span>, <span class="dv">50</span>)) <span class="co"># inverted x-axis</span></span>
+<span id="cb530-11"><a href="time-dependent-variables-and-multiple-states.html#cb530-11" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">as.numeric</span>(<span class="fu">rownames</span>(ppf)), ppf[, <span class="st">&quot;NRA&quot;</span>], <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb530-12"><a href="time-dependent-variables-and-multiple-states.html#cb530-12" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">59.5</span>, <span class="fl">0.95</span>, <span class="st">&quot;Women&quot;</span>, <span class="at">adj =</span> <span class="dv">0</span>, <span class="at">col =</span> <span class="st">&quot;white&quot;</span>, <span class="at">font =</span> <span class="dv">2</span>, <span class="at">cex =</span> <span class="fl">1.2</span>)</span>
+<span id="cb530-13"><a href="time-dependent-variables-and-multiple-states.html#cb530-13" tabindex="-1"></a><span class="fu">axis</span>(<span class="at">side =</span> <span class="dv">2</span>, <span class="at">at =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">10</span> <span class="sc">/</span> <span class="dv">10</span>)</span>
+<span id="cb530-14"><a href="time-dependent-variables-and-multiple-states.html#cb530-14" tabindex="-1"></a><span class="fu">axis</span>(<span class="at">side =</span> <span class="dv">2</span>, <span class="at">at =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">99</span> <span class="sc">/</span> <span class="dv">100</span>, <span class="at">labels =</span> <span class="cn">NA</span>, <span class="at">tck =</span> <span class="sc">-</span><span class="fl">0.01</span>)</span></code></pre></div>
 <p>What is the 10-year risk of remission for men and women respectively?</p></li>
 </ol>
 

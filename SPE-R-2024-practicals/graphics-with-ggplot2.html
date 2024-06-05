@@ -352,7 +352,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="data" class="section level2 hasAnchor" number="10.1">
 <h2><span class="header-section-number">10.1</span> Data<a href="graphics-with-ggplot2.html#data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The data are available in the file <code>alkfos.csv</code>. This is a text file in comma-separated variable format. It can be read into R using the <code>read.csv()</code> function.</p>
-<div class="sourceCode" id="cb267"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb267-1"><a href="graphics-with-ggplot2.html#cb267-1" tabindex="-1"></a>alkfos <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;./data/alkfos.csv&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb288"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb288-1"><a href="graphics-with-ggplot2.html#cb288-1" tabindex="-1"></a>alkfos <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;./data/alkfos.csv&quot;</span>)</span></code></pre></div>
 <p>There are 14 rows in the data frame <code>alkfos</code>: one for each combination of the 7 visits and the 2 groups. The variables in the data frame are:</p>
 <ul>
 <li><code>time</code> The time since randomization for each follow-up visit.</li>
@@ -378,8 +378,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <p>We make the mapping in a call to the function <code>aes()</code>.</p>
 <p>The code below creates a basic plot and assigns it to the object <code>p0</code>.</p>
-<div class="sourceCode" id="cb268"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb268-1"><a href="graphics-with-ggplot2.html#cb268-1" tabindex="-1"></a><span class="fu">library</span>(ggplot2, <span class="at">quietly=</span><span class="cn">TRUE</span>)</span>
-<span id="cb268-2"><a href="graphics-with-ggplot2.html#cb268-2" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data=</span>alkfos, <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>time, <span class="at">y=</span>mean))</span></code></pre></div>
+<div class="sourceCode" id="cb289"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb289-1"><a href="graphics-with-ggplot2.html#cb289-1" tabindex="-1"></a><span class="fu">library</span>(ggplot2, <span class="at">quietly=</span><span class="cn">TRUE</span>)</span>
+<span id="cb289-2"><a href="graphics-with-ggplot2.html#cb289-2" tabindex="-1"></a>p0 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data=</span>alkfos, <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>time, <span class="at">y=</span>mean))</span></code></pre></div>
 <p>Running the code creates the plot but does not display it. This is an important difference between base graphics and ggplot graphics:</p>
 <ul>
 <li>Base graphics functions do not return an R object but will always display a plot on the current graphics device.</li>
@@ -391,7 +391,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>If we have not saved the result, the graphical object will be displayed in the same way that a regular R object is printed to the screen.</li>
 </ol>
 <p>The code chunk below displays the object <code>p0</code> created in the chunk above.</p>
-<div class="sourceCode" id="cb269"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb269-1"><a href="graphics-with-ggplot2.html#cb269-1" tabindex="-1"></a><span class="fu">show</span>(p0)</span></code></pre></div>
+<div class="sourceCode" id="cb290"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb290-1"><a href="graphics-with-ggplot2.html#cb290-1" tabindex="-1"></a><span class="fu">show</span>(p0)</span></code></pre></div>
 <p>You may find the results a little disappointing. The <code>ggplot()</code> function has drawn x- and y-axes that span the range of the data, but otherwise has drawn no points or lines. This is another important difference between ggplot2 and base graphics. Whereas base plotting functions will usually create a sensible default plot, <code>ggplot()</code> makes no assumptions about what you want.</p>
 <p>We will recreate the plot in <em>layers</em>. Layers are added to a ggplot object by calling additional functions and adding their return value to the basic plot using the <code>+</code> symbol.</p>
 </div>
@@ -401,13 +401,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="points-and-lines" class="section level4 hasAnchor" number="10.2.2.1">
 <h4><span class="header-section-number">10.2.2.1</span> Points and lines<a href="graphics-with-ggplot2.html#points-and-lines" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>We want to plot points representing the mean of the outcome at each visit. This is done with the function <code>geom_point()</code>. We also want to plot lines between successive points in time. This is done with the function <code>geom_line()</code>. The code chunk below adds point and line geometries to our basic plot <code>p0</code> and saves the result to the new object <code>p1</code>.</p>
-<div class="sourceCode" id="cb270"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb270-1"><a href="graphics-with-ggplot2.html#cb270-1" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> p0 <span class="sc">+</span> <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">geom_line</span>()</span>
-<span id="cb270-2"><a href="graphics-with-ggplot2.html#cb270-2" tabindex="-1"></a><span class="fu">show</span>(p1)</span></code></pre></div>
+<div class="sourceCode" id="cb291"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb291-1"><a href="graphics-with-ggplot2.html#cb291-1" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> p0 <span class="sc">+</span> <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">geom_line</span>()</span>
+<span id="cb291-2"><a href="graphics-with-ggplot2.html#cb291-2" tabindex="-1"></a><span class="fu">show</span>(p1)</span></code></pre></div>
 <p>Again, this is not quite what we want. The line geometry is mixing up observations from the treatment and control groups, but we want separate lines for each group. To obtain this we need to add an additional aesthetic mapping inside the call to <code>ggplot()</code>. The aesthetic <code>group</code> gives the name of the variable in the data frame that distinguishes observations from different groups.</p>
 <p>Modify the code chunk below so that it includes the <code>group</code> aesthetic to recreate plot <code>p1</code> correctly.</p>
-<div class="sourceCode" id="cb271"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb271-1"><a href="graphics-with-ggplot2.html#cb271-1" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data=</span>alkfos, <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>time, <span class="at">y=</span>mean)) <span class="sc">+</span></span>
-<span id="cb271-2"><a href="graphics-with-ggplot2.html#cb271-2" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">geom_line</span>()</span>
-<span id="cb271-3"><a href="graphics-with-ggplot2.html#cb271-3" tabindex="-1"></a><span class="fu">show</span>(p1)</span></code></pre></div>
+<div class="sourceCode" id="cb292"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb292-1"><a href="graphics-with-ggplot2.html#cb292-1" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data=</span>alkfos, <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>time, <span class="at">y=</span>mean)) <span class="sc">+</span></span>
+<span id="cb292-2"><a href="graphics-with-ggplot2.html#cb292-2" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">geom_line</span>()</span>
+<span id="cb292-3"><a href="graphics-with-ggplot2.html#cb292-3" tabindex="-1"></a><span class="fu">show</span>(p1)</span></code></pre></div>
 </div>
 <div id="error-bars" class="section level4 hasAnchor" number="10.2.2.2">
 <h4><span class="header-section-number">10.2.2.2</span> Error bars<a href="graphics-with-ggplot2.html#error-bars" class="anchor-section" aria-label="Anchor link to header"></a></h4>
@@ -418,16 +418,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><code>ymax</code> is the mean plus the standard error</li>
 </ul>
 <p>Note that the error bars are <em>not confidence intervals</em>. In statistical graphics it is very common to use plus/minus the standard error to represent the uncertainty in the data without making any statistical claims about coverage.</p>
-<div class="sourceCode" id="cb272"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb272-1"><a href="graphics-with-ggplot2.html#cb272-1" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> p1 <span class="sc">+</span> <span class="fu">geom_linerange</span>(...)</span>
-<span id="cb272-2"><a href="graphics-with-ggplot2.html#cb272-2" tabindex="-1"></a><span class="fu">show</span>(p2)</span></code></pre></div>
+<div class="sourceCode" id="cb293"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb293-1"><a href="graphics-with-ggplot2.html#cb293-1" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> p1 <span class="sc">+</span> <span class="fu">geom_linerange</span>(...)</span>
+<span id="cb293-2"><a href="graphics-with-ggplot2.html#cb293-2" tabindex="-1"></a><span class="fu">show</span>(p2)</span></code></pre></div>
 <p>Compare the y-axes for plots <code>p1</code> and <code>p2</code>. Note that when we add the error bars, the y-axis automatically expanded the limits of the y-axis to include the highest and lowest values on the error bars.</p>
 </div>
 <div id="horizontal-reference-line" class="section level4 hasAnchor" number="10.2.2.3">
 <h4><span class="header-section-number">10.2.2.3</span> Horizontal reference line<a href="graphics-with-ggplot2.html#horizontal-reference-line" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>The last geometry we want to add is the horizontal reference line at zero. This is added using the <code>hline</code> geometry. We must supply the argument <code>yintercept</code> which determines where the horizontal line intersects the y-axis.</p>
 <p>We should distinguish the reference line from the lines used to plot the data, otherwise it may distract the viewer. We could do this by changing the colour of the reference line. But here we will use a thinner line using the optional argument <code>linewidth</code> to the hline geometry. The default value of <code>linewidth</code> is 1. A value less than 1 draws a thinner line; a value greater than 1 draws a thicker line. Choose a suitable value for your plot.</p>
-<div class="sourceCode" id="cb273"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb273-1"><a href="graphics-with-ggplot2.html#cb273-1" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> p2 <span class="sc">+</span> <span class="fu">geom_hline</span>(...)</span>
-<span id="cb273-2"><a href="graphics-with-ggplot2.html#cb273-2" tabindex="-1"></a><span class="fu">show</span>(p3)</span></code></pre></div>
+<div class="sourceCode" id="cb294"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb294-1"><a href="graphics-with-ggplot2.html#cb294-1" tabindex="-1"></a>p3 <span class="ot">&lt;-</span> p2 <span class="sc">+</span> <span class="fu">geom_hline</span>(...)</span>
+<span id="cb294-2"><a href="graphics-with-ggplot2.html#cb294-2" tabindex="-1"></a><span class="fu">show</span>(p3)</span></code></pre></div>
 </div>
 </div>
 <div id="scales" class="section level3 hasAnchor" number="10.2.3">
@@ -439,11 +439,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><code>limits</code> A numeric vector of length 2 giving the minimum and maximum values to be displayed on the axis.</li>
 </ul>
 <p>Modify the code chunk below to create the custom axes:</p>
-<div class="sourceCode" id="cb274"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb274-1"><a href="graphics-with-ggplot2.html#cb274-1" tabindex="-1"></a>p4 <span class="ot">&lt;-</span> p3 <span class="sc">+</span> <span class="fu">scale_x_continuous</span>() <span class="sc">+</span> <span class="fu">scale_y_continuous</span>()</span>
-<span id="cb274-2"><a href="graphics-with-ggplot2.html#cb274-2" tabindex="-1"></a><span class="fu">show</span>(p4)</span></code></pre></div>
+<div class="sourceCode" id="cb295"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb295-1"><a href="graphics-with-ggplot2.html#cb295-1" tabindex="-1"></a>p4 <span class="ot">&lt;-</span> p3 <span class="sc">+</span> <span class="fu">scale_x_continuous</span>() <span class="sc">+</span> <span class="fu">scale_y_continuous</span>()</span>
+<span id="cb295-2"><a href="graphics-with-ggplot2.html#cb295-2" tabindex="-1"></a><span class="fu">show</span>(p4)</span></code></pre></div>
 <p>We should also supply informative axis labels. The default axis labels are taken from the names of the variables that we used in the aesthetic mappings for <code>x</code> and <code>y</code>. Use the <code>xlab()</code> and <code>ylab()</code> functions to provide informative axis labels.</p>
-<div class="sourceCode" id="cb275"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb275-1"><a href="graphics-with-ggplot2.html#cb275-1" tabindex="-1"></a>p5 <span class="ot">&lt;-</span> p4 <span class="sc">+</span> <span class="fu">xlab</span>(...) <span class="sc">+</span> <span class="fu">ylab</span>(...)</span>
-<span id="cb275-2"><a href="graphics-with-ggplot2.html#cb275-2" tabindex="-1"></a><span class="fu">show</span>(p5)</span></code></pre></div>
+<div class="sourceCode" id="cb296"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb296-1"><a href="graphics-with-ggplot2.html#cb296-1" tabindex="-1"></a>p5 <span class="ot">&lt;-</span> p4 <span class="sc">+</span> <span class="fu">xlab</span>(...) <span class="sc">+</span> <span class="fu">ylab</span>(...)</span>
+<span id="cb296-2"><a href="graphics-with-ggplot2.html#cb296-2" tabindex="-1"></a><span class="fu">show</span>(p5)</span></code></pre></div>
 </div>
 <div id="themes" class="section level3 hasAnchor" number="10.2.4">
 <h3><span class="header-section-number">10.2.4</span> Themes<a href="graphics-with-ggplot2.html#themes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -453,14 +453,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Modify the chunk below to use different themes until you find one that most closely matches the original plot in the file bentK.pdf.</li>
 <li>Find the parameter that changes to the font size and use it to reduce the font until the y-axis label fits.</li>
 </ul>
-<div class="sourceCode" id="cb276"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb276-1"><a href="graphics-with-ggplot2.html#cb276-1" tabindex="-1"></a>p6 <span class="ot">&lt;-</span> p5 <span class="sc">+</span> ...</span>
-<span id="cb276-2"><a href="graphics-with-ggplot2.html#cb276-2" tabindex="-1"></a><span class="fu">show</span>(p6)</span></code></pre></div>
+<div class="sourceCode" id="cb297"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb297-1"><a href="graphics-with-ggplot2.html#cb297-1" tabindex="-1"></a>p6 <span class="ot">&lt;-</span> p5 <span class="sc">+</span> ...</span>
+<span id="cb297-2"><a href="graphics-with-ggplot2.html#cb297-2" tabindex="-1"></a><span class="fu">show</span>(p6)</span></code></pre></div>
 </div>
 <div id="putting-everything-together" class="section level3 hasAnchor" number="10.2.5">
 <h3><span class="header-section-number">10.2.5</span> Putting everything together<a href="graphics-with-ggplot2.html#putting-everything-together" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>In this exercise, you have constructed the plot in steps, saving and displaying the plot in separate chunks to allow you to see the changes as we add each layer of the plot. In practice, we do not work like this. All the instructions for creating the plot should be together. Fill in the chunk below so that the plot is recreated in a single chunk.</p>
-<div class="sourceCode" id="cb277"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb277-1"><a href="graphics-with-ggplot2.html#cb277-1" tabindex="-1"></a>p <span class="ot">&lt;-</span> ...</span>
-<span id="cb277-2"><a href="graphics-with-ggplot2.html#cb277-2" tabindex="-1"></a><span class="fu">show</span>(p)</span></code></pre></div>
+<div class="sourceCode" id="cb298"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb298-1"><a href="graphics-with-ggplot2.html#cb298-1" tabindex="-1"></a>p <span class="ot">&lt;-</span> ...</span>
+<span id="cb298-2"><a href="graphics-with-ggplot2.html#cb298-2" tabindex="-1"></a><span class="fu">show</span>(p)</span></code></pre></div>
 <p>There is still one thing missing from our reproduction. In the original plot, the treatment and control groups were distinguished by different plotting symbols, whereas in our plot they both have circular marks. We can change this by adding the aesthetic mapping <code>shape</code>.</p>
 <p>Modify the chunk above so that the aesthetic shape is mapped onto the variable treat. You can do this inside the call to <code>ggplot()</code> or in the call to <code>geom_point()</code>.</p>
 <p>Note that adding the shape aesthetic automatically adds a legend to the plot, telling us which shape corresponds to which group.</p>
@@ -475,17 +475,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">10.4</span> Adding the table (advanced topic)<a href="graphics-with-ggplot2.html#adding-the-table-advanced-topic" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>There is one important element missing from the graph. This is the table of the number of participants in each group. This is an advanced topic so instead of explaining each step I am just going to give you the solution. Do not be concerned if you do not understand this part.</p>
 <p>Firstly we create a new graphical object to represent the table. This object has its own aesthetic mappings, geometries and scales. I will skip a detailed description of this step except to note that some of the arguments below will suppress graphical features (e.g. <code>NULL</code> and <code>element_blank()</code>)</p>
-<div class="sourceCode" id="cb278"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb278-1"><a href="graphics-with-ggplot2.html#cb278-1" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data=</span>alkfos, </span>
-<span id="cb278-2"><a href="graphics-with-ggplot2.html#cb278-2" tabindex="-1"></a>              <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>time, <span class="at">y=</span>treat, <span class="at">label=</span>available)) <span class="sc">+</span></span>
-<span id="cb278-3"><a href="graphics-with-ggplot2.html#cb278-3" tabindex="-1"></a>              <span class="fu">geom_text</span>(<span class="at">size=</span><span class="dv">2</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="cn">NULL</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb278-4"><a href="graphics-with-ggplot2.html#cb278-4" tabindex="-1"></a>              <span class="fu">scale_x_continuous</span>(<span class="at">breaks=</span><span class="cn">NULL</span>) <span class="sc">+</span> </span>
-<span id="cb278-5"><a href="graphics-with-ggplot2.html#cb278-5" tabindex="-1"></a>              <span class="fu">theme_bw</span>(<span class="at">base_size=</span><span class="dv">9</span>) <span class="sc">+</span></span>
-<span id="cb278-6"><a href="graphics-with-ggplot2.html#cb278-6" tabindex="-1"></a>              <span class="fu">theme</span>(<span class="at">panel.grid=</span><span class="fu">element_blank</span>())</span>
-<span id="cb278-7"><a href="graphics-with-ggplot2.html#cb278-7" tabindex="-1"></a>tab</span></code></pre></div>
+<div class="sourceCode" id="cb299"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb299-1"><a href="graphics-with-ggplot2.html#cb299-1" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data=</span>alkfos, </span>
+<span id="cb299-2"><a href="graphics-with-ggplot2.html#cb299-2" tabindex="-1"></a>              <span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>time, <span class="at">y=</span>treat, <span class="at">label=</span>available)) <span class="sc">+</span></span>
+<span id="cb299-3"><a href="graphics-with-ggplot2.html#cb299-3" tabindex="-1"></a>              <span class="fu">geom_text</span>(<span class="at">size=</span><span class="dv">2</span>) <span class="sc">+</span> <span class="fu">xlab</span>(<span class="cn">NULL</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb299-4"><a href="graphics-with-ggplot2.html#cb299-4" tabindex="-1"></a>              <span class="fu">scale_x_continuous</span>(<span class="at">breaks=</span><span class="cn">NULL</span>) <span class="sc">+</span> </span>
+<span id="cb299-5"><a href="graphics-with-ggplot2.html#cb299-5" tabindex="-1"></a>              <span class="fu">theme_bw</span>(<span class="at">base_size=</span><span class="dv">9</span>) <span class="sc">+</span></span>
+<span id="cb299-6"><a href="graphics-with-ggplot2.html#cb299-6" tabindex="-1"></a>              <span class="fu">theme</span>(<span class="at">panel.grid=</span><span class="fu">element_blank</span>())</span>
+<span id="cb299-7"><a href="graphics-with-ggplot2.html#cb299-7" tabindex="-1"></a>tab</span></code></pre></div>
 <p>Next use the <code>plot_grid()</code> function from the cowplot package to stack the displayed objects vertically (<code>align="v"</code>), in a single column (<code>ncol=1</code>, <code>nrow=2</code>), with the left and right ends of the x-axes aligned (<code>axis="lr"</code>) and most of the space taken up by the plot (<code>rel_heights=c(5,1)</code>).</p>
-<div class="sourceCode" id="cb279"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb279-1"><a href="graphics-with-ggplot2.html#cb279-1" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
-<span id="cb279-2"><a href="graphics-with-ggplot2.html#cb279-2" tabindex="-1"></a><span class="fu">plot_grid</span>(<span class="at">plotlist=</span><span class="fu">list</span>(p, tab), <span class="at">align=</span><span class="st">&quot;v&quot;</span>, <span class="at">axis=</span><span class="st">&quot;lr&quot;</span>, </span>
-<span id="cb279-3"><a href="graphics-with-ggplot2.html#cb279-3" tabindex="-1"></a>          <span class="at">ncol=</span><span class="dv">1</span>, <span class="at">nrow=</span><span class="dv">2</span>, <span class="at">rel_heights=</span><span class="fu">c</span>(<span class="dv">5</span>,<span class="dv">1</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb300"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb300-1"><a href="graphics-with-ggplot2.html#cb300-1" tabindex="-1"></a><span class="fu">library</span>(cowplot)</span>
+<span id="cb300-2"><a href="graphics-with-ggplot2.html#cb300-2" tabindex="-1"></a><span class="fu">plot_grid</span>(<span class="at">plotlist=</span><span class="fu">list</span>(p, tab), <span class="at">align=</span><span class="st">&quot;v&quot;</span>, <span class="at">axis=</span><span class="st">&quot;lr&quot;</span>, </span>
+<span id="cb300-3"><a href="graphics-with-ggplot2.html#cb300-3" tabindex="-1"></a>          <span class="at">ncol=</span><span class="dv">1</span>, <span class="at">nrow=</span><span class="dv">2</span>, <span class="at">rel_heights=</span><span class="fu">c</span>(<span class="dv">5</span>,<span class="dv">1</span>))</span></code></pre></div>
 </div>
 <div id="references" class="section level2 hasAnchor" number="10.5">
 <h2><span class="header-section-number">10.5</span> References<a href="graphics-with-ggplot2.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h2>
