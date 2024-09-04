@@ -14,7 +14,7 @@ editor_options:
 ## R version
 
 The course material have been compiled and tested with
-R version 4.4.0 (2024-04-24).
+R version 4.4.1 (2024-06-14).
 We advise to install this version of `R`. For installation instructions please refer to [CRAN wbsite](https://cran.r-project.org/).
 
 ## Code source editing software
