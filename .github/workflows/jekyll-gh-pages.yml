@@ -135,13 +135,17 @@ jobs:
           cd ..
           # make -f pracs/Makefile clean
           make -f lectures/Makefile clean
-      - name: Deploy
-        uses: s0/git-publish-subdir-action@develop
+      - name: Deploy to gh-spe-material branch
         env:
-          REPO: self
-          BRANCH: gh-spe-material
-          FOLDER: deploy
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd deploy
+          git init -q -b gh-spe-material
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Deploy ${GITHUB_SHA::7} from ${GITHUB_REF_NAME}"
+          git push -q --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-spe-material
       - name: Archive production artifacts
         uses: actions/upload-artifact@v4
         with:
