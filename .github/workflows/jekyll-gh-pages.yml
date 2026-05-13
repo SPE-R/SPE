@@ -49,21 +49,24 @@ jobs:
       #   uses: teatimeguest/setup-texlive-action@v2
       #   with:
       #     version: 2023
-      - name: Setup TeX Live
-        uses: teatimeguest/setup-texlive-action@v3
-        with:
-          # version: 2023
-          packages: |
-            count1to
-            multitoc
-            prelim2e
-            ragged2e
-      # - name: Install tinytex
-      #   uses: r-lib/actions/setup-tinytex@v2
-      - name: Install pdfjam and pdfjam-extra
+      # Install TeX Live via apt. Previously used teatimeguest/setup-texlive-action,
+      # which GitHub now blocks (maintainer account suspended). Ubuntu's texlive-*
+      # collections cover the four CTAN packages the lecture handouts need
+      # (count1to, multitoc, prelim2e, ragged2e) as well as beamer/pgf for slides.
+      - name: Install TeX Live and pdfjam
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y texlive-extra-utils
+          sudo apt-get install -y \
+            texlive-latex-base \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            texlive-fonts-extra \
+            texlive-pictures \
+            texlive-science \
+            texlive-xetex \
+            texlive-luatex \
+            texlive-extra-utils
           git clone https://github.com/rrthomas/pdfjam-extras.git
           sudo cp pdfjam-extras/bin/* /usr/bin
           # tlmgr install ae caption currfile datetime enumitem eso-pic fancyhdr floatflt fmtcount grfext grffile listings ms needspace nth oberdiek pdflscape pdfpages subfig pgf tikz-cd
