@@ -106,6 +106,20 @@ to include covariate
 
 ``` r
 library(Epi)
+```
+
+```
+## 
+## Attaching package: 'Epi'
+```
+
+```
+## The following object is masked from 'package:dagitty':
+## 
+##     paths
+```
+
+``` r
 library(stdReg)
 library(PSweight)
 ```

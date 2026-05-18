@@ -561,8 +561,12 @@ births.06 <-
 ```
 
 ```
-## `summarise()` has grouped output by 'sex'. You can override using the `.groups`
-## argument.
+## `summarise()` has regrouped the output.
+## ℹ Summaries were computed grouped by sex and lowbw.
+## ℹ Output is grouped by sex.
+## ℹ Use `summarise(.groups = "drop_last")` to silence this message.
+## ℹ Use `summarise(.by = c(sex, lowbw))` for per-operation grouping
+##   (`?dplyr::dplyr_by`) instead.
 ```
 
 ``` r
@@ -715,8 +719,12 @@ births_tbl |>
 ```
 
 ```
-## `summarise()` has grouped output by 'lowbw'. You can override using the
-## `.groups` argument.
+## `summarise()` has regrouped the output.
+## ℹ Summaries were computed grouped by lowbw and gest4.
+## ℹ Output is grouped by lowbw.
+## ℹ Use `summarise(.groups = "drop_last")` to silence this message.
+## ℹ Use `summarise(.by = c(lowbw, gest4))` for per-operation grouping
+##   (`?dplyr::dplyr_by`) instead.
 ```
 
 ```
@@ -751,8 +759,12 @@ births_tbl |>
 ```
 
 ```
-## `summarise()` has grouped output by 'gest4'. You can override using the
-## `.groups` argument.
+## `summarise()` has regrouped the output.
+## ℹ Summaries were computed grouped by gest4 and lowbw.
+## ℹ Output is grouped by gest4.
+## ℹ Use `summarise(.groups = "drop_last")` to silence this message.
+## ℹ Use `summarise(.by = c(gest4, lowbw))` for per-operation grouping
+##   (`?dplyr::dplyr_by`) instead.
 ```
 
 ```
@@ -801,12 +813,12 @@ age
 ## # A tibble: 6 × 2
 ##     pid   age
 ##   <int> <int>
-## 1     1    19
-## 2     2    20
-## 3     3    16
-## 4     4    25
-## 5     5    15
-## 6     6    22
+## 1     1    17
+## 2     2    25
+## 3     3    19
+## 4     4    23
+## 5     5    19
+## 6     6    16
 ```
 
 ``` r
@@ -836,12 +848,12 @@ bind_rows(age, center)
 ## # A tibble: 11 × 3
 ##      pid   age center
 ##    <dbl> <int> <chr> 
-##  1     1    19 <NA>  
-##  2     2    20 <NA>  
-##  3     3    16 <NA>  
-##  4     4    25 <NA>  
-##  5     5    15 <NA>  
-##  6     6    22 <NA>  
+##  1     1    17 <NA>  
+##  2     2    25 <NA>  
+##  3     3    19 <NA>  
+##  4     4    23 <NA>  
+##  5     5    19 <NA>  
+##  6     6    16 <NA>  
 ##  7     1    NA A     
 ##  8     2    NA B     
 ##  9     3    NA A     
@@ -867,12 +879,12 @@ left_join(age, center, by = c("pid"))
 ## # A tibble: 6 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    19 A     
-## 2     2    20 B     
-## 3     3    16 A     
-## 4     4    25 B     
-## 5     5    15 <NA>  
-## 6     6    22 <NA>
+## 1     1    17 A     
+## 2     2    25 B     
+## 3     3    19 A     
+## 4     4    23 B     
+## 5     5    19 <NA>  
+## 6     6    16 <NA>
 ```
 
 ``` r
@@ -884,12 +896,12 @@ full_join(age, center, by = c("pid"))
 ## # A tibble: 7 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    19 A     
-## 2     2    20 B     
-## 3     3    16 A     
-## 4     4    25 B     
-## 5     5    15 <NA>  
-## 6     6    22 <NA>  
+## 1     1    17 A     
+## 2     2    25 B     
+## 3     3    19 A     
+## 4     4    23 B     
+## 5     5    19 <NA>  
+## 6     6    16 <NA>  
 ## 7    10    NA C
 ```
 
@@ -902,10 +914,10 @@ inner_join(age, center, by = c("pid"))
 ## # A tibble: 4 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    19 A     
-## 2     2    20 B     
-## 3     3    16 A     
-## 4     4    25 B
+## 1     1    17 A     
+## 2     2    25 B     
+## 3     3    19 A     
+## 4     4    23 B
 ```
 Can you spot the differences between the commands above?
 As an exercise, you can try to compute the individuals' mean age per center.
@@ -923,8 +935,8 @@ inner_join(age, center, by = c("pid")) |>
 ## # A tibble: 2 × 2
 ##   center mean_age
 ##   <chr>     <dbl>
-## 1 A          17.5
-## 2 B          22.5
+## 1 A            18
+## 2 B            24
 ```
 
 **Note:** the `by` argument indicates which column should be use to make the *join*. In some 
@@ -3074,21 +3086,23 @@ map_dbl(grades, mean)
 ## 85.0 79.5 90.0
 ```
 
+`map_chr()` requires the function to return a character. Since `mean()` returns
+a number, the call below errors with a clear type-mismatch message (in older
+versions of `purrr` the result was silently coerced to a string).
+
+
 ``` r
 map_chr(grades, mean)
 ```
 
 ```
-## Warning: Automatic coercion from double to character was deprecated in purrr 1.0.0.
-## ℹ Please use an explicit call to `as.character()` within `map_chr()` instead.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.
+## Error in `map_chr()`:
+## ℹ In index: 1.
+## ℹ With name: c1.
+## Caused by error:
+## ! Can't coerce from a number to a string.
 ```
 
-```
-##          c1          c2          c3 
-## "85.000000" "79.500000" "90.000000"
-```
 
 ``` r
 map_df(grades, mean)

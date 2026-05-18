@@ -88,6 +88,17 @@ if (!("dagitty" %in% installed.packages())){
 library(dagitty)
 ```
 
+```
+## 
+## Attaching package: 'dagitty'
+```
+
+```
+## The following object is masked from 'package:Epi':
+## 
+##     paths
+```
+
 
 Let's recreate the graph on the lecture slide 28 (but omitting the direct causal effect of interest, $C \rightarrow D$):
 

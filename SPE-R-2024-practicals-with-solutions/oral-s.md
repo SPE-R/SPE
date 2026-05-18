@@ -85,13 +85,13 @@ summary(orca)
 ```
 
 ```
-##      sex           age        stage         time           event      
-##  Male  :186   Min.   :15.2   I   :50   Min.   : 0.09   Min.   :0.000  
-##  Female:152   1st Qu.:53.2   II  :77   1st Qu.: 1.33   1st Qu.:0.000  
-##               Median :64.9   III :72   Median : 3.87   Median :1.000  
-##               Mean   :63.5   IV  :68   Mean   : 5.66   Mean   :0.994  
-##               3rd Qu.:74.3   unkn:71   3rd Qu.: 8.42   3rd Qu.:2.000  
-##               Max.   :92.2             Max.   :23.26   Max.   :2.000
+##      sex           age        stage         time            event      
+##  Male  :186   Min.   :15.2   I   :50   Min.   : 0.085   Min.   :0.000  
+##  Female:152   1st Qu.:53.2   II  :77   1st Qu.: 1.333   1st Qu.:0.000  
+##               Median :64.9   III :72   Median : 3.869   Median :1.000  
+##               Mean   :63.5   IV  :68   Mean   : 5.662   Mean   :0.994  
+##               3rd Qu.:74.3   unkn:71   3rd Qu.: 8.417   3rd Qu.:2.000  
+##               Max.   :92.2             Max.   :23.258   Max.   :2.000
 ```
 
 
@@ -122,13 +122,13 @@ summary(suob)
 ```
 
 ```
-##       time           status     
-##  Min.   : 0.09   Min.   :0.000  
-##  1st Qu.: 1.33   1st Qu.:0.000  
-##  Median : 3.87   Median :1.000  
-##  Mean   : 5.66   Mean   :0.678  
-##  3rd Qu.: 8.42   3rd Qu.:1.000  
-##  Max.   :23.26   Max.   :1.000
+##       time            status     
+##  Min.   : 0.085   Min.   :0.000  
+##  1st Qu.: 1.333   1st Qu.:0.000  
+##  Median : 3.869   Median :1.000  
+##  Mean   : 5.662   Mean   :0.678  
+##  3rd Qu.: 8.417   3rd Qu.:1.000  
+##  Max.   :23.258   Max.   :1.000
 ```
 
 -  Create a `survfit` object `s.all`, which does the
@@ -158,7 +158,7 @@ str(s.all)
 ```
 
 ```
-## List of 16
+## List of 17
 ##  $ n        : int 338
 ##  $ time     : num [1:251] 0.085 0.162 0.167 0.17 0.246 0.249 0.252 0.329 0.334 0.413 ...
 ##  $ n.risk   : num [1:251] 338 336 334 330 328 327 326 323 322 321 ...
@@ -174,6 +174,7 @@ str(s.all)
 ##  $ conf.type: chr "log"
 ##  $ lower    : num [1:251] 0.986 0.977 0.96 0.953 0.949 ...
 ##  $ upper    : num [1:251] 1 1 0.993 0.989 0.987 ...
+##  $ t0       : num 0
 ##  $ call     : language survfit(formula = suob ~ 1, data = orca)
 ##  - attr(*, "class")= chr "survfit"
 ```
@@ -326,6 +327,14 @@ library(survival)
 cif1 <- survfit(Surv(time, event, type = "mstate") ~ 1,
   data = orca
 )
+```
+
+```
+## Warning in Surv(time, event, type = "mstate"): type= 'mstate' is deprecated,
+## use a factor variable as status
+```
+
+``` r
 str(cif1)
 ```
 
@@ -352,12 +361,12 @@ str(cif1)
 ##  $ n.transition: num [1:251, 1:2] 2 2 2 1 1 0 2 1 1 1 ...
 ##   ..- attr(*, "dimnames")=List of 2
 ##   .. ..$ : NULL
-##   .. ..$ : chr [1:2] "1.2" "1.3"
+##   .. ..$ : chr [1:2] "1:2" "1:3"
 ##  $ n.id        : int 338
 ##  $ cumhaz      : num [1:251, 1:2] 0.00592 0.01187 0.01786 0.02089 0.02394 ...
 ##   ..- attr(*, "dimnames")=List of 2
 ##   .. ..$ : NULL
-##   .. ..$ : chr [1:2] "1.2" "1.3"
+##   .. ..$ : chr [1:2] "1:2" "1:3"
 ##  $ p0          : Named num [1:3] 1 0 0
 ##   ..- attr(*, "names")= chr [1:3] "(s0)" "1" "2"
 ##  $ std.err     : num [1:251, 1:3] 0.00417 0.00588 0.00827 0.00922 0.00965 ...
@@ -422,6 +431,14 @@ col5 <- col5
 cif2 <- survfit(Surv(time, event, type = "mstate") ~ stage,
   data = orca
 )
+```
+
+```
+## Warning in Surv(time, event, type = "mstate"): type= 'mstate' is deprecated,
+## use a factor variable as status
+```
+
+``` r
 str(cif2)
 ```
 
@@ -448,12 +465,12 @@ str(cif2)
 ##  $ n.transition: num [1:307, 1:2] 0 1 1 0 1 1 0 1 1 0 ...
 ##   ..- attr(*, "dimnames")=List of 2
 ##   .. ..$ : NULL
-##   .. ..$ : chr [1:2] "1.2" "1.3"
+##   .. ..$ : chr [1:2] "1:2" "1:3"
 ##  $ n.id        : int [1:5] 50 77 72 68 71
 ##  $ cumhaz      : num [1:307, 1:2] 0 0.0204 0.0412 0.0412 0.063 ...
 ##   ..- attr(*, "dimnames")=List of 2
 ##   .. ..$ : NULL
-##   .. ..$ : chr [1:2] "1.2" "1.3"
+##   .. ..$ : chr [1:2] "1:2" "1:3"
 ##  $ p0          : num [1:5, 1:3] 1 1 1 1 1 0 0 0 0 0 ...
 ##   ..- attr(*, "dimnames")=List of 2
 ##   .. ..$ : chr [1:5] "stage=I" "stage=II" "stage=III" "stage=IV" ...
@@ -695,7 +712,7 @@ leg<-levels(interaction(levels(factor(orca2$sex)),levels(orca2$st3))) #legend la
 ```
 
 ```
-## Warning in ans * length(l) + if1: longer object length is not a multiple of
+## Warning in ay * as.numeric(nx) + ax: longer object length is not a multiple of
 ## shorter object length
 ```
 
@@ -857,13 +874,8 @@ summary(orca.lex)
 ##        
 ## Transitions:
 ##      To
-## From    Alive Oral ca. death Other death  Records:  Events: Risk time:
-##   Alive   109            122         107       338      229       1914
-##        
-## Transitions:
-##      To
-## From     Persons:
-##   Alive       338
+## From    Alive Oral ca. death Other death Records: Events: Risk time: Persons:
+##   Alive   109            122         107      338     229       1914      338
 ```
 
 -  Draw a box diagram of the two-state set-up of competing transitions. Run first th e following command line

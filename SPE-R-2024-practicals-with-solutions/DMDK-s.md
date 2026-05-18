@@ -29,7 +29,7 @@ Loading required package: nlme
 ```
 
 ```
-This is mgcv 1.9-1. For overview type 'help("mgcv-package")'.
+This is mgcv 1.9-4. For overview type '?mgcv'.
 ```
 
 ``` r
@@ -38,11 +38,11 @@ library(tidyverse)
 
 ```
 ── Attaching core tidyverse packages ────────────────────────────────── tidyverse 2.0.0 ──
-✔ dplyr     1.1.4     ✔ readr     2.1.5
-✔ forcats   1.0.0     ✔ stringr   1.5.1
-✔ ggplot2   3.5.1     ✔ tibble    3.2.1
-✔ lubridate 1.9.3     ✔ tidyr     1.3.1
-✔ purrr     1.0.2     
+✔ dplyr     1.2.1     ✔ readr     2.2.0
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.3     ✔ tibble    3.3.1
+✔ lubridate 1.9.5     ✔ tidyr     1.3.2
+✔ purrr     1.2.2     
 ```
 
 ```
@@ -161,8 +161,8 @@ the help page:
            
     Transitions:
          To
-    From     Alive Dead  Records:  Events: Risk time:  Persons:
-      Alive 115974 2499    118473     2499   54273.27      9996
+    From     Alive Dead Records: Events: Risk time: Persons:
+      Alive 115974 2499   118473    2499   54273.27     9996
     ```
     How many records are now in the dataset? How many person-years?
     Compare to the original `Lexis`-dataset.

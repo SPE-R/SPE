@@ -95,13 +95,13 @@ summary(oc)
 ```
 
 ```
-##        id          birth              entry               exit          
-##  Min.   :   1   Length:1501        Length:1501        Length:1501       
-##  1st Qu.: 376   Class :character   Class :character   Class :character  
-##  Median : 751   Mode  :character   Mode  :character   Mode  :character  
-##  Mean   : 751                                                           
-##  3rd Qu.:1126                                                           
-##  Max.   :1501                                                           
+##        id             birth            entry             exit     
+##  Min.   :   1   Length   :1501   Length   :1501   Length   :1501  
+##  1st Qu.: 376   N.unique :1349   N.unique : 302   N.unique : 290  
+##  Median : 751   N.blank  :   0   N.blank  :   0   N.blank  :   0  
+##  Mean   : 751   Min.nchar:  10   Min.nchar:  10   Min.nchar:  10  
+##  3rd Qu.:1126   Max.nchar:  10   Max.nchar:  10   Max.nchar:  10  
+##  Max.   :1501                                                     
 ##      death           chdeath       
 ##  Min.   :0.0000   Min.   :0.00000  
 ##  1st Qu.:0.0000   1st Qu.:0.00000  
@@ -184,8 +184,8 @@ summary(oc.lex)
 ##     
 ## Transitions:
 ##      To
-## From    0   1  Records:  Events: Risk time:  Persons:
-##    0 1381 120      1501      120   25280.91      1501
+## From    0   1 Records: Events: Risk time: Persons:
+##    0 1381 120     1501     120   25280.91     1501
 ```
 
 - At this stage it is informative to examine a graphical

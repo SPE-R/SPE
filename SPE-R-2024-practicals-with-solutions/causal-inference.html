@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 9 Causal inference | Statistical Practice in Epidemiology with R</title>
   <meta name="description" content="This is the SPE-R 2024 exercises book" />
-  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 9 Causal inference | Statistical Practice in Epidemiology with R" />
   <meta property="og:type" content="book" />
@@ -59,8 +59,9 @@
 
 
 <style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -361,12 +362,12 @@ average to <span class="math inline">\(0.5mmHg\)</span> difference in (systolic)
 <li><p>Beer-drinking has <strong>no</strong> effect on body weight.</p></li>
 </ul>
 <p>The <code>R</code> commands to generate the data are:</p>
-<div class="sourceCode" id="cb497"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb497-1"><a href="causal-inference.html#cb497-1" tabindex="-1"></a>bdat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">sex =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">500</span>), <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">500</span>)))</span>
-<span id="cb497-2"><a href="causal-inference.html#cb497-2" tabindex="-1"></a><span class="co"># a data frame with 500 females, 500 males</span></span>
-<span id="cb497-3"><a href="causal-inference.html#cb497-3" tabindex="-1"></a>bdat<span class="sc">$</span>beer <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="dv">1000</span>, <span class="dv">1</span>, <span class="fl">0.2</span> <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> bdat<span class="sc">$</span>sex)</span>
-<span id="cb497-4"><a href="causal-inference.html#cb497-4" tabindex="-1"></a>bdat<span class="sc">$</span>weight <span class="ot">&lt;-</span> <span class="dv">60</span> <span class="sc">+</span> <span class="dv">10</span> <span class="sc">*</span> bdat<span class="sc">$</span>sex <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">0</span>, <span class="dv">7</span>)</span>
-<span id="cb497-5"><a href="causal-inference.html#cb497-5" tabindex="-1"></a>bdat<span class="sc">$</span>bp <span class="ot">&lt;-</span> </span>
-<span id="cb497-6"><a href="causal-inference.html#cb497-6" tabindex="-1"></a>  <span class="dv">110</span> <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> bdat<span class="sc">$</span>weight <span class="sc">+</span> <span class="dv">10</span> <span class="sc">*</span> bdat<span class="sc">$</span>beer <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">0</span>, <span class="dv">10</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb496"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb496-1"><a href="causal-inference.html#cb496-1" tabindex="-1"></a>bdat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">sex =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">500</span>), <span class="fu">rep</span>(<span class="dv">1</span>, <span class="dv">500</span>)))</span>
+<span id="cb496-2"><a href="causal-inference.html#cb496-2" tabindex="-1"></a><span class="co"># a data frame with 500 females, 500 males</span></span>
+<span id="cb496-3"><a href="causal-inference.html#cb496-3" tabindex="-1"></a>bdat<span class="sc">$</span>beer <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="dv">1000</span>, <span class="dv">1</span>, <span class="fl">0.2</span> <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> bdat<span class="sc">$</span>sex)</span>
+<span id="cb496-4"><a href="causal-inference.html#cb496-4" tabindex="-1"></a>bdat<span class="sc">$</span>weight <span class="ot">&lt;-</span> <span class="dv">60</span> <span class="sc">+</span> <span class="dv">10</span> <span class="sc">*</span> bdat<span class="sc">$</span>sex <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">0</span>, <span class="dv">7</span>)</span>
+<span id="cb496-5"><a href="causal-inference.html#cb496-5" tabindex="-1"></a>bdat<span class="sc">$</span>bp <span class="ot">&lt;-</span> </span>
+<span id="cb496-6"><a href="causal-inference.html#cb496-6" tabindex="-1"></a>  <span class="dv">110</span> <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> bdat<span class="sc">$</span>weight <span class="sc">+</span> <span class="dv">10</span> <span class="sc">*</span> bdat<span class="sc">$</span>beer <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">0</span>, <span class="dv">10</span>)</span></code></pre></div>
 <ul>
 <li><p>Now fit the following models for body weight as dependent
 variable and beer-drinking as independent variable. Look, what is
@@ -383,8 +384,8 @@ does increase the body weight by 2kg. Look, what are
 the conclusions in the above models now.
 Thus the data is generated as before, but the weight variable is computed as:</p></li>
 </ul>
-<div class="sourceCode" id="cb498"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb498-1"><a href="causal-inference.html#cb498-1" tabindex="-1"></a>bdat<span class="sc">$</span>weight <span class="ot">&lt;-</span> </span>
-<span id="cb498-2"><a href="causal-inference.html#cb498-2" tabindex="-1"></a>  <span class="dv">60</span> <span class="sc">+</span> <span class="dv">10</span> <span class="sc">*</span> bdat<span class="sc">$</span>sex <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> bdat<span class="sc">$</span>beer <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">0</span>, <span class="dv">7</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb497"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb497-1"><a href="causal-inference.html#cb497-1" tabindex="-1"></a>bdat<span class="sc">$</span>weight <span class="ot">&lt;-</span> </span>
+<span id="cb497-2"><a href="causal-inference.html#cb497-2" tabindex="-1"></a>  <span class="dv">60</span> <span class="sc">+</span> <span class="dv">10</span> <span class="sc">*</span> bdat<span class="sc">$</span>sex <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> bdat<span class="sc">$</span>beer <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>, <span class="dv">0</span>, <span class="dv">7</span>)</span></code></pre></div>
 <ul>
 <li>Suppose one is interested in the effect of beer-drinking on blood pressure instead, and is fitting a) an unadjusted model for blood pressure, with beer as an only covariate; b) a model with beer and sex as covariates. Would either a) or b) give an unbiased estimate for the effect? (You may double-check whether the simulated data is consistent with your answer).</li>
 </ul>
@@ -392,46 +393,51 @@ Thus the data is generated as before, but the weight variable is computed as:</p
 <div id="dag-tools-in-the-package-dagitty" class="section level2 hasAnchor" number="9.2">
 <h2><span class="header-section-number">9.2</span> DAG tools in the package <code>dagitty</code><a href="causal-inference.html#dag-tools-in-the-package-dagitty" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>There is a software <em>DAGitty</em> (<a href="http://www.dagitty.net/">http://www.dagitty.net/</a>) and also an R package <em>dagitty</em> that can be helpful in dealing with DAGs. Let’s try to get the answer to the previous exercise using this package.</p>
-<div class="sourceCode" id="cb499"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb499-1"><a href="causal-inference.html#cb499-1" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span>(<span class="st">&quot;dagitty&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>())){</span>
-<span id="cb499-2"><a href="causal-inference.html#cb499-2" tabindex="-1"></a>  <span class="fu">install.packages</span>(<span class="st">&quot;dagitty&quot;</span>)</span>
-<span id="cb499-3"><a href="causal-inference.html#cb499-3" tabindex="-1"></a>}</span>
-<span id="cb499-4"><a href="causal-inference.html#cb499-4" tabindex="-1"></a><span class="fu">library</span>(dagitty)</span></code></pre></div>
+<div class="sourceCode" id="cb498"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb498-1"><a href="causal-inference.html#cb498-1" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span>(<span class="st">&quot;dagitty&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>())){</span>
+<span id="cb498-2"><a href="causal-inference.html#cb498-2" tabindex="-1"></a>  <span class="fu">install.packages</span>(<span class="st">&quot;dagitty&quot;</span>)</span>
+<span id="cb498-3"><a href="causal-inference.html#cb498-3" tabindex="-1"></a>}</span>
+<span id="cb498-4"><a href="causal-inference.html#cb498-4" tabindex="-1"></a><span class="fu">library</span>(dagitty)</span></code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;dagitty&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:Epi&#39;:
+## 
+##     paths</code></pre>
 <p>Let’s recreate the graph on the lecture slide 28 (but omitting the direct causal effect of interest, <span class="math inline">\(C \rightarrow D\)</span>):</p>
-<div class="sourceCode" id="cb500"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb500-1"><a href="causal-inference.html#cb500-1" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">dagitty</span>(<span class="st">&quot;dag {</span></span>
-<span id="cb500-2"><a href="causal-inference.html#cb500-2" tabindex="-1"></a><span class="st">    C &lt;- S -&gt; Y -&gt; U -&gt; D</span></span>
-<span id="cb500-3"><a href="causal-inference.html#cb500-3" tabindex="-1"></a><span class="st">    C -&gt; Z &lt;- Y</span></span>
-<span id="cb500-4"><a href="causal-inference.html#cb500-4" tabindex="-1"></a><span class="st">    Z -&gt; D</span></span>
-<span id="cb500-5"><a href="causal-inference.html#cb500-5" tabindex="-1"></a><span class="st">    C &lt;- X -&gt; D</span></span>
-<span id="cb500-6"><a href="causal-inference.html#cb500-6" tabindex="-1"></a><span class="st">    C -&gt; Q</span></span>
-<span id="cb500-7"><a href="causal-inference.html#cb500-7" tabindex="-1"></a><span class="st">    W -&gt; D</span></span>
-<span id="cb500-8"><a href="causal-inference.html#cb500-8" tabindex="-1"></a><span class="st">  }&quot;</span>)</span>
-<span id="cb500-9"><a href="causal-inference.html#cb500-9" tabindex="-1"></a><span class="fu">plot</span>(g)</span></code></pre></div>
+<div class="sourceCode" id="cb501"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb501-1"><a href="causal-inference.html#cb501-1" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">dagitty</span>(<span class="st">&quot;dag {</span></span>
+<span id="cb501-2"><a href="causal-inference.html#cb501-2" tabindex="-1"></a><span class="st">    C &lt;- S -&gt; Y -&gt; U -&gt; D</span></span>
+<span id="cb501-3"><a href="causal-inference.html#cb501-3" tabindex="-1"></a><span class="st">    C -&gt; Z &lt;- Y</span></span>
+<span id="cb501-4"><a href="causal-inference.html#cb501-4" tabindex="-1"></a><span class="st">    Z -&gt; D</span></span>
+<span id="cb501-5"><a href="causal-inference.html#cb501-5" tabindex="-1"></a><span class="st">    C &lt;- X -&gt; D</span></span>
+<span id="cb501-6"><a href="causal-inference.html#cb501-6" tabindex="-1"></a><span class="st">    C -&gt; Q</span></span>
+<span id="cb501-7"><a href="causal-inference.html#cb501-7" tabindex="-1"></a><span class="st">    W -&gt; D</span></span>
+<span id="cb501-8"><a href="causal-inference.html#cb501-8" tabindex="-1"></a><span class="st">  }&quot;</span>)</span>
+<span id="cb501-9"><a href="causal-inference.html#cb501-9" tabindex="-1"></a><span class="fu">plot</span>(g)</span></code></pre></div>
 <p>To get a more similar look as on the slide, we must supply the coordinates (x increases from left to right, y from top to bottom):</p>
-<div class="sourceCode" id="cb501"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb501-1"><a href="causal-inference.html#cb501-1" tabindex="-1"></a><span class="fu">coordinates</span>(g) <span class="ot">&lt;-</span> </span>
-<span id="cb501-2"><a href="causal-inference.html#cb501-2" tabindex="-1"></a>  <span class="fu">list</span>(</span>
-<span id="cb501-3"><a href="causal-inference.html#cb501-3" tabindex="-1"></a>    <span class="at">x =</span> </span>
-<span id="cb501-4"><a href="causal-inference.html#cb501-4" tabindex="-1"></a>      <span class="fu">c</span>(</span>
-<span id="cb501-5"><a href="causal-inference.html#cb501-5" tabindex="-1"></a>        <span class="at">S =</span> <span class="dv">1</span>, <span class="at">C =</span> <span class="dv">1</span>, <span class="at">Q =</span> <span class="dv">1</span>, <span class="at">Y =</span> <span class="dv">2</span>, <span class="at">Z =</span> <span class="dv">2</span>, </span>
-<span id="cb501-6"><a href="causal-inference.html#cb501-6" tabindex="-1"></a>        <span class="at">X =</span> <span class="dv">2</span>, <span class="at">U =</span> <span class="dv">3</span>, <span class="at">D =</span> <span class="dv">3</span>, <span class="at">W =</span> <span class="dv">3</span></span>
-<span id="cb501-7"><a href="causal-inference.html#cb501-7" tabindex="-1"></a>      ),</span>
-<span id="cb501-8"><a href="causal-inference.html#cb501-8" tabindex="-1"></a>    <span class="at">y =</span> </span>
-<span id="cb501-9"><a href="causal-inference.html#cb501-9" tabindex="-1"></a>      <span class="fu">c</span>(</span>
-<span id="cb501-10"><a href="causal-inference.html#cb501-10" tabindex="-1"></a>        <span class="at">U =</span> <span class="dv">1</span>, <span class="at">Y =</span> <span class="dv">1</span>, <span class="at">S =</span> <span class="dv">1</span>, <span class="at">Z =</span> <span class="dv">2</span>, <span class="at">C =</span> <span class="dv">3</span>, </span>
-<span id="cb501-11"><a href="causal-inference.html#cb501-11" tabindex="-1"></a>        <span class="at">D =</span> <span class="dv">3</span>, <span class="at">X =</span> <span class="dv">4</span>, <span class="at">W =</span> <span class="dv">4</span>, <span class="at">Q =</span> <span class="dv">4</span></span>
-<span id="cb501-12"><a href="causal-inference.html#cb501-12" tabindex="-1"></a>      )</span>
-<span id="cb501-13"><a href="causal-inference.html#cb501-13" tabindex="-1"></a>  )</span>
-<span id="cb501-14"><a href="causal-inference.html#cb501-14" tabindex="-1"></a><span class="fu">plot</span>(g)</span></code></pre></div>
-<p><img src="causal-s_files/figure-html/dagitty3-1.png" width="384" /></p>
+<div class="sourceCode" id="cb502"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb502-1"><a href="causal-inference.html#cb502-1" tabindex="-1"></a><span class="fu">coordinates</span>(g) <span class="ot">&lt;-</span> </span>
+<span id="cb502-2"><a href="causal-inference.html#cb502-2" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb502-3"><a href="causal-inference.html#cb502-3" tabindex="-1"></a>    <span class="at">x =</span> </span>
+<span id="cb502-4"><a href="causal-inference.html#cb502-4" tabindex="-1"></a>      <span class="fu">c</span>(</span>
+<span id="cb502-5"><a href="causal-inference.html#cb502-5" tabindex="-1"></a>        <span class="at">S =</span> <span class="dv">1</span>, <span class="at">C =</span> <span class="dv">1</span>, <span class="at">Q =</span> <span class="dv">1</span>, <span class="at">Y =</span> <span class="dv">2</span>, <span class="at">Z =</span> <span class="dv">2</span>, </span>
+<span id="cb502-6"><a href="causal-inference.html#cb502-6" tabindex="-1"></a>        <span class="at">X =</span> <span class="dv">2</span>, <span class="at">U =</span> <span class="dv">3</span>, <span class="at">D =</span> <span class="dv">3</span>, <span class="at">W =</span> <span class="dv">3</span></span>
+<span id="cb502-7"><a href="causal-inference.html#cb502-7" tabindex="-1"></a>      ),</span>
+<span id="cb502-8"><a href="causal-inference.html#cb502-8" tabindex="-1"></a>    <span class="at">y =</span> </span>
+<span id="cb502-9"><a href="causal-inference.html#cb502-9" tabindex="-1"></a>      <span class="fu">c</span>(</span>
+<span id="cb502-10"><a href="causal-inference.html#cb502-10" tabindex="-1"></a>        <span class="at">U =</span> <span class="dv">1</span>, <span class="at">Y =</span> <span class="dv">1</span>, <span class="at">S =</span> <span class="dv">1</span>, <span class="at">Z =</span> <span class="dv">2</span>, <span class="at">C =</span> <span class="dv">3</span>, </span>
+<span id="cb502-11"><a href="causal-inference.html#cb502-11" tabindex="-1"></a>        <span class="at">D =</span> <span class="dv">3</span>, <span class="at">X =</span> <span class="dv">4</span>, <span class="at">W =</span> <span class="dv">4</span>, <span class="at">Q =</span> <span class="dv">4</span></span>
+<span id="cb502-12"><a href="causal-inference.html#cb502-12" tabindex="-1"></a>      )</span>
+<span id="cb502-13"><a href="causal-inference.html#cb502-13" tabindex="-1"></a>  )</span>
+<span id="cb502-14"><a href="causal-inference.html#cb502-14" tabindex="-1"></a><span class="fu">plot</span>(g)</span></code></pre></div>
+<p><img src="causal-s_files/figure-html/dagitty3-1.png" alt="" width="384" /></p>
 <p>Let’s look at all possible paths from <span class="math inline">\(C\)</span> to <span class="math inline">\(D\)</span>:</p>
-<div class="sourceCode" id="cb502"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb502-1"><a href="causal-inference.html#cb502-1" tabindex="-1"></a><span class="fu">paths</span>(g, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb503"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb503-1"><a href="causal-inference.html#cb503-1" tabindex="-1"></a><span class="fu">paths</span>(g, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>)</span></code></pre></div>
 <p>As you see, one path contains a collider and is therefore a <em>closed</em> path and the others are <em>open</em>.</p>
 <p>Let’s identify the minimal sets of variables needed to adjust the model for <span class="math inline">\(D\)</span> for, to obtain an unbiased estimate of the effect of <span class="math inline">\(C\)</span>. You can specify, whether you want to estimate direct or total effect of <span class="math inline">\(C\)</span>:</p>
-<div class="sourceCode" id="cb503"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb503-1"><a href="causal-inference.html#cb503-1" tabindex="-1"></a><span class="fu">adjustmentSets</span>(</span>
-<span id="cb503-2"><a href="causal-inference.html#cb503-2" tabindex="-1"></a>  g, <span class="at">exposure =</span> <span class="st">&quot;C&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;D&quot;</span>, <span class="at">effect =</span> <span class="st">&quot;direct&quot;</span></span>
-<span id="cb503-3"><a href="causal-inference.html#cb503-3" tabindex="-1"></a>)</span>
-<span id="cb503-4"><a href="causal-inference.html#cb503-4" tabindex="-1"></a><span class="fu">adjustmentSets</span>(</span>
-<span id="cb503-5"><a href="causal-inference.html#cb503-5" tabindex="-1"></a>  g, <span class="at">exposure =</span> <span class="st">&quot;C&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;D&quot;</span>, <span class="at">effect =</span> <span class="st">&quot;total&quot;</span></span>
-<span id="cb503-6"><a href="causal-inference.html#cb503-6" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb504"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb504-1"><a href="causal-inference.html#cb504-1" tabindex="-1"></a><span class="fu">adjustmentSets</span>(</span>
+<span id="cb504-2"><a href="causal-inference.html#cb504-2" tabindex="-1"></a>  g, <span class="at">exposure =</span> <span class="st">&quot;C&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;D&quot;</span>, <span class="at">effect =</span> <span class="st">&quot;direct&quot;</span></span>
+<span id="cb504-3"><a href="causal-inference.html#cb504-3" tabindex="-1"></a>)</span>
+<span id="cb504-4"><a href="causal-inference.html#cb504-4" tabindex="-1"></a><span class="fu">adjustmentSets</span>(</span>
+<span id="cb504-5"><a href="causal-inference.html#cb504-5" tabindex="-1"></a>  g, <span class="at">exposure =</span> <span class="st">&quot;C&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;D&quot;</span>, <span class="at">effect =</span> <span class="st">&quot;total&quot;</span></span>
+<span id="cb504-6"><a href="causal-inference.html#cb504-6" tabindex="-1"></a>)</span></code></pre></div>
 <p>Thus, for total effect estimation one should adjust for <span class="math inline">\(X\)</span> and either <span class="math inline">\(Y\)</span> or <span class="math inline">\(S\)</span>, whereas for direct effect estimation, one would also need to adjust for <span class="math inline">\(Z\)</span>.</p>
 <p>You can verify that, these are the variables that will block all open paths from <span class="math inline">\(C\)</span> to <span class="math inline">\(D\)</span>.</p>
 <p><strong>Now try to do the <em>beer-weight</em> exercise using <em>dagitty</em>: </strong></p>
@@ -444,41 +450,41 @@ Thus the data is generated as before, but the weight variable is computed as:</p
 <div id="identifying-the-true-dag-for-the-data" class="section level2 hasAnchor" number="9.3">
 <h2><span class="header-section-number">9.3</span> Identifying the true DAG for the data<a href="causal-inference.html#identifying-the-true-dag-for-the-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The following code creates three DAGs</p>
-<div class="sourceCode" id="cb504"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb504-1"><a href="causal-inference.html#cb504-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>))</span>
-<span id="cb504-2"><a href="causal-inference.html#cb504-2" tabindex="-1"></a>g1 <span class="ot">&lt;-</span> <span class="fu">dagitty</span>(<span class="st">&quot;dag {</span></span>
-<span id="cb504-3"><a href="causal-inference.html#cb504-3" tabindex="-1"></a><span class="st">    U -&gt; Z -&gt; Y </span></span>
-<span id="cb504-4"><a href="causal-inference.html#cb504-4" tabindex="-1"></a><span class="st">    U -&gt; X</span></span>
-<span id="cb504-5"><a href="causal-inference.html#cb504-5" tabindex="-1"></a><span class="st">    W -&gt; Y</span></span>
-<span id="cb504-6"><a href="causal-inference.html#cb504-6" tabindex="-1"></a><span class="st">    Q -&gt; W -&gt; X</span></span>
-<span id="cb504-7"><a href="causal-inference.html#cb504-7" tabindex="-1"></a><span class="st">    Q -&gt; Y</span></span>
-<span id="cb504-8"><a href="causal-inference.html#cb504-8" tabindex="-1"></a><span class="st">    }&quot;</span>)</span>
-<span id="cb504-9"><a href="causal-inference.html#cb504-9" tabindex="-1"></a>g2 <span class="ot">&lt;-</span> <span class="fu">dagitty</span>(<span class="st">&quot;dag {</span></span>
-<span id="cb504-10"><a href="causal-inference.html#cb504-10" tabindex="-1"></a><span class="st">    U -&gt; Z -&gt; Y -&gt; W </span></span>
-<span id="cb504-11"><a href="causal-inference.html#cb504-11" tabindex="-1"></a><span class="st">    U -&gt; X -&gt; W </span></span>
-<span id="cb504-12"><a href="causal-inference.html#cb504-12" tabindex="-1"></a><span class="st">    Q -&gt; W</span></span>
-<span id="cb504-13"><a href="causal-inference.html#cb504-13" tabindex="-1"></a><span class="st">    Q -&gt; Y</span></span>
-<span id="cb504-14"><a href="causal-inference.html#cb504-14" tabindex="-1"></a><span class="st">    }&quot;</span>)</span>
-<span id="cb504-15"><a href="causal-inference.html#cb504-15" tabindex="-1"></a>g3 <span class="ot">&lt;-</span> <span class="fu">dagitty</span>(<span class="st">&quot;dag {</span></span>
-<span id="cb504-16"><a href="causal-inference.html#cb504-16" tabindex="-1"></a><span class="st">    U -&gt; Z -&gt; Y </span></span>
-<span id="cb504-17"><a href="causal-inference.html#cb504-17" tabindex="-1"></a><span class="st">    U -&gt; X -&gt; W  -&gt; Y</span></span>
-<span id="cb504-18"><a href="causal-inference.html#cb504-18" tabindex="-1"></a><span class="st">    Q -&gt; W</span></span>
-<span id="cb504-19"><a href="causal-inference.html#cb504-19" tabindex="-1"></a><span class="st">    Q -&gt; Y</span></span>
-<span id="cb504-20"><a href="causal-inference.html#cb504-20" tabindex="-1"></a><span class="st">    }&quot;</span>)</span>
-<span id="cb504-21"><a href="causal-inference.html#cb504-21" tabindex="-1"></a>coord <span class="ot">&lt;-</span> </span>
-<span id="cb504-22"><a href="causal-inference.html#cb504-22" tabindex="-1"></a>  <span class="fu">list</span>( <span class="at">x =</span> <span class="fu">c</span>(<span class="at">X=</span><span class="dv">1</span>, <span class="at">U =</span> <span class="fl">1.3</span>, <span class="at">W =</span> <span class="dv">2</span>, <span class="at">Z =</span> <span class="fl">2.3</span>, <span class="at">Q =</span> <span class="fl">2.7</span>, <span class="at">Y=</span><span class="dv">3</span>), </span>
-<span id="cb504-23"><a href="causal-inference.html#cb504-23" tabindex="-1"></a>        <span class="at">y =</span> <span class="fu">c</span>(<span class="at">U=</span><span class="dv">1</span>,   <span class="at">Z=</span><span class="fl">1.3</span>, <span class="at">X=</span><span class="dv">2</span>, <span class="at">Y=</span><span class="dv">2</span>,   <span class="at">W=</span><span class="fl">2.7</span>,  <span class="at">Q=</span><span class="dv">3</span>)</span>
-<span id="cb504-24"><a href="causal-inference.html#cb504-24" tabindex="-1"></a>  )</span>
-<span id="cb504-25"><a href="causal-inference.html#cb504-25" tabindex="-1"></a><span class="fu">coordinates</span>(g1)<span class="ot">&lt;-</span><span class="fu">coordinates</span>(g2)<span class="ot">&lt;-</span><span class="fu">coordinates</span>(g3)<span class="ot">&lt;-</span>coord</span>
-<span id="cb504-26"><a href="causal-inference.html#cb504-26" tabindex="-1"></a><span class="fu">plot</span>(g1)</span>
-<span id="cb504-27"><a href="causal-inference.html#cb504-27" tabindex="-1"></a><span class="fu">title</span>(<span class="st">&quot;(a)&quot;</span>)</span>
-<span id="cb504-28"><a href="causal-inference.html#cb504-28" tabindex="-1"></a><span class="fu">plot</span>(g2)</span>
-<span id="cb504-29"><a href="causal-inference.html#cb504-29" tabindex="-1"></a><span class="fu">title</span>(<span class="st">&quot;(b)&quot;</span>)</span>
-<span id="cb504-30"><a href="causal-inference.html#cb504-30" tabindex="-1"></a><span class="fu">plot</span>(g3)</span>
-<span id="cb504-31"><a href="causal-inference.html#cb504-31" tabindex="-1"></a><span class="fu">title</span>(<span class="st">&quot;(c)&quot;</span>)</span></code></pre></div>
-<p><img src="causal-s_files/figure-html/threedags-1.png" width="768" /></p>
+<div class="sourceCode" id="cb505"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb505-1"><a href="causal-inference.html#cb505-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>))</span>
+<span id="cb505-2"><a href="causal-inference.html#cb505-2" tabindex="-1"></a>g1 <span class="ot">&lt;-</span> <span class="fu">dagitty</span>(<span class="st">&quot;dag {</span></span>
+<span id="cb505-3"><a href="causal-inference.html#cb505-3" tabindex="-1"></a><span class="st">    U -&gt; Z -&gt; Y </span></span>
+<span id="cb505-4"><a href="causal-inference.html#cb505-4" tabindex="-1"></a><span class="st">    U -&gt; X</span></span>
+<span id="cb505-5"><a href="causal-inference.html#cb505-5" tabindex="-1"></a><span class="st">    W -&gt; Y</span></span>
+<span id="cb505-6"><a href="causal-inference.html#cb505-6" tabindex="-1"></a><span class="st">    Q -&gt; W -&gt; X</span></span>
+<span id="cb505-7"><a href="causal-inference.html#cb505-7" tabindex="-1"></a><span class="st">    Q -&gt; Y</span></span>
+<span id="cb505-8"><a href="causal-inference.html#cb505-8" tabindex="-1"></a><span class="st">    }&quot;</span>)</span>
+<span id="cb505-9"><a href="causal-inference.html#cb505-9" tabindex="-1"></a>g2 <span class="ot">&lt;-</span> <span class="fu">dagitty</span>(<span class="st">&quot;dag {</span></span>
+<span id="cb505-10"><a href="causal-inference.html#cb505-10" tabindex="-1"></a><span class="st">    U -&gt; Z -&gt; Y -&gt; W </span></span>
+<span id="cb505-11"><a href="causal-inference.html#cb505-11" tabindex="-1"></a><span class="st">    U -&gt; X -&gt; W </span></span>
+<span id="cb505-12"><a href="causal-inference.html#cb505-12" tabindex="-1"></a><span class="st">    Q -&gt; W</span></span>
+<span id="cb505-13"><a href="causal-inference.html#cb505-13" tabindex="-1"></a><span class="st">    Q -&gt; Y</span></span>
+<span id="cb505-14"><a href="causal-inference.html#cb505-14" tabindex="-1"></a><span class="st">    }&quot;</span>)</span>
+<span id="cb505-15"><a href="causal-inference.html#cb505-15" tabindex="-1"></a>g3 <span class="ot">&lt;-</span> <span class="fu">dagitty</span>(<span class="st">&quot;dag {</span></span>
+<span id="cb505-16"><a href="causal-inference.html#cb505-16" tabindex="-1"></a><span class="st">    U -&gt; Z -&gt; Y </span></span>
+<span id="cb505-17"><a href="causal-inference.html#cb505-17" tabindex="-1"></a><span class="st">    U -&gt; X -&gt; W  -&gt; Y</span></span>
+<span id="cb505-18"><a href="causal-inference.html#cb505-18" tabindex="-1"></a><span class="st">    Q -&gt; W</span></span>
+<span id="cb505-19"><a href="causal-inference.html#cb505-19" tabindex="-1"></a><span class="st">    Q -&gt; Y</span></span>
+<span id="cb505-20"><a href="causal-inference.html#cb505-20" tabindex="-1"></a><span class="st">    }&quot;</span>)</span>
+<span id="cb505-21"><a href="causal-inference.html#cb505-21" tabindex="-1"></a>coord <span class="ot">&lt;-</span> </span>
+<span id="cb505-22"><a href="causal-inference.html#cb505-22" tabindex="-1"></a>  <span class="fu">list</span>( <span class="at">x =</span> <span class="fu">c</span>(<span class="at">X=</span><span class="dv">1</span>, <span class="at">U =</span> <span class="fl">1.3</span>, <span class="at">W =</span> <span class="dv">2</span>, <span class="at">Z =</span> <span class="fl">2.3</span>, <span class="at">Q =</span> <span class="fl">2.7</span>, <span class="at">Y=</span><span class="dv">3</span>), </span>
+<span id="cb505-23"><a href="causal-inference.html#cb505-23" tabindex="-1"></a>        <span class="at">y =</span> <span class="fu">c</span>(<span class="at">U=</span><span class="dv">1</span>,   <span class="at">Z=</span><span class="fl">1.3</span>, <span class="at">X=</span><span class="dv">2</span>, <span class="at">Y=</span><span class="dv">2</span>,   <span class="at">W=</span><span class="fl">2.7</span>,  <span class="at">Q=</span><span class="dv">3</span>)</span>
+<span id="cb505-24"><a href="causal-inference.html#cb505-24" tabindex="-1"></a>  )</span>
+<span id="cb505-25"><a href="causal-inference.html#cb505-25" tabindex="-1"></a><span class="fu">coordinates</span>(g1)<span class="ot">&lt;-</span><span class="fu">coordinates</span>(g2)<span class="ot">&lt;-</span><span class="fu">coordinates</span>(g3)<span class="ot">&lt;-</span>coord</span>
+<span id="cb505-26"><a href="causal-inference.html#cb505-26" tabindex="-1"></a><span class="fu">plot</span>(g1)</span>
+<span id="cb505-27"><a href="causal-inference.html#cb505-27" tabindex="-1"></a><span class="fu">title</span>(<span class="st">&quot;(a)&quot;</span>)</span>
+<span id="cb505-28"><a href="causal-inference.html#cb505-28" tabindex="-1"></a><span class="fu">plot</span>(g2)</span>
+<span id="cb505-29"><a href="causal-inference.html#cb505-29" tabindex="-1"></a><span class="fu">title</span>(<span class="st">&quot;(b)&quot;</span>)</span>
+<span id="cb505-30"><a href="causal-inference.html#cb505-30" tabindex="-1"></a><span class="fu">plot</span>(g3)</span>
+<span id="cb505-31"><a href="causal-inference.html#cb505-31" tabindex="-1"></a><span class="fu">title</span>(<span class="st">&quot;(c)&quot;</span>)</span></code></pre></div>
+<p><img src="causal-s_files/figure-html/threedags-1.png" alt="" width="768" /></p>
 <p>Now, the following script generates a dataset:</p>
-<div class="sourceCode" id="cb505"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb505-1"><a href="causal-inference.html#cb505-1" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;data/gendata.r&quot;</span>)</span>
-<span id="cb505-2"><a href="causal-inference.html#cb505-2" tabindex="-1"></a><span class="fu">head</span>(dat)</span></code></pre></div>
+<div class="sourceCode" id="cb506"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb506-1"><a href="causal-inference.html#cb506-1" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;data/gendata.r&quot;</span>)</span>
+<span id="cb506-2"><a href="causal-inference.html#cb506-2" tabindex="-1"></a><span class="fu">head</span>(dat)</span></code></pre></div>
 <pre><code>##        Q      W      X      Z       Y
 ## 1 -0.397  1.056  0.199 -0.372  -4.198
 ## 2  0.460  2.393 -1.647 -3.004 -10.667
@@ -487,10 +493,10 @@ Thus the data is generated as before, but the weight variable is computed as:</p
 ## 5  1.048  1.637  0.783 -2.047  -4.378
 ## 6  1.895  3.272 -3.900 -2.313  -9.871</code></pre>
 <p><em>Exercise:</em> Using linear models, try to identify, which of the three DAGs has been used to generate the data.</p>
-<div class="sourceCode" id="cb507"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb507-1"><a href="causal-inference.html#cb507-1" tabindex="-1"></a><span class="fu">adjustmentSets</span>(g1,<span class="st">&quot;X&quot;</span>,<span class="st">&quot;Y&quot;</span>, <span class="at">effect=</span><span class="st">&quot;direct&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb508"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb508-1"><a href="causal-inference.html#cb508-1" tabindex="-1"></a><span class="fu">adjustmentSets</span>(g1,<span class="st">&quot;X&quot;</span>,<span class="st">&quot;Y&quot;</span>, <span class="at">effect=</span><span class="st">&quot;direct&quot;</span>)</span></code></pre></div>
 <pre><code>## { W, Z }
 ## { U, W }</code></pre>
-<div class="sourceCode" id="cb509"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb509-1"><a href="causal-inference.html#cb509-1" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(Y<span class="sc">~</span>X<span class="sc">+</span>W<span class="sc">+</span>Z,<span class="at">data=</span>dat))</span></code></pre></div>
+<div class="sourceCode" id="cb510"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb510-1"><a href="causal-inference.html#cb510-1" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(Y<span class="sc">~</span>X<span class="sc">+</span>W<span class="sc">+</span>Z,<span class="at">data=</span>dat))</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = Y ~ X + W + Z, data = dat)
@@ -511,12 +517,12 @@ Thus the data is generated as before, but the weight variable is computed as:</p
 ## Residual standard error: 1.097 on 1996 degrees of freedom
 ## Multiple R-squared:  0.9686, Adjusted R-squared:  0.9686 
 ## F-statistic: 2.054e+04 on 3 and 1996 DF,  p-value: &lt; 2.2e-16</code></pre>
-<div class="sourceCode" id="cb511"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb511-1"><a href="causal-inference.html#cb511-1" tabindex="-1"></a><span class="co"># no X effect: this DAG is possible</span></span>
-<span id="cb511-2"><a href="causal-inference.html#cb511-2" tabindex="-1"></a></span>
-<span id="cb511-3"><a href="causal-inference.html#cb511-3" tabindex="-1"></a><span class="fu">adjustmentSets</span>(g2,<span class="st">&quot;X&quot;</span>,<span class="st">&quot;Y&quot;</span>, <span class="at">effect=</span><span class="st">&quot;direct&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb512"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb512-1"><a href="causal-inference.html#cb512-1" tabindex="-1"></a><span class="co"># no X effect: this DAG is possible</span></span>
+<span id="cb512-2"><a href="causal-inference.html#cb512-2" tabindex="-1"></a></span>
+<span id="cb512-3"><a href="causal-inference.html#cb512-3" tabindex="-1"></a><span class="fu">adjustmentSets</span>(g2,<span class="st">&quot;X&quot;</span>,<span class="st">&quot;Y&quot;</span>, <span class="at">effect=</span><span class="st">&quot;direct&quot;</span>)</span></code></pre></div>
 <pre><code>## { Z }
 ## { U }</code></pre>
-<div class="sourceCode" id="cb513"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb513-1"><a href="causal-inference.html#cb513-1" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(Y<span class="sc">~</span>X<span class="sc">+</span>Z,<span class="at">data=</span>dat))</span></code></pre></div>
+<div class="sourceCode" id="cb514"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb514-1"><a href="causal-inference.html#cb514-1" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(Y<span class="sc">~</span>X<span class="sc">+</span>Z,<span class="at">data=</span>dat))</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = Y ~ X + Z, data = dat)
@@ -536,12 +542,12 @@ Thus the data is generated as before, but the weight variable is computed as:</p
 ## Residual standard error: 2.277 on 1997 degrees of freedom
 ## Multiple R-squared:  0.8648, Adjusted R-squared:  0.8647 
 ## F-statistic:  6387 on 2 and 1997 DF,  p-value: &lt; 2.2e-16</code></pre>
-<div class="sourceCode" id="cb515"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb515-1"><a href="causal-inference.html#cb515-1" tabindex="-1"></a><span class="co"># X effect is significant: this DAG is not likely</span></span>
-<span id="cb515-2"><a href="causal-inference.html#cb515-2" tabindex="-1"></a></span>
-<span id="cb515-3"><a href="causal-inference.html#cb515-3" tabindex="-1"></a><span class="fu">adjustmentSets</span>(g3,<span class="st">&quot;X&quot;</span>,<span class="st">&quot;Y&quot;</span>, <span class="at">effect=</span><span class="st">&quot;direct&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb516"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb516-1"><a href="causal-inference.html#cb516-1" tabindex="-1"></a><span class="co"># X effect is significant: this DAG is not likely</span></span>
+<span id="cb516-2"><a href="causal-inference.html#cb516-2" tabindex="-1"></a></span>
+<span id="cb516-3"><a href="causal-inference.html#cb516-3" tabindex="-1"></a><span class="fu">adjustmentSets</span>(g3,<span class="st">&quot;X&quot;</span>,<span class="st">&quot;Y&quot;</span>, <span class="at">effect=</span><span class="st">&quot;direct&quot;</span>)</span></code></pre></div>
 <pre><code>## { Q, W, Z }
 ## { Q, U, W }</code></pre>
-<div class="sourceCode" id="cb517"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb517-1"><a href="causal-inference.html#cb517-1" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(Y<span class="sc">~</span>X<span class="sc">+</span>Q<span class="sc">+</span>W<span class="sc">+</span>Z,<span class="at">data=</span>dat))</span></code></pre></div>
+<div class="sourceCode" id="cb518"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb518-1"><a href="causal-inference.html#cb518-1" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(Y<span class="sc">~</span>X<span class="sc">+</span>Q<span class="sc">+</span>W<span class="sc">+</span>Z,<span class="at">data=</span>dat))</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = Y ~ X + Q + W + Z, data = dat)
@@ -563,11 +569,11 @@ Thus the data is generated as before, but the weight variable is computed as:</p
 ## Residual standard error: 0.9903 on 1995 degrees of freedom
 ## Multiple R-squared:  0.9745, Adjusted R-squared:  0.9744 
 ## F-statistic: 1.902e+04 on 4 and 1995 DF,  p-value: &lt; 2.2e-16</code></pre>
-<div class="sourceCode" id="cb519"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb519-1"><a href="causal-inference.html#cb519-1" tabindex="-1"></a><span class="co"># no X effect: this DAG is possible</span></span>
-<span id="cb519-2"><a href="causal-inference.html#cb519-2" tabindex="-1"></a></span>
-<span id="cb519-3"><a href="causal-inference.html#cb519-3" tabindex="-1"></a><span class="fu">adjustmentSets</span>(g1,<span class="st">&quot;Z&quot;</span>,<span class="st">&quot;W&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb520"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb520-1"><a href="causal-inference.html#cb520-1" tabindex="-1"></a><span class="co"># no X effect: this DAG is possible</span></span>
+<span id="cb520-2"><a href="causal-inference.html#cb520-2" tabindex="-1"></a></span>
+<span id="cb520-3"><a href="causal-inference.html#cb520-3" tabindex="-1"></a><span class="fu">adjustmentSets</span>(g1,<span class="st">&quot;Z&quot;</span>,<span class="st">&quot;W&quot;</span>)</span></code></pre></div>
 <pre><code>##  {}</code></pre>
-<div class="sourceCode" id="cb521"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb521-1"><a href="causal-inference.html#cb521-1" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(W<span class="sc">~</span>Z,<span class="at">data=</span>dat))</span></code></pre></div>
+<div class="sourceCode" id="cb522"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb522-1"><a href="causal-inference.html#cb522-1" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(W<span class="sc">~</span>Z,<span class="at">data=</span>dat))</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = W ~ Z, data = dat)
@@ -584,12 +590,12 @@ Thus the data is generated as before, but the weight variable is computed as:</p
 ## Residual standard error: 2.2 on 1998 degrees of freedom
 ## Multiple R-squared:  0.0003635,  Adjusted R-squared:  -0.0001368 
 ## F-statistic: 0.7266 on 1 and 1998 DF,  p-value: 0.3941</code></pre>
-<div class="sourceCode" id="cb523"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb523-1"><a href="causal-inference.html#cb523-1" tabindex="-1"></a><span class="co"># no Z effect: this DAG is possible</span></span>
-<span id="cb523-2"><a href="causal-inference.html#cb523-2" tabindex="-1"></a></span>
-<span id="cb523-3"><a href="causal-inference.html#cb523-3" tabindex="-1"></a><span class="fu">adjustmentSets</span>(g3,<span class="st">&quot;Z&quot;</span>,<span class="st">&quot;W&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb524"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb524-1"><a href="causal-inference.html#cb524-1" tabindex="-1"></a><span class="co"># no Z effect: this DAG is possible</span></span>
+<span id="cb524-2"><a href="causal-inference.html#cb524-2" tabindex="-1"></a></span>
+<span id="cb524-3"><a href="causal-inference.html#cb524-3" tabindex="-1"></a><span class="fu">adjustmentSets</span>(g3,<span class="st">&quot;Z&quot;</span>,<span class="st">&quot;W&quot;</span>)</span></code></pre></div>
 <pre><code>## { X }
 ## { U }</code></pre>
-<div class="sourceCode" id="cb525"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb525-1"><a href="causal-inference.html#cb525-1" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(W<span class="sc">~</span>Z<span class="sc">+</span>X,<span class="at">data=</span>dat))</span></code></pre></div>
+<div class="sourceCode" id="cb526"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb526-1"><a href="causal-inference.html#cb526-1" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lm</span>(W<span class="sc">~</span>Z<span class="sc">+</span>X,<span class="at">data=</span>dat))</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = W ~ Z + X, data = dat)
@@ -609,7 +615,7 @@ Thus the data is generated as before, but the weight variable is computed as:</p
 ## Residual standard error: 0.7676 on 1997 degrees of freedom
 ## Multiple R-squared:  0.8783, Adjusted R-squared:  0.8782 
 ## F-statistic:  7208 on 2 and 1997 DF,  p-value: &lt; 2.2e-16</code></pre>
-<div class="sourceCode" id="cb527"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb527-1"><a href="causal-inference.html#cb527-1" tabindex="-1"></a><span class="co"># significant Z effect: this DAG is possible</span></span></code></pre></div>
+<div class="sourceCode" id="cb528"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb528-1"><a href="causal-inference.html#cb528-1" tabindex="-1"></a><span class="co"># significant Z effect: this DAG is possible</span></span></code></pre></div>
 <p>If you have made your decision, you may check the script ‘gendata.r’ to see, whether your guess was right.</p>
 </div>
 <div id="instrumental-variables-estimation-mendelian-randomization" class="section level2 hasAnchor" number="9.4">
@@ -619,24 +625,24 @@ Let’s conduct a simulation study to verify that when the exposure-outcome asso
 <ul>
 <li>Start by generating the genotype variable as <em>Binomial(2,p)</em>, with <span class="math inline">\(p=0.2\)</span> (and look at the resulting genotype frequencies):</li>
 </ul>
-<div class="sourceCode" id="cb528"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb528-1"><a href="causal-inference.html#cb528-1" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
-<span id="cb528-2"><a href="causal-inference.html#cb528-2" tabindex="-1"></a>mrdat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">G =</span> <span class="fu">rbinom</span>(n, <span class="dv">2</span>, <span class="fl">0.2</span>))</span>
-<span id="cb528-3"><a href="causal-inference.html#cb528-3" tabindex="-1"></a><span class="fu">table</span>(mrdat<span class="sc">$</span>G)</span></code></pre></div>
+<div class="sourceCode" id="cb529"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb529-1"><a href="causal-inference.html#cb529-1" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
+<span id="cb529-2"><a href="causal-inference.html#cb529-2" tabindex="-1"></a>mrdat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">G =</span> <span class="fu">rbinom</span>(n, <span class="dv">2</span>, <span class="fl">0.2</span>))</span>
+<span id="cb529-3"><a href="causal-inference.html#cb529-3" tabindex="-1"></a><span class="fu">table</span>(mrdat<span class="sc">$</span>G)</span></code></pre></div>
 <ul>
 <li>Also generate the confounder variable U</li>
 </ul>
-<div class="sourceCode" id="cb529"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb529-1"><a href="causal-inference.html#cb529-1" tabindex="-1"></a>mrdat<span class="sc">$</span>U <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span></code></pre></div>
+<div class="sourceCode" id="cb530"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb530-1"><a href="causal-inference.html#cb530-1" tabindex="-1"></a>mrdat<span class="sc">$</span>U <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span></code></pre></div>
 <ul>
 <li>Generate a continuous (normally distributed) exposure variable <span class="math inline">\(BMI\)</span> so that it depends on <span class="math inline">\(G\)</span> and <span class="math inline">\(U\)</span>.
 Check with linear regression, whether there is enough power to get significant parameter estimates.<br />
 For instance:</li>
 </ul>
-<div class="sourceCode" id="cb530"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb530-1"><a href="causal-inference.html#cb530-1" tabindex="-1"></a>mrdat<span class="sc">$</span>BMI <span class="ot">&lt;-</span> <span class="fu">with</span>(mrdat, <span class="dv">25</span> <span class="sc">+</span> <span class="fl">0.7</span> <span class="sc">*</span> G <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> U <span class="sc">+</span> <span class="fu">rnorm</span>(n))</span></code></pre></div>
+<div class="sourceCode" id="cb531"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb531-1"><a href="causal-inference.html#cb531-1" tabindex="-1"></a>mrdat<span class="sc">$</span>BMI <span class="ot">&lt;-</span> <span class="fu">with</span>(mrdat, <span class="dv">25</span> <span class="sc">+</span> <span class="fl">0.7</span> <span class="sc">*</span> G <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> U <span class="sc">+</span> <span class="fu">rnorm</span>(n))</span></code></pre></div>
 <ul>
 <li>Finally generate <span class="math inline">\(Y\)</span> (“Blood glucose level”) so that it depends on <span class="math inline">\(BMI\)</span> and <span class="math inline">\(U\)</span> (but not on <span class="math inline">\(G\)</span>).</li>
 </ul>
-<div class="sourceCode" id="cb531"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb531-1"><a href="causal-inference.html#cb531-1" tabindex="-1"></a>mrdat<span class="sc">$</span>Y <span class="ot">&lt;-</span> </span>
-<span id="cb531-2"><a href="causal-inference.html#cb531-2" tabindex="-1"></a>  <span class="fu">with</span>(mrdat, <span class="dv">3</span> <span class="sc">+</span> <span class="fl">0.1</span> <span class="sc">*</span> BMI <span class="sc">-</span> <span class="fl">1.5</span> <span class="sc">*</span> U <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.5</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb532"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb532-1"><a href="causal-inference.html#cb532-1" tabindex="-1"></a>mrdat<span class="sc">$</span>Y <span class="ot">&lt;-</span> </span>
+<span id="cb532-2"><a href="causal-inference.html#cb532-2" tabindex="-1"></a>  <span class="fu">with</span>(mrdat, <span class="dv">3</span> <span class="sc">+</span> <span class="fl">0.1</span> <span class="sc">*</span> BMI <span class="sc">-</span> <span class="fl">1.5</span> <span class="sc">*</span> U <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.5</span>))</span></code></pre></div>
 <ul>
 <li>Verify, that simple regression model for <span class="math inline">\(Y\)</span>, with <span class="math inline">\(BMI\)</span> as a covariate, results in a biased
 estimate of the causal effect (parameter estimate is different from what was generated)</li>
@@ -649,56 +655,56 @@ Could you explain analytically, why one may see a significant parameter estimate
 in the lecture notes (use two linear models and find a ratio of the parameter estimates).
 Does the estimate get closer to the generated effect size?</p></li>
 </ul>
-<div class="sourceCode" id="cb532"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb532-1"><a href="causal-inference.html#cb532-1" tabindex="-1"></a>mgx <span class="ot">&lt;-</span> <span class="fu">lm</span>(BMI <span class="sc">~</span> G, <span class="at">data =</span> mrdat)</span>
-<span id="cb532-2"><a href="causal-inference.html#cb532-2" tabindex="-1"></a><span class="fu">ci.lin</span>(mgx) <span class="co"># check the instrument effect</span></span>
-<span id="cb532-3"><a href="causal-inference.html#cb532-3" tabindex="-1"></a>bgx <span class="ot">&lt;-</span> mgx<span class="sc">$</span>coef[<span class="dv">2</span>] <span class="co"># save the 2nd coefficient (coef of G)</span></span>
-<span id="cb532-4"><a href="causal-inference.html#cb532-4" tabindex="-1"></a>mgy <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> G, <span class="at">data =</span> mrdat)</span>
-<span id="cb532-5"><a href="causal-inference.html#cb532-5" tabindex="-1"></a><span class="fu">ci.lin</span>(mgy)</span>
-<span id="cb532-6"><a href="causal-inference.html#cb532-6" tabindex="-1"></a>bgy <span class="ot">&lt;-</span> mgy<span class="sc">$</span>coef[<span class="dv">2</span>]</span>
-<span id="cb532-7"><a href="causal-inference.html#cb532-7" tabindex="-1"></a>causeff <span class="ot">&lt;-</span> bgy <span class="sc">/</span> bgx</span>
-<span id="cb532-8"><a href="causal-inference.html#cb532-8" tabindex="-1"></a>causeff <span class="co"># closer to 0.1?</span></span></code></pre></div>
+<div class="sourceCode" id="cb533"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb533-1"><a href="causal-inference.html#cb533-1" tabindex="-1"></a>mgx <span class="ot">&lt;-</span> <span class="fu">lm</span>(BMI <span class="sc">~</span> G, <span class="at">data =</span> mrdat)</span>
+<span id="cb533-2"><a href="causal-inference.html#cb533-2" tabindex="-1"></a><span class="fu">ci.lin</span>(mgx) <span class="co"># check the instrument effect</span></span>
+<span id="cb533-3"><a href="causal-inference.html#cb533-3" tabindex="-1"></a>bgx <span class="ot">&lt;-</span> mgx<span class="sc">$</span>coef[<span class="dv">2</span>] <span class="co"># save the 2nd coefficient (coef of G)</span></span>
+<span id="cb533-4"><a href="causal-inference.html#cb533-4" tabindex="-1"></a>mgy <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> G, <span class="at">data =</span> mrdat)</span>
+<span id="cb533-5"><a href="causal-inference.html#cb533-5" tabindex="-1"></a><span class="fu">ci.lin</span>(mgy)</span>
+<span id="cb533-6"><a href="causal-inference.html#cb533-6" tabindex="-1"></a>bgy <span class="ot">&lt;-</span> mgy<span class="sc">$</span>coef[<span class="dv">2</span>]</span>
+<span id="cb533-7"><a href="causal-inference.html#cb533-7" tabindex="-1"></a>causeff <span class="ot">&lt;-</span> bgy <span class="sc">/</span> bgx</span>
+<span id="cb533-8"><a href="causal-inference.html#cb533-8" tabindex="-1"></a>causeff <span class="co"># closer to 0.1?</span></span></code></pre></div>
 <ul>
 <li>A proper simulation study would require the analysis to be run several times, to see the extent of variability in the parameter estimates.
 A simple way to do it here would be using a <code>for</code>-loop. Modify the code as follows (exactly the same commands as executed so far, adding a few lines of code to the beginning and to the end):</li>
 </ul>
-<div class="sourceCode" id="cb533"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb533-1"><a href="causal-inference.html#cb533-1" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
-<span id="cb533-2"><a href="causal-inference.html#cb533-2" tabindex="-1"></a><span class="co"># initializing simulations:</span></span>
-<span id="cb533-3"><a href="causal-inference.html#cb533-3" tabindex="-1"></a><span class="co"># 30 simulations (change it, if you want more):</span></span>
-<span id="cb533-4"><a href="causal-inference.html#cb533-4" tabindex="-1"></a>nsim <span class="ot">&lt;-</span> <span class="dv">30</span></span>
-<span id="cb533-5"><a href="causal-inference.html#cb533-5" tabindex="-1"></a>mr <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>, nsim) <span class="co"># empty vector for the outcome parameters</span></span>
-<span id="cb533-6"><a href="causal-inference.html#cb533-6" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nsim) { <span class="co"># start the loop</span></span>
-<span id="cb533-7"><a href="causal-inference.html#cb533-7" tabindex="-1"></a>  <span class="do">## Exactly the same commands as before:</span></span>
-<span id="cb533-8"><a href="causal-inference.html#cb533-8" tabindex="-1"></a>  mrdat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">G =</span> <span class="fu">rbinom</span>(n, <span class="dv">2</span>, <span class="fl">0.2</span>))</span>
-<span id="cb533-9"><a href="causal-inference.html#cb533-9" tabindex="-1"></a>  mrdat<span class="sc">$</span>U <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
-<span id="cb533-10"><a href="causal-inference.html#cb533-10" tabindex="-1"></a>  mrdat<span class="sc">$</span>BMI <span class="ot">&lt;-</span> </span>
-<span id="cb533-11"><a href="causal-inference.html#cb533-11" tabindex="-1"></a>    <span class="fu">with</span>(mrdat, <span class="dv">25</span> <span class="sc">+</span> <span class="fl">0.7</span> <span class="sc">*</span> G <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> U <span class="sc">+</span> <span class="fu">rnorm</span>(n))</span>
-<span id="cb533-12"><a href="causal-inference.html#cb533-12" tabindex="-1"></a>  mrdat<span class="sc">$</span>Y <span class="ot">&lt;-</span> </span>
-<span id="cb533-13"><a href="causal-inference.html#cb533-13" tabindex="-1"></a>    <span class="fu">with</span>(mrdat, <span class="dv">3</span> <span class="sc">+</span> <span class="fl">0.1</span> <span class="sc">*</span> BMI <span class="sc">-</span> <span class="fl">1.5</span> <span class="sc">*</span> U <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.5</span>))</span>
-<span id="cb533-14"><a href="causal-inference.html#cb533-14" tabindex="-1"></a>  mgx <span class="ot">&lt;-</span> <span class="fu">lm</span>(BMI <span class="sc">~</span> G, <span class="at">data =</span> mrdat)</span>
-<span id="cb533-15"><a href="causal-inference.html#cb533-15" tabindex="-1"></a>  bgx <span class="ot">&lt;-</span> mgx<span class="sc">$</span>coef[<span class="dv">2</span>]</span>
-<span id="cb533-16"><a href="causal-inference.html#cb533-16" tabindex="-1"></a>  mgy <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> G, <span class="at">data =</span> mrdat)</span>
-<span id="cb533-17"><a href="causal-inference.html#cb533-17" tabindex="-1"></a>  bgy <span class="ot">&lt;-</span> mgy<span class="sc">$</span>coef[<span class="dv">2</span>]</span>
-<span id="cb533-18"><a href="causal-inference.html#cb533-18" tabindex="-1"></a>  <span class="co"># Save the i&#39;th parameter estimate:</span></span>
-<span id="cb533-19"><a href="causal-inference.html#cb533-19" tabindex="-1"></a>  mr[i] <span class="ot">&lt;-</span> bgy <span class="sc">/</span> bgx</span>
-<span id="cb533-20"><a href="causal-inference.html#cb533-20" tabindex="-1"></a>} <span class="co"># end the loop</span></span></code></pre></div>
+<div class="sourceCode" id="cb534"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb534-1"><a href="causal-inference.html#cb534-1" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
+<span id="cb534-2"><a href="causal-inference.html#cb534-2" tabindex="-1"></a><span class="co"># initializing simulations:</span></span>
+<span id="cb534-3"><a href="causal-inference.html#cb534-3" tabindex="-1"></a><span class="co"># 30 simulations (change it, if you want more):</span></span>
+<span id="cb534-4"><a href="causal-inference.html#cb534-4" tabindex="-1"></a>nsim <span class="ot">&lt;-</span> <span class="dv">30</span></span>
+<span id="cb534-5"><a href="causal-inference.html#cb534-5" tabindex="-1"></a>mr <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>, nsim) <span class="co"># empty vector for the outcome parameters</span></span>
+<span id="cb534-6"><a href="causal-inference.html#cb534-6" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nsim) { <span class="co"># start the loop</span></span>
+<span id="cb534-7"><a href="causal-inference.html#cb534-7" tabindex="-1"></a>  <span class="do">## Exactly the same commands as before:</span></span>
+<span id="cb534-8"><a href="causal-inference.html#cb534-8" tabindex="-1"></a>  mrdat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">G =</span> <span class="fu">rbinom</span>(n, <span class="dv">2</span>, <span class="fl">0.2</span>))</span>
+<span id="cb534-9"><a href="causal-inference.html#cb534-9" tabindex="-1"></a>  mrdat<span class="sc">$</span>U <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb534-10"><a href="causal-inference.html#cb534-10" tabindex="-1"></a>  mrdat<span class="sc">$</span>BMI <span class="ot">&lt;-</span> </span>
+<span id="cb534-11"><a href="causal-inference.html#cb534-11" tabindex="-1"></a>    <span class="fu">with</span>(mrdat, <span class="dv">25</span> <span class="sc">+</span> <span class="fl">0.7</span> <span class="sc">*</span> G <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> U <span class="sc">+</span> <span class="fu">rnorm</span>(n))</span>
+<span id="cb534-12"><a href="causal-inference.html#cb534-12" tabindex="-1"></a>  mrdat<span class="sc">$</span>Y <span class="ot">&lt;-</span> </span>
+<span id="cb534-13"><a href="causal-inference.html#cb534-13" tabindex="-1"></a>    <span class="fu">with</span>(mrdat, <span class="dv">3</span> <span class="sc">+</span> <span class="fl">0.1</span> <span class="sc">*</span> BMI <span class="sc">-</span> <span class="fl">1.5</span> <span class="sc">*</span> U <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.5</span>))</span>
+<span id="cb534-14"><a href="causal-inference.html#cb534-14" tabindex="-1"></a>  mgx <span class="ot">&lt;-</span> <span class="fu">lm</span>(BMI <span class="sc">~</span> G, <span class="at">data =</span> mrdat)</span>
+<span id="cb534-15"><a href="causal-inference.html#cb534-15" tabindex="-1"></a>  bgx <span class="ot">&lt;-</span> mgx<span class="sc">$</span>coef[<span class="dv">2</span>]</span>
+<span id="cb534-16"><a href="causal-inference.html#cb534-16" tabindex="-1"></a>  mgy <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> G, <span class="at">data =</span> mrdat)</span>
+<span id="cb534-17"><a href="causal-inference.html#cb534-17" tabindex="-1"></a>  bgy <span class="ot">&lt;-</span> mgy<span class="sc">$</span>coef[<span class="dv">2</span>]</span>
+<span id="cb534-18"><a href="causal-inference.html#cb534-18" tabindex="-1"></a>  <span class="co"># Save the i&#39;th parameter estimate:</span></span>
+<span id="cb534-19"><a href="causal-inference.html#cb534-19" tabindex="-1"></a>  mr[i] <span class="ot">&lt;-</span> bgy <span class="sc">/</span> bgx</span>
+<span id="cb534-20"><a href="causal-inference.html#cb534-20" tabindex="-1"></a>} <span class="co"># end the loop</span></span></code></pre></div>
 <p>Now look at the distribution of the parameter estimate:</p>
-<div class="sourceCode" id="cb534"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb534-1"><a href="causal-inference.html#cb534-1" tabindex="-1"></a><span class="fu">summary</span>(mr)</span></code></pre></div>
+<div class="sourceCode" id="cb535"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb535-1"><a href="causal-inference.html#cb535-1" tabindex="-1"></a><span class="fu">summary</span>(mr)</span></code></pre></div>
 <ul>
 <li>(<em>optional</em>) Change the code of simulations so that the assumptions are violated: add a weak direct effect of the genotype G to the equation that generates <span class="math inline">\(Y\)</span>:</li>
 </ul>
-<div class="sourceCode" id="cb535"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb535-1"><a href="causal-inference.html#cb535-1" tabindex="-1"></a>mrdat<span class="sc">$</span>Y <span class="ot">&lt;-</span> </span>
-<span id="cb535-2"><a href="causal-inference.html#cb535-2" tabindex="-1"></a>  <span class="fu">with</span>(</span>
-<span id="cb535-3"><a href="causal-inference.html#cb535-3" tabindex="-1"></a>    mrdat, </span>
-<span id="cb535-4"><a href="causal-inference.html#cb535-4" tabindex="-1"></a>    <span class="dv">3</span> <span class="sc">+</span> <span class="fl">0.1</span> <span class="sc">*</span> BMI <span class="sc">-</span> <span class="fl">1.5</span> <span class="sc">*</span> U <span class="sc">+</span> <span class="fl">0.05</span> <span class="sc">*</span> G <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.5</span>)</span>
-<span id="cb535-5"><a href="causal-inference.html#cb535-5" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb536"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb536-1"><a href="causal-inference.html#cb536-1" tabindex="-1"></a>mrdat<span class="sc">$</span>Y <span class="ot">&lt;-</span> </span>
+<span id="cb536-2"><a href="causal-inference.html#cb536-2" tabindex="-1"></a>  <span class="fu">with</span>(</span>
+<span id="cb536-3"><a href="causal-inference.html#cb536-3" tabindex="-1"></a>    mrdat, </span>
+<span id="cb536-4"><a href="causal-inference.html#cb536-4" tabindex="-1"></a>    <span class="dv">3</span> <span class="sc">+</span> <span class="fl">0.1</span> <span class="sc">*</span> BMI <span class="sc">-</span> <span class="fl">1.5</span> <span class="sc">*</span> U <span class="sc">+</span> <span class="fl">0.05</span> <span class="sc">*</span> G <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.5</span>)</span>
+<span id="cb536-5"><a href="causal-inference.html#cb536-5" tabindex="-1"></a>  )</span></code></pre></div>
 <p>Repeat the simulation study to see, what is the bias in the average estimated causal effect of <span class="math inline">\(BMI\)</span> on <span class="math inline">\(Y\)</span>.</p>
 <ul>
 <li>(<em>optional</em>) Using library <code>sem</code> and function <code>tsls</code>, one can obtain a two-stage least squares estimate for the<br />
 causal effect and also the proper standard error. Do you get the same estimate as before?</li>
 </ul>
-<div class="sourceCode" id="cb536"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb536-1"><a href="causal-inference.html#cb536-1" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span>(<span class="st">&quot;sem&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>())) <span class="fu">install.packages</span>(<span class="st">&quot;sem&quot;</span>)</span>
-<span id="cb536-2"><a href="causal-inference.html#cb536-2" tabindex="-1"></a><span class="fu">library</span>(sem)</span>
-<span id="cb536-3"><a href="causal-inference.html#cb536-3" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">tsls</span>(Y <span class="sc">~</span> BMI, <span class="sc">~</span>G, <span class="at">data =</span> mrdat))</span></code></pre></div>
+<div class="sourceCode" id="cb537"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb537-1"><a href="causal-inference.html#cb537-1" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span>(<span class="st">&quot;sem&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>())) <span class="fu">install.packages</span>(<span class="st">&quot;sem&quot;</span>)</span>
+<span id="cb537-2"><a href="causal-inference.html#cb537-2" tabindex="-1"></a><span class="fu">library</span>(sem)</span>
+<span id="cb537-3"><a href="causal-inference.html#cb537-3" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">tsls</span>(Y <span class="sc">~</span> BMI, <span class="sc">~</span>G, <span class="at">data =</span> mrdat))</span></code></pre></div>
 <p>(There are also several other R packages for IV estimation and Mendelian Randomization (<em>MendelianRandomization</em> for instance))</p>
 </div>
 <div id="why-are-simulation-exercises-useful-for-causal-inference" class="section level2 hasAnchor" number="9.5">
@@ -729,42 +735,42 @@ data analysis, if the data-generation mechanism is similar to what was used in s
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
-"sharing": {
-"github": false,
-"facebook": true,
-"twitter": true,
-"linkedin": false,
-"weibo": false,
-"instapaper": false,
-"vk": false,
-"whatsapp": false,
-"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
-},
-"fontsettings": {
-"theme": "white",
-"family": "sans",
-"size": 2
-},
-"edit": {
-"link": "https://github.com/SPE-R/SPE/edit/master/pracs-book/causal-s.rmd",
-"text": "Edit"
-},
-"history": {
-"link": null,
-"text": null
-},
-"view": {
-"link": null,
-"text": null
-},
-"download": ["SPE-R-2024-practicals-with-solutions.pdf", "SPE-R-2024-practicals-with-solutions.epub"],
-"search": {
-"engine": "fuse",
-"options": null
-},
-"toc": {
-"collapse": "subsection"
-}
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/SPE-R/SPE/edit/master/pracs-book/causal-s.rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["SPE-R-2024-practicals-with-solutions.pdf", "SPE-R-2024-practicals-with-solutions.epub"],
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
 });
 });
 </script>

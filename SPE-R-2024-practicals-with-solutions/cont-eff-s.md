@@ -38,7 +38,7 @@ library(mgcv)
 ```
 
 ```
-## This is mgcv 1.9-1. For overview type 'help("mgcv-package")'.
+## This is mgcv 1.9-4. For overview type '?mgcv'.
 ```
 
 ``` r
@@ -382,17 +382,17 @@ gam.check(mPen)
 ## 
 ## Method: UBRE   Optimizer: outer newton
 ## full convergence after 7 iterations.
-## Gradient range [-9.390731e-10,1.362468e-06]
+## Gradient range [-9.387549e-10,1.362e-06]
 ## (score 0.0820511 & scale 1).
-## Hessian positive definite, eigenvalue range [0.0002209238,0.0003824007].
+## Hessian positive definite, eigenvalue range [0.0002209238,0.0003823997].
 ## Model rank =  19 / 19 
 ## 
 ## Basis dimension (k) checking results. Low p-value (k-index<1) may
 ## indicate that k is too low, especially if edf is close to k'.
 ## 
-##        k'  edf k-index p-value   
-## s(A) 9.00 8.14    0.93   0.005 **
-## s(P) 9.00 3.05    0.95   0.075 . 
+##        k'  edf k-index p-value    
+## s(A) 9.00 8.14    0.93  <2e-16 ***
+## s(P) 9.00 3.05    0.95    0.05 *  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -444,7 +444,7 @@ gam.check(mPen2)
 ## 
 ## Method: UBRE   Optimizer: outer newton
 ## full convergence after 6 iterations.
-## Gradient range [-2.397829e-12,2.90395e-09]
+## Gradient range [-2.396066e-12,2.901858e-09]
 ## (score 0.08180917 & scale 1).
 ## Hessian positive definite, eigenvalue range [0.00022158,0.0009322215].
 ## Model rank =  29 / 29 
@@ -454,7 +454,7 @@ gam.check(mPen2)
 ## 
 ##         k'   edf k-index p-value   
 ## s(A) 19.00 11.13    0.93   0.005 **
-## s(P)  9.00  3.05    0.95   0.070 . 
+## s(P)  9.00  3.05    0.95   0.140   
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```

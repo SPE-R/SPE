@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 3 Data manipulation with tidyverse | Statistical Practice in Epidemiology with R</title>
   <meta name="description" content="This is the SPE-R 2024 exercises book" />
-  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 3 Data manipulation with tidyverse | Statistical Practice in Epidemiology with R" />
   <meta property="og:type" content="book" />
@@ -59,8 +59,9 @@
 
 
 <style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -731,8 +732,12 @@ Let’s count the number of births per gender and birth weight class (low vs not
 <span id="cb214-4"><a href="data-manipulation-with-tidyverse.html#cb214-4" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
 <span id="cb214-5"><a href="data-manipulation-with-tidyverse.html#cb214-5" tabindex="-1"></a>    <span class="at">count =</span> <span class="fu">n</span>()</span>
 <span id="cb214-6"><a href="data-manipulation-with-tidyverse.html#cb214-6" tabindex="-1"></a>  )</span></code></pre></div>
-<pre><code>## `summarise()` has grouped output by &#39;sex&#39;. You can override using the `.groups`
-## argument.</code></pre>
+<pre><code>## `summarise()` has regrouped the output.
+## ℹ Summaries were computed grouped by sex and lowbw.
+## ℹ Output is grouped by sex.
+## ℹ Use `summarise(.groups = &quot;drop_last&quot;)` to silence this message.
+## ℹ Use `summarise(.by = c(sex, lowbw))` for per-operation grouping
+##   (`?dplyr::dplyr_by`) instead.</code></pre>
 <div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb216-1"><a href="data-manipulation-with-tidyverse.html#cb216-1" tabindex="-1"></a>births<span class="fl">.06</span></span></code></pre></div>
 <pre><code>## # A tibble: 4 × 3
 ## # Groups:   sex [2]
@@ -837,8 +842,12 @@ Lets cross-tabulate the birth weight category and the gestation time groups.</p>
 <span id="cb228-13"><a href="data-manipulation-with-tidyverse.html#cb228-13" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb228-14"><a href="data-manipulation-with-tidyverse.html#cb228-14" tabindex="-1"></a>    <span class="at">percent =</span> count <span class="sc">/</span> <span class="fu">sum</span>(count, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb228-15"><a href="data-manipulation-with-tidyverse.html#cb228-15" tabindex="-1"></a>  )</span></code></pre></div>
-<pre><code>## `summarise()` has grouped output by &#39;lowbw&#39;. You can override using the
-## `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has regrouped the output.
+## ℹ Summaries were computed grouped by lowbw and gest4.
+## ℹ Output is grouped by lowbw.
+## ℹ Use `summarise(.groups = &quot;drop_last&quot;)` to silence this message.
+## ℹ Use `summarise(.by = c(lowbw, gest4))` for per-operation grouping
+##   (`?dplyr::dplyr_by`) instead.</code></pre>
 <pre><code>## # A tibble: 6 × 4
 ## # Groups:   lowbw [2]
 ##   lowbw gest4              count percent
@@ -863,8 +872,12 @@ Lets cross-tabulate the birth weight category and the gestation time groups.</p>
 <span id="cb231-11"><a href="data-manipulation-with-tidyverse.html#cb231-11" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb231-12"><a href="data-manipulation-with-tidyverse.html#cb231-12" tabindex="-1"></a>    <span class="at">percent =</span> count <span class="sc">/</span> <span class="fu">sum</span>(count, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb231-13"><a href="data-manipulation-with-tidyverse.html#cb231-13" tabindex="-1"></a>  )</span></code></pre></div>
-<pre><code>## `summarise()` has grouped output by &#39;gest4&#39;. You can override using the
-## `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has regrouped the output.
+## ℹ Summaries were computed grouped by gest4 and lowbw.
+## ℹ Output is grouped by gest4.
+## ℹ Use `summarise(.groups = &quot;drop_last&quot;)` to silence this message.
+## ℹ Use `summarise(.by = c(gest4, lowbw))` for per-operation grouping
+##   (`?dplyr::dplyr_by`) instead.</code></pre>
 <pre><code>## # A tibble: 6 × 4
 ## # Groups:   gest4 [4]
 ##   gest4              lowbw count percent
@@ -902,12 +915,12 @@ and <code>center</code> (the center where an individual is registered coded as a
 <pre><code>## # A tibble: 6 × 2
 ##     pid   age
 ##   &lt;int&gt; &lt;int&gt;
-## 1     1    22
-## 2     2    17
-## 3     3    25
-## 4     4    17
-## 5     5    17
-## 6     6    25</code></pre>
+## 1     1    17
+## 2     2    24
+## 3     3    15
+## 4     4    15
+## 5     5    25
+## 6     6    20</code></pre>
 <div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb236-1"><a href="data-manipulation-with-tidyverse.html#cb236-1" tabindex="-1"></a>center</span></code></pre></div>
 <pre><code>## # A tibble: 5 × 2
 ##     pid center
@@ -924,12 +937,12 @@ First of all let’s have a look to <code>bind_rows</code> function.</p>
 <pre><code>## # A tibble: 11 × 3
 ##      pid   age center
 ##    &lt;dbl&gt; &lt;int&gt; &lt;chr&gt; 
-##  1     1    22 &lt;NA&gt;  
-##  2     2    17 &lt;NA&gt;  
-##  3     3    25 &lt;NA&gt;  
-##  4     4    17 &lt;NA&gt;  
-##  5     5    17 &lt;NA&gt;  
-##  6     6    25 &lt;NA&gt;  
+##  1     1    17 &lt;NA&gt;  
+##  2     2    24 &lt;NA&gt;  
+##  3     3    15 &lt;NA&gt;  
+##  4     4    15 &lt;NA&gt;  
+##  5     5    25 &lt;NA&gt;  
+##  6     6    20 &lt;NA&gt;  
 ##  7     1    NA A     
 ##  8     2    NA B     
 ##  9     3    NA A     
@@ -946,33 +959,33 @@ between <code>left_join</code>, <code>full_join</code> and <code>inner_join</cod
 <pre><code>## # A tibble: 6 × 3
 ##     pid   age center
 ##   &lt;dbl&gt; &lt;int&gt; &lt;chr&gt; 
-## 1     1    22 A     
-## 2     2    17 B     
-## 3     3    25 A     
-## 4     4    17 B     
-## 5     5    17 &lt;NA&gt;  
-## 6     6    25 &lt;NA&gt;</code></pre>
+## 1     1    17 A     
+## 2     2    24 B     
+## 3     3    15 A     
+## 4     4    15 B     
+## 5     5    25 &lt;NA&gt;  
+## 6     6    20 &lt;NA&gt;</code></pre>
 <div class="sourceCode" id="cb242"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb242-1"><a href="data-manipulation-with-tidyverse.html#cb242-1" tabindex="-1"></a><span class="co"># everithing is kept</span></span>
 <span id="cb242-2"><a href="data-manipulation-with-tidyverse.html#cb242-2" tabindex="-1"></a><span class="fu">full_join</span>(age, center, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;pid&quot;</span>))</span></code></pre></div>
 <pre><code>## # A tibble: 7 × 3
 ##     pid   age center
 ##   &lt;dbl&gt; &lt;int&gt; &lt;chr&gt; 
-## 1     1    22 A     
-## 2     2    17 B     
-## 3     3    25 A     
-## 4     4    17 B     
-## 5     5    17 &lt;NA&gt;  
-## 6     6    25 &lt;NA&gt;  
+## 1     1    17 A     
+## 2     2    24 B     
+## 3     3    15 A     
+## 4     4    15 B     
+## 5     5    25 &lt;NA&gt;  
+## 6     6    20 &lt;NA&gt;  
 ## 7    10    NA C</code></pre>
 <div class="sourceCode" id="cb244"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb244-1"><a href="data-manipulation-with-tidyverse.html#cb244-1" tabindex="-1"></a><span class="co"># only the individuals present in both dataset are kept</span></span>
 <span id="cb244-2"><a href="data-manipulation-with-tidyverse.html#cb244-2" tabindex="-1"></a><span class="fu">inner_join</span>(age, center, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;pid&quot;</span>))</span></code></pre></div>
 <pre><code>## # A tibble: 4 × 3
 ##     pid   age center
 ##   &lt;dbl&gt; &lt;int&gt; &lt;chr&gt; 
-## 1     1    22 A     
-## 2     2    17 B     
-## 3     3    25 A     
-## 4     4    17 B</code></pre>
+## 1     1    17 A     
+## 2     2    24 B     
+## 3     3    15 A     
+## 4     4    15 B</code></pre>
 <p>Can you spot the differences between the commands above?
 As an exercise, you can try to compute the individuals’ mean age per center.</p>
 <div class="sourceCode" id="cb246"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb246-1"><a href="data-manipulation-with-tidyverse.html#cb246-1" tabindex="-1"></a><span class="fu">inner_join</span>(age, center, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;pid&quot;</span>)) <span class="sc">|&gt;</span></span>
@@ -983,8 +996,8 @@ As an exercise, you can try to compute the individuals’ mean age per center.</
 <pre><code>## # A tibble: 2 × 2
 ##   center mean_age
 ##   &lt;chr&gt;     &lt;dbl&gt;
-## 1 A          23.5
-## 2 B          17</code></pre>
+## 1 A          16  
+## 2 B          19.5</code></pre>
 <p><strong>Note:</strong> the <code>by</code> argument indicates which column should be use to make the <em>join</em>. In some
 cases, you might have to uses several columns to match (e.g. per sex and age group), this
 can be easily done specifying a vector of column names.</p>
@@ -1003,14 +1016,14 @@ First you have to create a table with the number of birth per age group.</p>
 <div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb249-1"><a href="data-manipulation-with-tidyverse.html#cb249-1" tabindex="-1"></a>(gg<span class="fl">.01</span> <span class="ot">&lt;-</span></span>
 <span id="cb249-2"><a href="data-manipulation-with-tidyverse.html#cb249-2" tabindex="-1"></a>  <span class="fu">ggplot</span>(birth_per_ageg, <span class="fu">aes</span>(<span class="at">x =</span> agegrp, <span class="at">y =</span> total_births)) <span class="sc">+</span></span>
 <span id="cb249-3"><a href="data-manipulation-with-tidyverse.html#cb249-3" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">&quot;identity&quot;</span>))</span></code></pre></div>
-<p><img src="tidyverse-s_files/figure-html/unnamed-chunk-30-1.png" width="672" />
+<p><img src="tidyverse-s_files/figure-html/unnamed-chunk-30-1.png" alt="" width="672" />
 This graph can be customize adding labels and title to the plot:</p>
 <div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb250-1"><a href="data-manipulation-with-tidyverse.html#cb250-1" tabindex="-1"></a>(gg<span class="fl">.02</span> <span class="ot">&lt;-</span></span>
 <span id="cb250-2"><a href="data-manipulation-with-tidyverse.html#cb250-2" tabindex="-1"></a>  gg<span class="fl">.01</span> <span class="sc">+</span></span>
 <span id="cb250-3"><a href="data-manipulation-with-tidyverse.html#cb250-3" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Women Age Group&quot;</span>) <span class="sc">+</span></span>
 <span id="cb250-4"><a href="data-manipulation-with-tidyverse.html#cb250-4" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">&quot;Total Births&quot;</span>) <span class="sc">+</span></span>
 <span id="cb250-5"><a href="data-manipulation-with-tidyverse.html#cb250-5" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;Number of Births per Women Age Group&quot;</span>))</span></code></pre></div>
-<p><img src="tidyverse-s_files/figure-html/unnamed-chunk-31-1.png" width="672" />
+<p><img src="tidyverse-s_files/figure-html/unnamed-chunk-31-1.png" alt="" width="672" />
 As you can see, plots from <code>ggplot</code> family are built incrementally using the <code>+</code> operator for each additional element.</p>
 </div>
 <div id="pivoting-data-with-tidyr" class="section level2 hasAnchor" number="3.11">
@@ -2939,14 +2952,16 @@ Check and try to explain the differences between the following command lines:</p
 <div class="sourceCode" id="cb302"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb302-1"><a href="data-manipulation-with-tidyverse.html#cb302-1" tabindex="-1"></a><span class="fu">map_dbl</span>(grades, mean)</span></code></pre></div>
 <pre><code>##   c1   c2   c3 
 ## 85.0 79.5 90.0</code></pre>
+<p><code>map_chr()</code> requires the function to return a character. Since <code>mean()</code> returns
+a number, the call below errors with a clear type-mismatch message (in older
+versions of <code>purrr</code> the result was silently coerced to a string).</p>
 <div class="sourceCode" id="cb304"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb304-1"><a href="data-manipulation-with-tidyverse.html#cb304-1" tabindex="-1"></a><span class="fu">map_chr</span>(grades, mean)</span></code></pre></div>
-<pre><code>## Warning: Automatic coercion from double to character was deprecated in purrr 1.0.0.
-## ℹ Please use an explicit call to `as.character()` within `map_chr()` instead.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.</code></pre>
-<pre><code>##          c1          c2          c3 
-## &quot;85.000000&quot; &quot;79.500000&quot; &quot;90.000000&quot;</code></pre>
-<div class="sourceCode" id="cb307"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb307-1"><a href="data-manipulation-with-tidyverse.html#cb307-1" tabindex="-1"></a><span class="fu">map_df</span>(grades, mean)</span></code></pre></div>
+<pre><code>## Error in `map_chr()`:
+## ℹ In index: 1.
+## ℹ With name: c1.
+## Caused by error:
+## ! Can&#39;t coerce from a number to a string.</code></pre>
+<div class="sourceCode" id="cb306"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb306-1"><a href="data-manipulation-with-tidyverse.html#cb306-1" tabindex="-1"></a><span class="fu">map_df</span>(grades, mean)</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 3
 ##      c1    c2    c3
 ##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
@@ -2956,9 +2971,9 @@ Check and try to explain the differences between the following command lines:</p
 If you are interested you can have a look to this function help file and play with the examples.</p>
 <p><code>purrr</code> package has also a set of functions that can be used to apply iteratively a function using <code>reduce</code> and/or <code>accumulate</code>. The 2 functions behave the same way, it takes the 2 first element of a list, apply a function taking 2 arguments. The results is combined with the third element of the list and given as input to the same function and so on.. The only difference is that accumulate return intermediate results while reduce return only the final results.</p>
 <p>Here an example of the cumulative product of the 10 first numbers.</p>
-<div class="sourceCode" id="cb309"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb309-1"><a href="data-manipulation-with-tidyverse.html#cb309-1" tabindex="-1"></a><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span> <span class="sc">|&gt;</span> purrr<span class="sc">::</span><span class="fu">reduce</span>(<span class="st">`</span><span class="at">*</span><span class="st">`</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb308"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb308-1"><a href="data-manipulation-with-tidyverse.html#cb308-1" tabindex="-1"></a><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span> <span class="sc">|&gt;</span> purrr<span class="sc">::</span><span class="fu">reduce</span>(<span class="st">`</span><span class="at">*</span><span class="st">`</span>)</span></code></pre></div>
 <pre><code>## [1] 3628800</code></pre>
-<div class="sourceCode" id="cb311"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb311-1"><a href="data-manipulation-with-tidyverse.html#cb311-1" tabindex="-1"></a><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span> <span class="sc">|&gt;</span> purrr<span class="sc">::</span><span class="fu">accumulate</span>(<span class="st">`</span><span class="at">*</span><span class="st">`</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb310"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb310-1"><a href="data-manipulation-with-tidyverse.html#cb310-1" tabindex="-1"></a><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span> <span class="sc">|&gt;</span> purrr<span class="sc">::</span><span class="fu">accumulate</span>(<span class="st">`</span><span class="at">*</span><span class="st">`</span>)</span></code></pre></div>
 <pre><code>##  [1]       1       2       6      24     120     720    5040   40320  362880
 ## [10] 3628800</code></pre>
 <p><code>purrr</code> have many of others useful features. Please check the dedicated documentation if you want to go further with this package.</p>
@@ -2966,34 +2981,34 @@ If you are interested you can have a look to this function help file and play wi
 <div id="bonus-rendering-tables" class="section level2 hasAnchor" number="3.15">
 <h2><span class="header-section-number">3.15</span> Bonus: Rendering tables<a href="data-manipulation-with-tidyverse.html#bonus-rendering-tables" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Once you have produced a nice data-set we can be interested in rendering it in a nice format that can meet presentation/publication expectations. The <code>kableExtra</code> table can be useful to achieve this goal.</p>
-<div class="sourceCode" id="cb313"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb313-1"><a href="data-manipulation-with-tidyverse.html#cb313-1" tabindex="-1"></a><span class="co"># if(!require(kableExtra)) install.packages(&#39;kableExtra&#39;)</span></span>
-<span id="cb313-2"><a href="data-manipulation-with-tidyverse.html#cb313-2" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
-<span id="cb313-3"><a href="data-manipulation-with-tidyverse.html#cb313-3" tabindex="-1"></a></span>
-<span id="cb313-4"><a href="data-manipulation-with-tidyverse.html#cb313-4" tabindex="-1"></a>births<span class="fl">.08</span> <span class="ot">&lt;-</span></span>
-<span id="cb313-5"><a href="data-manipulation-with-tidyverse.html#cb313-5" tabindex="-1"></a>  births_tbl <span class="sc">|&gt;</span></span>
-<span id="cb313-6"><a href="data-manipulation-with-tidyverse.html#cb313-6" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
-<span id="cb313-7"><a href="data-manipulation-with-tidyverse.html#cb313-7" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">is.na</span>(gest4)</span>
-<span id="cb313-8"><a href="data-manipulation-with-tidyverse.html#cb313-8" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb313-9"><a href="data-manipulation-with-tidyverse.html#cb313-9" tabindex="-1"></a>  <span class="fu">group_by</span>(gest4) <span class="sc">|&gt;</span></span>
-<span id="cb313-10"><a href="data-manipulation-with-tidyverse.html#cb313-10" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb313-11"><a href="data-manipulation-with-tidyverse.html#cb313-11" tabindex="-1"></a>    <span class="at">N =</span> <span class="fu">n</span>()</span>
-<span id="cb313-12"><a href="data-manipulation-with-tidyverse.html#cb313-12" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb313-13"><a href="data-manipulation-with-tidyverse.html#cb313-13" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb313-14"><a href="data-manipulation-with-tidyverse.html#cb313-14" tabindex="-1"></a>    <span class="st">`</span><span class="at">(%)</span><span class="st">`</span> <span class="ot">=</span> (N <span class="sc">/</span> <span class="fu">sum</span>(N)) <span class="sc">|&gt;</span> scales<span class="sc">::</span><span class="fu">percent</span>()</span>
-<span id="cb313-15"><a href="data-manipulation-with-tidyverse.html#cb313-15" tabindex="-1"></a>  )</span>
-<span id="cb313-16"><a href="data-manipulation-with-tidyverse.html#cb313-16" tabindex="-1"></a></span>
-<span id="cb313-17"><a href="data-manipulation-with-tidyverse.html#cb313-17" tabindex="-1"></a><span class="co"># default</span></span>
-<span id="cb313-18"><a href="data-manipulation-with-tidyverse.html#cb313-18" tabindex="-1"></a>births<span class="fl">.08</span></span>
-<span id="cb313-19"><a href="data-manipulation-with-tidyverse.html#cb313-19" tabindex="-1"></a></span>
-<span id="cb313-20"><a href="data-manipulation-with-tidyverse.html#cb313-20" tabindex="-1"></a><span class="co"># create an html version of the table and save it on the hard drive</span></span>
-<span id="cb313-21"><a href="data-manipulation-with-tidyverse.html#cb313-21" tabindex="-1"></a>births<span class="fl">.08</span> <span class="sc">|&gt;</span></span>
-<span id="cb313-22"><a href="data-manipulation-with-tidyverse.html#cb313-22" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="sc">|&gt;</span></span>
-<span id="cb313-23"><a href="data-manipulation-with-tidyverse.html#cb313-23" tabindex="-1"></a>  <span class="fu">kable_styling</span>(</span>
-<span id="cb313-24"><a href="data-manipulation-with-tidyverse.html#cb313-24" tabindex="-1"></a>    <span class="at">bootstrap_options =</span> </span>
-<span id="cb313-25"><a href="data-manipulation-with-tidyverse.html#cb313-25" tabindex="-1"></a>      <span class="fu">c</span>(<span class="st">&quot;striped&quot;</span>, <span class="st">&quot;hover&quot;</span>, <span class="st">&quot;condensed&quot;</span>, <span class="st">&quot;responsive&quot;</span>),</span>
-<span id="cb313-26"><a href="data-manipulation-with-tidyverse.html#cb313-26" tabindex="-1"></a>    <span class="at">full_width =</span> <span class="cn">FALSE</span></span>
-<span id="cb313-27"><a href="data-manipulation-with-tidyverse.html#cb313-27" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb313-28"><a href="data-manipulation-with-tidyverse.html#cb313-28" tabindex="-1"></a>  <span class="fu">save_kable</span>(<span class="at">file =</span> <span class="st">&quot;births.08.html&quot;</span>, <span class="at">self_contained =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb312"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb312-1"><a href="data-manipulation-with-tidyverse.html#cb312-1" tabindex="-1"></a><span class="co"># if(!require(kableExtra)) install.packages(&#39;kableExtra&#39;)</span></span>
+<span id="cb312-2"><a href="data-manipulation-with-tidyverse.html#cb312-2" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb312-3"><a href="data-manipulation-with-tidyverse.html#cb312-3" tabindex="-1"></a></span>
+<span id="cb312-4"><a href="data-manipulation-with-tidyverse.html#cb312-4" tabindex="-1"></a>births<span class="fl">.08</span> <span class="ot">&lt;-</span></span>
+<span id="cb312-5"><a href="data-manipulation-with-tidyverse.html#cb312-5" tabindex="-1"></a>  births_tbl <span class="sc">|&gt;</span></span>
+<span id="cb312-6"><a href="data-manipulation-with-tidyverse.html#cb312-6" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb312-7"><a href="data-manipulation-with-tidyverse.html#cb312-7" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">is.na</span>(gest4)</span>
+<span id="cb312-8"><a href="data-manipulation-with-tidyverse.html#cb312-8" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb312-9"><a href="data-manipulation-with-tidyverse.html#cb312-9" tabindex="-1"></a>  <span class="fu">group_by</span>(gest4) <span class="sc">|&gt;</span></span>
+<span id="cb312-10"><a href="data-manipulation-with-tidyverse.html#cb312-10" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb312-11"><a href="data-manipulation-with-tidyverse.html#cb312-11" tabindex="-1"></a>    <span class="at">N =</span> <span class="fu">n</span>()</span>
+<span id="cb312-12"><a href="data-manipulation-with-tidyverse.html#cb312-12" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb312-13"><a href="data-manipulation-with-tidyverse.html#cb312-13" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb312-14"><a href="data-manipulation-with-tidyverse.html#cb312-14" tabindex="-1"></a>    <span class="st">`</span><span class="at">(%)</span><span class="st">`</span> <span class="ot">=</span> (N <span class="sc">/</span> <span class="fu">sum</span>(N)) <span class="sc">|&gt;</span> scales<span class="sc">::</span><span class="fu">percent</span>()</span>
+<span id="cb312-15"><a href="data-manipulation-with-tidyverse.html#cb312-15" tabindex="-1"></a>  )</span>
+<span id="cb312-16"><a href="data-manipulation-with-tidyverse.html#cb312-16" tabindex="-1"></a></span>
+<span id="cb312-17"><a href="data-manipulation-with-tidyverse.html#cb312-17" tabindex="-1"></a><span class="co"># default</span></span>
+<span id="cb312-18"><a href="data-manipulation-with-tidyverse.html#cb312-18" tabindex="-1"></a>births<span class="fl">.08</span></span>
+<span id="cb312-19"><a href="data-manipulation-with-tidyverse.html#cb312-19" tabindex="-1"></a></span>
+<span id="cb312-20"><a href="data-manipulation-with-tidyverse.html#cb312-20" tabindex="-1"></a><span class="co"># create an html version of the table and save it on the hard drive</span></span>
+<span id="cb312-21"><a href="data-manipulation-with-tidyverse.html#cb312-21" tabindex="-1"></a>births<span class="fl">.08</span> <span class="sc">|&gt;</span></span>
+<span id="cb312-22"><a href="data-manipulation-with-tidyverse.html#cb312-22" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="sc">|&gt;</span></span>
+<span id="cb312-23"><a href="data-manipulation-with-tidyverse.html#cb312-23" tabindex="-1"></a>  <span class="fu">kable_styling</span>(</span>
+<span id="cb312-24"><a href="data-manipulation-with-tidyverse.html#cb312-24" tabindex="-1"></a>    <span class="at">bootstrap_options =</span> </span>
+<span id="cb312-25"><a href="data-manipulation-with-tidyverse.html#cb312-25" tabindex="-1"></a>      <span class="fu">c</span>(<span class="st">&quot;striped&quot;</span>, <span class="st">&quot;hover&quot;</span>, <span class="st">&quot;condensed&quot;</span>, <span class="st">&quot;responsive&quot;</span>),</span>
+<span id="cb312-26"><a href="data-manipulation-with-tidyverse.html#cb312-26" tabindex="-1"></a>    <span class="at">full_width =</span> <span class="cn">FALSE</span></span>
+<span id="cb312-27"><a href="data-manipulation-with-tidyverse.html#cb312-27" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb312-28"><a href="data-manipulation-with-tidyverse.html#cb312-28" tabindex="-1"></a>  <span class="fu">save_kable</span>(<span class="at">file =</span> <span class="st">&quot;births.08.html&quot;</span>, <span class="at">self_contained =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p><strong>note:</strong> One other very cool package to produce advance formatted Excel spreadsheet I am using more and more is <code>openxlsx</code>. Check it out if you are interested.</p>
 
 </div>
@@ -3018,42 +3033,42 @@ If you are interested you can have a look to this function help file and play wi
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
-"sharing": {
-"github": false,
-"facebook": true,
-"twitter": true,
-"linkedin": false,
-"weibo": false,
-"instapaper": false,
-"vk": false,
-"whatsapp": false,
-"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
-},
-"fontsettings": {
-"theme": "white",
-"family": "sans",
-"size": 2
-},
-"edit": {
-"link": "https://github.com/SPE-R/SPE/edit/master/pracs-book/tidyverse-s.rmd",
-"text": "Edit"
-},
-"history": {
-"link": null,
-"text": null
-},
-"view": {
-"link": null,
-"text": null
-},
-"download": ["SPE-R-2024-practicals-with-solutions.pdf", "SPE-R-2024-practicals-with-solutions.epub"],
-"search": {
-"engine": "fuse",
-"options": null
-},
-"toc": {
-"collapse": "subsection"
-}
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/SPE-R/SPE/edit/master/pracs-book/tidyverse-s.rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["SPE-R-2024-practicals-with-solutions.pdf", "SPE-R-2024-practicals-with-solutions.epub"],
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
 });
 });
 </script>

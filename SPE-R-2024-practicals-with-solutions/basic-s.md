@@ -975,7 +975,7 @@ summary(births)
 ##  Mean   :250.5   Mean   :3137   Mean   :0.12   Mean   :38.72   Mean   :0.1286  
 ##  3rd Qu.:375.2   3rd Qu.:3551   3rd Qu.:0.00   3rd Qu.:40.09   3rd Qu.:0.0000  
 ##  Max.   :500.0   Max.   :4553   Max.   :1.00   Max.   :43.16   Max.   :1.0000  
-##                                                NA's   :10      NA's   :10      
+##                                                NAs    :10      NAs    :10      
 ##      matage           hyp             sex       
 ##  Min.   :23.00   Min.   :0.000   Min.   :1.000  
 ##  1st Qu.:31.00   1st Qu.:0.000   1st Qu.:1.000  
@@ -1204,7 +1204,7 @@ largest value.
   values.
   
   ```
-  ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+  ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.     NAs 
   ##   24.69   37.94   39.12   38.72   40.09   43.16      10
   ```
 

@@ -1,10 +1,11 @@
 % Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
-%
 \documentclass[
 ]{book}
+\usepackage{xcolor}
 \usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
@@ -35,7 +36,6 @@
 }{% if KOMA class
   \KOMAoptions{parskip=half}}
 \makeatother
-\usepackage{xcolor}
 \usepackage{color}
 \usepackage{fancyvrb}
 \newcommand{\VerbBar}{|}
@@ -77,6 +77,7 @@
 \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
 \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 \usepackage{longtable,booktabs,array}
+\newcounter{none} % for unnumbered tables
 \usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
 \usepackage{etoolbox}
@@ -88,21 +89,24 @@
 \makesavenoteenv{longtable}
 \usepackage{graphicx}
 \makeatletter
-\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
-\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
-\makeatother
-% Scale images if necessary, so that they will not overflow the page
-% margins by default, and it is still possible to overwrite the defaults
-% using explicit options in \includegraphics[width, height, ...]{}
-\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
 % Set default figure placement to htbp
-\makeatletter
 \def\fps@figure{htbp}
 \makeatother
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{5}
+\usepackage[]{natbib}
+\bibliographystyle{plainnat}
 \usepackage{booktabs}
 \usepackage{fancyhdr}
 
@@ -124,11 +128,6 @@
 \fancyhead[OL]{\rm \leftmark}
 \fancyhead[OR]{\rm \quad \bf \thepage}
 \fancyfoot{}
-\ifLuaTeX
-  \usepackage{selnolig}  % disable illegal ligatures
-\fi
-\usepackage[]{natbib}
-\bibliographystyle{plainnat}
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same}
@@ -1202,6 +1201,7 @@ editor and ask three questions:
 The file \texttt{fem.dat} contains data on 118 female psychiatric
 patients. The data set contains nine variables.
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}ll@{}}
 \toprule\noalign{}
 Name & Description \\
@@ -1219,6 +1219,7 @@ SEX & Lost interest in sex (1=yes, 2=no) \\
 LIFE & Considered suicide (1=yes, 2=no) \\
 WEIGHT & Weight change (kg) in previous 6 months \\
 \end{longtable}
+}
 
 Inspect the file \texttt{fem.dat} with a text editor to answer the
 questions above.
@@ -1934,8 +1935,12 @@ Let's count the number of births per gender and birth weight class (low vs not l
 \end{Shaded}
 
 \begin{verbatim}
-## `summarise()` has grouped output by 'sex'. You can override using
-## the `.groups` argument.
+## `summarise()` has regrouped the output.
+## i Summaries were computed grouped by sex and lowbw.
+## i Output is grouped by sex.
+## i Use `summarise(.groups = "drop_last")` to silence this message.
+## i Use `summarise(.by = c(sex, lowbw))` for per-operation grouping
+##   (`?dplyr::dplyr_by`) instead.
 \end{verbatim}
 
 \begin{Shaded}
@@ -2030,8 +2035,12 @@ Lets cross-tabulate the birth weight category and the gestation time groups.
 \end{Shaded}
 
 \begin{verbatim}
-## `summarise()` has grouped output by 'lowbw'. You can override
-## using the `.groups` argument.
+## `summarise()` has regrouped the output.
+## i Summaries were computed grouped by lowbw and gest4.
+## i Output is grouped by lowbw.
+## i Use `summarise(.groups = "drop_last")` to silence this message.
+## i Use `summarise(.by = c(lowbw, gest4))` for per-operation
+##   grouping (`?dplyr::dplyr_by`) instead.
 \end{verbatim}
 
 Similarly we can be interested in the birth weight distribution per gestational time.
@@ -2055,8 +2064,12 @@ Similarly we can be interested in the birth weight distribution per gestational 
 \end{Shaded}
 
 \begin{verbatim}
-## `summarise()` has grouped output by 'gest4'. You can override
-## using the `.groups` argument.
+## `summarise()` has regrouped the output.
+## i Summaries were computed grouped by gest4 and lowbw.
+## i Output is grouped by gest4.
+## i Use `summarise(.groups = "drop_last")` to silence this message.
+## i Use `summarise(.by = c(gest4, lowbw))` for per-operation
+##   grouping (`?dplyr::dplyr_by`) instead.
 \end{verbatim}
 
 \textbf{Note:} grouping order matters! and can be confusing so think about ungrouping intermediate tables.
@@ -2167,7 +2180,7 @@ First you have to create a table with the number of birth per age group.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-104-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-104-1.pdf}}
 This graph can be customize adding labels and title to the plot:
 
 \begin{Shaded}
@@ -2180,7 +2193,7 @@ This graph can be customize adding labels and title to the plot:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-105-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-105-1.pdf}}
 As you can see, plots from \texttt{ggplot} family are built incrementally using the \texttt{+} operator for each additional element.
 
 \section{pivoting data with tidyr}\label{pivoting-data-with-tidyr}
@@ -2458,17 +2471,25 @@ Check and try to explain the differences between the following command lines:
 \begin{Highlighting}[]
 \FunctionTok{map}\NormalTok{(grades, mean)}
 \FunctionTok{map\_dbl}\NormalTok{(grades, mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{map\_chr()} requires the function to return a character. Since \texttt{mean()} returns
+a number, the call below errors with a clear type-mismatch message (in older
+versions of \texttt{purrr} the result was silently coerced to a string).
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{map\_chr}\NormalTok{(grades, mean)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## Warning: Automatic coercion from double to character was deprecated in
-## purrr 1.0.0.
-## i Please use an explicit call to `as.character()` within
-##   `map_chr()` instead.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this
-## warning was generated.
+## Error in `map_chr()`:
+## i In index: 1.
+## i With name: c1.
+## Caused by error:
+## ! Can't coerce from a number to a string.
 \end{verbatim}
 
 \begin{Shaded}
@@ -2823,7 +2844,7 @@ Now look at the birth weight distribution with
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-127-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-129-1.pdf}}
 The histogram can be refined -- take a look at the possible options with
 
 \begin{Shaded}
@@ -2840,7 +2861,7 @@ and try some of the options, for example:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-129-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-131-1.pdf}}
 To look at the relationship between birthweight and gestational weeks, try
 
 \begin{Shaded}
@@ -2849,7 +2870,7 @@ To look at the relationship between birthweight and gestational weeks, try
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-130-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-132-1.pdf}}
 You can change the plot-symbol by the option \texttt{pch=}. If you
 want to see all the plot symbols try:
 
@@ -2859,7 +2880,7 @@ want to see all the plot symbols try:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-131-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-133-1.pdf}}
 
 \begin{itemize}
 \tightlist
@@ -2873,7 +2894,7 @@ want to see all the plot symbols try:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-132-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-134-1.pdf}}
 - Label the axes with
 
 \begin{Shaded}
@@ -2890,7 +2911,7 @@ want to see all the plot symbols try:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-133-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-135-1.pdf}}
 
 \section{Colours}\label{colours}
 
@@ -2905,7 +2926,7 @@ versus gestational weeks, try
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-134-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-136-1.pdf}}
 This creates a solid mass of colour in the centre of the cluster of
 points and it is no longer possible to see individual points. You can
 recover this information by overwriting the points with black circles
@@ -2918,7 +2939,7 @@ using the \texttt{points()} function.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-135-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-137-1.pdf}}
 Note: when the number of data points on a scatter plot is large, you may also want to decrease the point size: to get points that are 50\% of the original size, add the parameter \texttt{cex=0.5} (or another number \textless1 for different sizes).
 
 \section{Adding to a plot}\label{adding-to-a-plot}
@@ -2947,7 +2968,7 @@ Then add the points with the \texttt{points} function.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-136-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-138-1.pdf}}
 
 To add a legend explaining the colours, try
 
@@ -2971,7 +2992,7 @@ To add a legend explaining the colours, try
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-137-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-139-1.pdf}}
 which puts the legend in the top left hand corner.
 
 Finally we can add a title to the plot with
@@ -2999,7 +3020,7 @@ Finally we can add a title to the plot with
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-138-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-140-1.pdf}}
 
 \section{Using indexing for plot elements}\label{using-indexing-for-plot-elements}
 
@@ -3049,7 +3070,7 @@ This can now be used in the plot:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-141-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-143-1.pdf}}
 The same trick can be used if we want to have a separate symbol for
 mothers over 40 say. We first generate the indexing variable:
 
@@ -3077,7 +3098,7 @@ variable, so by adding 1 we get a numeric variable with values 1 and
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-143-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-145-1.pdf}}
 so where \texttt{oldmum} is 1 we get \texttt{pch=16} (a dot) and where
 \texttt{oldmum} is 2 we get \texttt{pch=3} (a cross).
 
@@ -3099,7 +3120,7 @@ variable \texttt{oldmum}, you can create it on the fly:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-144-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-146-1.pdf}}
 
 \section{Generating colours}\label{generating-colours}
 
@@ -3129,7 +3150,7 @@ Gray-tones are produced by the function \texttt{gray} (or
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-146-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-148-1.pdf}}
 
 \section{Saving your graphs for use in other documents}\label{saving-your-graphs-for-use-in-other-documents}
 
@@ -3234,7 +3255,7 @@ plot,
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-151-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/unnamed-chunk-153-1.pdf}}
 and then add the legend where you wish it to appear by typing
 
 \begin{Shaded}
@@ -5035,7 +5056,7 @@ To get a more similar look as on the slide, we must supply the coordinates (x in
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/dagitty3-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/dagitty3-1.pdf}}
 
 Let's look at all possible paths from \(C\) to \(D\):
 
@@ -5115,7 +5136,7 @@ The following code creates three DAGs
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/threedags-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/threedags-1.pdf}}
 
 Now, the following script generates a dataset:
 
@@ -5545,7 +5566,7 @@ data analysis, if the data-generation mechanism is similar to what was used in s
 
 The plot below is from randomized study of the effect of Tamoxifen treatment on bone mineral metabolism in a group of patients who were treated for breast cancer (Kristensen et al, 1994). It is reproduced with permission from the author Peter Dalgaard who has also shared the original data.
 
-\includegraphics{./graph/bentK.png}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/graph/bentK.png}}
 
 The purpose of this exercise is to show you how to build a similar plot in R using the \texttt{ggplot2} package.
 
@@ -5852,9 +5873,10 @@ for mortality until 31 December 2008.
 
 The dataset contains the following variables:
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1231}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8769}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.1231}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.8769}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Variable
@@ -5871,6 +5893,7 @@ Description
 \texttt{time} & follow-up time (in years) since diagnosis until death or censoring \\
 \texttt{event} & event ending the follow-up (numeric): \texttt{0\ =\ censoring\ alive,\ 1\ =\ death\ from\ oral\ cancer,\ 2\ =\ death\ from\ other\ causes.} \\
 \end{longtable}
+}
 
 \section{Loading the packages and the data}\label{loading-the-packages-and-the-data}
 
@@ -6105,6 +6128,16 @@ by prognostic factors.
 \NormalTok{cif1 }\OtherTok{\textless{}{-}} \FunctionTok{survfit}\NormalTok{(}\FunctionTok{Surv}\NormalTok{(time, event, }\AttributeTok{type =} \StringTok{"mstate"}\NormalTok{) }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{,}
   \AttributeTok{data =}\NormalTok{ orca}
 \NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in Surv(time, event, type = "mstate"): type= 'mstate' is
+## deprecated, use a factor variable as status
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{str}\NormalTok{(cif1)}
 \end{Highlighting}
 \end{Shaded}
@@ -6118,6 +6151,7 @@ by prognostic factors.
   The main arguments are
 \end{itemize}
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}ll@{}}
 \toprule\noalign{}
 \endhead
@@ -6126,6 +6160,7 @@ by prognostic factors.
 \texttt{data} & data frame created by function \}\texttt{survfit()} \\
 \texttt{event} & indicator for the event: values 1 or 2. \\
 \end{longtable}
+}
 
 Other arguments are like in the ordinary \texttt{plot()} function.
 
@@ -6162,6 +6197,16 @@ Cut the \(y\)-axis for a more efficient graphical presentation
 \NormalTok{cif2 }\OtherTok{\textless{}{-}} \FunctionTok{survfit}\NormalTok{(}\FunctionTok{Surv}\NormalTok{(time, event, }\AttributeTok{type =} \StringTok{"mstate"}\NormalTok{) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ stage,}
   \AttributeTok{data =}\NormalTok{ orca}
 \NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in Surv(time, event, type = "mstate"): type= 'mstate' is
+## deprecated, use a factor variable as status
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{str}\NormalTok{(cif2)}
 
 \FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
@@ -6294,8 +6339,8 @@ Look at the results. What are the main findings?
 \end{Shaded}
 
 \begin{verbatim}
-## Warning in ans * length(l) + if1: longer object length is not a
-## multiple of shorter object length
+## Warning in ay * as.numeric(nx) + ax: longer object length is not
+## a multiple of shorter object length
 \end{verbatim}
 
 \begin{Shaded}
@@ -6569,8 +6614,8 @@ the help page:
 
 \NormalTok{Transitions:}
 \NormalTok{     To}
-\NormalTok{From     Alive Dead  Records:  Events: Risk time:  Persons:}
-\NormalTok{  Alive 115974 2499    118473     2499      54273      9996}
+\NormalTok{From     Alive Dead Records: Events: Risk time: Persons:}
+\NormalTok{  Alive 115974 2499   118473    2499      54273     9996}
 \end{Highlighting}
 \end{Shaded}
 
@@ -7369,9 +7414,10 @@ the dates of death and emigration were obtained. Another linkage was performed w
 deaths from coronary heart disease identified. As a result a data file
 \texttt{occoh.txt} was completed containing the following variables:
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1569}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8431}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.1569}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.8431}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Variable
@@ -7389,6 +7435,7 @@ Description
 \texttt{death} & indicator for vital status at the end of follow-up; 1, if dead from any cause, and = 0, if alive \\
 \texttt{chdeath} & indicator for death from coronary heart disease; 1, if \emph{yes}, and 0, if \emph{no}. \\
 \end{longtable}
+}
 
 This exercise is divided into five main parts:
 
@@ -7645,9 +7692,10 @@ data frame from the help page of function \texttt{ccwc()}.
   values of the following variables.
 \end{itemize}
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1569}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8431}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.1569}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.8431}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Variable
@@ -7663,6 +7711,7 @@ Description
 \texttt{sbp} & systolic blood pressure (mmHg) \\
 \texttt{tchol} & total cholesterol level (mmol/l) \\
 \end{longtable}
+}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7707,9 +7756,10 @@ Description
   latter will be divided by 10 to get more interpretable effect estimates.
 \end{itemize}
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1569}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8431}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.1569}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.8431}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Variable
@@ -7723,6 +7773,7 @@ Description
 \texttt{cholgrp} & cholesterol class; 1: \texttt{\textless{}5}, 2: \texttt{5-\textless{}6.5}, 3: \texttt{\textgreater{}=6.5} \\
 \texttt{sbpgrp} & blood pressure class; 1: \texttt{\textless{}130}, 2: \texttt{130-\textless{}150}, 3: \texttt{150-\textless{}170}, 4: \texttt{\textgreater{}=170} \\
 \end{longtable}
+}
 
 Convert the smoking variable into a factor.
 
@@ -8048,9 +8099,10 @@ is a set of four covariates \(Z = (Z_1, Z_2, Z_3, Z_4)\). As a background
 story, we imagine a population of cancer patients, in whom the variables
 and the assumed marginal distributions of the covariates are
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.2113}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.7887}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.2113}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.7887}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Variable
@@ -8068,12 +8120,13 @@ Description
 \(Z_3\) & stage of cancer; 4 classes; \(Z_3 \sim \text{DiscUnif}(1, \dots, 4)\) \\
 \(Z_4\) & comorbidity score; 5 classes; \(Z_3 \sim \text{DiscUnif}(1, \dots, 5)\) \\
 \end{longtable}
+}
 
 For simplicity, covariates \(Z_3\) and \(Z_4\) are treated as continuous
 variables in the models. The assumed causal diagram
 is drawn using \texttt{dagitty} and is shown below.
 
-\includegraphics{SPE-R-2024-practicals_files/figure-latex/dagitty-1.pdf}
+\pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2024-practicals_files/SPE-R-2024-practicals_files/figure-latex/dagitty-1.pdf}}
 
 For more generic notation, the probabilities of \(Y=1\) will be expressed
 as expectations, e.g.~
@@ -8945,6 +8998,7 @@ certain level as a sign of kidney disease. The levels may however drop
 as a consequence of treatment, this is called remission. Patients exit
 the study at death or kidney failure (dialysis or transplant).
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}ll@{}}
 \toprule\noalign{}
 Variable & Description \\
@@ -8960,6 +9014,7 @@ Variable & Description \\
 \texttt{dox} & Date of exit from study \\
 \texttt{event} & Exit status: 1,2,3=event (death, ESRD), 0=censored \\
 \end{longtable}
+}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -9053,8 +9108,8 @@ Variable & Description \\
 
 \NormalTok{Transitions:}
 \NormalTok{     To}
-\NormalTok{From  NRA ESRD  Records:  Events: Risk time:  Persons:}
-\NormalTok{  NRA  48   77       125       77       1085       125}
+\NormalTok{From  NRA ESRD Records: Events: Risk time: Persons:}
+\NormalTok{  NRA  48   77      125      77       1085      125}
 \end{Highlighting}
 \end{Shaded}
 
@@ -9184,10 +9239,10 @@ Variable & Description \\
 
 \NormalTok{Transitions:}
 \NormalTok{     To}
-\NormalTok{From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{  NRA  24  29   69         0       122       98        825       122}
-\NormalTok{  Rem   0  24    0         8        32        8        260        32}
-\NormalTok{  Sum  24  53   69         8       154      106       1085       125}
+\NormalTok{From  NRA Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:}
+\NormalTok{  NRA  24  29   69         0      122      98        825      122}
+\NormalTok{  Rem   0  24    0         8       32       8        260       32}
+\NormalTok{  Sum  24  53   69         8      154     106       1085      125}
 \end{Highlighting}
 \end{Shaded}
 
@@ -9335,10 +9390,10 @@ Variable & Description \\
 
 \NormalTok{Transitions:}
 \NormalTok{     To}
-\NormalTok{From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{  NRA  24  29   69         0       122       98        825       122}
-\NormalTok{  Rem   0  24    0         8        32        8        260        32}
-\NormalTok{  Sum  24  53   69         8       154      106       1085       125}
+\NormalTok{From  NRA Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:}
+\NormalTok{  NRA  24  29   69         0      122      98        825      122}
+\NormalTok{  Rem   0  24    0         8       32       8        260       32}
+\NormalTok{  Sum  24  53   69         8      154     106       1085      125}
 \end{Highlighting}
 \end{Shaded}
 
@@ -9353,10 +9408,10 @@ Variable & Description \\
 
 \NormalTok{Transitions:}
 \NormalTok{     To}
-\NormalTok{From   NRA  Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{  NRA 9854   29   69         0      9952       98        825       122}
-\NormalTok{  Rem    0 3139    0         8      3147        8        260        32}
-\NormalTok{  Sum 9854 3168   69         8     13099      106       1085       125}
+\NormalTok{From   NRA  Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:}
+\NormalTok{  NRA 9854   29   69         0     9952      98        825      122}
+\NormalTok{  Rem    0 3139    0         8     3147       8        260       32}
+\NormalTok{  Sum 9854 3168   69         8    13099     106       1085      125}
 \end{Highlighting}
 \end{Shaded}
 \item
@@ -9858,19 +9913,19 @@ occurrence rate of remission itself.
 
 \NormalTok{Transitions:}
 \NormalTok{     To}
-\NormalTok{From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{  NRA   1   1    8         0        10        9       98.3        10}
-\NormalTok{  Rem   0   0    0         1         1        1       12.0         1}
-\NormalTok{  Sum   1   1    8         1        11       10      110.3        10}
+\NormalTok{From  NRA Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:}
+\NormalTok{  NRA   1   1    8         0       10       9       98.3       10}
+\NormalTok{  Rem   0   0    0         1        1       1       12.0        1}
+\NormalTok{  Sum   1   1    8         1       11      10      110.3       10}
 
 \NormalTok{$F}
 
 \NormalTok{Transitions:}
 \NormalTok{     To}
-\NormalTok{From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{  NRA   0   4    6         0        10       10       55.0        10}
-\NormalTok{  Rem   0   0    0         4         4        4       28.2         4}
-\NormalTok{  Sum   0   4    6         4        14       14       83.2        10}
+\NormalTok{From  NRA Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:}
+\NormalTok{  NRA   0   4    6         0       10      10       55.0       10}
+\NormalTok{  Rem   0   0    0         4        4       4       28.2        4}
+\NormalTok{  Sum   0   4    6         4       14      14       83.2       10}
 \end{Highlighting}
 \end{Shaded}
 
@@ -9889,7 +9944,7 @@ occurrence rate of remission itself.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{   user  system elapsed }
-\NormalTok{   2.48    3.12    1.96 }
+\NormalTok{   2.39    3.04    1.89 }
 \end{Highlighting}
 \end{Shaded}
 
@@ -9905,19 +9960,19 @@ occurrence rate of remission itself.
 
 \NormalTok{Transitions:}
 \NormalTok{     To}
-\NormalTok{From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{  NRA  30  72  398         0       500      470       2721       500}
-\NormalTok{  Rem   0  35    0        37        72       37        415        72}
-\NormalTok{  Sum  30 107  398        37       572      507       3136       500}
+\NormalTok{From  NRA Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:}
+\NormalTok{  NRA  30  72  398         0      500     470       2721      500}
+\NormalTok{  Rem   0  35    0        37       72      37        415       72}
+\NormalTok{  Sum  30 107  398        37      572     507       3136      500}
 
 \NormalTok{$F}
 
 \NormalTok{Transitions:}
 \NormalTok{     To}
-\NormalTok{From  NRA Rem ESRD ESRD(Rem)  Records:  Events: Risk time:  Persons:}
-\NormalTok{  NRA  32 143  325         0       500      468       2358       500}
-\NormalTok{  Rem   0  89    0        54       143       54       1023       143}
-\NormalTok{  Sum  32 232  325        54       643      522       3380       500}
+\NormalTok{From  NRA Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:}
+\NormalTok{  NRA  32 143  325         0      500     468       2358      500}
+\NormalTok{  Rem   0  89    0        54      143      54       1023      143}
+\NormalTok{  Sum  32 232  325        54      643     522       3380      500}
 \end{Highlighting}
 \end{Shaded}
 
@@ -10045,6 +10100,6 @@ occurrence rate of remission itself.
   What is the 10-year risk of remission for men and women respectively?
 \end{enumerate}
 
-  \bibliography{book.bib,packages.bib}
+\bibliography{book.bib,packages.bib}
 
 \end{document}

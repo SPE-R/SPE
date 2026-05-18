@@ -124,13 +124,13 @@ summary(births)
 ##  Mean   :250.5   Mean   :3137   Mean   :0.12   Mean   :38.72   Mean   :0.1286  
 ##  3rd Qu.:375.2   3rd Qu.:3551   3rd Qu.:0.00   3rd Qu.:40.09   3rd Qu.:0.0000  
 ##  Max.   :500.0   Max.   :4553   Max.   :1.00   Max.   :43.16   Max.   :1.0000  
-##                                                NA's   :10      NA's   :10      
+##                                                NAs    :10      NAs    :10      
 ##      matage          hyp      sex         maged         gest4    
 ##  Min.   :23.00   normal:428   M:264   [22,35):270   [20,35): 31  
 ##  1st Qu.:31.00   hyper : 72   F:236   [35,44):230   [35,37): 32  
 ##  Median :34.00                                      [37,39):167  
 ##  Mean   :34.03                                      [39,45):260  
-##  3rd Qu.:37.00                                      NA's   : 10  
+##  3rd Qu.:37.00                                      NAs    : 10  
 ##  Max.   :43.00                                                   
 ## 
 ```

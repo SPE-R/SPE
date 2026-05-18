@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 4 Tabulation | Statistical Practice in Epidemiology with R</title>
   <meta name="description" content="This is the SPE-R 2024 exercises book" />
-  <meta name="generator" content="bookdown 0.40 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 4 Tabulation | Statistical Practice in Epidemiology with R" />
   <meta property="og:type" content="book" />
@@ -59,8 +59,9 @@
 
 
 <style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -359,12 +360,12 @@ and this practical is designed to introduce this function.</p>
 singleton births in a large London hospital. The outcome of interest
 is the birth weight of the baby, also dichotomised as normal or low
 birth weight. These data are available in the Epi package:</p>
-<div class="sourceCode" id="cb314"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb314-1"><a href="tabulation.html#cb314-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
-<span id="cb314-2"><a href="tabulation.html#cb314-2" tabindex="-1"></a><span class="fu">data</span>(births)</span>
-<span id="cb314-3"><a href="tabulation.html#cb314-3" tabindex="-1"></a><span class="fu">names</span>(births)</span></code></pre></div>
+<div class="sourceCode" id="cb313"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb313-1"><a href="tabulation.html#cb313-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
+<span id="cb313-2"><a href="tabulation.html#cb313-2" tabindex="-1"></a><span class="fu">data</span>(births)</span>
+<span id="cb313-3"><a href="tabulation.html#cb313-3" tabindex="-1"></a><span class="fu">names</span>(births)</span></code></pre></div>
 <pre><code>## [1] &quot;id&quot;      &quot;bweight&quot; &quot;lowbw&quot;   &quot;gestwks&quot; &quot;preterm&quot; &quot;matage&quot;  &quot;hyp&quot;    
 ## [8] &quot;sex&quot;</code></pre>
-<div class="sourceCode" id="cb316"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb316-1"><a href="tabulation.html#cb316-1" tabindex="-1"></a><span class="fu">head</span>(births)</span></code></pre></div>
+<div class="sourceCode" id="cb315"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb315-1"><a href="tabulation.html#cb315-1" tabindex="-1"></a><span class="fu">head</span>(births)</span></code></pre></div>
 <pre><code>##   id bweight lowbw gestwks preterm matage hyp sex
 ## 1  1    2974     0   38.52       0     34   0   2
 ## 2  2    3270     0      NA      NA     30   0   1
@@ -374,20 +375,20 @@ birth weight. These data are available in the Epi package:</p>
 ## 6  6    3673     0   40.97       0     33   0   2</code></pre>
 <p>In order to work with this data set we need to transform some of the variables
 into factors. This is done with the following commands:</p>
-<div class="sourceCode" id="cb318"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb318-1"><a href="tabulation.html#cb318-1" tabindex="-1"></a>births<span class="sc">$</span>hyp <span class="ot">&lt;-</span> <span class="fu">factor</span>(births<span class="sc">$</span>hyp, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;normal&quot;</span>, <span class="st">&quot;hyper&quot;</span>))</span>
-<span id="cb318-2"><a href="tabulation.html#cb318-2" tabindex="-1"></a>births<span class="sc">$</span>sex <span class="ot">&lt;-</span> <span class="fu">factor</span>(births<span class="sc">$</span>sex, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>))</span>
-<span id="cb318-3"><a href="tabulation.html#cb318-3" tabindex="-1"></a>births<span class="sc">$</span>agegrp <span class="ot">&lt;-</span> </span>
-<span id="cb318-4"><a href="tabulation.html#cb318-4" tabindex="-1"></a>  <span class="fu">cut</span>(</span>
-<span id="cb318-5"><a href="tabulation.html#cb318-5" tabindex="-1"></a>    births<span class="sc">$</span>matage, </span>
-<span id="cb318-6"><a href="tabulation.html#cb318-6" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">25</span>, <span class="dv">30</span>, <span class="dv">35</span>, <span class="dv">40</span>, <span class="dv">45</span>), </span>
-<span id="cb318-7"><a href="tabulation.html#cb318-7" tabindex="-1"></a>    <span class="at">right =</span> <span class="cn">FALSE</span></span>
-<span id="cb318-8"><a href="tabulation.html#cb318-8" tabindex="-1"></a>  )</span>
-<span id="cb318-9"><a href="tabulation.html#cb318-9" tabindex="-1"></a>births<span class="sc">$</span>gest4 <span class="ot">&lt;-</span> </span>
-<span id="cb318-10"><a href="tabulation.html#cb318-10" tabindex="-1"></a>  <span class="fu">cut</span>(</span>
-<span id="cb318-11"><a href="tabulation.html#cb318-11" tabindex="-1"></a>    births<span class="sc">$</span>gestwks, </span>
-<span id="cb318-12"><a href="tabulation.html#cb318-12" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">35</span>, <span class="dv">37</span>, <span class="dv">39</span>, <span class="dv">45</span>), </span>
-<span id="cb318-13"><a href="tabulation.html#cb318-13" tabindex="-1"></a>    <span class="at">right =</span> <span class="cn">FALSE</span></span>
-<span id="cb318-14"><a href="tabulation.html#cb318-14" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb317"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb317-1"><a href="tabulation.html#cb317-1" tabindex="-1"></a>births<span class="sc">$</span>hyp <span class="ot">&lt;-</span> <span class="fu">factor</span>(births<span class="sc">$</span>hyp, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;normal&quot;</span>, <span class="st">&quot;hyper&quot;</span>))</span>
+<span id="cb317-2"><a href="tabulation.html#cb317-2" tabindex="-1"></a>births<span class="sc">$</span>sex <span class="ot">&lt;-</span> <span class="fu">factor</span>(births<span class="sc">$</span>sex, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>))</span>
+<span id="cb317-3"><a href="tabulation.html#cb317-3" tabindex="-1"></a>births<span class="sc">$</span>agegrp <span class="ot">&lt;-</span> </span>
+<span id="cb317-4"><a href="tabulation.html#cb317-4" tabindex="-1"></a>  <span class="fu">cut</span>(</span>
+<span id="cb317-5"><a href="tabulation.html#cb317-5" tabindex="-1"></a>    births<span class="sc">$</span>matage, </span>
+<span id="cb317-6"><a href="tabulation.html#cb317-6" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">25</span>, <span class="dv">30</span>, <span class="dv">35</span>, <span class="dv">40</span>, <span class="dv">45</span>), </span>
+<span id="cb317-7"><a href="tabulation.html#cb317-7" tabindex="-1"></a>    <span class="at">right =</span> <span class="cn">FALSE</span></span>
+<span id="cb317-8"><a href="tabulation.html#cb317-8" tabindex="-1"></a>  )</span>
+<span id="cb317-9"><a href="tabulation.html#cb317-9" tabindex="-1"></a>births<span class="sc">$</span>gest4 <span class="ot">&lt;-</span> </span>
+<span id="cb317-10"><a href="tabulation.html#cb317-10" tabindex="-1"></a>  <span class="fu">cut</span>(</span>
+<span id="cb317-11"><a href="tabulation.html#cb317-11" tabindex="-1"></a>    births<span class="sc">$</span>gestwks, </span>
+<span id="cb317-12"><a href="tabulation.html#cb317-12" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">35</span>, <span class="dv">37</span>, <span class="dv">39</span>, <span class="dv">45</span>), </span>
+<span id="cb317-13"><a href="tabulation.html#cb317-13" tabindex="-1"></a>    <span class="at">right =</span> <span class="cn">FALSE</span></span>
+<span id="cb317-14"><a href="tabulation.html#cb317-14" tabindex="-1"></a>  )</span></code></pre></div>
 <p>Now use <code>str(births)</code> to examine the modified data frame. We have
 transformed the binary variables <code>hyp</code> and <code>sex</code> into factors
 with informative labels. This will help when displaying the tables. We
@@ -398,7 +399,7 @@ can be tabulated.</p>
 <div id="one-way-tables" class="section level2 hasAnchor" number="4.3">
 <h2><span class="header-section-number">4.3</span> One-way tables<a href="tabulation.html#one-way-tables" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The simplest table one-way table is created by</p>
-<div class="sourceCode" id="cb319"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb319-1"><a href="tabulation.html#cb319-1" tabindex="-1"></a><span class="fu">stat.table</span>(<span class="at">index =</span> sex, <span class="at">data =</span> births)</span></code></pre></div>
+<div class="sourceCode" id="cb318"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb318-1"><a href="tabulation.html#cb318-1" tabindex="-1"></a><span class="fu">stat.table</span>(<span class="at">index =</span> sex, <span class="at">data =</span> births)</span></code></pre></div>
 <pre><code>##  -------------- 
 ##  sex   count()  
 ##  -------------- 
@@ -412,11 +413,11 @@ by the <code>table</code> function. Note that <code>stat.table</code> has a
 specifying the frame.</p>
 <p>You can display several summary statistics in the same table by
 giving a list of expressions to the <code>contents</code> argument:</p>
-<div class="sourceCode" id="cb321"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb321-1"><a href="tabulation.html#cb321-1" tabindex="-1"></a><span class="fu">stat.table</span>(</span>
-<span id="cb321-2"><a href="tabulation.html#cb321-2" tabindex="-1"></a>  <span class="at">index =</span> sex, </span>
-<span id="cb321-3"><a href="tabulation.html#cb321-3" tabindex="-1"></a>  <span class="at">contents =</span> <span class="fu">list</span>(<span class="fu">count</span>(), <span class="fu">percent</span>(sex)), </span>
-<span id="cb321-4"><a href="tabulation.html#cb321-4" tabindex="-1"></a>  <span class="at">data =</span> births</span>
-<span id="cb321-5"><a href="tabulation.html#cb321-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb320"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb320-1"><a href="tabulation.html#cb320-1" tabindex="-1"></a><span class="fu">stat.table</span>(</span>
+<span id="cb320-2"><a href="tabulation.html#cb320-2" tabindex="-1"></a>  <span class="at">index =</span> sex, </span>
+<span id="cb320-3"><a href="tabulation.html#cb320-3" tabindex="-1"></a>  <span class="at">contents =</span> <span class="fu">list</span>(<span class="fu">count</span>(), <span class="fu">percent</span>(sex)), </span>
+<span id="cb320-4"><a href="tabulation.html#cb320-4" tabindex="-1"></a>  <span class="at">data =</span> births</span>
+<span id="cb320-5"><a href="tabulation.html#cb320-5" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>##  --------------------------- 
 ##  sex   count() percent(sex)  
 ##  --------------------------- 
@@ -438,7 +439,7 @@ same as the number of rows of the data frame <code>births</code>.</p>
 ##  Total       500        100.0  
 ##  -----------------------------</code></pre>
 <p>To see how the mean birth weight changes with <code>sex</code>, try</p>
-<div class="sourceCode" id="cb324"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb324-1"><a href="tabulation.html#cb324-1" tabindex="-1"></a><span class="fu">stat.table</span>(<span class="at">index =</span> sex, <span class="at">contents =</span> <span class="fu">mean</span>(bweight), <span class="at">data =</span> births)</span></code></pre></div>
+<div class="sourceCode" id="cb323"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb323-1"><a href="tabulation.html#cb323-1" tabindex="-1"></a><span class="fu">stat.table</span>(<span class="at">index =</span> sex, <span class="at">contents =</span> <span class="fu">mean</span>(bweight), <span class="at">data =</span> births)</span></code></pre></div>
 <pre><code>##  -------------------- 
 ##  sex   mean(bweight)  
 ##  -------------------- 
@@ -455,7 +456,7 @@ same as the number of rows of the data frame <code>births</code>.</p>
 ##  Total       500       3136.88  
 ##  ------------------------------</code></pre>
 <p>As an alternative to <code>bweight</code> we can look at <code>lowbw</code> with</p>
-<div class="sourceCode" id="cb327"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb327-1"><a href="tabulation.html#cb327-1" tabindex="-1"></a><span class="fu">stat.table</span>(<span class="at">index =</span> sex, <span class="at">contents =</span> <span class="fu">percent</span>(lowbw), <span class="at">data =</span> births)</span></code></pre></div>
+<div class="sourceCode" id="cb326"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb326-1"><a href="tabulation.html#cb326-1" tabindex="-1"></a><span class="fu">stat.table</span>(<span class="at">index =</span> sex, <span class="at">contents =</span> <span class="fu">percent</span>(lowbw), <span class="at">data =</span> births)</span></code></pre></div>
 <pre><code>##  --------------------- 
 ##  sex   percent(lowbw)  
 ##  --------------------- 
@@ -463,11 +464,11 @@ same as the number of rows of the data frame <code>births</code>.</p>
 ##  F              100.0  
 ##  ---------------------</code></pre>
 <p>All the percentages are 100! To use the <code>percent</code> function the variable <code>lowbw</code> must also be in the index, as in</p>
-<div class="sourceCode" id="cb329"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb329-1"><a href="tabulation.html#cb329-1" tabindex="-1"></a><span class="fu">stat.table</span>(</span>
-<span id="cb329-2"><a href="tabulation.html#cb329-2" tabindex="-1"></a>  <span class="at">index =</span> <span class="fu">list</span>(sex, lowbw), </span>
-<span id="cb329-3"><a href="tabulation.html#cb329-3" tabindex="-1"></a>  <span class="at">contents =</span> <span class="fu">percent</span>(lowbw), </span>
-<span id="cb329-4"><a href="tabulation.html#cb329-4" tabindex="-1"></a>  <span class="at">data =</span> births</span>
-<span id="cb329-5"><a href="tabulation.html#cb329-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb328"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb328-1"><a href="tabulation.html#cb328-1" tabindex="-1"></a><span class="fu">stat.table</span>(</span>
+<span id="cb328-2"><a href="tabulation.html#cb328-2" tabindex="-1"></a>  <span class="at">index =</span> <span class="fu">list</span>(sex, lowbw), </span>
+<span id="cb328-3"><a href="tabulation.html#cb328-3" tabindex="-1"></a>  <span class="at">contents =</span> <span class="fu">percent</span>(lowbw), </span>
+<span id="cb328-4"><a href="tabulation.html#cb328-4" tabindex="-1"></a>  <span class="at">data =</span> births</span>
+<span id="cb328-5"><a href="tabulation.html#cb328-5" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>##  ---------------------- 
 ##       ------lowbw------ 
 ##  sex         0       1  
@@ -506,7 +507,7 @@ same as the number of rows of the data frame <code>births</code>.</p>
 ##  ----------------------------------------</code></pre>
 <p>Another way of obtaining the percentage of low birth weight babies by
 gestation is to use the ratio function:</p>
-<div class="sourceCode" id="cb334"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb334-1"><a href="tabulation.html#cb334-1" tabindex="-1"></a><span class="fu">stat.table</span>(gest4, <span class="fu">ratio</span>(lowbw, <span class="dv">1</span>, <span class="dv">100</span>), <span class="at">data =</span> births)</span></code></pre></div>
+<div class="sourceCode" id="cb333"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb333-1"><a href="tabulation.html#cb333-1" tabindex="-1"></a><span class="fu">stat.table</span>(gest4, <span class="fu">ratio</span>(lowbw, <span class="dv">1</span>, <span class="dv">100</span>), <span class="at">data =</span> births)</span></code></pre></div>
 <pre><code>##  ----------------------- 
 ##  gest4     ratio(lowbw,  
 ##                 1, 100)  
@@ -530,10 +531,10 @@ shall return to rates in a later practical.</p>
 on the <code>contents</code> argument, but these are not always very informative.
 Supply your own column headings using <em>tagged</em> lists as the
 value of the <code>contents</code> argument, within a <code>stat.table</code> call:</p>
-<div class="sourceCode" id="cb336"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb336-1"><a href="tabulation.html#cb336-1" tabindex="-1"></a><span class="fu">stat.table</span>(gest4, <span class="at">contents =</span> <span class="fu">list</span>(</span>
-<span id="cb336-2"><a href="tabulation.html#cb336-2" tabindex="-1"></a>  <span class="at">N =</span> <span class="fu">count</span>(),</span>
-<span id="cb336-3"><a href="tabulation.html#cb336-3" tabindex="-1"></a>  <span class="st">&quot;(%)&quot;</span> <span class="ot">=</span> <span class="fu">percent</span>(gest4)</span>
-<span id="cb336-4"><a href="tabulation.html#cb336-4" tabindex="-1"></a>), <span class="at">data =</span> births)</span></code></pre></div>
+<div class="sourceCode" id="cb335"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb335-1"><a href="tabulation.html#cb335-1" tabindex="-1"></a><span class="fu">stat.table</span>(gest4, <span class="at">contents =</span> <span class="fu">list</span>(</span>
+<span id="cb335-2"><a href="tabulation.html#cb335-2" tabindex="-1"></a>  <span class="at">N =</span> <span class="fu">count</span>(),</span>
+<span id="cb335-3"><a href="tabulation.html#cb335-3" tabindex="-1"></a>  <span class="st">&quot;(%)&quot;</span> <span class="ot">=</span> <span class="fu">percent</span>(gest4)</span>
+<span id="cb335-4"><a href="tabulation.html#cb335-4" tabindex="-1"></a>), <span class="at">data =</span> births)</span></code></pre></div>
 <pre><code>##  -------------------------- 
 ##  gest4           N     (%)  
 ##  -------------------------- 
@@ -546,7 +547,7 @@ value of the <code>contents</code> argument, within a <code>stat.table</code> ca
 informative title to the index variable. You can do this in the same way:
 instead of giving <code>gest4</code> as the <code>index</code> argument to <code>stat.table</code>,
 use a named list:</p>
-<div class="sourceCode" id="cb338"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb338-1"><a href="tabulation.html#cb338-1" tabindex="-1"></a><span class="fu">stat.table</span>(<span class="at">index =</span> <span class="fu">list</span>(<span class="st">&quot;Gestation time&quot;</span> <span class="ot">=</span> gest4), <span class="at">data =</span> births)</span></code></pre></div>
+<div class="sourceCode" id="cb337"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb337-1"><a href="tabulation.html#cb337-1" tabindex="-1"></a><span class="fu">stat.table</span>(<span class="at">index =</span> <span class="fu">list</span>(<span class="st">&quot;Gestation time&quot;</span> <span class="ot">=</span> gest4), <span class="at">data =</span> births)</span></code></pre></div>
 <pre><code>##  -------------------- 
 ##  Gestation   count()  
 ##  time                 
@@ -561,11 +562,11 @@ use a named list:</p>
 <h2><span class="header-section-number">4.5</span> Two-way Tables<a href="tabulation.html#two-way-tables" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The following call gives a <span class="math inline">\(2\times 2\)</span> table showing the mean birth weight
 cross-classified by <code>sex</code> and <code>hyp</code>.</p>
-<div class="sourceCode" id="cb340"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb340-1"><a href="tabulation.html#cb340-1" tabindex="-1"></a><span class="fu">stat.table</span>(</span>
-<span id="cb340-2"><a href="tabulation.html#cb340-2" tabindex="-1"></a>  <span class="fu">list</span>(sex, hyp), </span>
-<span id="cb340-3"><a href="tabulation.html#cb340-3" tabindex="-1"></a>  <span class="at">contents =</span> <span class="fu">mean</span>(bweight), </span>
-<span id="cb340-4"><a href="tabulation.html#cb340-4" tabindex="-1"></a>  <span class="at">data =</span> births</span>
-<span id="cb340-5"><a href="tabulation.html#cb340-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb339"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb339-1"><a href="tabulation.html#cb339-1" tabindex="-1"></a><span class="fu">stat.table</span>(</span>
+<span id="cb339-2"><a href="tabulation.html#cb339-2" tabindex="-1"></a>  <span class="fu">list</span>(sex, hyp), </span>
+<span id="cb339-3"><a href="tabulation.html#cb339-3" tabindex="-1"></a>  <span class="at">contents =</span> <span class="fu">mean</span>(bweight), </span>
+<span id="cb339-4"><a href="tabulation.html#cb339-4" tabindex="-1"></a>  <span class="at">data =</span> births</span>
+<span id="cb339-5"><a href="tabulation.html#cb339-5" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>##  ---------------------- 
 ##       -------hyp------- 
 ##  sex    normal   hyper  
@@ -635,13 +636,13 @@ call to <code>print()</code></p>
 <code>width</code> argument which specifies the minimum column width, and the
 <code>digits</code> argument which controls
 the number of digits printed after the decimal point. This table</p>
-<div class="sourceCode" id="cb345"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb345-1"><a href="tabulation.html#cb345-1" tabindex="-1"></a>odds.tab <span class="ot">&lt;-</span> </span>
-<span id="cb345-2"><a href="tabulation.html#cb345-2" tabindex="-1"></a>  <span class="fu">stat.table</span>(</span>
-<span id="cb345-3"><a href="tabulation.html#cb345-3" tabindex="-1"></a>    gest4, </span>
-<span id="cb345-4"><a href="tabulation.html#cb345-4" tabindex="-1"></a>    <span class="fu">list</span>(<span class="st">&quot;odds of low bw&quot;</span> <span class="ot">=</span> <span class="fu">ratio</span>(lowbw, <span class="dv">1</span> <span class="sc">-</span> lowbw)),</span>
-<span id="cb345-5"><a href="tabulation.html#cb345-5" tabindex="-1"></a>    <span class="at">data =</span> births</span>
-<span id="cb345-6"><a href="tabulation.html#cb345-6" tabindex="-1"></a>)</span>
-<span id="cb345-7"><a href="tabulation.html#cb345-7" tabindex="-1"></a><span class="fu">print</span>(odds.tab)</span></code></pre></div>
+<div class="sourceCode" id="cb344"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb344-1"><a href="tabulation.html#cb344-1" tabindex="-1"></a>odds.tab <span class="ot">&lt;-</span> </span>
+<span id="cb344-2"><a href="tabulation.html#cb344-2" tabindex="-1"></a>  <span class="fu">stat.table</span>(</span>
+<span id="cb344-3"><a href="tabulation.html#cb344-3" tabindex="-1"></a>    gest4, </span>
+<span id="cb344-4"><a href="tabulation.html#cb344-4" tabindex="-1"></a>    <span class="fu">list</span>(<span class="st">&quot;odds of low bw&quot;</span> <span class="ot">=</span> <span class="fu">ratio</span>(lowbw, <span class="dv">1</span> <span class="sc">-</span> lowbw)),</span>
+<span id="cb344-5"><a href="tabulation.html#cb344-5" tabindex="-1"></a>    <span class="at">data =</span> births</span>
+<span id="cb344-6"><a href="tabulation.html#cb344-6" tabindex="-1"></a>)</span>
+<span id="cb344-7"><a href="tabulation.html#cb344-7" tabindex="-1"></a><span class="fu">print</span>(odds.tab)</span></code></pre></div>
 <pre><code>##  ------------------ 
 ##  gest4     odds of  
 ##             low bw  
@@ -684,42 +685,42 @@ the number of digits printed after the decimal point. This table</p>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
-"sharing": {
-"github": false,
-"facebook": true,
-"twitter": true,
-"linkedin": false,
-"weibo": false,
-"instapaper": false,
-"vk": false,
-"whatsapp": false,
-"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
-},
-"fontsettings": {
-"theme": "white",
-"family": "sans",
-"size": 2
-},
-"edit": {
-"link": "https://github.com/SPE-R/SPE/edit/master/pracs-book/tab-s.rmd",
-"text": "Edit"
-},
-"history": {
-"link": null,
-"text": null
-},
-"view": {
-"link": null,
-"text": null
-},
-"download": ["SPE-R-2024-practicals-with-solutions.pdf", "SPE-R-2024-practicals-with-solutions.epub"],
-"search": {
-"engine": "fuse",
-"options": null
-},
-"toc": {
-"collapse": "subsection"
-}
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/SPE-R/SPE/edit/master/pracs-book/tab-s.rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["SPE-R-2024-practicals-with-solutions.pdf", "SPE-R-2024-practicals-with-solutions.epub"],
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
 });
 });
 </script>
