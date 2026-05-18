@@ -842,8 +842,10 @@ objects()
 ```
 
 ```
-##  [1] "births"   "m"        "mydata"   "mylist"   "N"        "newdata" 
-##  [7] "v"        "w"        "x"        "y"        "yourdata"
+##  [1] "births"        "exercise"      "m"             "mydata"       
+##  [5] "mylist"        "N"             "newdata"       "solution"     
+##  [9] "spe_solutions" "v"             "w"             "x"            
+## [13] "y"             "yourdata"
 ```
 
 The function `objects()` shows what is in your workspace. To
