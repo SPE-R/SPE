@@ -212,6 +212,89 @@ The `-s.rmd` files are generated automatically from the `-e.rmd` files by
 regenerate the `-s.rmd` or run the `solutions` target locally
 (see [section 4](#4-build-the-book-locally)).
 
+### Solution-only content (single-source mode)
+
+The simple `-e.rmd` → `-s.rmd` mechanism above turns each chunk's `results = "hide"`
+into `results = "markup"` and that's it. It can't add **extra prose or extra code**
+that should appear only in the solutions book. To do that without maintaining two
+divergent copies of the same chapter, the build supports three primitives keyed
+off an environment variable `SPE_SOLUTIONS` (set automatically by CI and by the
+`Makefile`).
+
+You keep **one** source file. The same `xxx-e.rmd` is included in both the
+exercise and the solutions book; the conditional bits are filtered at render
+time.
+
+#### 1. Inline prose
+
+In the middle of a sentence:
+
+```markdown
+The mean rate is `r round(rate, 2)`.
+`r solution("In epidemiological practice we also report a 95% CI; see Section 3.4.")`
+```
+
+The wrapped string is rendered only in the solutions book. Use the mirror
+helper `r exercise("...")` for content that should appear only in the
+exercise book.
+
+#### 2. Multi-line prose blocks
+
+Use a fenced div with the class `solution` or `exercise`:
+
+````markdown
+The mean rate is computed as follows.
+
+::: solution
+**Bonus**: in epidemiological practice we also report a 95% CI. Compute it
+with `epitools::pois.exact()` and compare against the asymptotic interval —
+they differ for small denominators.
+:::
+````
+
+The block (anything between `::: solution` and the closing `:::`) is stripped
+from the exercise book and kept in the solutions book. `::: exercise` works
+symmetrically.
+
+#### 3. Whole code chunks
+
+Use the chunk options `solution = TRUE` or `exercise = TRUE`:
+
+````markdown
+```{r, solution = TRUE}
+# This chunk only runs (and only appears) in the solutions book.
+ci_results <- epitools::pois.exact(events, person_years)
+print(ci_results)
+```
+
+```{r, exercise = TRUE}
+# "Fill in this code" placeholder, shown only in the exercise book.
+my_rate <- ___
+```
+````
+
+A chunk marked `solution = TRUE` is not evaluated, echoed, or included in the
+exercise build — it is as if the chunk were not in the file.
+
+#### Migrating a chapter to single-source
+
+This is opt-in per chapter. Existing chapters keep working through the
+classic `-e.rmd` / `-s.rmd` pair. To convert one chapter:
+
+1. Open `xxx-e.rmd`. Add the solution-only content using the helpers above.
+2. Test locally with both `make -f pracs-book/Makefile html` and
+   `make -f pracs-book/Makefile html-sol` and confirm each book contains
+   only the intended content.
+3. In `pracs-book/_bookdown-sol.yml`, change the chapter entry from
+   `"xxx-s.rmd"` to `"xxx-e.rmd"` so the solutions book reads the same file.
+4. In `misc/from_e_to_s_rmd.R`, remove `"xxx-e.rmd"` from the `files.in` list
+   (it no longer needs auto-derivation), and delete the old `xxx-s.rmd`
+   from `pracs-book/`.
+
+The hand-maintained `pracs-book/ggplot2-s.rmd` is the natural first
+candidate for migration — its solution diverges materially from the
+exercise version, which is exactly what this mechanism is designed for.
+
 ---
 
 ## 4. Build the book locally
