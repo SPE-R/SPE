@@ -28,13 +28,13 @@ help:
 	@echo "  clean       Remove generated book output directories"
 
 html:
-	$(RSCRIPT) '$(ALLOWDUP); bookdown::render_book("$(BOOK_DIR)/", "bookdown::gitbook")'
+	SPE_SOLUTIONS=0 $(RSCRIPT) '$(ALLOWDUP); bookdown::render_book("$(BOOK_DIR)/", "bookdown::gitbook")'
 
 pdf:
-	$(RSCRIPT) '$(ALLOWDUP); bookdown::render_book("$(BOOK_DIR)/", "bookdown::pdf_book")'
+	SPE_SOLUTIONS=0 $(RSCRIPT) '$(ALLOWDUP); bookdown::render_book("$(BOOK_DIR)/", "bookdown::pdf_book")'
 
 epub:
-	$(RSCRIPT) '$(ALLOWDUP); bookdown::render_book("$(BOOK_DIR)/", "bookdown::epub_book")'
+	SPE_SOLUTIONS=0 $(RSCRIPT) '$(ALLOWDUP); bookdown::render_book("$(BOOK_DIR)/", "bookdown::epub_book")'
 
 all: html pdf epub
 
@@ -42,13 +42,13 @@ solutions:
 	$(RSCRIPT) 'source("misc/from_e_to_s_rmd.R")'
 
 html-sol: solutions
-	$(RSCRIPT) '$(ALLOWDUP); bookdown::render_book("$(BOOK_DIR)/", "bookdown::gitbook", new_session = TRUE, config_file = "_bookdown-sol.yml")'
+	SPE_SOLUTIONS=1 $(RSCRIPT) '$(ALLOWDUP); bookdown::render_book("$(BOOK_DIR)/", "bookdown::gitbook", new_session = TRUE, config_file = "_bookdown-sol.yml")'
 
 pdf-sol: solutions
-	$(RSCRIPT) '$(ALLOWDUP); bookdown::render_book("$(BOOK_DIR)/", "bookdown::pdf_book", new_session = TRUE, config_file = "_bookdown-sol.yml")'
+	SPE_SOLUTIONS=1 $(RSCRIPT) '$(ALLOWDUP); bookdown::render_book("$(BOOK_DIR)/", "bookdown::pdf_book", new_session = TRUE, config_file = "_bookdown-sol.yml")'
 
 epub-sol: solutions
-	$(RSCRIPT) '$(ALLOWDUP); bookdown::render_book("$(BOOK_DIR)/", "bookdown::epub_book", new_session = TRUE, config_file = "_bookdown-sol.yml")'
+	SPE_SOLUTIONS=1 $(RSCRIPT) '$(ALLOWDUP); bookdown::render_book("$(BOOK_DIR)/", "bookdown::epub_book", new_session = TRUE, config_file = "_bookdown-sol.yml")'
 
 all-sol: all html-sol pdf-sol epub-sol
 
