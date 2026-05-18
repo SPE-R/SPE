@@ -760,29 +760,32 @@ the study at death or kidney failure (dialysis or transplant).
     
     ```
      lex.id     per   age  tfi lex.dur lex.Cst   lex.Xst id sex  dob  doe cens
-          1 2000.00 50.00 0.00    7.53     NRA      ESRD NA   M 1950 2000 2020
-          2 2000.00 50.00 0.00    2.73     NRA      ESRD NA   M 1950 2000 2020
-          3 2000.00 50.00 0.00    9.09     NRA      ESRD NA   M 1950 2000 2020
-          4 2000.00 50.00 0.00    2.61     NRA       Rem NA   M 1950 2000 2020
-          4 2002.61 52.61 2.61    1.75     Rem ESRD(Rem) NA   M 1950 2000 2020
-          5 2000.00 50.00 0.00    3.53     NRA      ESRD NA   M 1950 2000 2020
-          6 2000.00 50.00 0.00    7.16     NRA      ESRD NA   M 1950 2000 2020
-          7 2000.00 50.00 0.00    5.51     NRA      ESRD NA   M 1950 2000 2020
-          8 2000.00 50.00 0.00    7.43     NRA      ESRD NA   M 1950 2000 2020
-          9 2000.00 50.00 0.00    6.88     NRA      ESRD NA   M 1950 2000 2020
-         10 2000.00 50.00 0.00    7.52     NRA      ESRD NA   M 1950 2000 2020
-         11 2000.00 50.00 0.00    6.13     NRA      ESRD NA   F 1950 2000 2020
-         12 2000.00 50.00 0.00    2.72     NRA      ESRD NA   F 1950 2000 2020
-         13 2000.00 50.00 0.00    2.91     NRA      ESRD NA   F 1950 2000 2020
-         14 2000.00 50.00 0.00    0.86     NRA      ESRD NA   F 1950 2000 2020
-         15 2000.00 50.00 0.00    1.05     NRA       Rem NA   F 1950 2000 2020
-         15 2001.05 51.05 1.05    2.55     Rem ESRD(Rem) NA   F 1950 2000 2020
-         16 2000.00 50.00 0.00    5.24     NRA       Rem NA   F 1950 2000 2020
-         16 2005.24 55.24 5.24   14.76     Rem       Rem NA   F 1950 2000 2020
-         17 2000.00 50.00 0.00    5.23     NRA      ESRD NA   F 1950 2000 2020
-         18 2000.00 50.00 0.00    9.22     NRA      ESRD NA   F 1950 2000 2020
-         19 2000.00 50.00 0.00    1.42     NRA      ESRD NA   F 1950 2000 2020
-         20 2000.00 50.00 0.00    2.77     NRA      ESRD NA   F 1950 2000 2020
+          1 2000.00 50.00 0.00    3.97     NRA      ESRD NA   M 1950 2000 2020
+          2 2000.00 50.00 0.00    4.98     NRA      ESRD NA   M 1950 2000 2020
+          3 2000.00 50.00 0.00    7.06     NRA       Rem NA   M 1950 2000 2020
+          3 2007.06 57.06 7.06    0.07     Rem ESRD(Rem) NA   M 1950 2000 2020
+          4 2000.00 50.00 0.00    1.98     NRA      ESRD NA   M 1950 2000 2020
+          5 2000.00 50.00 0.00    1.77     NRA      ESRD NA   M 1950 2000 2020
+          6 2000.00 50.00 0.00    7.14     NRA      ESRD NA   M 1950 2000 2020
+          7 2000.00 50.00 0.00   10.74     NRA      ESRD NA   M 1950 2000 2020
+          8 2000.00 50.00 0.00   14.19     NRA      ESRD NA   M 1950 2000 2020
+          9 2000.00 50.00 0.00    8.57     NRA      ESRD NA   M 1950 2000 2020
+         10 2000.00 50.00 0.00    1.49     NRA      ESRD NA   M 1950 2000 2020
+         11 2000.00 50.00 0.00    0.13     NRA       Rem NA   F 1950 2000 2020
+         11 2000.13 50.13 0.13   10.41     Rem ESRD(Rem) NA   F 1950 2000 2020
+         12 2000.00 50.00 0.00    3.37     NRA       Rem NA   F 1950 2000 2020
+         12 2003.37 53.37 3.37    5.82     Rem ESRD(Rem) NA   F 1950 2000 2020
+         13 2000.00 50.00 0.00    6.21     NRA      ESRD NA   F 1950 2000 2020
+         14 2000.00 50.00 0.00    2.75     NRA      ESRD NA   F 1950 2000 2020
+         15 2000.00 50.00 0.00    5.60     NRA       Rem NA   F 1950 2000 2020
+         15 2005.60 55.60 5.60    1.05     Rem ESRD(Rem) NA   F 1950 2000 2020
+         16 2000.00 50.00 0.00    1.17     NRA       Rem NA   F 1950 2000 2020
+         16 2001.17 51.17 1.17   12.95     Rem ESRD(Rem) NA   F 1950 2000 2020
+         17 2000.00 50.00 0.00    4.27     NRA      ESRD NA   F 1950 2000 2020
+         18 2000.00 50.00 0.00    6.50     NRA      ESRD NA   F 1950 2000 2020
+         19 2000.00 50.00 0.00    1.48     NRA      ESRD NA   F 1950 2000 2020
+         20 2000.00 50.00 0.00    4.78     NRA       Rem NA   F 1950 2000 2020
+         20 2004.78 54.78 4.78   15.22     Rem       Rem NA   F 1950 2000 2020
     ```
     
     ``` r
@@ -795,18 +798,18 @@ the study at death or kidney failure (dialysis or transplant).
     Transitions:
          To
     From  NRA Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:
-      NRA   0   1    9         0       10      10      60.00       10
-      Rem   0   0    0         1        1       1       1.75        1
-      Sum   0   1    9         1       11      11      61.75       10
+      NRA   0   1    9         0       10      10      61.88       10
+      Rem   0   0    0         1        1       1       0.07        1
+      Sum   0   1    9         1       11      11      61.95       10
     
     $F
          
     Transitions:
          To
     From  NRA Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:
-      NRA   0   2    8         0       10      10      37.54       10
-      Rem   0   1    0         1        2       1      17.31        2
-      Sum   0   3    8         1       12      11      54.85       10
+      NRA   0   5    5         0       10      10      36.27       10
+      Rem   0   1    0         4        5       4      45.45        5
+      Sum   0   6    5         4       15      14      81.72       10
     ```
     What type of object have you got as `iL`?
     
@@ -820,7 +823,7 @@ the study at death or kidney failure (dialysis or transplant).
     
     ```
        user  system elapsed 
-      2.481   3.280   2.090 
+      2.666   3.346   2.188 
     ```
     
     ``` r
@@ -833,18 +836,18 @@ the study at death or kidney failure (dialysis or transplant).
     Transitions:
          To
     From  NRA Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:
-      NRA  36  68  396         0      500     464    2790.76      500
-      Rem   0  39    0        29       68      29     414.09       68
-      Sum  36 107  396        29      568     493    3204.85      500
+      NRA  34  69  397         0      500     466    2645.66      500
+      Rem   0  42    0        27       69      27     478.60       69
+      Sum  34 111  397        27      569     493    3124.25      500
     
     $F
          
     Transitions:
          To
     From  NRA Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:
-      NRA  26 173  301         0      500     474    2324.25      500
-      Rem   0 104    0        69      173      69    1224.62      173
-      Sum  26 277  301        69      673     543    3548.86      500
+      NRA  27 155  318         0      500     473    2345.14      500
+      Rem   0 110    0        45      155      45    1145.12      155
+      Sum  27 265  318        45      655     518    3490.26      500
     ```
     Why are there so many ESRD-events in the resulting data set?
     
@@ -866,20 +869,20 @@ the study at death or kidney failure (dialysis or transplant).
           State
     when   NRA Rem ESRD ESRD(Rem)
       50   500   0    0         0
-      50.1 491   7    2         0
-      50.2 487   9    4         0
-      50.3 482  13    5         0
-      50.4 475  19    6         0
-      50.5 468  23    9         0
-      50.6 465  25   10         0
-      50.7 454  32   14         0
-      50.8 450  35   15         0
-      50.9 441  40   19         0
-      51   435  42   23         0
-      51.1 430  44   26         0
-      51.2 424  46   29         1
-      51.3 418  50   31         1
-      51.4 415  52   32         1
+      50.1 499   1    0         0
+      50.2 493   4    3         0
+      50.3 492   4    4         0
+      50.4 489   6    5         0
+      50.5 481   9   10         0
+      50.6 477  11   12         0
+      50.7 473  14   13         0
+      50.8 467  19   14         0
+      50.9 459  26   15         0
+      51   451  31   18         0
+      51.1 447  32   21         0
+      51.2 438  37   25         0
+      51.3 428  40   32         0
+      51.4 420  44   36         0
     ```
     What is in the object `nStf`?
     
@@ -897,11 +900,11 @@ the study at death or kidney failure (dialysis or transplant).
           State
     when     Rem   NRA ESRD ESRD(Rem)
       50   0.000 1.000    1         1
-      50.1 0.014 0.996    1         1
-      50.2 0.018 0.992    1         1
-      50.3 0.026 0.990    1         1
-      50.4 0.038 0.988    1         1
-      50.5 0.046 0.982    1         1
+      50.1 0.002 1.000    1         1
+      50.2 0.008 0.994    1         1
+      50.3 0.008 0.992    1         1
+      50.4 0.012 0.990    1         1
+      50.5 0.018 0.980    1         1
     ```
     
     ``` r
@@ -911,12 +914,12 @@ the study at death or kidney failure (dialysis or transplant).
     ```
           State
     when     Rem   NRA  ESRD ESRD(Rem)
-      59.5 0.236 0.336 0.902         1
-      59.6 0.236 0.334 0.902         1
-      59.7 0.238 0.332 0.902         1
-      59.8 0.236 0.326 0.900         1
-      59.9 0.238 0.324 0.898         1
-      60   0.238 0.322 0.898         1
+      59.5 0.232 0.338 0.936         1
+      59.6 0.232 0.338 0.936         1
+      59.7 0.230 0.334 0.934         1
+      59.8 0.230 0.332 0.934         1
+      59.9 0.230 0.328 0.932         1
+      60   0.228 0.322 0.930         1
     ```
     What do the entries in `ppf` represent?
     
