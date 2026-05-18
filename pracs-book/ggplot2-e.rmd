@@ -1,6 +1,6 @@
 ```{r, include=FALSE}
-knitr::opts_chunk$set(results = "hide", 
-                      fig.show = "hide",
+knitr::opts_chunk$set(results = if (spe_solutions()) "markup" else "hide",
+                      fig.show = if (spe_solutions()) "show" else "hide",
                       keep.source = TRUE,
                       eps = FALSE,
                       include = TRUE,
@@ -104,8 +104,14 @@ Again, this is not quite what we want. The line geometry is mixing up observatio
 
 Modify the code chunk below so that it includes the `group` aesthetic to recreate plot `p1` correctly.
 
-```{r, eval=FALSE}
+```{r, exercise=TRUE, eval=FALSE}
 p1 <- ggplot(data=alkfos, mapping=aes(x=time, y=mean)) +
+  geom_point() + geom_line()
+show(p1)
+```
+
+```{r, solution=TRUE}
+p1 <- ggplot(data=alkfos, mapping=aes(x=time, y=mean, group=treat)) +
   geom_point() + geom_line()
 show(p1)
 ```
@@ -121,8 +127,13 @@ Modify the code chunk below so that the `linerange` geometry has its own aesthet
 
 Note that the error bars are *not confidence intervals*. In statistical graphics it is very common to use plus/minus the standard error to represent the uncertainty in the data without making any statistical claims about coverage.
 
-```{r, eval=FALSE}
+```{r, exercise=TRUE, eval=FALSE}
 p2 <- p1 + geom_linerange(...)
+show(p2)
+```
+
+```{r, solution=TRUE}
+p2 <- p1 + geom_linerange(mapping=aes(ymin=mean-sem, ymax=mean+sem))
 show(p2)
 ```
 
@@ -134,8 +145,13 @@ The last geometry we want to add is the horizontal reference line at zero. This 
 
 We should distinguish the reference line from the lines used to plot the data, otherwise it may distract the viewer. We could do this by changing the colour of the reference line. But here we will use a thinner line using the optional argument `linewidth` to the hline geometry. The default value of `linewidth` is 1. A value less than 1 draws a thinner line; a value greater than 1 draws a thicker line. Choose a suitable value for your plot.
 
-```{r, eval=FALSE}
+```{r, exercise=TRUE, eval=FALSE}
 p3 <- p2 + geom_hline(...)
+show(p3)
+```
+
+```{r, solution=TRUE}
+p3 <- p2 + geom_hline(yintercept=0, linewidth=0.1)
 show(p3)
 ```
 
@@ -150,15 +166,28 @@ Both axes are continuous. Therefore we use the `scale_x_continuous()` and `scale
 
 Modify the code chunk below to create the custom axes:
 
-```{r, eval=FALSE}
+```{r, exercise=TRUE, eval=FALSE}
 p4 <- p3 + scale_x_continuous() + scale_y_continuous()
+show(p4)
+```
+
+```{r, solution=TRUE}
+p4 <- p3 + scale_x_continuous(breaks=c(0,3,6,9,12,18,24)) +
+  scale_y_continuous(breaks=seq(from=-40, to=30, by=5),
+                              limits = c(-40, 30))
 show(p4)
 ```
 
 We should also supply informative axis labels. The default axis labels are taken from the names of the variables that we used in the aesthetic mappings for `x` and `y`. Use the `xlab()` and `ylab()` functions to provide informative axis labels.
 
-```{r, eval=FALSE}
+```{r, exercise=TRUE, eval=FALSE}
 p5 <- p4 + xlab(...) + ylab(...)
+show(p5)
+```
+
+```{r, solution=TRUE}
+p5 <- p4 + xlab("Months after randomization") +
+  ylab("Percent change in serum alkaline phosphate")
 show(p5)
 ```
 
@@ -171,8 +200,13 @@ Themes control many aspects of the appearance of the plot that do not depend on 
 -   Modify the chunk below to use different themes until you find one that most closely matches the original plot in the file bentK.pdf.
 -   Find the parameter that changes to the font size and use it to reduce the font until the y-axis label fits.
 
-```{r, eval=FALSE}
+```{r, exercise=TRUE, eval=FALSE}
 p6 <- p5 + ...
+show(p6)
+```
+
+```{r, solution=TRUE}
+p6 <- p5 + theme_classic(base_size=9)
 show(p6)
 ```
 
@@ -180,14 +214,29 @@ show(p6)
 
 In this exercise, you have constructed the plot in steps, saving and displaying the plot in separate chunks to allow you to see the changes as we add each layer of the plot. In practice, we do not work like this. All the instructions for creating the plot should be together. Fill in the chunk below so that the plot is recreated in a single chunk.
 
-```{r, eval=FALSE}
+```{r, exercise=TRUE, eval=FALSE}
 p <- ...
+show(p)
+```
+
+```{r, solution=TRUE}
+p <- ggplot(alkfos, mapping=aes(x=time, y=mean, groups=treat)) +
+  geom_point(mapping=aes(shape=treat)) +
+  geom_line() +
+  geom_linerange(mapping=aes(ymin=mean-sem, ymax=mean+sem)) +
+  scale_x_continuous(breaks=c(0,3,6,9,12,18,24)) +
+  scale_y_continuous(breaks=seq(from=-40, to=30, by=5),
+                     limits = c(-40, 30)) +
+  xlab("Months after randomization") +
+  ylab("Percent change in serum alkaline phosphate") +
+  geom_hline(yintercept=0, linewidth=0.1) +
+  theme_classic(base_size=9)
 show(p)
 ```
 
 There is still one thing missing from our reproduction. In the original plot, the treatment and control groups were distinguished by different plotting symbols, whereas in our plot they both have circular marks. We can change this by adding the aesthetic mapping `shape`.
 
-Modify the chunk above so that the aesthetic shape is mapped onto the variable treat. You can do this inside the call to `ggplot()` or in the call to `geom_point()`.
+Modify the chunk above so that the aesthetic `shape` is mapped onto the variable `treat`. You can do this inside the call to `ggplot()` or in the call to `geom_point()`.
 
 Note that adding the shape aesthetic automatically adds a legend to the plot, telling us which shape corresponds to which group.
 
@@ -203,11 +252,11 @@ There is one important element missing from the graph. This is the table of the 
 
 Firstly we create a new graphical object to represent the table. This object has its own aesthetic mappings, geometries and scales. I will skip a detailed description of this step except to note that some of the arguments below will suppress graphical features (e.g. `NULL` and `element_blank()`)
 
-```{r, eval=FALSE}
-tab <- ggplot(data=alkfos, 
+```{r, eval=spe_solutions()}
+tab <- ggplot(data=alkfos,
               mapping=aes(x=time, y=treat, label=available)) +
               geom_text(size=2) + xlab(NULL) + ylab(NULL) +
-              scale_x_continuous(breaks=NULL) + 
+              scale_x_continuous(breaks=NULL) +
               theme_bw(base_size=9) +
               theme(panel.grid=element_blank())
 tab
@@ -215,9 +264,9 @@ tab
 
 Next use the `plot_grid()` function from the cowplot package to stack the displayed objects vertically (`align="v"`), in a single column (`ncol=1`, `nrow=2`), with the left and right ends of the x-axes aligned (`axis="lr"`) and most of the space taken up by the plot (`rel_heights=c(5,1)`).
 
-```{r, eval=FALSE}
+```{r, eval=spe_solutions()}
 library(cowplot)
-plot_grid(plotlist=list(p, tab), align="v", axis="lr", 
+plot_grid(plotlist=list(p, tab), align="v", axis="lr",
           ncol=1, nrow=2, rel_heights=c(5,1))
 ```
 
