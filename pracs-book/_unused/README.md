@@ -10,6 +10,12 @@ they can be reintegrated quickly if needed in a future edition.
   build by `graph-intro-e.rmd` and `ggplot2-e.rmd`.
 - `simulation-e.rmd` — never referenced by `_bookdown.yml`. Likely a draft
   that was never finished.
+- `index-s.Rmd` — older "with solutions" version of the book front
+  matter. Its subtitle/description difference is now encoded as inline
+  R in `pracs-book/index.Rmd`, dispatched by the `SPE_SOLUTIONS` env
+  var, so the same `index.Rmd` serves both books and bookdown can name
+  the first output file `index.html` (which it only does when the
+  source is literally named `index.Rmd`).
 
 ## How to reintegrate a file
 
