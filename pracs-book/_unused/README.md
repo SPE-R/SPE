@@ -10,9 +10,6 @@ they can be reintegrated quickly if needed in a future edition.
   build by `graph-intro-e.rmd` and `ggplot2-e.rmd`.
 - `simulation-e.rmd` — never referenced by `_bookdown.yml`. Likely a draft
   that was never finished.
-- `index-s.Rmd` — old solution-book front matter. The active
-  `_bookdown-sol.yml` uses `index.Rmd` (the same file as the exercise
-  book), so this duplicate `index-s.Rmd` is orphan.
 
 ## How to reintegrate a file
 
