@@ -53,3 +53,14 @@ knitr::opts_hooks$set(
 # Multi-line PROSE blocks are handled by the companion pandoc lua filter
 # pracs-book/_solutions.lua, which dispatches on the same SPE_SOLUTIONS
 # env var to strip or keep ::: solution and ::: exercise fenced divs.
+
+# Global default chunk options driven by the solutions flag.
+# - Exercise book: code chunk OUTPUT (results + figures) is hidden by
+#   default, so students see only the code and run it themselves.
+# - Solutions book: chunk output and figures are shown by default.
+# Per-chapter setup chunks can override these explicitly when needed;
+# chunk-level options always beat the global default below.
+knitr::opts_chunk$set(
+  results  = if (spe_solutions()) "markup" else "hide",
+  fig.show = if (spe_solutions()) "show"   else "hide"
+)
