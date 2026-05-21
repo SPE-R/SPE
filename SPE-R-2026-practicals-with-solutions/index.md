@@ -1,6 +1,6 @@
 --- 
 title: "Statistical Practice in Epidemiology with R"
-subtitle: "SPE practicals"
+subtitle: "SPE practicals with solutions"
 author: 
   - Krista Fischer^[Estonian Genome Center, University of Tartu, Estonia, Krista.Fischer@ut.ee]
   - Martyn Plummer^[University of Warwick, UK, martyn.plummer@warwick.ac.uk]
@@ -15,7 +15,7 @@ bibliography: [book.bib, packages.bib]
 # url: your book url like https://bookdown.org/yihui/bookdown
 # cover-image: path to the social sharing image like images/cover.jpg
 description: |
-  This is the SPE-R 2026 exercises book
+  This is the SPE-R 2026 exercises book with solutions
 link-citations: yes
 github-repo: spe-r/spe
 ---

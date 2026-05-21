@@ -196,14 +196,14 @@ plot(s.all,main="KM estimate of the survival
      xlab="years", ylab="Survival")
 ```
 
-![](oral-s_files/figure-epub3/survcdf1-1.png)<!-- -->
+![](oral-s_files/figure-epub3/survcdf1-1.png)
 
 ``` r
 plot(s.all)
 lines(s.all, fun = "event", mark.time = F, conf.int = FALSE)
 ```
 
-![](oral-s_files/figure-epub3/survcdf1-2.png)<!-- -->
+![](oral-s_files/figure-epub3/survcdf1-2.png)
 
 The effect of option `mark.time=F` is to omit
 marking the times when censorings occurred.

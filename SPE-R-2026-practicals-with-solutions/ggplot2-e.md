@@ -79,7 +79,7 @@ The code chunk below displays the object `p0` created in the chunk above.
 show(p0)
 ```
 
-![](ggplot2-s_files/figure-epub3/unnamed-chunk-4-1.png)<!-- -->
+![](ggplot2-e_files/figure-epub3/unnamed-chunk-4-1.png)<!-- -->
 
 You may find the results a little disappointing. The `ggplot()` function has drawn x- and y-axes that span the range of the data, but otherwise has drawn no points or lines. This is another important difference between ggplot2 and base graphics. Whereas base plotting functions will usually create a sensible default plot, `ggplot()` makes no assumptions about what you want.
 
@@ -99,11 +99,13 @@ p1 <- p0 + geom_point() + geom_line()
 show(p1)
 ```
 
-![](ggplot2-s_files/figure-epub3/unnamed-chunk-5-1.png)<!-- -->
+![](ggplot2-e_files/figure-epub3/unnamed-chunk-5-1.png)<!-- -->
 
 Again, this is not quite what we want. The line geometry is mixing up observations from the treatment and control groups, but we want separate lines for each group. To obtain this we need to add an additional aesthetic mapping inside the call to `ggplot()`. The aesthetic `group` gives the name of the variable in the data frame that distinguishes observations from different groups.
 
 Modify the code chunk below so that it includes the `group` aesthetic to recreate plot `p1` correctly.
+
+
 
 
 ``` r
@@ -112,7 +114,7 @@ p1 <- ggplot(data=alkfos, mapping=aes(x=time, y=mean, group=treat)) +
 show(p1)
 ```
 
-![](ggplot2-s_files/figure-epub3/unnamed-chunk-6-1.png)<!-- -->
+![](ggplot2-e_files/figure-epub3/unnamed-chunk-7-1.png)<!-- -->
 
 #### Error bars
 
@@ -126,12 +128,14 @@ Modify the code chunk below so that the `linerange` geometry has its own aesthet
 Note that the error bars are *not confidence intervals*. In statistical graphics it is very common to use plus/minus the standard error to represent the uncertainty in the data without making any statistical claims about coverage.
 
 
+
+
 ``` r
 p2 <- p1 + geom_linerange(mapping=aes(ymin=mean-sem, ymax=mean+sem))
 show(p2)
 ```
 
-![](ggplot2-s_files/figure-epub3/unnamed-chunk-7-1.png)<!-- -->
+![](ggplot2-e_files/figure-epub3/unnamed-chunk-9-1.png)<!-- -->
 
 Compare the y-axes for plots `p1` and `p2`. Note that when we add the error bars, the y-axis automatically expanded the limits of the y-axis to include the highest and lowest values on the error bars.
 
@@ -142,12 +146,14 @@ The last geometry we want to add is the horizontal reference line at zero. This 
 We should distinguish the reference line from the lines used to plot the data, otherwise it may distract the viewer. We could do this by changing the colour of the reference line. But here we will use a thinner line using the optional argument `linewidth` to the hline geometry. The default value of `linewidth` is 1. A value less than 1 draws a thinner line; a value greater than 1 draws a thicker line. Choose a suitable value for your plot.
 
 
+
+
 ``` r
 p3 <- p2 + geom_hline(yintercept=0, linewidth=0.1)
 show(p3)
 ```
 
-![](ggplot2-s_files/figure-epub3/unnamed-chunk-8-1.png)<!-- -->
+![](ggplot2-e_files/figure-epub3/unnamed-chunk-11-1.png)<!-- -->
 
 ### Scales
 
@@ -161,6 +167,8 @@ Both axes are continuous. Therefore we use the `scale_x_continuous()` and `scale
 Modify the code chunk below to create the custom axes:
 
 
+
+
 ``` r
 p4 <- p3 + scale_x_continuous(breaks=c(0,3,6,9,12,18,24)) +
   scale_y_continuous(breaks=seq(from=-40, to=30, by=5),
@@ -168,18 +176,20 @@ p4 <- p3 + scale_x_continuous(breaks=c(0,3,6,9,12,18,24)) +
 show(p4)
 ```
 
-![](ggplot2-s_files/figure-epub3/unnamed-chunk-9-1.png)<!-- -->
+![](ggplot2-e_files/figure-epub3/unnamed-chunk-13-1.png)<!-- -->
 
 We should also supply informative axis labels. The default axis labels are taken from the names of the variables that we used in the aesthetic mappings for `x` and `y`. Use the `xlab()` and `ylab()` functions to provide informative axis labels.
 
 
+
+
 ``` r
-p5 <- p4 + xlab("Months after randomization") + 
+p5 <- p4 + xlab("Months after randomization") +
   ylab("Percent change in serum alkaline phosphate")
 show(p5)
 ```
 
-![](ggplot2-s_files/figure-epub3/unnamed-chunk-10-1.png)<!-- -->
+![](ggplot2-e_files/figure-epub3/unnamed-chunk-15-1.png)<!-- -->
 
 ### Themes
 
@@ -191,16 +201,20 @@ Themes control many aspects of the appearance of the plot that do not depend on 
 -   Find the parameter that changes to the font size and use it to reduce the font until the y-axis label fits.
 
 
+
+
 ``` r
 p6 <- p5 + theme_classic(base_size=9)
 show(p6)
 ```
 
-![](ggplot2-s_files/figure-epub3/unnamed-chunk-11-1.png)<!-- -->
+![](ggplot2-e_files/figure-epub3/unnamed-chunk-17-1.png)<!-- -->
 
 ### Putting everything together
 
 In this exercise, you have constructed the plot in steps, saving and displaying the plot in separate chunks to allow you to see the changes as we add each layer of the plot. In practice, we do not work like this. All the instructions for creating the plot should be together. Fill in the chunk below so that the plot is recreated in a single chunk.
+
+
 
 
 ``` r
@@ -211,14 +225,14 @@ p <- ggplot(alkfos, mapping=aes(x=time, y=mean, groups=treat)) +
   scale_x_continuous(breaks=c(0,3,6,9,12,18,24)) +
   scale_y_continuous(breaks=seq(from=-40, to=30, by=5),
                      limits = c(-40, 30)) +
-  xlab("Months after randomization") + 
+  xlab("Months after randomization") +
   ylab("Percent change in serum alkaline phosphate") +
   geom_hline(yintercept=0, linewidth=0.1) +
   theme_classic(base_size=9)
 show(p)
 ```
 
-![](ggplot2-s_files/figure-epub3/unnamed-chunk-12-1.png)<!-- -->
+![](ggplot2-e_files/figure-epub3/unnamed-chunk-19-1.png)<!-- -->
 
 There is still one thing missing from our reproduction. In the original plot, the treatment and control groups were distinguished by different plotting symbols, whereas in our plot they both have circular marks. We can change this by adding the aesthetic mapping `shape`.
 
@@ -240,27 +254,27 @@ Firstly we create a new graphical object to represent the table. This object has
 
 
 ``` r
-tab <- ggplot(data=alkfos, 
+tab <- ggplot(data=alkfos,
               mapping=aes(x=time, y=treat, label=available)) +
               geom_text(size=2) + xlab(NULL) + ylab(NULL) +
-              scale_x_continuous(breaks=NULL) + 
+              scale_x_continuous(breaks=NULL) +
               theme_bw(base_size=9) +
               theme(panel.grid=element_blank())
 tab
 ```
 
-![](ggplot2-s_files/figure-epub3/unnamed-chunk-13-1.png)<!-- -->
+![](ggplot2-e_files/figure-epub3/unnamed-chunk-20-1.png)<!-- -->
 
 Next use the `plot_grid()` function from the cowplot package to stack the displayed objects vertically (`align="v"`), in a single column (`ncol=1`, `nrow=2`), with the left and right ends of the x-axes aligned (`axis="lr"`) and most of the space taken up by the plot (`rel_heights=c(5,1)`).
 
 
 ``` r
 library(cowplot)
-plot_grid(plotlist=list(p, tab), align="v", axis="lr", 
+plot_grid(plotlist=list(p, tab), align="v", axis="lr",
           ncol=1, nrow=2, rel_heights=c(5,1))
 ```
 
-![](ggplot2-s_files/figure-epub3/unnamed-chunk-14-1.png)<!-- -->
+![](ggplot2-e_files/figure-epub3/unnamed-chunk-21-1.png)<!-- -->
 
 ## References
 
