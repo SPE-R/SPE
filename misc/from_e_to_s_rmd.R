@@ -3,7 +3,9 @@
 
 ## Files whose -s.rmd is hand-maintained and must NOT be auto-regenerated.
 ## Listed for defense-in-depth even though we also exclude them from files.in.
-PROTECTED_S_RMD <- c("ggplot2-s.rmd")
+## Currently empty: ggplot2 was migrated to the single-source mechanism (see
+## misc/SPE_faculty_setup.md "Solution-only content").
+PROTECTED_S_RMD <- character(0)
 
 ## function to (re)generate the solution version of a practical from the
 ## exercise version. ALWAYS overwrites the output file -- this is the
@@ -41,7 +43,8 @@ files.in <-
     "cont-eff-e.rmd",
     "causal-e.rmd",
     ## "graphics-e.rmd" -- moved to pracs-book/_unused/, no longer rendered
-    ## "ggplot2-e.rmd"  -- its -s.rmd is hand-maintained; do not regenerate
+    ## "ggplot2-e.rmd"  -- migrated to single-source; included directly in
+    ##                    both _bookdown.yml and _bookdown-sol.yml.
     "oral-e.rmd",
     "DMDK-e.rmd",
     "occoh-caco-e.rmd",
