@@ -177,123 +177,85 @@ For more detail with screenshots see [`SPE_git-quick_start.md`](SPE_git-quick_st
 
 ---
 
-## 3. What to edit (and what NOT to edit)
-
-### Edit these
+## 3. What to edit
 
 | Path | What it is |
 |---|---|
-| `adm/prog.tex` | The 2-page program/timetable (compiled to PDF) |
-| `adm/SPE-R-timetable.md` | The detailed timetable with links (rendered to the website) |
-| `pracs-book/*.rmd` | **The practicals.** One file per session (e.g. `basic-e.rmd`, `causal-e.rmd`). These are R Markdown files — text + R code chunks. |
+| `pracs-book/*-e.rmd` | **The practicals.** One R Markdown file per session. **This is the only file per chapter that you edit.** Both books (exercise and with-solutions) are rendered from this one source — see section 3.1 below. |
 | `pracs-book/index.Rmd` | Book front matter: title, dates, authors. Rarely needs touching. |
-| `lectures/<your-topic>/` | Your lecture slides. Whatever source format you use (`.tex`, `.Rnw`, PowerPoint exported to PDF) plus the compiled `.pdf` we ship to students. |
+| `adm/prog.tex` | The 2-page program (compiled to PDF). |
+| `adm/SPE-R-timetable.md` | The detailed timetable with links (rendered to the website). |
+| `lectures/<your-topic>/` | Your lecture slides — whatever source format you use — plus the compiled `.pdf` we ship to students. |
 
-### Do NOT edit these
+**Do NOT edit**:
 
 | Path | Why |
 |---|---|
-| `pracs/*.rnw` | **Deprecated.** Old Sweave version of the practicals, kept only for historical reference. Will be removed in a future cleanup. All edits go to `pracs-book/*.rmd`. |
-| `pracs-book/*-s.rmd` | Auto-generated solutions, derived from the corresponding `*-e.rmd`. The one exception is `pracs-book/ggplot2-s.rmd` which is hand-maintained. |
-| `pracs-book/SPE-R-*-practicals*.Rmd` | Auto-generated merged book file. If you see one in the directory, it's a leftover from a failed render — delete it (see Phase 4 of the Makefile's `clean` target). |
-| `pracs-book/SPE-R-*-practicals/` | Built book output (ignored by git anyway). |
-| `renv/`, `renv.lock` | R package environment. Touch only via `renv::snapshot()` and only when you've deliberately added a package. |
+| `pracs-book/*-s.rmd` | Auto-generated on every build from the matching `-e.rmd` by [`misc/from_e_to_s_rmd.R`](from_e_to_s_rmd.R). The file is git-ignored; any local copy is regenerated. |
+| `pracs-book/SPE-R-*-practicals*.Rmd` | Auto-generated merged book file. If you see one in the directory, it is a leftover from a failed render — run `make -f pracs-book/Makefile clean` before retrying. |
+| `pracs-book/SPE-R-*-practicals*/` | Built book output (git-ignored). |
+| `pracs-book/_unused/` | Archived chapters and front-matter, kept for reference. |
+| `renv/`, `renv.lock` | R package environment. Touch only via `renv::snapshot()` and only when you have deliberately added a package. |
 | `.github/workflows/` | CI definitions. Coordinate with Damien before changing. |
 
-### The exercise → solution pattern
+### 3.1 How exercise and solution content differ — in one source file
 
-Each practical lives in two files:
+You write ONE `-e.rmd` per practical. The build produces TWO books from
+the same source:
 
-- `xxx-e.rmd` (exercise) — what the student sees. Code chunks have `results = "hide"` so outputs aren't shown.
-- `xxx-s.rmd` (solution) — same content, with `results = "markup"` so outputs are shown.
+- the **exercise book** — what students get during the course;
+- the **with-solutions book** — extra explanations and full code, shipped alongside.
 
-The `-s.rmd` files are generated automatically from the `-e.rmd` files by
-`misc/from_e_to_s_rmd.R`. **Edit only the `-e.rmd` file**, then either let CI
-regenerate the `-s.rmd` or run the `solutions` target locally
-(see [section 4](#4-build-the-book-locally)).
+The differentiation is driven by an `SPE_SOLUTIONS` env var, set automatically
+by CI and the local Makefile. By default, code chunk **output** (text and
+figures) is hidden in the exercise book and shown in the with-solutions book —
+you do not have to do anything to get that. For finer control, four primitives
+let you mark content as exercise-only, solution-only, or both:
 
-### Solution-only content (single-source mode)
+| What you want | How to write it |
+|---|---|
+| Prose / code shown in **both** books | Just write it. |
+| **Inline** prose in one book only | `` `r solution("Only in solutions.")` `` / `` `r exercise("Only in exercises.")` `` |
+| A **multi-line** prose block in one book only | `::: solution` …content… `:::` &nbsp;&nbsp; (or `::: exercise`) |
+| A **whole code chunk** in one book only | ` ```{r, solution = TRUE} ` &nbsp;&nbsp; (or `exercise = TRUE`) |
+| The **same code** but evaluated only in the solutions | ` ```{r, eval = spe_solutions()} ` |
 
-The simple `-e.rmd` → `-s.rmd` mechanism above turns each chunk's `results = "hide"`
-into `results = "markup"` and that's it. It can't add **extra prose or extra code**
-that should appear only in the solutions book. To do that without maintaining two
-divergent copies of the same chapter, the build supports three primitives keyed
-off an environment variable `SPE_SOLUTIONS` (set automatically by CI and by the
-`Makefile`).
-
-You keep **one** source file. The same `xxx-e.rmd` is included in both the
-exercise and the solutions book; the conditional bits are filtered at render
-time.
-
-#### 1. Inline prose
-
-In the middle of a sentence:
-
-```markdown
-The mean rate is `r round(rate, 2)`.
-`r solution("In epidemiological practice we also report a 95% CI; see Section 3.4.")`
-```
-
-The wrapped string is rendered only in the solutions book. Use the mirror
-helper `r exercise("...")` for content that should appear only in the
-exercise book.
-
-#### 2. Multi-line prose blocks
-
-Use a fenced div with the class `solution` or `exercise`:
+A self-contained example combining most of them:
 
 ````markdown
-The mean rate is computed as follows.
+Compute the rate.
+
+`r exercise("Hint: use the rate variable from the dataset.")`
+
+```{r, exercise = TRUE, eval = FALSE}
+mean_rate <- ___          # fill in the blank
+```
+
+```{r, solution = TRUE}
+mean_rate <- mean(rate)
+mean_rate
+```
 
 ::: solution
-**Bonus**: in epidemiological practice we also report a 95% CI. Compute it
-with `epitools::pois.exact()` and compare against the asymptotic interval —
-they differ for small denominators.
+**Bonus**: in epidemiological practice we usually also report a 95% CI.
+Compute it with `epitools::pois.exact()` and compare to the asymptotic
+interval — they differ for small denominators.
 :::
 ````
 
-The block (anything between `::: solution` and the closing `:::`) is stripped
-from the exercise book and kept in the solutions book. `::: exercise` works
-symmetrically.
+The implementation lives in [`pracs-book/_common.R`](../pracs-book/_common.R)
+(R helpers and chunk hooks) and
+[`pracs-book/_solutions.lua`](../pracs-book/_solutions.lua) (a pandoc filter
+for the fenced `::: solution` / `::: exercise` divs). You should not need to
+touch either while writing a practical.
 
-#### 3. Whole code chunks
-
-Use the chunk options `solution = TRUE` or `exercise = TRUE`:
-
-````markdown
-```{r, solution = TRUE}
-# This chunk only runs (and only appears) in the solutions book.
-ci_results <- epitools::pois.exact(events, person_years)
-print(ci_results)
-```
-
-```{r, exercise = TRUE}
-# "Fill in this code" placeholder, shown only in the exercise book.
-my_rate <- ___
-```
-````
-
-A chunk marked `solution = TRUE` is not evaluated, echoed, or included in the
-exercise build — it is as if the chunk were not in the file.
-
-#### Migrating a chapter to single-source
-
-This is opt-in per chapter. Existing chapters keep working through the
-classic `-e.rmd` / `-s.rmd` pair. To convert one chapter:
-
-1. Open `xxx-e.rmd`. Add the solution-only content using the helpers above.
-2. Test locally with both `make -f pracs-book/Makefile html` and
-   `make -f pracs-book/Makefile html-sol` and confirm each book contains
-   only the intended content.
-3. In `pracs-book/_bookdown-sol.yml`, change the chapter entry from
-   `"xxx-s.rmd"` to `"xxx-e.rmd"` so the solutions book reads the same file.
-4. In `misc/from_e_to_s_rmd.R`, remove `"xxx-e.rmd"` from the `files.in` list
-   (it no longer needs auto-derivation), and delete the old `xxx-s.rmd`
-   from `pracs-book/`.
-
-The hand-maintained `pracs-book/ggplot2-s.rmd` is the natural first
-candidate for migration — its solution diverges materially from the
-exercise version, which is exactly what this mechanism is designed for.
+> **Legacy** — a handful of older chapters do not yet use the primitives
+> above. For those, the `-s.rmd` file is generated mechanically from the
+> matching `-e.rmd` (basically `results = "hide"` → `results = "markup"`),
+> with no room for solution-only content. When you next touch one of those
+> chapters and want to add extras to the solutions, migrate it to the
+> single-source pattern: see [`pracs-book/ggplot2-e.rmd`](../pracs-book/ggplot2-e.rmd)
+> as a worked example.
 
 ---
 
