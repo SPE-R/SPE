@@ -51,7 +51,7 @@ as well as deaths from oral cancer and other causes, respectively,
  from the `event` variable.
 
 ``` r
-orca <-  read.table(file = 'https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/oralca2.txt', header = TRUE, sep = " ",row.names = 1 )
+orca <-  read.table(file = 'https://raw.githubusercontent.com/SPE-R/SPE/master/pracs-book/data/oralca2.txt', header = TRUE, sep = " ",row.names = 1 )
 head(orca)
 ```
 

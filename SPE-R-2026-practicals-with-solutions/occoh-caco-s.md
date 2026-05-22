@@ -75,7 +75,7 @@ See its structure and print the univariate summaries.
 ``` r
 library(Epi)
 library(survival)
-url <- "https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data"
+url <- "https://raw.githubusercontent.com/SPE-R/SPE/master/pracs-book/data"
 oc <- read.table(paste(url, "occoh.txt", sep = "/"), header = TRUE)
 str(oc)
 ```
