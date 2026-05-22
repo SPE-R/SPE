@@ -9,7 +9,7 @@ cB8  <- c("#000000", "#E69F00", "#56B4E9", "#009E73",
           "#F0E442", "#0072B2", "#D55E00", "#CC79A7") 
 ###################################################
 
-read.table(file = 'https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/oralca2.txt', header = TRUE, sep = " ",row.names = 1 )
+read.table(file = 'https://raw.githubusercontent.com/SPE-R/SPE/gh-spe-material/data/oralca2.txt', header = TRUE, sep = " ", row.names = 1)
 head(orca)
 str(orca)
 summary(orca)
