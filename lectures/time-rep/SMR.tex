@@ -83,9 +83,10 @@ compared with reference rates obtained from:
   \begin{itemize}[<+->]
   \item As for the rates, the SMR can be modelled using individual
     data.
-  \item Response is $d_i$, the event indicator (\code{lex.Xst}).
-  \item $\log$-offset is the expected value for each piece of
-    follow-up, $e_i=y_i \times \lambda_\text{p}$ (\code{lex.dur * rate})
+  \item First column of response is $d_i$, the event indicator
+    (\tcode{lex.Xst}).
+  \item Second column the expected value for each piece of
+    follow-up, $e_i=y_i \times \lambda_\text{p}$ (\tcode{lex.dur * rate})
   \item $\lambda_\text{p}$ is the population rate corresponding to the age,
     period and sex of the follow-up period $y_i$.
   \end{itemize}
@@ -111,8 +112,8 @@ compared with reference rates obtained from:
 \begin{Soutput}
 Transitions:
      To
-From     0    1  Records:  Events: Risk time:  Persons:
-   0 21059 1939     22998     1939   51787.96      2463
+From     0    1 Records: Events: Risk time: Persons:
+   0 21059 1939    22998    1939   51787.96     2463
 \end{Soutput}
 \end{Schunk}
 \pause
@@ -160,36 +161,9 @@ Create variables to fit with the population data
 \end{Soutput}
 \begin{Sinput}
 > gmortDK$per <- gmortDK$per+1900
-> #
 > thadx <- merge( thad, gmortDK[,c("agr","per","sex","rt")] )
-> #
 > thadx$E <- thadx$lex.dur * thadx$rt / 1000
 \end{Sinput}
-\end{Schunk}
-\end{frame}
-
-%----------------------------------------------------------------------
-\begin{frame}[fragile]
-\begin{Schunk}
-\begin{Sinput}
-> stat.table(contrast,
-+            list( D = sum(lex.Xst),
-+                  Y = sum(lex.dur),
-+                  E = sum(E),
-+                SMR = ratio(lex.Xst, E)),
-+             margin = TRUE,
-+               data = thadx)
-\end{Sinput}
-\begin{Soutput}
- -------------------------------------------- 
- contrast         D        Y       E     SMR  
- -------------------------------------------- 
- 1           917.00 20045.46  214.66    4.27  
- 2          1022.00 31742.51  447.21    2.29  
-                                              
- Total      1939.00 51787.96  661.87    2.93  
- -------------------------------------------- 
-\end{Soutput}
 \end{Schunk}
 \end{frame}
 
@@ -222,7 +196,7 @@ factor(contrast)2      2.29 2.15  2.43
 \pause
 \begin{itemize}[<+->]
 \item Analysis of SMR is like analysis of rates:
-\item Replace $Y$ with $E$ --- that's all! (\code{glm.Lexis} not usable)
+\item Replace $Y$ with $E$ --- that's all! (\tcode{glmLexis} not usable)
 \item \ldots it's the calculation of $E$ that is difficult
 \end{itemize}
 \end{frame}
