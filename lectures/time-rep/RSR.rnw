@@ -1,0 +1,126 @@
+%----------------------------------------------------------------------
+\begin{frame}{Cohort rates vs. population rates: RSR}
+  \begin{itemize}[<+->]
+  \item \textbf{Additive:} $\lambda(a) = \delta(a) +
+    \lambda_\text{p}(a)$, \quad $\lambda_\text{p}$ assumed known
+  \item Note that the survival (since $a=a_0$, say) is: \vspace*{-1ex}
+\begin{align*}
+     S(a) &= \exp\Bigl(-\!\!\int_{a_0}^a\!\! \delta(a) + \lambda_\text{p}(a) \dif a\Bigr)\\
+          &= \exp\Bigl(-\!\!\int_{a_0}^a\!\! \delta(a)          \dif a\Bigr) \times
+             \exp\Bigl(-\!\!\int_{a_0}^a\!\! \lambda_\text{p}(a) \dif a\Bigr)
+          &= \exp\Bigl(-\!\!  \int_{a_0}^a\!\! \delta(a) \dif a\Bigr) \times S_\text{p}(a)\\
+    \pause \Rightarrow \quad
+    r(a) = S(a)/S_\text{p}(a) &= \exp\Bigl(-\!\!\int_{a_0}^a\!\! \delta(a) \dif a\Bigr)
+  \end{align*}
+    \pause
+  \item \textbf{Additive} model for \textbf{rates} $\Leftrightarrow$ \textbf{Relative survival} model.
+  \end{itemize}
+\end{frame}
+
+%----------------------------------------------------------------------
+\begin{frame}[fragile]{Split the data to fit with population data}
+<<results=hide,echo=FALSE>>=
+library(Epi)
+library(popEpi)
+options("popEpi.datatable" = FALSE)
+library(tidyverse)
+library(rlang)
+@
+<<>>=
+data( thoro )
+thoro <- cal.yr(thoro)
+thL <- Lexis(entry = list(age = injecdat - birthdat,
+                          dte = injecdat,
+                          tfi = 0),
+              exit = list(dte = exitdat),
+       exit.status = as.numeric(exitstat == 1),
+              data = thoro)
+thad <- splitMulti(thL, age = seq(0, 90, 5), dte = seq(1938, 2038, 5))
+thad$agr <- timeBand(thad, "age", "left")
+thad$per <- timeBand(thad, "dte", "left")
+thad[1:5, c(lexVars(thad), "agr", "per", "sex")]
+@
+\end{frame}
+
+%----------------------------------------------------------------------
+\begin{frame}[fragile]{Important to have rates in correct dimansion}
+<<>>=
+data(gmortDK)
+gmortDK[1:3, 1:6]
+gmortDK <- mutate(gmortDK, per = per + 1900,
+                            rt = rt / 1000) # rates per 1 year
+thadx <- merge( thad, gmortDK[,c("agr","per","sex","rt")] )
+thadx <- mutate( thadx, E = lex.dur * rt )
+@
+\end{frame}
+
+%----------------------------------------------------------------------
+\begin{frame}[fragile]{Additive excess rate model---data}
+<<>>=
+(stat.table( contrast,
+            list(D = sum(lex.Xst),
+                 Y = sum(lex.dur),
+              Rate = ratio(lex.Xst, lex.dur, 100),
+                 E = sum(E),
+             Erate = ratio(E, lex.dur, 100),
+               SMR = ratio(lex.Xst, E)),
+            data = thadx ) -> zz)
+round(cbind(cohR = zz["Rate", ], popR = zz["Erate", ],
+            excR = zz["Rate", ] - zz["Erate", ]), 2)
+@
+These are the emprical cohort and population rates and their difference
+\end{frame}
+
+%----------------------------------------------------------------------
+\begin{frame}[fragile]{Simple additive model}
+A model where the \textbf{difference} between the cohort and the
+population rates are the parameters.
+
+\pause
+Poisson model with \textcolor{forestgreen}{identity link}
+and the expected numbers as \textcolor{forestgreen}{offset}
+
+\pause
+\ldots not easy to fit:
+<<>>=
+try(
+glm(cbind(lex.Xst == 1, lex.dur) ~ factor(contrast) - 1,
+    offset = E,
+    family = poisreg(link = "identity"),
+    data = thadx) ) ; geterrmessage() ; warnings()
+@
+\end{frame}
+
+%----------------------------------------------------------------------
+\begin{frame}[fragile]{Additive excess rate model}
+<<>>=
+# start without offset
+glm(cbind(lex.Xst == 1, lex.dur) ~ factor(contrast) - 1,
+    family = poisreg(link = "identity"),
+      data = thadx) -> m0
+#
+# add offset and use starting values from simple model
+update(m0, offset = E,
+            start = coef(m0)) -> mE
+round(ci.lin(mE), 4)
+round(ci.exp(mE, Exp = FALSE) * 100, 1) # excess mortality in %/year
+@
+\end{frame}
+
+%----------------------------------------------------------------------
+\begin{frame}[fragile]{Additive excess rate model---estimates}
+\vspace*{-1ex}
+<<>>=
+round(ci.exp(mE, Exp = FALSE) * 100, 2) # excess mortality in %/year
+round(cbind(cohR = zz["Rate", ],
+            popR = zz["Erate", ],
+            excR = zz["Rate", ] - zz["Erate", ]), 2)
+@ %
+Not identical estimates, because
+the model is with \code{identity} link---not the canonical link for the
+Poisson distribution.
+
+For \code{contrast=1} the excess rate is 3.1 per 100 PY\\
+For \code{contrast=2} the excess rate is 1.8 per 100 PY
+
+\end{frame}

@@ -83,9 +83,10 @@ compared with reference rates obtained from:
   \begin{itemize}[<+->]
   \item As for the rates, the SMR can be modelled using individual
     data.
-  \item Response is $d_i$, the event indicator (\code{lex.Xst}).
-  \item $\log$-offset is the expected value for each piece of
-    follow-up, $e_i=y_i \times \lambda_\text{p}$ (\code{lex.dur * rate})
+  \item First column of response is $d_i$, the event indicator
+    (\tcode{lex.Xst}).
+  \item Second column the expected value for each piece of
+    follow-up, $e_i=y_i \times \lambda_\text{p}$ (\tcode{lex.dur * rate})
   \item $\lambda_\text{p}$ is the population rate corresponding to the age,
     period and sex of the follow-up period $y_i$.
   \end{itemize}
@@ -118,7 +119,7 @@ thL <- Lexis( entry = list( age = injecdat-birthdat,
 <<>>=
 thad <- splitMulti(thL, age=seq(0,90,5), dte=seq(1938,2038,5) )
 summary( thad )
-@
+@ %
 \pause
 \vspace*{-1em}
 Create variables to fit with the population data
@@ -137,24 +138,9 @@ data( gmortDK )
 dim( gmortDK )
 gmortDK[1:6,1:6]
 gmortDK$per <- gmortDK$per+1900
-#
 thadx <- merge( thad, gmortDK[,c("agr","per","sex","rt")] )
-#
 thadx$E <- thadx$lex.dur * thadx$rt / 1000
-@
-\end{frame}
-
-%----------------------------------------------------------------------
-\begin{frame}[fragile]
-<<>>=
-stat.table(contrast,
-           list( D = sum(lex.Xst),
-                 Y = sum(lex.dur),
-                 E = sum(E),
-               SMR = ratio(lex.Xst, E)),
-            margin = TRUE,
-              data = thadx)
-@
+@ %
 \end{frame}
 
 %----------------------------------------------------------------------
@@ -177,7 +163,7 @@ round(ci.exp(m.SMR), 2)
 \pause
 \begin{itemize}[<+->]
 \item Analysis of SMR is like analysis of rates:
-\item Replace $Y$ with $E$ --- that's all! (\code{glm.Lexis} not usable)
+\item Replace $Y$ with $E$ --- that's all! (\tcode{glmLexis} not usable)
 \item \ldots it's the calculation of $E$ that is difficult
 \end{itemize}
 \end{frame}
