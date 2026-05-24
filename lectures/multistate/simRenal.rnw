@@ -9,38 +9,39 @@ options(width = 90,
                          lend = "butt")))
 @ %
 
-%----------------------------------------------------------------------
-\begin{frame}{A more complicated multistate model}
-\vspace*{-1em}
-\includegraphics[width=0.82\textwidth]{./GbAd-states.pdf}
-\end{frame}
+% %----------------------------------------------------------------------
+% \begin{frame}{A more complicated multistate model}
+% \vspace*{-1em}
+% \includegraphics[width=0.82\textwidth]{./GbAd-states.pdf}
+% \end{frame}
 
-%----------------------------------------------------------------------
-\begin{frame}{A more complicated multistate model}
-\includegraphics[width=0.75\textwidth]{./GbAd-probs.pdf}
-\end{frame}
-%----------------------------------------------------------------------
+% %----------------------------------------------------------------------
+% \begin{frame}{A more complicated multistate model}
+% \includegraphics[width=0.75\textwidth]{./GbAd-probs.pdf}
+% \end{frame}
+% %----------------------------------------------------------------------
 
 <<states-col,eval=TRUE,echo=FALSE,results=hide,fig=TRUE,height=4>>=
-# setwd("/home/bendix/teach/SPE/git/SPE/lectures/multistate")
+setwd("/bendix/teach/SPE/git/SPE/lectures/multistate")
 library(Epi)
 library(mgcv)
 library(foreign)
-renal <- read.dta( "../../pracs/data/renal.dta" )
-renal <- read.dta("https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/renal.dta")
-
-renal$sex <- factor(renal$sex,
-                    labels = c("M", "F"))
-renal <- transform(renal, dob = ifelse(dob > 2000,
-                                       dob - 100,
-                                       dob))
+renal <- read.dta("../../pracs-book/data/renal.dta")
+# renal <- read.dta("https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/renal.dta")
+subset(renal, dob > 2000)
+renal <- transform(renal,
+                   sex = factor(renal$sex,
+                                labels = c("M", "F")),
+                   dob = ifelse(dob > 2000,
+                                dob - 100,
+                                dob))
 Lr <- Lexis( entry = list(per = doe,
                           age = doe-dob,
                           tfi = 0),
               exit = list(per = dox),
        exit.status = factor(event > 0,
                             labels=c("NRA","ESRD")),
-              data = renal)
+              data = renal )
 # plot(Lr)
 # subset(Lr, age < 0)
 Lc <- cutLexis(Lr, cut = Lr$dor, # where to cut follow up
@@ -48,8 +49,8 @@ Lc <- cutLexis(Lr, cut = Lr$dor, # where to cut follow up
              new.state = "Rem",  # name of the new state
            split.state = TRUE)   # which states are less severe
 summary(Lc)
-clr <- c("forestgreen", "orange")
-clr <- c(clr, adjustcolor(rev(clr), alpha = 0.35))
+clr <- c("orange", "forestgreen")
+clr <- c(clr, adjustcolor(rev(clr), alpha = 0.3))
 bw <- rep(c("white", "black"), each=2)
 boxes(Lc,
       boxpos = list(x = c(15,85,15,85),
@@ -57,14 +58,18 @@ boxes(Lc,
      scale.R = 100,
      show.BE = TRUE,
       col.bg = clr[c(1,2,4,3)],
-     col.txt = bw,
+     col.txt = bw, lwd = 3,
   col.border = c(clr[1:2],
                  rep("black",2)))
 @ %
 
 %----------------------------------------------------------------------
 \begin{frame}
-  \includegraphics[height=\textheight,keepaspectratio]{simRenal-states-col}
+  \includegraphics[width=0.45\textwidth]{simRenal-states-col} \hfill
+% \end{frame}
+% %----------------------------------------------------------------------
+% \begin{frame}{Simulated probabilities}
+\includegraphics[width=0.50\textwidth]{simRenal-sP1}
 \end{frame}
 
 %----------------------------------------------------------------------
@@ -83,17 +88,15 @@ summary(sLc, t = T)
 %----------------------------------------------------------------------
 \begin{frame}[fragile]{Modeling rates in a multistate model}
 <<>>=
-# Rem-rate
+# Remission-rate
 mr <- gam(cbind(lex.Xst == "Rem", lex.dur)
           ~ s(tfi, k = 10) + sex,
           family = poisreg,
-            data = subset(sLc, lex.Cst == "NRA"))
-# ESRD-rates
-mx <- gam(cbind(lex.Xst %in% c("ESRD", "ESRD(Ren)"), lex.dur)
-          ~ s(tfi, k = 10) + sex + I((doe - dob - 40) / 10) +
-                                   I(lex.Cst == "Rem"),
-          family = poisreg,
-            data = subset(sLc, lex.Cst %in% c("NRA", "Rem")))
+          data = subset(sLc, lex.Cst == "NRA"))
+#
+mr <- gamLexis( sLc,
+                ~ s(tfi, k = 10) + sex,
+                to = "Rem" )
 @ %
 \end{frame}
 
@@ -101,13 +104,16 @@ mx <- gam(cbind(lex.Xst %in% c("ESRD", "ESRD(Ren)"), lex.dur)
 \begin{frame}[fragile]{\ldots using the \texttt{Lexis} properties}
 \vspace*{-1em}
 <<>>=
-# Remisson-rate
-mr <- gam.Lexis(sLc, from = "NRA", to = "Rem",
-                formula = ~ s(tfi, k = 10) + sex)
 # ESRD-rates
-mx <- gam.Lexis(sLc,
-                formula = ~ s(tfi,k=10) + sex +
-                            I((doe - dob - 40) / 10) + I(lex.Cst == "Rem"))
+mx <- gam(cbind(lex.Xst %in% c("ESRD", "ESRD(Rem)"), lex.dur)
+          ~ s(tfi, k = 10) + sex + I((doe - dob - 40) / 10) +
+                                   I(lex.Cst == "Rem"),
+          family = poisreg,
+            data = subset(sLc, lex.Cst %in% c("NRA", "Rem")))
+#
+mx <- gamLexis( sLc,
+                ~ s(tfi, k = 10) + sex + I((doe - dob - 40) / 10) +
+                                         lex.Cst )
 @ %
 \vspace*{-1em}
 Default is to model all transitions \textbf{to} absorbing states
@@ -138,7 +144,7 @@ Default is to model all transitions \textbf{to} absorbing states
    \end{itemize}
 \end{frame}
 
-%----------------------------------------------------------------------
+%'----------------------------------------------------------------------
 \begin{frame}
    \frametitle{Simulation of a survival time}
    \begin{itemize}[<+->]
@@ -277,11 +283,11 @@ init[1,"sex"] <- "M"
 init[1,"dob"] <- 1954
 init[1,"doe"] <- 1994
 init
-system.time(sim1 <- simLexis(Tr, init, N = 10000, t.range = 15.1))
+system.time( sim1 <- simLexis(Tr, init, N = 10000, t.range = 15.1) )
 summary(sim1)
 @ %
 \pause
-This is a simulated cohort of 10,000 persons with NRA aged 40 in 1994.
+This is a simulated cohort of 10,000 persons with NRA, aged 40 in 1994.
 \pause
 \end{frame}
 
@@ -296,8 +302,9 @@ sP1 <- pState(NN, perm = c(1, 2, 4, 3))
 head(sP1, 3)
 tail(sP1, 3)
 par(mar = c(3, 3, 0.5, 2), mgp = c(3, 1, 0) / 1.6, las = 1)
-plot(sP1, col = clr[c(2, 1, 4, 3)], xlim = c(0,15) )
+plot(sP1, col = clr[c(1, 2, 3, 4)], xlim = c(0,15) )
 lines(as.numeric(rownames(sP1)), sP1[,2], lwd = 2)
+axis(side = 1, at = 1:55, labels = NA, tcl = -0.3)
 axis(side = 4, at = 0:5 / 5)
 axis(side = 4, at = 0:10 / 10, labels = NA)
 axis(side = 4, at = 0:20 / 20, labels = NA, tcl = -0.3)
@@ -308,7 +315,8 @@ sP2 <- pState(NN, perm = c(4, 2, 1, 3))
 head(sP2, 3)
 tail(sP2, 3)
 par(mar = c(3, 3, 0.5, 2), mgp = c(3, 1, 0) / 1.6, las = 1)
-plot(sP2, col = clr[c(4, 1, 2, 3)])
+plot(sP2, col = clr[c(3, 2, 1, 4)])
+axis(side = 1, at = 1:55, labels = NA, tcl = -0.3)
 axis(side = 4, at = 0:5 / 5)
 axis(side = 4, at = 0:10 / 10, labels = NA)
 axis(side = 4, at = 0:20 / 20, labels = NA, tcl = -0.3)
@@ -349,6 +357,17 @@ axis(side = 4, at = 0:100/100, labels = NA, tcl = -0.2)
 \begin{frame}
    \frametitle{Precision of simulated probabilities}
 \includegraphics[width=0.75\textwidth]{./se-probs.pdf}
+\end{frame}
+
+%----------------------------------------------------------------------
+\begin{frame}[fragile,allowframebreaks]{Using a simulated
+    \texttt{Lexis} object --- sohourn time}
+<<>>=
+summary(sim1)
+xtabs(lex.dur / 10000 ~ lex.Cst, data = sim1) |> addmargins()
+@
+During the first 15 years after entry, the expected time in remission
+is 1.5 years out of an expected lifetime of 8.7 years, for a 40 year old man
 \end{frame}
 
 %----------------------------------------------------------------------

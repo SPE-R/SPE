@@ -91,10 +91,10 @@ Note patient 26, 33 and 42 obtain remission.
 \footnotesize
 \begin{verbatim}
 > Lr <- Lexis(entry = list(per = doe,
-+                          age = doe-dob,
++                          age = doe - dob,
 +                          tfi = 0),
 +              exit = list(per = dox),
-+       exit.status = event>0,
++       exit.status = event >0,
 +            states = c("NRA", "ESRD"),
 +              data = renal)
 > summary(Lr)
@@ -200,7 +200,7 @@ From  NRA Rem ESRD\alert<3>{ ESRD(Rem)}  Records:  Events: Risk time:  Persons:
 \footnotesize
 \begin{verbatim}
 > boxes(Lc, boxpos = list(x = c(15, 85, 15, 85),
-+                         y = c(85, 85, 20, 20)), 
++                         y = c(85, 85, 20, 20)),
 +          scale.R = 100)
 \end{verbatim}
 \normalsize
@@ -216,17 +216,23 @@ From  NRA Rem ESRD\alert<3>{ ESRD(Rem)}  Records:  Events: Risk time:  Persons:
   \item \textbf{Risk time} is the risk time in the ``From'' state
   \item \textbf{Events} are transitions to the ``To'' state
   \item All other transitions out of ``From'' are treated as \textbf{censorings}
-  \item Possible to fit models
+  \item Possible to fit models to \code{Lexis} objects
 
     \begin{itemize}
     \item separately for each transition
-    \item jointly for transitions from \textbf{different} states
-    \item jointly for different transitions out of the \textbf{same}
-      state: \textbf{don't!}  
+    \item jointly for transitions \textbf{from different} states \textbf{to the same} state
+    \item jointly for transitions \textbf{from the same} state \textbf{to different}
+      states: but \alert{don't!}
     \end{itemize}
-    
+
   \end{itemize}
 \end{frame}
+
+% %----------------------------------------------------------------------
+% \begin{frame}{A more complicated multistate model}
+% \vspace*{-1em}
+% \includegraphics[width=0.82\textwidth]{./GbAd-states.pdf}
+% \end{frame}
 
 % %----------------------------------------------------------------------
 % \begin{frame}
@@ -283,8 +289,8 @@ Note $\mu_\text{rem}$ could also depend on $u$, time since obtained remission.
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile]
-  Sketch of programming, assuming that 
-$\lambda$ (\texttt{lambda}), 
+  Sketch of programming, assuming that
+$\lambda$ (\texttt{lambda}),
 $\mu_\text{NRA}$ (\texttt{mu.nra}) and
 $\mu_\text{rem}$ (\texttt{mu.rem}) are known at any age (stored in vectors)
 \renewcommand{\baselinestretch}{0.85}
@@ -295,7 +301,7 @@ c.mort.nra <- cumsum(mu.nra)
 c.mort.rem <- cumsum(mu.rem)
 pr1 <- cumsum(lambda * exp(-(c.rem + c.mort.nra)))
 
-intgr(t,s) <- 
+intgr(t,s) <-
 function(t,s){
 lambda[s] * exp(-(c.rem[s] + c.mort.nra[s])) *
             exp(-(c.mort.rem[t] - c.mort.rem[s]))
@@ -305,7 +311,10 @@ for(t in 1:100) p2[t] <- sum(intgr(t,1:t))
 \normalsize
 \renewcommand{\baselinestretch}{1.00}
 If $\mu_\text{rem}$ also depends on time since remission, then
-\texttt{c.mort.rem} should have an extra argument---technically very complicated
+\texttt{c.mort.rem} should have an extra argument---technically very
+complicated
+
+Analytical approach is not recommended --- simulation is simpler
 \end{frame}
 
 % %----------------------------------------------------------------------
