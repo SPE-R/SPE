@@ -1,7 +1,6 @@
 library(Epi)
 library(scales)
 
-
 calfit <- function(model) {
     fit <- predict(model, se.fit=TRUE)
     fit$lower <- fit$fit - fit$se.fit
@@ -24,9 +23,6 @@ calterm2 <- function(gestwks) {
         right=FALSE)
 }
 
-newdata <- data.frame(gestwks = seq(from=min(births$gestwks), to=max(births$gestwks), length=1001))
-newdata$term <- calterm(newdata$gestwks)
-newdata$term2 <- calterm2(newdata$gestwks)
                       
 plotfit <- function(model) {
     fit <- predict(model, newdata=newdata, se.fit=TRUE)
@@ -43,39 +39,53 @@ births <- births[order(births$gestwks),]
 births$term <- calterm(births$gestwks)
 births$term2 <- calterm2(births$gestwks)
 
+newdata <- data.frame(gestwks = seq(from=min(births$gestwks), to=max(births$gestwks), length=1001))
+newdata$term <- calterm(newdata$gestwks)
+newdata$term2 <- calterm2(newdata$gestwks)
+
 ### Linear model
 lm.linear <- lm(bweight ~ gestwks, data=births)
+pdf("births-linear.pdf")
 plot(bweight ~ gestwks, data=births,
      xlab="Gestation weeks", ylab="Birth weight (g)",
      col=grey(0.5))
 plotfit(lm.linear)
+dev.off()
 
 ## Polynomial model
 lm.poly <- lm(bweight ~ poly(gestwks,3), data=births)
+pdf("births-poly.pdf")
 plot(bweight ~ gestwks, data=births,
      xlab="Gestation weeks", ylab="Birth weight (g)",
      col=grey(0.5))
 plotfit(lm.poly)
+dev.off()
 
 ## Stepwise model
 lm.step <- glm(bweight ~ term, data=births)
+pdf("births-step1.pdf")
 plot(bweight ~ gestwks, data=births,
      xlab="Gestation weeks", ylab="Birth weight (g)",
      col=grey(0.5))
 plotfit(lm.step)
+dev.off()
 
 ## Stepwise model
 lm.step2 <- glm(bweight ~ term2, data=births)
+pdf("births-step2.pdf")
 plot(bweight ~ gestwks, data=births,
      xlab="Gestation weeks", ylab="Birth weight (g)",
      col=grey(0.5))
 plotfit(lm.step2)
+dev.off()
 
 ## GAM
 library(mgcv)
 gam.out <- gam(bweight ~ s(gestwks), data=births)
+pdf("births-gam.pdf")
 plot(bweight ~ gestwks, data=births,
      xlab="Gestation weeks", ylab="Birth weight (g)",
      col=grey(0.5))
 plotfit(gam.out)
+dev.off()
 
