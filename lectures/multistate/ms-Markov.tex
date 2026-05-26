@@ -7,58 +7,50 @@
       ``diseased'', with no intermediate state.
     \item The disease is \textbf{irreversible}, or requires
       intervention to be cured.
-    \item The time of disease incidence is known \textbf{exactly}.
     \item The disease is \textbf{accurately} diagnosed.
+    \item The time of disease incidence is known \textbf{exactly}.
     \end{enumerate}
     \pause
     These assumptions are true for \alert{death} and many
     \alert{chronic diseases}.
     \pause
-    
-    A question of definition:\\ -- consider occurrence of \textbf{recording of} a
+
+    A question of definition:\\ ---we use occurrence of \textbf{recording of} a
     given disease
 \end{frame}
 
-% %----------------------------------------------------------------------
-% \begin{frame}{Is the disease a dichotomy?}
-%   A disease may be preceded by a \alert{sub-clinical} phase before it shows
-%   symptoms.
-%   \pause
-%   \begin{center}
-%     \begin{tabular}{ll}
-%       {\bf AIDS} & Decline in CD4 count \\
-%       {\bf Cancer} & Pre-cancerous lesions \\
-%       {\bf Type 2 Diabetes} & Impaired glucose tolerance \\
-%     \end{tabular}
-%   \end{center}
-%   \pause
-%   Or a disease may be classified into \alert{degrees of severity}
-%   (mild, moderate, severe).
-% \end{frame}
-
 %----------------------------------------------------------------------
-\begin{frame}{A model for cervical cancer}
-  Invasive squamous cell cancer of the cervix is preceded by
-  cervical intraepithelial neoplasia (CIN)\\[-1.5em]
-%\hspace*{-1em}
-\includegraphics<1-2|handout:0>[width=1.1\textwidth,keepaspectratio]{cervical2}
-\includegraphics<3|handout:0>[width=1.1\textwidth,keepaspectratio]{cervical3}
-\includegraphics<4-|handout:1>[width=1.1\textwidth,keepaspectratio]{cervical4}\\[-1.5em]
-
-\pause Purpose of a screening programme is to detect and treat
-CIN --- status of persons obtained at screening dates
-
-\pause \alert<5->{Aim} of the modeling the \alert<3>{transition rates}
-  between \alert<4>{states},
-  is to be able predict how population moves between
-  \alert<4>{states}
-  
-\pause \pause 
+\begin{frame}{Accurate event dates?}
   \begin{itemize}
-    \item Transition rates between states
-    \item Probability of state occupancy
+    \item \textbf{Accurate dates of transition}:\\
+      complete observation of the process\\
+      all times and types of transitions between states are known
+    \item \textbf{Panel data}\\
+      states known at certain times for each person\\
+      not necessarily the same times for different persons
+    \item Panel data is analyzed with the \code{msm} package\\
+      this represetation not treated further here
   \end{itemize}
 \end{frame}
+
+%% %----------------------------------------------------------------------
+%% \begin{frame}{A model for cervical cancer}
+%%   Invasive squamous cell cancer of the cervix is preceded by
+%%   cervical intraepithelial neoplasia (CIN)\\[-1.5em]
+%% %\hspace*{-1em}
+%% \includegraphics<1-2|handout:0>[width=1.1\textwidth,keepaspectratio]{cervical2}
+%% \includegraphics<3|handout:0>[width=1.1\textwidth,keepaspectratio]{cervical3}
+%% \includegraphics<4-|handout:1>[width=1.1\textwidth,keepaspectratio]{cervical4}\\[-1.5em]
+
+%% \pause Purpose of a screening programme is to detect and treat
+%% CIN --- status of persons obtained at screening dates
+
+%% \pause \alert<5->{Aim} of the modeling the \alert<3>{transition rates}
+%%   between \alert<4>{states},
+%%   is to be able predict how population moves between
+%%   \alert<4>{states}
+
+%% \end{frame}
 
 % %----------------------------------------------------------------------
 % \begin{frame}
@@ -136,16 +128,21 @@ CIN --- status of persons obtained at screening dates
 
 %----------------------------------------------------------------------
 \begin{frame}{Markov models for multistate processes}
-  The natural generalization of Poisson regression to multiple
-    disease states:
-  \pause
+  % The natural generalization of Poisson regression to multiple
+  %   disease states:  \pause
     \begin{itemize}
-    \item transition between states depends \textbf{only} on current state
+    \item transition \textbf{probability} between two states
+    ($\textcolor{blue}{\mathtt{A}}\rightarrow
+      \textcolor{blue}{\mathtt{B}}$) depends only on current
+      state through $\textcolor{red}{t} - \textcolor{red}{s}$:
+\[\ptxt{state \textcolor{blue}{\texttt{B}} at \textcolor{red}{$t$} |
+        state \textcolor{blue}{\texttt{A}} at \textcolor{red}{$s$}} =
+    f(\textcolor{red}{t} - \textcolor{red}{s})\]
     \item --- this is the \textbf{Markov} property
-    \item $\Rightarrow$ transition rates are constant over time
+    \item $\Rightarrow$ transition \textbf{rates} are constant over time
     \item (time-fixed) covariates may influence transition rates
     \item the formal Markov property is \textbf{very} restrictive
-    \item in the clinical litterature ``Markov model'' is often used
+    \item in the clinical litterature, the term ``Markov model'' is often used
       about any type of multistate model
     \end{itemize}
 \end{frame}
@@ -172,7 +169,16 @@ CIN --- status of persons obtained at screening dates
       \item disease status at death (prev.CVD, prev.Can, neither)
       \end{itemize}
 
+    \item Types of parameters to target:
+
+  \begin{itemize}
+    \item \textcolor{forestgreen}{\textbf{Transition}} \textcolor{orange}{\textbf{rates}} between states
+    \item \textcolor{orange}{\textbf{Probability}} of \textcolor{forestgreen}{\textbf{state occupancy}}
+    \item Expected \textcolor{forestgreen}{\textbf{sojourn}} \textcolor{orange}{\textbf{time}} in a state
   \end{itemize}
+
+  \end{itemize}
+
 \end{frame}
 
 %----------------------------------------------------------------------
@@ -267,7 +273,7 @@ CIN --- status of persons obtained at screening dates
   \item Assume transition rates constant in small time intervals,
     $\lambda^{\mathtt{A}\rightarrow\mathtt{B}}$
   \item $\Rightarrow$ each interval for a person contributes term(s)
-    to the likelihood
+    to the log-likelihood
   \item one term for each possible transition to a subsequent state
   \item the total log-likelihood for person $p$ in state \texttt{A}
     during interval $i$ is a
@@ -276,7 +282,8 @@ CIN --- status of persons obtained at screening dates
       \log(\lambda^{\mathtt{A}\rightarrow\mathtt{B}}_{pi})-
            \lambda^{\mathtt{A}\rightarrow\mathtt{B}}_{pi}y_{pi}\big)$}
   \item $\Rightarrow$ each term has the form of the likelihood for a\\
-    Poisson variate \alert<6>{$d$} with mean \alert<6>{$\lambda y$}
+    Poisson variate \alert<6>{$d$} with mean \alert<6>{$\lambda y$}:
+    \alert<6>{$d\,\log(\lambda) - \lambda y$}
   \end{itemize}
 \end{frame}
 
@@ -286,9 +293,9 @@ CIN --- status of persons obtained at screening dates
     \item each term has the form of the likelihood for a Poisson
       variate $d$ with mean $\lambda y$
   \item terms are \textbf{not} independent, but the total
-    likelihood is a product; hence of the same form as the
-    likelihood from independent Poisson variates
-  \item but observations from intervals from one person are\\
+    likelihood is a \textbf{product}; hence of the same form as the
+    likelihood from independent (Poisson) variates
+  \item but terms from intervals within one person are\\
     neither Poisson nor independent
   \end{itemize}
 \end{frame}
@@ -296,11 +303,11 @@ CIN --- status of persons obtained at screening dates
 %----------------------------------------------------------------------
 \begin{frame}{Realms of multistate modeling}
   \begin{itemize}
-  \item intensities --- dimension \alert<4>{$\textrm{time}^{-1}$}\\
+  \item transition rates (intensities) --- dimension \alert<4>{$\textrm{time}^{-1}$}\\
     this is the scale of observation, $(d,y)$ (complete data)
   \item state probabilities --- dimensionless, \alert<4>{$\textrm{time}^{0}$}\\
     \alert<4>{integral} of intensities w.r.t. to time
-  \item sojourn times --- dimension \alert<4>{$\textrm{time}^{1}$}\\ 
+  \item sojourn times --- dimension \alert<4>{$\textrm{time}^{1}$}\\
     \alert<4>{integral} of state probabilities w.r.t. to time
   \end{itemize}
 \end{frame}
@@ -326,14 +333,14 @@ CIN --- status of persons obtained at screening dates
 %----------------------------------------------------------------------
 \begin{frame}{Computing state probabilities\newline from intensities in multistate models}
   \begin{itemize}
-  \item time-homogeneous Markov model:\\closed-form formulae exist 
+  \item time-homogeneous Markov model:\\closed-form formulae exist
   \item time-\textbf{in}homogeneous Markov model:\\closed-form
     formulae exist (a bit more complicated)
-  \item \textbf{semi}-Markov model:\\no closed form formulae exist  
-  \item general multistate model:\\no closed form formulae exist  
+  \item \textbf{semi}-Markov model:\\no closed form formulae exist
+  \item general multistate model:\\no closed form formulae exist
   \end{itemize}
   \pause
   No formulae means that any inference on state probabilities and sojourn
-  times must be based on \textbf{simulation} from the model.
+  times must be based on (micro)\textbf{simulation} from the model.
 \end{frame}
 

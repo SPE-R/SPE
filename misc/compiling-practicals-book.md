@@ -1,49 +1,56 @@
 Compiling SPE-R practicals book
-=====================
+===============================
 
-## Preamble
+This is a short reference about the structure of the practicals book and how
+to render individual chapters. For the full faculty workflow (GitHub setup,
+daily git actions, building the whole book locally, what to edit), see
+[`SPE_faculty_setup.md`](SPE_faculty_setup.md).
 
-A new version of the practicals book based on markdown/bookdown is available in `pracs-book` directory. The master file is `_bookdown.yml` where the parameter `rmd_files:` indicate the chapter order based on individual files names. This is the files you should edit.
+## Where chapter order is defined
 
-```markdown
-rmd_files: ["index.Rmd", 
+The book is assembled by `bookdown` from the files listed in
+[`pracs-book/_bookdown.yml`](../pracs-book/_bookdown.yml) under the
+`rmd_files:` key. The order in that list is the order chapters appear in the
+book.
+
+```yaml
+rmd_files: [
+  "index.Rmd",
   "basic-e.rmd", "dinput-e.rmd",
   "tidyverse-e.rmd", "tab-e.rmd", "graph-intro-e.rmd", "rates-rrrd-e.rmd",
   "effects-e.rmd", "cont-eff-e.rmd", "causal-e.rmd",
-  "graphics-e.rmd", "oral-e.rmd", "DMDK-e.rmd", "occoh-caco-e.rmd",
-  "causInf2-e.rmd", "renal-e.rmd"]
+  "ggplot2-e.rmd", "oral-e.rmd", "DMDK-e.rmd", "occoh-caco-e.rmd",
+  "causInf2-e.rmd", "renal-e.rmd"
+]
 ```
 
-## Compiling the files
+If you add a new practical, drop the `.rmd` file in `pracs-book/` and add its
+filename to that list at the position you want it to appear in. The
+"with-solutions" book has its own list in
+[`pracs-book/_bookdown-sol.yml`](../pracs-book/_bookdown-sol.yml) — keep both
+lists in sync.
 
-When you are working on a file and you want to check the render ou could click on `Knit` button in `Rstudio`.
+## Rendering a single chapter
 
-![](SPE_git-quick_start-images/compiling-practicals-book-001.png)
+While you're editing one practical, the fastest feedback loop is to render
+just that one file. In RStudio, open the `.rmd` file and click **Knit** (use
+the down-arrow next to it to pick HTML, PDF, or Word).
 
-Note that you can choose the output format clicking on the down arrow just right to the button.
+From the command line, equivalently:
 
-Compiling individual files is handy when you are developing/editing your own practical.
-
-That being said, It is advise also to try to compile the entire book before to `push` your files online
-
-## Compiling the book
-
-If you want to compile the book you should use `bookdown` package (see. <https://bookdown.org/yihui/bookdown/> for a detailed guide)
-
-To compile the `HTML` version just type:
-
-```r 
-options(knitr.duplicate.label = "allow")
-bookdown::render_book('pracs-book/', 'bookdown::gitbook', clean = TRUE, new_session = TRUE)
+```bash
+make -f pracs-book/Makefile preview CHAPTER=basic-e.rmd
 ```
 
-For the `pdf` one:
+This produces a standalone preview of the chapter — useful for iterating on
+your text and code chunks without paying the cost of a full book build.
 
-```r
-options(knitr.duplicate.label = "allow")
-bookdown::render_book('pracs-book/', 'bookdown::pdf_book', clean = TRUE, new_session = TRUE)
-```
+## Rendering the full book
 
-This will create a `SPE-R-2024-practicals` directory in which all the needed compiled files are stored.
+See [section 4 of the faculty setup guide](SPE_faculty_setup.md#4-build-the-book-locally)
+for the `make` targets (`html`, `pdf`, `html-sol`, `pdf-sol`, `clean`).
 
-To open the website, open `SPE-R-2024-practicals/index.html` file in your web browser. To open the \`pdf\` version of the book, open `SPE-R-2024-practicals/SPE-R-2024-practicals.pdf`
+**Important**: if a full render fails midway, run `make -f pracs-book/Makefile clean`
+before retrying. Bookdown leaves a half-written merged `.Rmd` in the
+`pracs-book/` directory after a failed run; subsequent renders pick that up
+instead of rebuilding from your edited sources, which can be very confusing.
