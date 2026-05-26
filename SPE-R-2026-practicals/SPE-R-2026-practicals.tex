@@ -6442,7 +6442,7 @@ If you are not happy with the outcome, run the command line again and repeat the
 
 \chapter{Time-splitting, time-scales and SMR}\label{time-splitting-time-scales-and-smr}
 
-This exercise is about mortaity among Danish Diabetes patients. It is
+This exercise is about mortality among Danish Diabetes patients. It is
 based on the dataset \texttt{DMlate}, a random sample of 10,000
 patients from the Danish Diabetes Register (scrambeled dates), all
 with date of diagnosis after 1994.
@@ -6453,8 +6453,8 @@ Start by loading the relevant packages:
 \begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(Epi)}
 \FunctionTok{library}\NormalTok{(popEpi)}
-\FunctionTok{library}\NormalTok{(mgcv)}
-\FunctionTok{library}\NormalTok{(tidyverse)}
+\FunctionTok{library}\NormalTok{(mgcv, }\AttributeTok{quietly =} \ConstantTok{TRUE}\NormalTok{)}
+\FunctionTok{library}\NormalTok{(tidyverse, }\AttributeTok{quietly =} \ConstantTok{TRUE}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6499,11 +6499,11 @@ the help page:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{LL }\OtherTok{\textless{}{-}} \FunctionTok{Lexis}\NormalTok{(}\AttributeTok{entry =} \FunctionTok{list}\NormalTok{(}\AttributeTok{A =}\NormalTok{ dodm }\SpecialCharTok{{-}}\NormalTok{ dobth, }
-                         \AttributeTok{P =}\NormalTok{ dodm, }
+\NormalTok{LL }\OtherTok{\textless{}{-}} \FunctionTok{Lexis}\NormalTok{(}\AttributeTok{entry =} \FunctionTok{list}\NormalTok{(}\AttributeTok{A =}\NormalTok{ dodm }\SpecialCharTok{{-}}\NormalTok{ dobth,}
+                         \AttributeTok{P =}\NormalTok{ dodm,}
                        \AttributeTok{dur =} \DecValTok{0}\NormalTok{),}
              \AttributeTok{exit =} \FunctionTok{list}\NormalTok{(}\AttributeTok{P =}\NormalTok{ dox),}
-      \AttributeTok{exit.status =} \FunctionTok{factor}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(dodth), }
+      \AttributeTok{exit.status =} \FunctionTok{factor}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(dodth),}
                            \AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Alive"}\NormalTok{, }\StringTok{"Dead"}\NormalTok{)),}
              \AttributeTok{data =}\NormalTok{ DMlate)}
 \end{Highlighting}
@@ -6513,6 +6513,22 @@ the help page:
 \begin{Highlighting}[]
 \NormalTok{NOTE: entry.status has been set to "Alive" for all.}
 \NormalTok{NOTE: Dropping  4  rows with duration of follow up \textless{} tol}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(LL)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\NormalTok{Transitions:}
+\NormalTok{     To}
+\NormalTok{From    Alive Dead Records: Events: Risk time: Persons:}
+\NormalTok{  Alive  7497 2499     9996    2499      54273     9996}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6528,8 +6544,8 @@ the help page:
 \FunctionTok{stat.table}\NormalTok{(sex,}
            \FunctionTok{list}\NormalTok{(}\AttributeTok{D =} \FunctionTok{sum}\NormalTok{(lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{),}
                 \AttributeTok{Y =} \FunctionTok{sum}\NormalTok{(lex.dur),}
-             \AttributeTok{rate =} \FunctionTok{ratio}\NormalTok{(lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{, }
-\NormalTok{                          lex.dur, }
+             \AttributeTok{rate =} \FunctionTok{ratio}\NormalTok{(lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{,}
+\NormalTok{                          lex.dur,}
                           \DecValTok{1000}\NormalTok{)),}
           \AttributeTok{margins =} \ConstantTok{TRUE}\NormalTok{,}
              \AttributeTok{data =}\NormalTok{ LL)}
@@ -6551,10 +6567,10 @@ the help page:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# stat.table is more versatile than xtabs:}
+\CommentTok{\# a less versatile alternative is xtabs:}
 \FunctionTok{xtabs}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(}\AttributeTok{D =}\NormalTok{ lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{,}
-            \AttributeTok{Y =}\NormalTok{ lex.dur) }
-      \SpecialCharTok{\textasciitilde{}}\NormalTok{ sex, }
+            \AttributeTok{Y =}\NormalTok{ lex.dur)}
+      \SpecialCharTok{\textasciitilde{}}\NormalTok{ sex,}
       \AttributeTok{data =}\NormalTok{ LL)}
 \end{Highlighting}
 \end{Shaded}
@@ -6582,9 +6598,25 @@ the help page:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{SL }\OtherTok{\textless{}{-}} \FunctionTok{splitLexis}\NormalTok{(LL, }
-                 \AttributeTok{breaks =} \FunctionTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{125}\NormalTok{, }\DecValTok{1} \SpecialCharTok{/} \DecValTok{2}\NormalTok{), }
+\NormalTok{SL }\OtherTok{\textless{}{-}} \FunctionTok{splitLexis}\NormalTok{(LL,}
+                 \AttributeTok{breaks =} \FunctionTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{125}\NormalTok{, }\DecValTok{1} \SpecialCharTok{/} \DecValTok{2}\NormalTok{),}
              \AttributeTok{time.scale =} \StringTok{"A"}\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(LL)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\NormalTok{Transitions:}
+\NormalTok{     To}
+\NormalTok{From    Alive Dead Records: Events: Risk time: Persons:}
+\NormalTok{  Alive  7497 2499     9996    2499      54273     9996}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{summary}\NormalTok{(SL)}
 \end{Highlighting}
 \end{Shaded}
@@ -6614,9 +6646,32 @@ the help page:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{r.m }\OtherTok{\textless{}{-}}\NormalTok{ mgcv}\SpecialCharTok{::}\FunctionTok{gam}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{, lex.dur) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{k =} \DecValTok{20}\NormalTok{),}
+\NormalTok{r.m }\OtherTok{\textless{}{-}}\NormalTok{ mgcv}\SpecialCharTok{::}\FunctionTok{gam}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{, lex.dur) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{k =} \DecValTok{10}\NormalTok{),}
                  \AttributeTok{family =}\NormalTok{ poisreg,}
                    \AttributeTok{data =} \FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"M"}\NormalTok{))}
+\FunctionTok{summary}\NormalTok{(r.m)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\NormalTok{Family: poisson }
+\NormalTok{Link function: log }
+
+\NormalTok{Formula:}
+\NormalTok{cbind(lex.Xst == "Dead", lex.dur) \textasciitilde{} s(A, k = 10)}
+
+\NormalTok{Parametric coefficients:}
+\NormalTok{            Estimate Std. Error z value Pr(\textgreater{}|z|)}
+\NormalTok{(Intercept)    {-}3.53       0.05   {-}70.6   \textless{}2e{-}16}
+
+\NormalTok{Approximate significance of smooth terms:}
+\NormalTok{      edf Ref.df Chi.sq p{-}value}
+\NormalTok{s(A) 4.34   5.33   1017  \textless{}2e{-}16}
+
+\NormalTok{R{-}sq.(adj) =  0.00313   Deviance explained = 9.13\%}
+\NormalTok{UBRE = {-}0.80407  Scale est. = 1         n = 60347}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6628,7 +6683,7 @@ the help page:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{r.m }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"M"}\NormalTok{), }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{k =} \DecValTok{20}\NormalTok{))}
+\NormalTok{r.m }\OtherTok{\textless{}{-}} \FunctionTok{gamLexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"M"}\NormalTok{), }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{k =} \DecValTok{10}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6642,7 +6697,7 @@ the help page:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{r.f }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"F"}\NormalTok{), }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{k =} \DecValTok{20}\NormalTok{))}
+\NormalTok{r.f }\OtherTok{\textless{}{-}} \FunctionTok{gamLexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"F"}\NormalTok{), }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{k =} \DecValTok{10}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6658,9 +6713,10 @@ the help page:
   \texttt{ci.pred} that computes predicted rates and confidence
   limits for these.
 
-  \texttt{glm.Lexis} and \texttt{gam.Lexis} use the \texttt{poisreg} family that will return
+  \texttt{glm.Lexis} and \texttt{gamLexis} use the \texttt{poisreg} family that will return
   the rates in the (inverse) units in which the person-years were
-  given; that is the units in which \texttt{lex.dur} is recorded.
+  given; that is the units in which \texttt{lex.dur} is recorded---in
+  this case 1 year.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6673,7 +6729,7 @@ the help page:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{ num [1:141, 1:3] 0.00132 0.00137 0.00142 0.00147 0.00152 ...}
+\NormalTok{ num [1:141, 1:3] 0.00132 0.00137 0.00142 0.00146 0.00152 ...}
 \NormalTok{ {-} attr(*, "dimnames")=List of 2}
 \NormalTok{  ..$ : chr [1:141] "1" "2" "3" "4" ...}
 \NormalTok{  ..$ : chr [1:3] "Estimate" "2.5\%" "97.5\%"}
@@ -6688,7 +6744,7 @@ the help page:
     \FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\FloatTok{3.5}\NormalTok{,}\FloatTok{3.5}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{),}
         \AttributeTok{mgp =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{) }\SpecialCharTok{/} \FloatTok{1.6}\NormalTok{,}
         \AttributeTok{las =} \DecValTok{1}\NormalTok{,}
-        \AttributeTok{bty =} \StringTok{"n"}\NormalTok{, }
+        \AttributeTok{bty =} \StringTok{"n"}\NormalTok{,}
        \AttributeTok{lend =} \StringTok{"butt"}\NormalTok{)}
 \FunctionTok{matplot}\NormalTok{(nd}\SpecialCharTok{$}\NormalTok{A, }\FunctionTok{cbind}\NormalTok{(p.m, p.f) }\SpecialCharTok{*} \DecValTok{1000}\NormalTok{,}
         \AttributeTok{type =} \StringTok{"l"}\NormalTok{,}
@@ -6696,9 +6752,35 @@ the help page:
          \AttributeTok{lwd =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{),}
          \AttributeTok{lty =} \DecValTok{1}\NormalTok{,}
          \AttributeTok{log =} \StringTok{"y"}\NormalTok{, }\AttributeTok{yaxt =} \StringTok{"n"}\NormalTok{,}
-        \AttributeTok{xlab =} \StringTok{"Age"}\NormalTok{, }
+        \AttributeTok{xlab =} \StringTok{"Age"}\NormalTok{,}
         \AttributeTok{ylab =} \StringTok{"Mortality per 1000 PY"}\NormalTok{)}
-\FunctionTok{axis}\NormalTok{(}\AttributeTok{side =} \DecValTok{2}\NormalTok{, }
+\FunctionTok{axis}\NormalTok{(}\AttributeTok{side =} \DecValTok{2}\NormalTok{,}
+     \AttributeTok{at =}\NormalTok{ ll }\OtherTok{\textless{}{-}} \FunctionTok{outer}\NormalTok{( }\FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{10}\NormalTok{, }\DecValTok{20}\NormalTok{), }\SpecialCharTok{{-}}\DecValTok{1}\SpecialCharTok{:}\DecValTok{1}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(x,y) x }\SpecialCharTok{*} \DecValTok{10}\SpecialCharTok{\^{}}\NormalTok{y),}
+     \AttributeTok{labels =}\NormalTok{ ll)}
+\end{Highlighting}
+\end{Shaded}
+
+  The \texttt{axis} statement is a trick to get the labels on the \(y\)-axis
+  without ``.0''s.
+  \texttt{matshade} assumes that curves are added to an existing plot, so
+  the \texttt{plot=TRUE} must be supplied to create a new plot:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+    \FunctionTok{par}\NormalTok{(}\AttributeTok{mar =} \FunctionTok{c}\NormalTok{(}\FloatTok{3.5}\NormalTok{,}\FloatTok{3.5}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{),}
+        \AttributeTok{mgp =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{0}\NormalTok{) }\SpecialCharTok{/} \FloatTok{1.6}\NormalTok{,}
+        \AttributeTok{las =} \DecValTok{1}\NormalTok{,}
+        \AttributeTok{bty =} \StringTok{"n"}\NormalTok{,}
+       \AttributeTok{lend =} \StringTok{"butt"}\NormalTok{)}
+   \FunctionTok{matshade}\NormalTok{(nd}\SpecialCharTok{$}\NormalTok{A, }\FunctionTok{cbind}\NormalTok{(p.m, p.f) }\SpecialCharTok{*} \DecValTok{1000}\NormalTok{, }\AttributeTok{plot =} \ConstantTok{TRUE}\NormalTok{,}
+        \AttributeTok{type =} \StringTok{"l"}\NormalTok{,}
+         \AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{, }\StringTok{"red"}\NormalTok{),}
+         \AttributeTok{lwd =} \DecValTok{3}\NormalTok{,}
+         \AttributeTok{lty =} \DecValTok{1}\NormalTok{,}
+         \AttributeTok{log =} \StringTok{"y"}\NormalTok{, }\AttributeTok{yaxt =} \StringTok{"n"}\NormalTok{,}
+        \AttributeTok{xlab =} \StringTok{"Age"}\NormalTok{,}
+        \AttributeTok{ylab =} \StringTok{"Mortality per 1000 PY"}\NormalTok{)}
+\FunctionTok{axis}\NormalTok{(}\AttributeTok{side =} \DecValTok{2}\NormalTok{,}
      \AttributeTok{at =}\NormalTok{ ll }\OtherTok{\textless{}{-}} \FunctionTok{outer}\NormalTok{( }\FunctionTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{10}\NormalTok{, }\DecValTok{20}\NormalTok{), }\SpecialCharTok{{-}}\DecValTok{1}\SpecialCharTok{:}\DecValTok{1}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(x,y) x }\SpecialCharTok{*} \DecValTok{10}\SpecialCharTok{\^{}}\NormalTok{y),}
      \AttributeTok{labels =}\NormalTok{ ll)}
 \end{Highlighting}
@@ -6712,12 +6794,11 @@ the help page:
   cubic splines instead of thin plate (\texttt{"tp"}) splines which is
   the default.
 
-  As before specify the model exploiting the \texttt{Lexis} class
-  of the dataset, try:
+  As before specify the model exploiting the \texttt{Lexis} class of the dataset, try:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{Mcr }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"M"}\NormalTok{),}
+\NormalTok{Mcr }\OtherTok{\textless{}{-}} \FunctionTok{gamLexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"M"}\NormalTok{),}
                  \SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
                    \FunctionTok{s}\NormalTok{(P, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
                  \FunctionTok{s}\NormalTok{(dur, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{))}
@@ -6768,7 +6849,7 @@ the help page:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{Fcr }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"F"}\NormalTok{),}
+\NormalTok{Fcr }\OtherTok{\textless{}{-}} \FunctionTok{gamLexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"F"}\NormalTok{),}
                  \SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
                    \FunctionTok{s}\NormalTok{(P, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
                  \FunctionTok{s}\NormalTok{(dur, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{))}
@@ -6822,17 +6903,9 @@ the help page:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{))}
-\FunctionTok{plot}\NormalTok{(Mcr, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{3}\NormalTok{, }\DecValTok{3}\NormalTok{))}
-\FunctionTok{plot}\NormalTok{(Fcr, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{3}\NormalTok{, }\DecValTok{3}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \FunctionTok{par}\NormalTok{(}\AttributeTok{mfcol =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{2}\NormalTok{))}
-\FunctionTok{plot}\NormalTok{(Mcr, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{3}\NormalTok{, }\DecValTok{3}\NormalTok{))}
-\FunctionTok{plot}\NormalTok{(Fcr, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{3}\NormalTok{, }\DecValTok{3}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(Mcr, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{3}\NormalTok{, }\DecValTok{3}\NormalTok{), }\AttributeTok{col =} \StringTok{"blue"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(Fcr, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{3}\NormalTok{, }\DecValTok{3}\NormalTok{), }\AttributeTok{col =} \StringTok{"red"}\NormalTok{ , }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6855,10 +6928,31 @@ the help page:
 \NormalTok{    bs = "cr", k = 10) + s(P, bs = "cr", k = 10) + s(dur, bs = "cr", }
 \NormalTok{    k = 10)}
 \NormalTok{Model 2: cbind(trt(Lx$lex.Cst, Lx$lex.Xst) \%in\% trnam, Lx$lex.dur) \textasciitilde{} s(A, }
-\NormalTok{    k = 20)}
+\NormalTok{    k = 10)}
 \NormalTok{  Resid. Df Resid. Dev    Df Deviance Pr(\textgreater{}Chi)}
 \NormalTok{1     60332      11717                        }
-\NormalTok{2     60340      11812 {-}7.95    {-}95.1   \textless{}2e{-}16}
+\NormalTok{2     60341      11813 {-}8.62    {-}95.9   \textless{}2e{-}16}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(Fcr, r.f, }\AttributeTok{test =} \StringTok{"Chisq"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Analysis of Deviance Table}
+
+\NormalTok{Model 1: cbind(trt(Lx$lex.Cst, Lx$lex.Xst) \%in\% trnam, Lx$lex.dur) \textasciitilde{} s(A, }
+\NormalTok{    bs = "cr", k = 10) + s(P, bs = "cr", k = 10) + s(dur, bs = "cr", }
+\NormalTok{    k = 10)}
+\NormalTok{Model 2: cbind(trt(Lx$lex.Cst, Lx$lex.Xst) \%in\% trnam, Lx$lex.dur) \textasciitilde{} s(A, }
+\NormalTok{    k = 10)}
+\NormalTok{  Resid. Df Resid. Dev    Df Deviance Pr(\textgreater{}Chi)}
+\NormalTok{1     58112      10204                        }
+\NormalTok{2     58122      10268 {-}9.46    {-}63.4  4.8e{-}10}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6871,25 +6965,26 @@ the help page:
   they are not, as the three time scales advance simultaneously at the
   same pace.
 
-  The reporting would therefore more naturally be on the
+  The reporting should therefore more naturally be showing predicted rates on the
   mortality scale as a function of age, but showing the mortality
   for persons diagnosed in different ages, using separate displays
   for separate years of diagnosis.
+
   This is most easily done using the \texttt{ci.pred} function with
   the \texttt{newdata\ =} argument. So a person diagnosed in age 50 in
   1995 will have a mortality measured in cases per 1000 PY as:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{pts }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{12}\NormalTok{, }\DecValTok{1}\SpecialCharTok{/}\DecValTok{4}\NormalTok{)}
-\NormalTok{nd }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{A =} \DecValTok{50}   \SpecialCharTok{+}\NormalTok{ pts, }
-                 \AttributeTok{P =} \DecValTok{1995} \SpecialCharTok{+}\NormalTok{ pts, }
+\NormalTok{pts }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{12}\NormalTok{, }\DecValTok{1}\SpecialCharTok{/}\DecValTok{4}\NormalTok{) }\CommentTok{\# times since entry (date of diabetes)}
+\NormalTok{nd }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{A =} \DecValTok{50}   \SpecialCharTok{+}\NormalTok{ pts,}
+                 \AttributeTok{P =} \DecValTok{1995} \SpecialCharTok{+}\NormalTok{ pts,}
                \AttributeTok{dur =}\NormalTok{        pts)}
 \NormalTok{m.pr }\OtherTok{\textless{}{-}} \FunctionTok{ci.pred}\NormalTok{(Mcr, }\AttributeTok{newdata =}\NormalTok{ nd)}
 \end{Highlighting}
 \end{Shaded}
 
-  Note that because we used \texttt{gam.Lexis} which uses
+  Note that because we used \texttt{gamLexis} which uses
   the \texttt{poisreg} family we need not specify \texttt{lex.dur} as a
   variable in the prediction data frame \texttt{nd}. Predictions will
   be rates in the same units as \texttt{lex.dur} (well, the inverse).
@@ -6905,12 +7000,12 @@ the help page:
 \end{Highlighting}
 \end{Shaded}
 \item
-  From figure it seems that the duration effect is
+  From the figure with the three effects it seems that the duration effect is
   over-modeled, so refit constraining the d.f. to 5:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{Mcr }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"M"}\NormalTok{),}
+\NormalTok{Mcr }\OtherTok{\textless{}{-}} \FunctionTok{gamLexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"M"}\NormalTok{),}
                  \SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
                    \FunctionTok{s}\NormalTok{(P, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
                  \FunctionTok{s}\NormalTok{(dur, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{5}\NormalTok{))}
@@ -6927,7 +7022,7 @@ the help page:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{Fcr }\OtherTok{\textless{}{-}} \FunctionTok{gam.Lexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"F"}\NormalTok{),}
+\NormalTok{Fcr }\OtherTok{\textless{}{-}} \FunctionTok{gamLexis}\NormalTok{(}\FunctionTok{subset}\NormalTok{(SL, sex }\SpecialCharTok{==} \StringTok{"F"}\NormalTok{),}
                  \SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
                    \FunctionTok{s}\NormalTok{(P, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{10}\NormalTok{) }\SpecialCharTok{+}
                  \FunctionTok{s}\NormalTok{(dur, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{5}\NormalTok{))}
@@ -6943,6 +7038,15 @@ the help page:
 \end{Shaded}
 
   Plot the estimated rates from the revised models.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfcol =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(Mcr, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{3}\NormalTok{, }\DecValTok{3}\NormalTok{), }\AttributeTok{col =} \StringTok{"blue"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(Fcr, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{3}\NormalTok{, }\DecValTok{3}\NormalTok{), }\AttributeTok{col =} \StringTok{"red"}\NormalTok{ , }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
   What do you conclude from the plots?
 \end{enumerate}
 
@@ -6950,11 +7054,12 @@ the help page:
 
 The SMR is the \textbf{S}tandardized \textbf{M}ortality
 \textbf{R}atio, which is the mortality rate-ratio between the diabetes
-patients and the general population. In real studies we would
+patients and the general population (that is, persons without
+diabetes). In real studies we would
 subtract the deaths and the person-years among the diabetes patients
 from those of the general population, but since we do not have access
 to these, we make the comparison to the general population at large,
-\emph{i.e.} also including the diabetes patients.
+i.e.~also including the diabetes patients.
 
 So we now want to include the population mortality rates as a fixed
 variable in the split dataset; for each record in the split dataset we
@@ -7021,7 +7126,7 @@ table.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{SL}\SpecialCharTok{$}\NormalTok{Am }\OtherTok{\textless{}{-}} \FunctionTok{floor}\NormalTok{(SL}\SpecialCharTok{$}\NormalTok{A }\SpecialCharTok{+} \FloatTok{0.25}\NormalTok{)}
+\NormalTok{SL}\SpecialCharTok{$}\NormalTok{Am }\OtherTok{\textless{}{-}} \FunctionTok{floor}\NormalTok{(SL}\SpecialCharTok{$}\NormalTok{A }\SpecialCharTok{+} \FloatTok{0.25}\NormalTok{) }\CommentTok{\# data were split in .5 year intervals}
 \NormalTok{SL}\SpecialCharTok{$}\NormalTok{Pm }\OtherTok{\textless{}{-}} \FunctionTok{floor}\NormalTok{(SL}\SpecialCharTok{$}\NormalTok{P }\SpecialCharTok{+} \FloatTok{0.25}\NormalTok{)}
 \FunctionTok{data}\NormalTok{(M.dk)}
 \FunctionTok{str}\NormalTok{(M.dk)}
@@ -7071,7 +7176,7 @@ table.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{SLr }\OtherTok{\textless{}{-}} \FunctionTok{merge}\NormalTok{(SL, }
+\NormalTok{SLr }\OtherTok{\textless{}{-}} \FunctionTok{merge}\NormalTok{(SL,}
 \NormalTok{             M.dk[, }\FunctionTok{c}\NormalTok{(}\StringTok{"sex"}\NormalTok{, }\StringTok{"Am"}\NormalTok{, }\StringTok{"Pm"}\NormalTok{, }\StringTok{"rate"}\NormalTok{)])}
 \FunctionTok{dim}\NormalTok{(SL)}
 \end{Highlighting}
@@ -7110,15 +7215,14 @@ table.
   \end{itemize}
 \item
   Fit a poisson model with sex as the explanatory variable and
-  log-expected as offset to derive the SMR (and c.i.).
+  \texttt{E} as denominator to derive the SMR (and c.i.).
   Some of the population mortality rates are 0, so you need to exclude
   those records from the analysis.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{msmr }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{((lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sex }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{,}
-            \AttributeTok{offset =} \FunctionTok{log}\NormalTok{(E),}
-            \AttributeTok{family =}\NormalTok{ poisson,}
+\NormalTok{msmr }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}\FunctionTok{cbind}\NormalTok{((lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{), E) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sex }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{,}
+            \AttributeTok{family =}\NormalTok{ poisreg,}
               \AttributeTok{data =} \FunctionTok{subset}\NormalTok{(SLr, E }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{))}
 \FunctionTok{ci.exp}\NormalTok{(msmr)}
 \end{Highlighting}
@@ -7137,28 +7241,9 @@ table.
   \begin{itemize}
   \tightlist
   \item
-    The same model can be fitted a bit simpler by the \texttt{poisreg} family, try:
+    We can assess the ratios of SMRs between men and women by using the
+    \texttt{ctr.mat} argument which should be a matrix:
   \end{itemize}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{msmr }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{, E) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ sex }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{, }
-            \AttributeTok{family =}\NormalTok{ poisreg,}
-              \AttributeTok{data =} \FunctionTok{subset}\NormalTok{(SLr, E }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{))}
-\FunctionTok{ci.exp}\NormalTok{(msmr)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{     exp(Est.) 2.5\% 97.5\%}
-\NormalTok{sexM      1.69 1.60  1.78}
-\NormalTok{sexF      1.54 1.46  1.63}
-\end{Highlighting}
-\end{Shaded}
-
-  We can assess the ratios of SMRs between men and women by using the
-  \texttt{ctr.mat} argument which should be a matrix:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7192,6 +7277,8 @@ table.
 \end{Highlighting}
 \end{Shaded}
 
+  What do you conclude about the SMRs among men and women?
+
   What do you conclude about the mortality rates among men and women?
 \end{enumerate}
 
@@ -7206,7 +7293,7 @@ table.
   instead of the person-years, using separate models for
   men and women.
 
-  Note that you cannot use \texttt{gam.Lexis} from the code you used for
+  Note that you cannot use \texttt{gamLexis} from the code you used for
   fitting models for the rates, you need to use \texttt{gam} with
   the \texttt{poisreg} family. And remember to exclude those units
   where no deaths in the population occur (that is where the
@@ -7214,7 +7301,7 @@ table.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{Msmr }\OtherTok{\textless{}{-}} \FunctionTok{gam}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{, E) }
+\NormalTok{Msmr }\OtherTok{\textless{}{-}} \FunctionTok{gam}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{, E)}
             \SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(  A, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{5}\NormalTok{) }\SpecialCharTok{+}
               \FunctionTok{s}\NormalTok{(  P, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{5}\NormalTok{) }\SpecialCharTok{+}
               \FunctionTok{s}\NormalTok{(dur, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{5}\NormalTok{),}
@@ -7251,6 +7338,14 @@ table.
 
   Plot the estimated smooth effects for both men and women using
   e.g.~\texttt{plot.gam}. What do you see?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfcol =} \FunctionTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(Msmr, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{3}\NormalTok{, }\DecValTok{3}\NormalTok{), }\AttributeTok{col =} \StringTok{"blue"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(Fsmr, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{3}\NormalTok{, }\DecValTok{3}\NormalTok{), }\AttributeTok{col =} \StringTok{"red"}\NormalTok{ , }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 \item
   Plot the predicted SMRs from the models for men and women
   diagnosed in ages 50, 60 and 70 as you did for the rates. What do
@@ -7306,7 +7401,7 @@ table.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{Bsmr }\OtherTok{\textless{}{-}} \FunctionTok{gam}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{, E) }
+\NormalTok{Bsmr }\OtherTok{\textless{}{-}} \FunctionTok{gam}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(lex.Xst }\SpecialCharTok{==} \StringTok{"Dead"}\NormalTok{, E)}
             \SpecialCharTok{\textasciitilde{}}\NormalTok{ sex }\SpecialCharTok{/}\NormalTok{ A }\SpecialCharTok{+}
 \NormalTok{              sex }\SpecialCharTok{/}\NormalTok{ P }\SpecialCharTok{+}
               \FunctionTok{s}\NormalTok{(dur, }\AttributeTok{bs =} \StringTok{"cr"}\NormalTok{, }\AttributeTok{k =} \DecValTok{5}\NormalTok{),}
@@ -9924,7 +10019,7 @@ occurrence rate of remission itself.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{   user  system elapsed }
-\NormalTok{   2.41    3.12    1.94 }
+\NormalTok{   1.29    1.70    1.01 }
 \end{Highlighting}
 \end{Shaded}
 
