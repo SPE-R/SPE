@@ -1,7 +1,7 @@
 ---
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
   editor_options:
   chunk_output_type: console
 ---
@@ -36,8 +36,8 @@ Start by loading the relevant packages:
 ```{r echo=TRUE, results='hide'}
 library(Epi)
 library(popEpi)
-library(mgcv)
-library(tidyverse)
+library(mgcv, quietly = TRUE)
+library(tidyverse, quietly = TRUE)
 ```
 Then load the data and take a look at the data:
 ```{r }
@@ -110,18 +110,20 @@ the help page:
 1.  Now estimate age-specific mortality curves for men and
     women separately, using splines as implemented in `gam`.
     We use `k = 20` to be sure to catch any irregularities by age.
-    ```{r, eval = FALSE}
-    r.m <- mgcv::gam(cbind(lex.Xst == "Dead", lex.dur) ~ s(A, k = 20),
+    ```{r, eval = TRUE}
+    r.m <- mgcv::gam(cbind(lex.Xst == "Dead", lex.dur) ~ s(A, k = 10),
                      family = poisreg,
                        data = subset(SL, sex == "M"))
+    summary(r.m)
     ```
       Make sure you understand all the components on this modeling statement.
     Fit the same model for women.
 
     There is a convenient wrapper for this, exploiting the `Lexis`
     structure of data, but which does not have an update
-    ```{r}
-    r.m <- gamLexis(subset(SL, sex == "M"), ~ s(A, k = 15))
+
+    ```{r, eval = TRUE}
+    r.m <- gamLexis(subset(SL, sex == "M"), ~ s(A, k = 10))
     r.f <- gamLexis(subset(SL, sex == "F"), ~ s(A, k = 10))
     ```
 3.  Now, extract the estimated rates by using the wrapper function
@@ -130,7 +132,8 @@ the help page:
 
       `glm.Lexis` and `gamLexis` use the `poisreg` family that will return
       the rates in the (inverse) units in which the person-years were
-      given; that is the units in which `lex.dur` is recorded.
+      given; that is the units in which `lex.dur` is recorded---in
+      this case 1 year.
     ```{r }
     nd <- data.frame(A = seq(20, 90, 0.5))
     p.m <- ci.pred(r.m, newdata = nd)
@@ -139,7 +142,7 @@ the help page:
     ```
 4.  Plot the predicted rates for men and women together - using for
       example `matplot` or `matshade`.
-    ```{r }
+    ```{r, fig.cap = �Age-specific mortality for men and women�}
         par(mar = c(3.5,3.5,1,1),
             mgp = c(3,1,0) / 1.6,
             las = 1,
@@ -157,6 +160,10 @@ the help page:
          at = ll <- outer( c(5, 10, 20), -1:1, function(x,y) x * 10^y),
          labels = ll)
     ```
+    The  `axis` statement is a trick to get the labels on the $y$-axis
+    without ".0"s.
+    `matshade` assumes that curves are added to an existing plot, so
+      the `plot=TRUE` must be supplied to create a new plot:
     ```{r }
         par(mar = c(3.5,3.5,1,1),
             mgp = c(3,1,0) / 1.6,
@@ -207,14 +214,9 @@ the help page:
       estimated, so it is useful set up a multi-panel display, and for
       the sake of comparability to set ylim to the same for men and women:
     ```{r }
-    par(mfrow = c(2, 3))
-    plot(Mcr, ylim = c(-3, 3), col = "blue", lwd = 2)
-    plot(Fcr, ylim = c(-3, 3), col = "red", lwd = 2)
-    ```
-    ```{r }
     par(mfcol = c(3, 2))
-    plot(Mcr, ylim = c(-3, 3))
-    plot(Fcr, ylim = c(-3, 3))
+    plot(Mcr, ylim = c(-3, 3), col = "blue", lwd = 2)
+    plot(Fcr, ylim = c(-3, 3), col = "red" , lwd = 2)
     ```
     What is the absolute scale for these effects?
 
@@ -222,6 +224,7 @@ the help page:
       three-factor models, using `anova`, e.g.:
     ```{r }
     anova(Mcr, r.m, test = "Chisq")
+    anova(Fcr, r.f, test = "Chisq")
     ```
     What do you conclude?
 
@@ -232,10 +235,11 @@ the help page:
     they are not, as the three time scales advance simultaneously at the
     same pace.
 
-    The reporting would therefore more naturally be showing predicted rates on the
+    The reporting should therefore more naturally be showing predicted rates on the
     mortality scale as a function of age, but showing the mortality
     for persons diagnosed in different ages, using separate displays
     for separate years of diagnosis.
+
     This is most easily done using the `ci.pred` function with
     the `newdata = ` argument. So a person diagnosed in age 50 in
     1995 will have a mortality measured in cases per 1000 PY as:
@@ -255,10 +259,10 @@ the help page:
     construct prediction of mortality for men and women diagnosed in a
     range of ages, say 50, 60, 70, and plot these together in the same
     graph:
-    ```{r eval = FALSE, results='hide'}
+    ```{r eval = TRUE, results='hide'}
     cbind(nd, ci.pred(Mcr, newdata = nd))[1:10,]
     ```
-9.  From the figure it seems that the duration effect is
+9.  From the figure with the three effects it seems that the duration effect is
     over-modeled, so refit constraining the d.f. to 5:
     ```{r rates5,fig = TRUE, width = 10, eval = TRUE}
     Mcr <- gamLexis(subset(SL, sex == "M"),
@@ -271,6 +275,11 @@ the help page:
                      s(dur, bs = "cr", k = 5))
     ```
     Plot the estimated rates from the revised models.
+    ```{r }
+    par(mfcol = c(3, 2))
+    plot(Mcr, ylim = c(-3, 3), col = "blue", lwd = 2)
+    plot(Fcr, ylim = c(-3, 3), col = "red" , lwd = 2)
+    ```
     What do you conclude from the plots?
 
 ## SMR
@@ -312,7 +321,7 @@ table.
     a period variable that can be used in merging with the population data.
     ```{r eval = TRUE}
     str(SL)
-    SL$Am <- floor(SL$A + 0.25)
+    SL$Am <- floor(SL$A + 0.25) # data were split in .5 year intervals
     SL$Pm <- floor(SL$P + 0.25)
     data(M.dk)
     str(M.dk)
@@ -345,25 +354,17 @@ table.
     ```
 
 10. Fit a poisson model with sex as the explanatory variable and
-    log-expected as offset to derive the SMR (and c.i.).
+    `E` as denominator to derive the SMR (and c.i.).
     Some of the population mortality rates are 0, so you need to exclude
     those records from the analysis.
     ```{r }
-    msmr <- glm((lex.Xst == "Dead") ~ sex - 1,
-                offset = log(E),
-                family = poisson,
-                  data = subset(SLr, E > 0))
-    ci.exp(msmr)
-    ```
-    Do you recognize the numbers?
-    -  The same model can be fitted a bit simpler by the `poisreg` family, try:
-    ```{r }
-    msmr <- glm(cbind(lex.Xst == "Dead", E) ~ sex - 1,
+    msmr <- glm(cbind((lex.Xst == "Dead"), E) ~ sex - 1,
                 family = poisreg,
                   data = subset(SLr, E > 0))
     ci.exp(msmr)
     ```
-    We can assess the ratios of SMRs between men and women by using the
+    Do you recognize the numbers?
+    -  We can assess the ratios of SMRs between men and women by using the
     `ctr.mat` argument which should be a matrix:
     ```{r }
     (CM <- rbind(M = c(1, 0),
@@ -371,6 +372,8 @@ table.
              "M/F" = c(1, -1)))
     round(ci.exp(msmr, ctr.mat = CM), 2)
     ```
+    What do you conclude about the SMRs among men and women?
+
     What do you conclude about the mortality rates among men and women?
 
 ## SMR modeling
@@ -397,6 +400,12 @@ table.
     ```
     Plot the estimated smooth effects for both men and women using
     e.g. `plot.gam`. What do you see?
+
+    ```{r }
+    par(mfcol = c(3, 2))
+    plot(Msmr, ylim = c(-3, 3), col = "blue", lwd = 2)
+    plot(Fsmr, ylim = c(-3, 3), col = "red" , lwd = 2)
+    ```
 
 13. Plot the predicted SMRs from the models for men and women
     diagnosed in ages 50, 60 and 70 as you did for the rates. What do
