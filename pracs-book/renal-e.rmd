@@ -1,15 +1,15 @@
 ---
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
   editor_options:
   chunk_output_type: console
 ---
 ```{r, include = FALSE}
-knitr::opts_chunk$set(keep.source = TRUE, 
-                          results = "verbatim", 
-                          include = TRUE, 
-                             eval = TRUE, 
+knitr::opts_chunk$set(keep.source = TRUE,
+                          results = "verbatim",
+                          include = TRUE,
+                             eval = TRUE,
                           comment = "")
 knitr::opts_knit$set(global.par  = TRUE)
 ```
@@ -21,7 +21,7 @@ options(width = 90,
 par(mar = c(3,3,1,1),
     mgp = c(3,1,0) / 1.6,
     las = 1,
-    bty = "n", 
+    bty = "n",
    lend = "butt")
 ```
 
@@ -65,7 +65,8 @@ the study at death or kidney failure (dialysis or transplant).
     ```{r,  results = "hide" }
     library(Epi)
     library(survival)
-    library(mgcv)
+    library(mgcv, quietly = TRUE)
+    library(tidyverse, quietly = TRUE)
     library(foreign)
     # renal <- read.dta(
     #  "https://raw.githubusercontent.com/SPE-R/SPE/master/pracs-book/data/renal.dta")
@@ -89,14 +90,13 @@ the study at death or kidney failure (dialysis or transplant).
                  exit = list(per = dox),
           exit.status = factor(event > 0, labels = c("NRA", "ESRD")),
                  data = renal)
-    str(Lr)
     summary(Lr)
     ```
     Make sure you know what the variables in `Lr` stand for.
 
 3.  Visualize the follow-up in a Lexis-diagram, by using the
     `plot` method for `Lexis` objects.
-    ```{r Lexis-ups, fig=TRUE}
+    ```{r Lexis-ups, fig=FALSE}
     plot(Lr, col = "black", lwd = 3)
     subset(Lr, age < 0)
     ```
@@ -104,8 +104,8 @@ the study at death or kidney failure (dialysis or transplant).
 
 4.  Correct the data and make a new plot, for example by:
     ```{r Lexis-def,fig=TRUE}
-    Lr <- transform(Lr, age = ifelse(dob > 2000, age + 100, age),
-                        dob = ifelse(dob > 2000, dob - 100, dob))
+    Lr <- transform(Lr, dob = ifelse(dob > 2000, dob - 100, dob),
+                        age = ifelse(dob > 2000, age + 100, age))
     subset(Lr, id == 586)
     plot(Lr, col = "black", lwd = 3)
     ```
@@ -114,7 +114,7 @@ the study at death or kidney failure (dialysis or transplant).
     the variables sex and age at entry into the study, using time
     since entry to the study as time scale.
     ```{r }
-    mc <- coxph(Surv(lex.dur, lex.Xst == "ESRD") 
+    mc <- coxph(Surv(lex.dur, lex.Xst == "ESRD")
                 ~ I(age / 10) + sex, data = Lr)
     summary(mc)
     ```
@@ -127,13 +127,13 @@ the study at death or kidney failure (dialysis or transplant).
     *Remission* is a time-dependent variable which is initially 0, but
     takes the value 1 when remission occurs. In order to handle this, each
     person who sees a remission must have two records:
-  
+
     -  One record for the time before remission, where entry is
        `doe`, exit is `dor`, remission is 0, and event is 0.
     -  One record for the time after remission, where entry is
        `dor`, exit is `dox`, remission is 1, and event is 0
        or 1 according to whether the person had an event at `dox`.
-  
+
     This is accomplished using the `cutLexis` function on the
     `Lexis` object, where we introduce a remission state `Rem`.
     Also use `split.state=TRUE` to
@@ -148,7 +148,7 @@ the study at death or kidney failure (dialysis or transplant).
     ```
     List the records from a few select persons (choose values for
     `lex.id`, using for example `subset(Lc, lex.id %in% c(5,7,9))`).
-    
+
 8.  Now show how the states are connected and the number of transitions
       between them by using `boxes`. This is an interactive command
       that requires you to click in the graph window:
@@ -159,11 +159,11 @@ the study at death or kidney failure (dialysis or transplant).
     ```{r Lc-boxes,fig=TRUE}
     boxes(Lc, boxpos = TRUE, scale.R = 100, show.BE = TRUE, hm = 1.5, wm = 1.5)
     ```
-
-    You may even be tempted to read the help page for
+    That is presumably not what you want, so
+    you may be tempted to read the help page for
     `boxes.Lexis` ...
-    
-9.  Plot a Lexis diagram where different coloring is
+
+9.  Draw a `Lexis` diagram where different coloring is
     used for different segments of the follow-up. The
     `plot.Lexis` function draws a line for each record in the
     dataset, so you can index the coloring by `lex.Cst` and
@@ -176,14 +176,14 @@ the study at death or kidney failure (dialysis or transplant).
     plot(Lc, col = c("red", "limegreen")[Lc$lex.Cst],
             xlab = "Calendar time", ylab = "Age",
              lwd = 3, grid = 0:20 * 5, las = 1,
-            xlim = c(1970, 2010), ylim = c(20, 70), 
+            xlim = c(1970, 2010), ylim = c(20, 70),
             xaxs = "i", yaxs = "i")
     points(Lc, pch = c(NA, NA, 16, 16)[Lc$lex.Xst],
                col = c("red", "limegreen", "transparent", "transparent")[Lc$lex.Cst])
     points(Lc, pch = c(NA, NA, 1, 1)[Lc$lex.Xst],
                col = "black", lwd = 2)
     ```
-    
+
 10. Make a Cox-regression of mortality rates (i.e. endpoint `ESRD` or
     `ESRD(Rem)`) with sex, age at entry and remission as
     explanatory variables, using time since entry as timescale, and
@@ -196,23 +196,32 @@ the study at death or kidney failure (dialysis or transplant).
     m1 <- coxph(Surv(tfi,             # entry time
                      tfi + lex.dur,   # exit time
                      lex.Xst %in% EP) # event
-                ~ sex + I((doe - dob - 50) / 10) + # fixed covariates
+                ~ sex + I((doe - dob - 40) / 10) + # fixed covariates
                   (lex.Cst == "Rem"),              # time-dependent variable
                 data = Lc)
     summary(m1)
+    ci.exp(m1)
+    ```
+    There is actually also a wrapper for a Cox model used in a `Lexis`
+    object---since the baseline timescale has a special status this is
+    givn as the l.h.s. of the formula:
+    ```{r }
+    mL <- coxphLexis(Lc, tfi ~ sex + I((doe - dob - 40) / 10) + # fixed covariates
+                                     (lex.Cst == "Rem"))        # time-dependent variable
+    ci.exp(mL)
     ```
     What is the effect of of remission on the rate of ESRD?
-    
+
     ## Splitting the follow-up time
-    
+
     In order to explore the effect of remission on the rate of ESRD, we
     split the data further into small pieces of follow-up. To this
-    end we use the function `splitLexis`. The rates can then be
-    modeled using a Poisson-model, and the shape of the effect of the 
+    end we again use the function `splitLexis`. The rates can then be
+    modeled using a Poisson-model, and the shape of the effect of the
     underlying *rates* be explored. Furthermore, we can allow effects of both
     time since NRA and current age. To this end we will use splines, so we
     need the `splines` and also the `mgcv` packages.
-    
+
 11. Now split the follow-up time every month after entry, and verify
     that the number of events and risk time is the same as before and
     after the split:
@@ -221,45 +230,38 @@ the study at death or kidney failure (dialysis or transplant).
     summary( Lc)
     summary(sLc)
     ```
-    
+    What is the difference between the datasets `Lc` and `sLc`?
+
 12. Now fit the Poisson-model corresponding to the Cox-model
     we fitted previously. The function `Ns()` produces a model
     matrix corresponding to a piece-wise cubic function, modeling the
     baseline hazard explicitly (think of the `Ns` terms as the
-    baseline hazard that is not visible in the Cox-model). You 
-    can use the wrapper function `glm.Lexis`
+    baseline hazard that is not visible in the Cox-model). You
+    can use the wrapper function `glmLexis`
     ```{r }
-    mp <- glm.Lexis(sLc, 
-                    ~ Ns(tfi, knots = c(0, 2, 5, 10)) +
-                      sex + I((doe - dob - 40) / 10) + 
-                      I(lex.Cst == "Rem"))
+    mp <- glmLexis(sLc,
+                   ~ Ns(tfi, knots = c(0, 2, 5, 10)) +
+                     sex + I((doe - dob - 40) / 10) +
+                     I(lex.Cst == "Rem"))
     ci.exp(mp)
     ```
     How does the effects of sex change from the Cox-model?
-    
+
 13. Try instead using the `gam` function from the
     `mgcv` package. There is convenience wrapper for this for
     `Lexis` objects as well:
     ```{r }
-    mx <- gam.Lexis(sLc,
-                    ~ s(tfi, k = 10) + 
-                      sex + I((doe - dob - 40) / 10) + 
-                      I(lex.Cst == "Rem"))
+    mx <- gamLexis(sLc,
+                   ~ s(tfi, k = 10) +
+                     sex + I((doe - dob - 40) / 10) +
+                     I(lex.Cst == "Rem"))
     ci.exp(mp, subset = c("Cst", "doe", "sex"))
     ci.exp(mx, subset = c("Cst", "doe", "sex"))
+    ci.exp(m1, subset = c("Cst", "doe", "sex")) # from Cox model
     ```
-    We see that there is virtually no difference between the two
+    We see that there is virtually no difference between the three
     approaches in terms of the regression parameters.
-    
-14. Extract the regression parameters from the models using
-      `ci.exp` and compare with the estimates from the Cox-model:
-    ```{r }
-    ci.exp(mx, subset = c("sex", "dob", "Cst"), pval = TRUE)
-    ci.exp(m1)
-    round(ci.exp(mp, subset = c("sex", "dob", "Cst")) / ci.exp(m1), 2)
-    ```
-    How large are the differences in estimated regression parameters?
-    
+
 15. The model has the same assumptions as the Cox-model about
     proportionality of rates, but there is an additional assumption that
     the hazard is a smooth function of time since entry. It seems to be
@@ -271,9 +273,8 @@ the study at death or kidney failure (dialysis or transplant).
     ```{r }
     plot(mx)
     ```
-
     Is this a useful plot?
-    
+
 16. However, `plot` (well, `plot.gam`) does not give you the *absolute*
     level of the underlying rates because it bypasses the intercept. So
     in order to predict the rates as a function of `tfi` and the
@@ -296,15 +297,15 @@ the study at death or kidney failure (dialysis or transplant).
              ylab = "ESRD rate (per 100 PY) for 50 year old men")
     ```
     Try to overlay with the corresponding prediction from the
-    `glm` model using `Ns`.
-    
+    `glm` model using `Ns`. Any preferences?
+
  ## Prediction from the multistate model
-    
+
     If we want to make proper statements about the survival and disease
     probabilities we must know not only how the occurrence of remission
     influences the rate of death/ESRD, but we must also model the
     occurrence rate of remission itself.
-    
+
 17. The rates of ESRD were modelled by a Poisson model with
     effects of age and time since NRA --- in the models `mp`
     and `mx`.  But if we want to model whole process we must
@@ -313,16 +314,16 @@ the study at death or kidney failure (dialysis or transplant).
     covariates in this model to only time since NRA and sex. Note
     that only the records that represent follow-up in the `NRA`
     state should be used; this is most easily done using the
-    `gam.Lexis` function
+    `gamLexis` function
     ```{r rem-inc-mgcv}
-    mr <- gam.Lexis(sLc, ~ s(tfi, k = 10) + sex,
+    mr <- gamLexis(sLc, ~ s(tfi, k = 10) + sex,
                          from = "NRA",
                            to = "Rem")
     summary(mr)
     ci.exp(mr, pval = TRUE)
     ```
     What is the remission rate-ratio between men and women?
-    
+
 18. If we want to predict the probability of being in each of the
     three states using these estimated rates, we may resort to
     analytical calculations of the probabilities from the estimated
@@ -336,7 +337,7 @@ the study at death or kidney failure (dialysis or transplant).
     This is accomplished using the function `simLexis`. The input
     to this is the initial status of the persons whose life-course we
     shall simulate, and the transition rates in suitable form:
-    
+
     - Suppose we want predictions for men aged 50 at
     NRA. The input is in the form of a `Lexis` object (where
     `lex.dur` and `lex.Xst` will be ignored). Note that in
@@ -363,12 +364,14 @@ the study at death or kidney failure (dialysis or transplant).
     inL
     str(inL)
     ```
-    The other input for the simulation is the models for the transitions. This is given as 
-    a list with an element for each transient state (that is `NRA` and
-    `Rem`), each of which is again a list with names equal to the
-    states that can be reached from the transient state. The content of
-    the list will be `glm` objects, in this case the models we
-    just fitted, describing the transition rates:
+    The other input for the simulation is the models for the possible transitions.
+
+    This is given as a list with an element for each transient state
+    (that is `NRA` and `Rem`), each of which is again a list with
+    names equal to the states that can be reached from the transient
+    state. The content of the list will be `glm` objects, in this case
+    the models we just fitted, describing the transition rates:
+
     ```{r }
     Tr <- list("NRA" = list("Rem"  = mr,
                             "ESRD" = mx),
@@ -378,34 +381,34 @@ the study at death or kidney failure (dialysis or transplant).
     to simulate life course of 10 persons (5 for each set of starting values
     in `inL`):
     ```{r first-sim}
-    (iL <- simLexis(Tr, inL, N = 10))
+    (iL <- simLexis(Tr, inL, N = 5))
     summary(iL, by = "sex")
     ```
     What type of object have you got as `iL`?
-    
-19. Now generate the life course of, say, 5,000 persons, and look at the summary.
+
+19. Now generate the life course of, say, 1,000 persons, and look at the summary.
     The `system.time` command is just to tell you how long it
     took, you may want to start with 500 just to see how long that takes.
-    ```{r 5000-sim}
-    system.time(sM <- simLexis(Tr, inL, N = 500, t.range = 12))
+    ```{r 1000-sim}
+    system.time(sM <- simLexis(Tr, inL, N = 5000, t.range = 12))
     summary(sM, by = "sex")
     ```
     Why are there so many ESRD-events in the resulting data set?
-    
+
 20. Now count how many persons are present in each state
     at each time for the first 10 years after entry (which is at age 50). This
     can be done by using `nState`. Try:
     ```{r nState}
-    nStm <- nState(subset(sM, sex == "M"), time.scale = "age", 
-                   at = seq(0, 10, 0.1), 
+    nStm <- nState(subset(sM, sex == "M"), time.scale = "age",
+                   at = seq(0, 10, 0.1),
                  from = 50)
-    nStf <- nState(subset(sM, sex == "F"), time.scale = "age", 
-                   at = seq(0, 10, 0.1), 
+    nStf <- nState(subset(sM, sex == "F"), time.scale = "age",
+                   at = seq(0, 10, 0.1),
                  from = 50)
     head(nStf, 15)
     ```
     What is in the object `nStf`?
-    
+
 21. With the counts of persons in each state at the
     designated time points (in `nStm`), compute the cumulative
     fraction over the states, arranged in order given by `perm`:
@@ -416,15 +419,14 @@ the study at death or kidney failure (dialysis or transplant).
     tail(ppf)
     ```
     What do the entries in `ppf` represent?
-    
+
 22. Try to plot the cumulative probabilities using the `plot` method
-    for `pState` objects: 
+    for `pState` objects:
     ```{r plot-pp,fig=TRUE}
     plot(ppf)
     ```
-
     Is this useful?
-    
+
 23. Now try to improve the plot so that it is easier to read, and
     easier to compare between men and women, for example:
     ```{r new-nState,fig=TRUE}
@@ -435,7 +437,7 @@ the study at death or kidney failure (dialysis or transplant).
     text(59.5, 0.95, "Men", adj = 1, col = "white", font = 2, cex = 1.2)
     axis(side = 4, at = 0:10 / 10)
     axis(side = 4, at = 1:99 / 100, labels = NA, tck = -0.01)
-    # Women 
+    # Women
     plot(ppf, col = c("limegreen", "red", "#991111", "forestgreen"),
               xlim = c(60, 50)) # inverted x-axis
     lines(as.numeric(rownames(ppf)), ppf[, "NRA"], lwd = 2)
@@ -443,6 +445,5 @@ the study at death or kidney failure (dialysis or transplant).
     axis(side = 2, at = 0:10 / 10)
     axis(side = 2, at = 1:99 / 100, labels = NA, tck = -0.01)
     ```
-  
-    What is the 10-year risk of remission for men and women respectively?
-  
+    What is the 10-year risk of remission for 50 year old men and
+    women respectively?

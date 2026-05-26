@@ -1,7 +1,7 @@
 ---
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
   editor_options:
   chunk_output_type: console
 ---
@@ -36,8 +36,8 @@ Start by loading the relevant packages:
 ```{r echo=TRUE, results='hide'}
 library(Epi)
 library(popEpi)
-library(mgcv)
-library(tidyverse)
+library(mgcv, quietly = TRUE)
+library(tidyverse, quietly = TRUE)
 ```
 Then load the data and take a look at the data:
 ```{r }
@@ -110,7 +110,7 @@ the help page:
 1.  Now estimate age-specific mortality curves for men and
     women separately, using splines as implemented in `gam`.
     We use `k = 20` to be sure to catch any irregularities by age.
-    ```{r, eval = FALSE}
+    ```{r, eval = TRUE}
     r.m <- mgcv::gam(cbind(lex.Xst == "Dead", lex.dur) ~ s(A, k = 10),
                      family = poisreg,
                        data = subset(SL, sex == "M"))
@@ -121,7 +121,7 @@ the help page:
 
     There is a convenient wrapper for this, exploiting the `Lexis`
     structure of data, but which does not have an update
-    ```{r, eval = FALSE}
+    ```{r, eval = TRUE}
     r.m <- gamLexis(subset(SL, sex == "M"), ~ s(A, k = 10))
     r.f <- gamLexis(subset(SL, sex == "F"), ~ s(A, k = 10))
     ```
@@ -141,7 +141,7 @@ the help page:
     ```
 4.  Plot the predicted rates for men and women together - using for
       example `matplot` or `matshade`.
-    ```{r }
+    ```{r, fig.cap = “Age-specific mortality for men and women”}
         par(mar = c(3.5,3.5,1,1),
             mgp = c(3,1,0) / 1.6,
             las = 1,
@@ -258,7 +258,7 @@ the help page:
     construct prediction of mortality for men and women diagnosed in a
     range of ages, say 50, 60, 70, and plot these together in the same
     graph:
-    ```{r eval = FALSE, results='hide'}
+    ```{r eval = TRUE, results='hide'}
     cbind(nd, ci.pred(Mcr, newdata = nd))[1:10,]
     ```
 9.  From the figure with the three effects it seems that the duration effect is
@@ -357,7 +357,7 @@ table.
     Some of the population mortality rates are 0, so you need to exclude
     those records from the analysis.
     ```{r }
-    mxmr <- glm(cbind((lex.Xst == "Dead"), E) ~ sex - 1,
+    msmr <- glm(cbind((lex.Xst == "Dead"), E) ~ sex - 1,
                 family = poisreg,
                   data = subset(SLr, E > 0))
     ci.exp(msmr)
