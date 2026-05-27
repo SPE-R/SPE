@@ -13,21 +13,45 @@ PROTECTED_S_RMD <- character(0)
 ## without the developer having to remember to delete the latter.
 ## The PROTECTED_S_RMD list above is the escape hatch for files whose
 ## solutions are written by hand rather than mechanically derived.
+##
+## Inside the chapter's opts_chunk$set(...) call we flip the two "hide"
+## defaults to their "show" counterparts so the solutions book displays
+## output text AND plots by default:
+##
+##   results  = "hide"  ->  results  = "markup"
+##   fig.show = "hide"  ->  fig.show = "show"
+##
+## The opts_chunk$set call may span several lines (some chapters write
+## it that way), so we scan from its opening line forward until the
+## first line containing the matching ")" and apply the rewrites
+## across that whole block.
+##
+## Per-chunk overrides like {r dagitty, fig.show="hide"} live in chunk
+## headers, not in opts_chunk$set, and are intentionally NOT touched.
 from_e_to_s_rmd <-
   function(file.in, file.out){
     if (basename(file.out) %in% PROTECTED_S_RMD) {
       message(file.out, ' is protected (hand-maintained); not regenerated.')
       return(file.out)
     }
-    cmd.in <- cmd.out <- readLines(file.in)
-    ## detect the line where chunk options are set
-    opt.line.in <- which(stringr::str_detect(cmd.in, stringr::fixed('opts_chunk$set'))) |> head(1)
-    ## replace results = 'hide' by results = 'markup'
-    cmd.out[opt.line.in] <-
-      cmd.in[opt.line.in] |>
-      stringr::str_replace('results( {0,2})=( {0,2})\"hide\"', 'results = \"markup\"')
-    ## write the solution file (overwrites if it already exists)
-    writeLines(cmd.out, con = file.out)
+    cmd <- readLines(file.in)
+
+    start <- which(stringr::str_detect(cmd, stringr::fixed('opts_chunk$set')))
+    if (length(start) > 0) {
+      start <- start[1]
+      end <- start
+      while (end <= length(cmd) && !stringr::str_detect(cmd[end], '\\)')) {
+        end <- end + 1
+      }
+      block <- cmd[start:end]
+      block <- stringr::str_replace_all(
+        block, 'results( {0,2})=( {0,2})"hide"', 'results = "markup"')
+      block <- stringr::str_replace_all(
+        block, 'fig\\.show( {0,2})=( {0,2})"hide"', 'fig.show = "show"')
+      cmd[start:end] <- block
+    }
+
+    writeLines(cmd, con = file.out)
     file.out
   }
 

@@ -11,6 +11,13 @@
 # The workflow (deploy_bookdown.yml) and the local Makefile both set
 # SPE_SOLUTIONS appropriately before each render.
 
+# Force the C locale for date formatting so the "built <date>" string on the
+# title page (see pracs-book/index.Rmd) renders English month names regardless
+# of the laptop locale (e.g. "May" not "mai"). Wrapped in try() because on some
+# Windows configurations the "C" locale is not selectable; in that case we just
+# fall back to whatever locale R is already using.
+try(Sys.setlocale("LC_TIME", "C"), silent = TRUE)
+
 # Returns TRUE if we are currently rendering the solutions book.
 spe_solutions <- function() {
   identical(Sys.getenv("SPE_SOLUTIONS", "0"), "1")
