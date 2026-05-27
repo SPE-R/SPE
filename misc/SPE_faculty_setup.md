@@ -17,11 +17,12 @@ If you get stuck at any step, write to <georgesd@iarc.who.int>.
 ## Table of contents
 
 - [1. One-time setup (Windows)](#1-one-time-setup-windows)
-  - [1.1 Install Git for Windows](#11-install-git-for-windows)
-  - [1.2 Install R and RStudio](#12-install-r-and-rstudio)
-  - [1.3 Tell git who you are](#13-tell-git-who-you-are)
-  - [1.4 Authenticate to GitHub (pick one)](#14-authenticate-to-github-pick-one)
-  - [1.5 Clone the SPE repository](#15-clone-the-spe-repository)
+  - [1.1 Install Git Portable](#11-install-git-portable)
+  - [1.2 Install R, RStudio, and RTools](#12-install-r-rstudio-and-rtools)
+  - [1.3 Configure RStudio to use Git and the Bash terminal](#13-configure-rstudio-to-use-git-and-the-bash-terminal)
+  - [1.4 Tell git who you are](#14-tell-git-who-you-are)
+  - [1.5 Authenticate to GitHub (pick one)](#15-authenticate-to-github-pick-one)
+  - [1.6 Clone the SPE repository](#16-clone-the-spe-repository)
 - [2. Daily git workflow](#2-daily-git-workflow)
 - [3. What to edit (and what NOT to edit)](#3-what-to-edit-and-what-not-to-edit)
 - [4. Build the book locally](#4-build-the-book-locally)
@@ -31,27 +32,64 @@ If you get stuck at any step, write to <georgesd@iarc.who.int>.
 
 ## 1. One-time setup (Windows)
 
-### 1.1 Install Git for Windows
+### 1.1 Install Git Portable
 
-Download and install Git for Windows from <https://git-scm.com/download/win>.
-Accept the defaults; this gives you both **Git Bash** (a small Linux-style
-terminal where the `git` commands shown below work) and integration with
-RStudio.
+The Portable edition needs no installation and no admin rights:
 
-Verify by opening **Git Bash** and typing:
+1. Go to <https://git-scm.com/download/win> and download the file labelled
+   **Portable ("thumbdrive edition") 64-bit** (e.g. `PortableGit-2.XX.X-64-bit.7z.exe`).
+2. Run the file — it is a self-extracting archive. Pick a location you have
+   write access to, e.g. `C:\Users\<yourname>\PortableGit\`.
+3. Verify by double-clicking `<PortableGit>\git-bash.exe`. A terminal opens;
+   type `git --version` and press Enter — you should see the installed
+   version printed.
 
-```bash
-git --version
-```
+Wherever this guide says "in Git Bash", you can also use the RStudio Terminal
+once you have set it up in step 1.3 below.
 
-### 1.2 Install R and RStudio
+### 1.2 Install R, RStudio, and RTools
 
-- Install the latest R from <https://cran.r-project.org/bin/windows/base/>.
-- Install RStudio Desktop from <https://posit.co/download/rstudio-desktop/>.
-- Once you've cloned the repo (step 1.5), follow [`SPE_setup.md`](SPE_setup.md)
+- Install the latest **R** from <https://cran.r-project.org/bin/windows/base/>.
+- Install **RStudio Desktop** from <https://posit.co/download/rstudio-desktop/>.
+- Install **RTools** from <https://cran.r-project.org/bin/windows/Rtools/>.
+  RTools ships the `make.exe` that the local book Makefile needs, plus the
+  C/C++/Fortran toolchain that some R packages compile from source. Match
+  the RTools version to your R version (e.g. RTools 4.4 for R 4.4.x).
+- Once you have cloned the repo (step 1.6), follow [`SPE_setup.md`](SPE_setup.md)
   to restore the `renv` environment.
 
-### 1.3 Tell git who you are
+### 1.3 Configure RStudio to use Git and the Bash terminal
+
+So that the RStudio Git pane and the RStudio Terminal both work with the
+PortableGit you just installed:
+
+1. **Tools → Global Options → Git/SVN**:
+   - Tick *Enable version control interface for RStudio projects*.
+   - *Git executable*: browse to `<PortableGit>\bin\git.exe`
+     (or `<PortableGit>\cmd\git.exe` — either works).
+2. **Tools → Global Options → Terminal**:
+   - *New terminals open with*: choose **Custom**.
+   - *Custom shell binary*: `<PortableGit>\bin\bash.exe`.
+   - *Custom shell options*: `--login -i`.
+3. Click **OK** and restart RStudio.
+
+Open a new Terminal in RStudio (Terminal pane → ＋), and verify everything is
+wired up:
+
+```bash
+git  --version    # should print the PortableGit version
+make --version    # should print GNU Make from RTools
+bash --version    # should print the PortableGit bash version
+```
+
+If `make` reports "command not found", RStudio has not picked up RTools on
+`PATH`. The simplest fix is to re-run the RTools installer (it has an option
+near the end to add the toolchain to the Windows PATH), then restart RStudio.
+
+From now on the `git` and `make` commands shown in this guide can be typed
+directly into the RStudio Terminal — no need to leave the IDE.
+
+### 1.4 Tell git who you are
 
 In Git Bash, run **once**:
 
@@ -61,7 +99,7 @@ git config --global user.email "you@example.org"      # use the email tied to yo
 git config --global init.defaultBranch master
 ```
 
-### 1.4 Authenticate to GitHub (pick one)
+### 1.5 Authenticate to GitHub (pick one)
 
 GitHub no longer accepts password authentication. You need either an **SSH
 key** (recommended for long-lived setups) or a **personal access token (PAT)**
@@ -98,7 +136,7 @@ ssh -T git@github.com
 # expected: "Hi <username>! You've successfully authenticated..."
 ```
 
-When you clone in step 1.5, use the **SSH URL** form (`git@github.com:SPE-R/SPE.git`).
+When you clone in step 1.6, use the **SSH URL** form (`git@github.com:SPE-R/SPE.git`).
 
 #### Option B — Personal access token (PAT)
 
@@ -123,12 +161,12 @@ gitcreds::gitcreds_set()
 # paste the token when prompted
 ```
 
-When you clone in step 1.5, use the **HTTPS URL** form (`https://github.com/SPE-R/SPE.git`).
+When you clone in step 1.6, use the **HTTPS URL** form (`https://github.com/SPE-R/SPE.git`).
 
 > **Note:** You need to be a member of the [SPE-R GitHub organization](https://github.com/orgs/SPE-R/people)
 > to push. If you aren't yet, email <georgesd@iarc.who.int>.
 
-### 1.5 Clone the SPE repository
+### 1.6 Clone the SPE repository
 
 In Git Bash, pick where you want the repo on disk and run:
 
