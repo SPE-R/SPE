@@ -23,7 +23,7 @@ help:
 	@echo "  epub-sol    EPUB book with solutions"
 	@echo "  all-sol     all + html-sol + pdf-sol + epub-sol"
 	@echo "  solutions   Generate missing -s.rmd files from -e.rmd files"
-	@echo "  preview     Preview one chapter: make ... preview CHAPTER=basic-e.rmd"
+	@echo "  preview     Preview one chapter: make ... preview CHAPTER=basic-e.rmd [SOL=1]"
 	@echo "  restore     renv::restore() to install/update R packages"
 	@echo "  clean       Remove generated book output directories"
 
@@ -54,11 +54,12 @@ all-sol: all html-sol pdf-sol epub-sol
 
 preview:
 	@if [ -z "$(CHAPTER)" ]; then \
-	  echo "Usage: make -f pracs-book/Makefile preview CHAPTER=<file>"; \
-	  echo "  e.g.: make -f pracs-book/Makefile preview CHAPTER=basic-e.rmd"; \
+	  echo "Usage: make -f pracs-book/Makefile preview CHAPTER=<file> [SOL=1]"; \
+	  echo "  e.g.: make -f pracs-book/Makefile preview CHAPTER=oral-e.rmd"; \
+	  echo "        make -f pracs-book/Makefile preview CHAPTER=oral-e.rmd SOL=1"; \
 	  exit 1; \
 	fi
-	$(RSCRIPT) 'bookdown::preview_chapter("$(BOOK_DIR)/$(CHAPTER)")'
+	SPE_SOLUTIONS=$(if $(SOL),1,0) $(RSCRIPT) 'setwd("$(BOOK_DIR)"); bookdown::preview_chapter("$(CHAPTER)")'
 
 restore:
 	$(RSCRIPT) 'renv::restore()'
