@@ -54,8 +54,8 @@ r.m <- gam(cbind(lex.Xst == "Dead", lex.dur) ~ s(A, k = 20),
                    data = subset(SL, sex == "M"))
 
 #-simpler modeling using the Lexisi attributes in SL ---------------------------
-r.m <- gam.Lexis(subset(SL, sex == "M"), ~ s(A, k = 20))
-r.f <- gam.Lexis(subset(SL, sex == "F"), ~ s(A, k = 20))
+r.m <- gam.Lexis(subset(SL, sex == "M"), ~ s(A, k = 10))
+r.f <- gam.Lexis(subset(SL, sex == "F"), ~ s(A, k = 10))
 
 # fitted ok ? ------------------------------------------------------------------
 gam.check(r.f)
@@ -97,13 +97,9 @@ summary(Mcr)
 summary(Fcr)
 
 #--------------------------------------------------------------------------------
-par(mfrow = c(2, 3))
-plot(Mcr, ylim = c(-3, 3))
-plot(Fcr, ylim = c(-3, 3))
-#--------------------------------------------------------------------------------
 par(mfcol = c(3, 2))
-plot(Mcr, ylim = c(-3, 3))
-plot(Fcr, ylim = c(-3, 3))
+plot(Mcr, ylim = c(-3, 3), col = "blue", lwd = 2)
+plot(Fcr, ylim = c(-3, 3), col = "blue", lwd = 2)
 
 #--------------------------------------------------------------------------------
 anova(Mcr, r.m, test = "Chisq")
