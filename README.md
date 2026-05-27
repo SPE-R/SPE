@@ -16,10 +16,7 @@ The 2026 edition runs **1–5 June 2026 in Tartu, Estonia**.
 
 ## Faculty: start here
 
-- **[`misc/SPE_faculty_setup.md`](misc/SPE_faculty_setup.md)** — the single onboarding guide: install git on Windows, authenticate to GitHub, the daily `pull / edit / commit / push` loop, what to edit (and what *not* to edit), how to add solution-only content in a single source file, and how to build the book locally.
-- [`misc/SPE_setup.md`](misc/SPE_setup.md) — installing R, RStudio and the `renv` package environment.
-- [`misc/SPE_git-quick_start.md`](misc/SPE_git-quick_start.md) — the RStudio-based git workflow with screenshots.
-- [`misc/compiling-practicals-book.md`](misc/compiling-practicals-book.md) — short reference on how `bookdown` assembles chapters and how to render one chapter while iterating.
+**[`misc/SPE_faculty_setup.md`](misc/SPE_faculty_setup.md)** is the single onboarding guide. It covers: installing git / R / RStudio / RTools, configuring RStudio to use git and bash, authenticating to GitHub (SSH or PAT), cloning the repo and restoring the `renv` environment, the daily `pull → edit → commit → push` loop, what to edit (and what NOT to edit), how to mark content as exercise-only or solution-only from a single source file, and how to build and preview the book locally.
 
 ## What CI does on every push to `master`
 

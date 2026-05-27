@@ -1,179 +1,185 @@
-SPE-R faculty setup guide
-=========================
+SPE-R faculty guide
+===================
 
-This guide walks SPE-R faculty through getting the [SPE repository](https://github.com/SPE-R/SPE)
-set up on a Windows machine, the everyday `git` actions you need, **which files
-to edit** for the 2026 Tartu edition, and how to build the practicals book
-locally before pushing.
+The single onboarding document for SPE-R faculty: get the
+[SPE repository](https://github.com/SPE-R/SPE) running on your laptop,
+learn the everyday `git` actions, and find your way around the practicals
+book sources for the 2026 Tartu edition.
 
-For step-by-step screenshots of the RStudio workflow, see
-[`SPE_git-quick_start.md`](SPE_git-quick_start.md). For the R/`renv` setup, see
-[`SPE_setup.md`](SPE_setup.md).
-
-If you get stuck at any step, write to <georgesd@iarc.who.int>.
+If you get stuck, write to <georgesd@iarc.who.int>.
 
 ---
 
 ## Table of contents
 
-- [1. One-time setup (Windows)](#1-one-time-setup-windows)
-  - [1.1 Install Git for Windows](#11-install-git-for-windows)
-  - [1.2 Install R and RStudio](#12-install-r-and-rstudio)
-  - [1.3 Tell git who you are](#13-tell-git-who-you-are)
-  - [1.4 Authenticate to GitHub (pick one)](#14-authenticate-to-github-pick-one)
-  - [1.5 Clone the SPE repository](#15-clone-the-spe-repository)
+- [1. One-time setup](#1-one-time-setup)
+  - [1.1 Install git](#11-install-git)
+  - [1.2 Install R, RStudio, RTools](#12-install-r-rstudio-rtools)
+  - [1.3 Configure RStudio to use git and the bash terminal](#13-configure-rstudio-to-use-git-and-the-bash-terminal)
+  - [1.4 Authenticate to GitHub](#14-authenticate-to-github)
+  - [1.5 Clone the repository and restore R packages](#15-clone-the-repository-and-restore-r-packages)
 - [2. Daily git workflow](#2-daily-git-workflow)
-- [3. What to edit (and what NOT to edit)](#3-what-to-edit-and-what-not-to-edit)
-- [4. Build the book locally](#4-build-the-book-locally)
-- [5. After you push: what happens](#5-after-you-push-what-happens)
+- [3. What to edit](#3-what-to-edit)
+  - [3.1 Exercise vs solution content in one file](#31-exercise-vs-solution-content-in-one-file)
+- [4. Build and preview locally](#4-build-and-preview-locally)
+- [5. What happens after you push](#5-what-happens-after-you-push)
 
 ---
 
-## 1. One-time setup (Windows)
+## 1. One-time setup
 
-### 1.1 Install Git for Windows
+### 1.1 Install git
 
-Download and install Git for Windows from <https://git-scm.com/download/win>.
-Accept the defaults; this gives you both **Git Bash** (a small Linux-style
-terminal where the `git` commands shown below work) and integration with
-RStudio.
+**Windows** (no admin rights needed):
 
-Verify by opening **Git Bash** and typing:
+1. Download the **Portable** edition from <https://git-scm.com/download/win>
+   (look for "Portable" — file named like `PortableGit-2.XX.X-64-bit.7z.exe`).
+2. Run the file — it self-extracts. Pick a folder you have write access to,
+   e.g. `C:\Users\<you>\PortableGit\`.
+3. Verify by double-clicking `<PortableGit>\git-bash.exe` and typing
+   `git --version`.
+
+**macOS**: `brew install git`
+
+**Linux**: `sudo apt install git` (Debian/Ubuntu) or your distribution's
+equivalent.
+
+### 1.2 Install R, RStudio, RTools
+
+- **R**: <https://cran.r-project.org/bin/windows/base/>
+- **RStudio Desktop**: <https://posit.co/download/rstudio-desktop/>
+- **RTools** (Windows only): <https://cran.r-project.org/bin/windows/Rtools/>.
+  Match the version to your R (e.g. RTools 4.4 for R 4.4.x). RTools ships
+  `make.exe`, which the local book Makefile relies on, plus the toolchain
+  needed to compile some R packages from source.
+
+### 1.3 Configure RStudio to use git and the bash terminal
+
+So that the Git pane and the Terminal both work from inside RStudio:
+
+1. **Tools → Global Options → Git/SVN**:
+   - Tick *Enable version control interface for RStudio projects*.
+   - *Git executable*: browse to `<PortableGit>\bin\git.exe` (Windows).
+     On macOS/Linux the default value is usually fine.
+2. **Tools → Global Options → Terminal** (Windows only):
+   - *New terminals open with*: **Custom**.
+   - *Custom shell binary*: `<PortableGit>\bin\bash.exe`.
+   - *Custom shell options*: `--login -i`.
+3. Restart RStudio.
+
+Open a new Terminal (Terminal pane → **+**) and verify:
 
 ```bash
-git --version
+git  --version
+bash --version
+make --version    # only if you installed RTools
 ```
 
-### 1.2 Install R and RStudio
+Every `git` and `make` command in the rest of this guide can be typed
+directly into the RStudio Terminal — no need to leave the IDE.
 
-- Install the latest R from <https://cran.r-project.org/bin/windows/base/>.
-- Install RStudio Desktop from <https://posit.co/download/rstudio-desktop/>.
-- Once you've cloned the repo (step 1.5), follow [`SPE_setup.md`](SPE_setup.md)
-  to restore the `renv` environment.
+### 1.4 Authenticate to GitHub
 
-### 1.3 Tell git who you are
-
-In Git Bash, run **once**:
+GitHub no longer accepts password authentication. First tell git who you
+are, then pick one of two auth methods.
 
 ```bash
 git config --global user.name  "Your Full Name"
-git config --global user.email "you@example.org"      # use the email tied to your GitHub account
+git config --global user.email "you@example.org"     # email tied to your GitHub account
 git config --global init.defaultBranch master
 ```
 
-### 1.4 Authenticate to GitHub (pick one)
+> You must be a member of the [SPE-R organisation](https://github.com/orgs/SPE-R/people)
+> to push. If you are not yet, email <georgesd@iarc.who.int>.
 
-GitHub no longer accepts password authentication. You need either an **SSH
-key** (recommended for long-lived setups) or a **personal access token (PAT)**
-(easier for first-time users).
-
-#### Option A — SSH key (recommended)
-
-In Git Bash:
+#### (a) SSH key — recommended for long-term use
 
 ```bash
-ssh-keygen -t ed25519 -C "you@example.org"
-# Press Enter to accept the default file location.
-# Optionally set a passphrase.
-
-# Start the ssh-agent so it remembers the key:
+ssh-keygen -t ed25519 -C "you@example.org"   # press Enter for defaults
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519
 
-# Copy the public key to your clipboard:
-clip < ~/.ssh/id_ed25519.pub
+clip < ~/.ssh/id_ed25519.pub                 # Windows
+# macOS:  pbcopy < ~/.ssh/id_ed25519.pub
+# Linux:  xclip -sel clip < ~/.ssh/id_ed25519.pub
 ```
 
-Then in your browser:
-
-1. Go to <https://github.com/settings/keys>
-2. Click **New SSH key**
-3. Title: something memorable (e.g. *Lab laptop 2026*)
-4. Paste the key (already in your clipboard) and click **Add SSH key**
-
-Test it:
+Then in your browser: <https://github.com/settings/keys> → **New SSH key**
+→ paste → **Add SSH key**. Test:
 
 ```bash
-ssh -T git@github.com
-# expected: "Hi <username>! You've successfully authenticated..."
+ssh -T git@github.com    # expected: "Hi <username>! You have successfully authenticated..."
 ```
 
-When you clone in step 1.5, use the **SSH URL** form (`git@github.com:SPE-R/SPE.git`).
+For step 1.5, use the **SSH** clone URL: `git@github.com:SPE-R/SPE.git`.
 
-#### Option B — Personal access token (PAT)
+#### (b) Personal access token (PAT) — easier for first-timers
 
-In R (e.g. inside RStudio):
+In R:
 
 ```r
-install.packages(c("usethis", "gitcreds"))   # if not already installed
-usethis::create_github_token()
+install.packages(c("usethis", "gitcreds"))
+usethis::create_github_token()    # opens the GitHub token page in your browser
 ```
 
-This opens the GitHub token creation page in your browser. Suggested settings:
-
-- **Note**: *SPE-R 2026 token* (any memorable label)
-- **Expiration**: *90 days* (you'll regenerate when it expires)
-- **Scopes**: tick `repo`, `workflow`
-
-Click **Generate token**, **copy the token immediately** (you won't see it again),
-then in R:
+Tick scopes **`repo`** and **`workflow`**, click **Generate token**,
+**copy it immediately** (you only see it once), then:
 
 ```r
-gitcreds::gitcreds_set()
-# paste the token when prompted
+gitcreds::gitcreds_set()          # paste the token when prompted
 ```
 
-When you clone in step 1.5, use the **HTTPS URL** form (`https://github.com/SPE-R/SPE.git`).
+PATs expire (90 days by default); you'll need to regenerate when that
+happens.
 
-> **Note:** You need to be a member of the [SPE-R GitHub organization](https://github.com/orgs/SPE-R/people)
-> to push. If you aren't yet, email <georgesd@iarc.who.int>.
+For step 1.5, use the **HTTPS** clone URL: `https://github.com/SPE-R/SPE.git`.
 
-### 1.5 Clone the SPE repository
+### 1.5 Clone the repository and restore R packages
 
-In Git Bash, pick where you want the repo on disk and run:
+In your terminal:
 
 ```bash
-cd /c/Users/<you>/Documents             # or wherever you keep code
-git clone git@github.com:SPE-R/SPE.git  # SSH form (Option A)
-# or:
-git clone https://github.com/SPE-R/SPE.git   # HTTPS form (Option B, PAT)
+cd /c/Users/<you>/Documents             # Windows; macOS/Linux: cd ~/Documents
+git clone git@github.com:SPE-R/SPE.git  # SSH (or HTTPS form per 1.4)
 cd SPE
 ```
 
-(In RStudio: *File → New Project → Version Control → Git*, paste the URL,
-choose a parent directory, *Create Project*.)
+Then in RStudio: **File → Open Project in New Session...**, select the `SPE`
+folder. In the R console:
+
+```r
+renv::restore()        # downloads and installs all R packages locked in renv.lock
+```
+
+This takes 10–30 minutes the first time (packages compile from source on
+macOS/Linux; binary on Windows). Subsequent runs are seconds — packages
+are cached.
 
 ---
 
 ## 2. Daily git workflow
 
-The everyday cycle is **pull → edit → commit → pull → push**.
+The everyday cycle is **pull → edit → commit → pull → push**:
 
 ```bash
-git pull                              # 1. get the latest from GitHub before you start
-# ... edit your files in RStudio or any editor ...
-git status                            # 2. see what you've changed
-git add adm/prog.tex pracs-book/your-chapter-e.rmd   # 3. stage specific files
-git commit -m "Update Day 1 program for Tartu"        # 4. commit with a clear message
-git pull                              # 5. pull again before pushing (avoids conflicts)
-git push                              # 6. push your commits to GitHub
+git pull                                 # 1. before you start
+# ... edit files ...
+git status                               # 2. see what changed
+git add adm/prog.tex pracs-book/your-chapter-e.rmd      # 3. stage specific files
+git commit -m "Update Day 1 program for Tartu"          # 4. commit with a clear message
+git pull                                 # 5. again, just before pushing
+git push                                 # 6. push to GitHub
 ```
 
-Same six steps in RStudio's *Git* tab: **Pull**, edit, tick the changed files,
-**Commit** (write a message), then **Pull** again, then **Push**.
+Same six steps via RStudio's **Git** pane if you prefer: *Pull*, edit,
+tick files, *Commit* (write a message), *Pull* again, *Push*.
 
-A few habits that will save you grief:
+Habits worth keeping:
 
-- **Pull before you start editing.** Always.
-- **Commit small, focused chunks** (one logical change per commit) with
-  descriptive messages — "Fix typo in causal inference section" beats
-  "updates".
-- **Pull just before pushing** in case someone else pushed while you were
-  working. If git reports a conflict, RStudio will show you the differences;
-  you pick which side to keep, then commit the resolution.
-- **Push at least once a day** so nothing lives only on your laptop.
-
-For more detail with screenshots see [`SPE_git-quick_start.md`](SPE_git-quick_start.md).
+- **Pull before you edit.** Always.
+- **Commit small, descriptive chunks.** "Fix typo in causal inference" beats "updates".
+- **Pull just before pushing** so you catch any conflicts early.
+- **Push at least daily** so nothing important lives only on your laptop.
 
 ---
 
@@ -181,51 +187,52 @@ For more detail with screenshots see [`SPE_git-quick_start.md`](SPE_git-quick_st
 
 | Path | What it is |
 |---|---|
-| `pracs-book/*-e.rmd` | **The practicals.** One R Markdown file per session. **This is the only file per chapter that you edit.** Both books (exercise and with-solutions) are rendered from this one source — see section 3.1 below. |
+| `pracs-book/*-e.rmd` | **The practicals.** Edit only the `-e.rmd` files. Both books (exercise and with-solutions) are rendered from this single source — see section 3.1. |
 | `pracs-book/index.Rmd` | Book front matter: title, dates, authors. Rarely needs touching. |
 | `adm/prog.tex` | The 2-page program (compiled to PDF). |
-| `adm/SPE-R-timetable.md` | The detailed timetable with links (rendered to the website). |
-| `lectures/<your-topic>/` | Your lecture slides — whatever source format you use — plus the compiled `.pdf` we ship to students. |
+| `adm/SPE-R-timetable.md` | The detailed timetable with links (rendered on the website). |
+| `lectures/<your-topic>/` | Your lecture sources + the compiled `.pdf` shipped to students. |
 
 **Do NOT edit**:
 
 | Path | Why |
 |---|---|
-| `pracs-book/*-s.rmd` | Auto-generated on every build from the matching `-e.rmd` by [`misc/from_e_to_s_rmd.R`](from_e_to_s_rmd.R). The file is git-ignored; any local copy is regenerated. |
-| `pracs-book/SPE-R-*-practicals*.Rmd` | Auto-generated merged book file. If you see one in the directory, it is a leftover from a failed render — run `make -f pracs-book/Makefile clean` before retrying. |
+| `pracs-book/*-s.rmd` | Auto-generated on every build from the matching `-e.rmd`. Your edits are lost. |
+| `pracs-book/SPE-R-*-practicals*.Rmd` | Auto-generated merged book file. If you see one in `pracs-book/`, run `make -f pracs-book/Makefile clean` (or delete it). |
 | `pracs-book/SPE-R-*-practicals*/` | Built book output (git-ignored). |
-| `pracs-book/_unused/` | Archived chapters and front-matter, kept for reference. |
-| `renv/`, `renv.lock` | R package environment. Touch only via `renv::snapshot()` and only when you have deliberately added a package. |
+| `pracs-book/_unused/` | Archived chapters, kept for reference. |
+| `renv/`, `renv.lock` | R package environment. Touch only via `renv::snapshot()`. |
 | `.github/workflows/` | CI definitions. Coordinate with Damien before changing. |
 
-### 3.1 How exercise and solution content differ — in one source file
+### 3.1 Exercise vs solution content in one file
 
 You write ONE `-e.rmd` per practical. The build produces TWO books from
 the same source:
 
-- the **exercise book** — what students get during the course;
-- the **with-solutions book** — extra explanations and full code, shipped alongside.
+- **exercise book** — what students get during the course;
+- **with-solutions book** — extra explanations and full code, shipped alongside.
 
-The differentiation is driven by an `SPE_SOLUTIONS` env var, set automatically
-by CI and the local Makefile. By default, code chunk **output** (text and
-figures) is hidden in the exercise book and shown in the with-solutions book —
-you do not have to do anything to get that. For finer control, four primitives
-let you mark content as exercise-only, solution-only, or both:
+Dispatch is driven by an `SPE_SOLUTIONS` environment variable, set
+automatically by CI and the Makefile. By default chunk **output** (text and
+figures) is hidden in the exercise book and shown in the with-solutions
+book — nothing to do.
 
-| What you want | How to write it |
+For finer control, mark content as exercise-only, solution-only, or shared:
+
+| What you want | How |
 |---|---|
-| Prose / code shown in **both** books | Just write it. |
-| **Inline** prose in one book only | `` `r solution("Only in solutions.")` `` / `` `r exercise("Only in exercises.")` `` |
-| A **multi-line** prose block in one book only | `::: solution` …content… `:::` &nbsp;&nbsp; (or `::: exercise`) |
-| A **whole code chunk** in one book only | ` ```{r, solution = TRUE} ` &nbsp;&nbsp; (or `exercise = TRUE`) |
-| The **same code** but evaluated only in the solutions | ` ```{r, eval = spe_solutions()} ` |
+| Prose / code in **both** books | Just write it. |
+| **Inline** prose, one book only | `` `r solution("Only in solutions.")` `` / `` `r exercise("Only in exercises.")` `` |
+| **Multi-line** prose block, one book only | `::: solution` … `:::` &nbsp;&nbsp; (or `::: exercise`) |
+| **Whole code chunk**, one book only | ` ```{r, solution = TRUE} ` &nbsp;&nbsp; (or `exercise = TRUE`) |
+| **Same code**, run only in solutions | ` ```{r, eval = spe_solutions()} ` |
 
-A self-contained example combining most of them:
+Self-contained example:
 
 ````markdown
 Compute the rate.
 
-`r exercise("Hint: use the rate variable from the dataset.")`
+`r exercise("Hint: use the rate variable.")`
 
 ```{r, exercise = TRUE, eval = FALSE}
 mean_rate <- ___          # fill in the blank
@@ -238,78 +245,89 @@ mean_rate
 
 ::: solution
 **Bonus**: in epidemiological practice we usually also report a 95% CI.
-Compute it with `epitools::pois.exact()` and compare to the asymptotic
-interval — they differ for small denominators.
+Compute it with `epitools::pois.exact()`.
 :::
 ````
 
-The implementation lives in [`pracs-book/_common.R`](../pracs-book/_common.R)
-(R helpers and chunk hooks) and
-[`pracs-book/_solutions.lua`](../pracs-book/_solutions.lua) (a pandoc filter
-for the fenced `::: solution` / `::: exercise` divs). You should not need to
-touch either while writing a practical.
+See [`pracs-book/ggplot2-e.rmd`](../pracs-book/ggplot2-e.rmd) for a fully
+migrated example. The implementation lives in
+[`pracs-book/_common.R`](../pracs-book/_common.R) and
+[`pracs-book/_solutions.lua`](../pracs-book/_solutions.lua); you should
+not need to touch either.
 
-> **Legacy** — a handful of older chapters do not yet use the primitives
-> above. For those, the `-s.rmd` file is generated mechanically from the
-> matching `-e.rmd` (basically `results = "hide"` → `results = "markup"`),
-> with no room for solution-only content. When you next touch one of those
-> chapters and want to add extras to the solutions, migrate it to the
-> single-source pattern: see [`pracs-book/ggplot2-e.rmd`](../pracs-book/ggplot2-e.rmd)
-> as a worked example.
+> A handful of older chapters still use the legacy split `-e.rmd` /
+> `-s.rmd` pair (the `-s.rmd` is auto-generated from `-e.rmd` and is the
+> only thing that ships in the solutions book for those chapters). When
+> you next touch one of those chapters and want to add solution-only
+> extras, migrate it: drop the explicit `results = "hide"` from its
+> setup chunk, then use the primitives above.
 
 ---
 
-## 4. Build the book locally
+## 4. Build and preview locally
 
-Before you push, build the book locally to make sure your edits render. From
-the **repo root** (i.e. inside `SPE/`):
+From the **repo root**.
 
-```bash
-make -f pracs-book/Makefile help          # list all targets
-make -f pracs-book/Makefile restore       # one-time: install R packages from renv.lock
-make -f pracs-book/Makefile preview CHAPTER=basic-e.rmd     # fast: render one chapter
-make -f pracs-book/Makefile html          # render the full HTML book (no LaTeX needed)
-make -f pracs-book/Makefile pdf           # render the full PDF book (needs TinyTeX)
-make -f pracs-book/Makefile html-sol      # HTML book WITH solutions
-make -f pracs-book/Makefile pdf-sol       # PDF book WITH solutions
-make -f pracs-book/Makefile clean         # wipe build outputs (do this if a render fails midway)
+### Preview one chapter (fast, ~1 min)
+
+```r
+setwd("pracs-book")
+
+# Exercise version:
+Sys.setenv(SPE_SOLUTIONS = "0")
+bookdown::preview_chapter("oral-e.rmd")
+
+# With-solutions version
+Sys.setenv(SPE_SOLUTIONS = "1")
+bookdown::preview_chapter("ggplot2-e.rmd")
 ```
 
-The HTML build needs no LaTeX and is fastest — use it for everyday checking.
-Use `pdf` / `pdf-sol` before pushing if your edits touch math, figures, or
-page-layout-sensitive bits.
+### Full book (10–25 min)
 
-If `make ... html` fails midway, **always run `make ... clean` before
-retrying** — bookdown leaves a half-written merged file behind that causes
-subsequent renders to use stale content.
+If you have `make` (RTools provides it on Windows):
 
-> Don't have `make` on Windows? You can either install it via Git for
-> Windows (it includes a `make.exe` if you tick the optional tools) or run
-> the equivalent R commands directly:
->
-> ```r
-> options(knitr.duplicate.label = "allow")
-> bookdown::render_book("pracs-book/", "bookdown::gitbook")            # html
-> bookdown::render_book("pracs-book/", "bookdown::pdf_book")           # pdf
-> ```
+```bash
+make -f pracs-book/Makefile help        # list all targets
+make -f pracs-book/Makefile html        # exercise book, HTML
+make -f pracs-book/Makefile html-sol    # with-solutions book, HTML
+make -f pracs-book/Makefile pdf         # PDF (needs TinyTeX)
+make -f pracs-book/Makefile clean       # wipe build artefacts — always do this if a render fails midway
+```
+
+Without `make`, run the R equivalents from the repo root:
+
+```r
+options(knitr.duplicate.label = "allow")
+Sys.setenv(SPE_SOLUTIONS = "0"); bookdown::render_book("pracs-book/", "bookdown::gitbook")
+Sys.setenv(SPE_SOLUTIONS = "1"); bookdown::render_book("pracs-book/", "bookdown::gitbook",
+                                                       config_file  = "_bookdown-sol.yml",
+                                                       new_session  = TRUE)
+```
+
+Chapter order is defined in
+[`pracs-book/_bookdown.yml`](../pracs-book/_bookdown.yml) (exercise book)
+and [`pracs-book/_bookdown-sol.yml`](../pracs-book/_bookdown-sol.yml)
+(with-solutions). If you add a new practical, update both lists.
 
 ---
 
-## 5. After you push: what happens
+## 5. What happens after you push
 
-A push to `master` automatically triggers two GitHub Actions workflows:
+A push to `master` triggers two GitHub Actions workflows:
 
-1. **`renderbook`** — builds the practicals book in HTML + PDF + EPUB (both
-   exercise and with-solutions versions) and deploys to the `gh-pages` branch.
-   Visible at <https://spe-r.github.io/SPE/SPE-R-2026-practicals/>.
-2. **`Compile and build SPE-R GitHub material`** — compiles the lecture
-   handouts, extracts the R solution scripts, builds the data and material
-   zips, and deploys to the `gh-spe-material` branch.
+1. [`renderbook`](../.github/workflows/deploy_bookdown.yml) — renders the
+   practicals book (HTML + PDF + EPUB, exercise and with-solutions) and
+   deploys to the `gh-pages` branch. Visible at
+   <https://spe-r.github.io/SPE/SPE-R-2026-practicals/>.
+2. [`Compile and build SPE-R GitHub material`](../.github/workflows/jekyll-gh-pages.yml)
+   — compiles the lecture handouts, extracts R solution scripts, builds the
+   data and material zips, and deploys to the `gh-spe-material` branch.
 
-Both runs take 20–30 minutes. You can watch them at
-<https://github.com/SPE-R/SPE/actions>. The course website at
+Each run takes 20–30 minutes. Watch them at
+<https://github.com/SPE-R/SPE/actions>. The course landing page at
 <https://spe-r.github.io/> picks up the new artifacts automatically.
 
-If a run fails, GitHub will email you. Most failures are content-related (a
-broken R chunk, a missing package); a few are infrastructure-related (apt
-mirror hiccups, blocked third-party actions). For the latter, ping Damien.
+If a run fails, GitHub emails you. Most failures are content-related (a
+broken R chunk, a missing package); a few are infrastructure-related
+(blocked third-party actions, mirror hiccups). For the latter, ping
+Damien.
