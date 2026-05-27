@@ -53,6 +53,26 @@ bdat$bp <-
 -  Adjusted for sex and blood pressure
 
 
+```
+##              Estimate    StdErr          z            P      2.5%     97.5%
+## (Intercept) 62.859969 0.3675782 171.011139 0.000000e+00 62.139529 63.580409
+## beer         4.636855 0.5350308   8.666521 4.455243e-18  3.588214  5.685497
+```
+
+```
+##                Estimate    StdErr            z            P      2.5%     97.5%
+## (Intercept) 59.82103936 0.3385255 176.71058142 0.000000e+00 59.157542 60.484537
+## beer         0.03799114 0.4963653   0.07653868 9.389905e-01 -0.934867  1.010849
+## sex         10.41918706 0.4955864  21.02395689 3.960039e-98  9.447856 11.390519
+```
+
+```
+##               Estimate     StdErr         z            P       2.5%      97.5%
+## (Intercept) 31.5451508 2.87102497 10.987418 4.393153e-28 25.9180453 37.1722564
+## beer        -2.1167892 0.52129220 -4.060658 4.893468e-05 -3.1385031 -1.0950752
+## sex          9.2613661 0.48726293 19.006917 1.494833e-80  8.3063483 10.2163839
+## bp           0.2022089 0.02040106  9.911687 3.703398e-23  0.1622236  0.2421943
+```
 
 -  What would be the conclusions on the effect of beer on weight, based on the three models? Do they agree? 
 Which (if any) of the models gives an unbiased estimate of the
@@ -71,10 +91,53 @@ bdat$weight <-
 ```
 
 
+```
+##              Estimate    StdErr         z            P      2.5%     97.5%
+## (Intercept) 62.943484 0.3655327 172.19658 0.000000e+00 62.227053 63.659915
+## beer         6.594088 0.5320534  12.39366 2.828467e-35  5.551282  7.636893
+```
+
+```
+##              Estimate    StdErr          z            P      2.5%     97.5%
+## (Intercept) 60.044133 0.3425254 175.298345 0.000000e+00 59.372796 60.715471
+## beer         2.206450 0.5022302   4.393304 1.116407e-05  1.222097  3.190803
+## sex          9.940632 0.5014420  19.824089 1.844900e-87  8.957824 10.923440
+```
+
+```
+##                Estimate     StdErr           z            P       2.5%
+## (Intercept) 29.20498335 2.87494891 10.15843560 3.039136e-24 23.5701870
+## beer         0.02342766 0.51665057  0.04534527 9.638321e-01 -0.9891888
+## sex          8.95815033 0.48333386 18.53408411 1.096406e-76  8.0108334
+## bp           0.21882667 0.02026973 10.79573447 3.605679e-27  0.1790987
+##                  97.5%
+## (Intercept) 34.8397797
+## beer         1.0360442
+## sex          9.9054673
+## bp           0.2585546
+```
 
 -  Suppose one is interested in the effect of beer-drinking on blood pressure instead, and is fitting a) an unadjusted model  for blood pressure, with beer as an only covariate; b) a model with beer and sex as covariates. Would either a) or b) give an unbiased estimate for the effect? (You may double-check whether the simulated data is consistent with your answer).
 
 
+```
+##              Estimate    StdErr         z            P      2.5%     97.5%
+## (Intercept) 142.23909 0.4662278 305.08500 0.000000e+00 141.32530 143.15288
+## beer         11.95775 0.6786207  17.62066 1.709885e-69  10.62768  13.28782
+```
+
+```
+##                Estimate     StdErr          z            P        2.5%
+## (Intercept) 112.1849944 2.70543525 41.4665235 0.000000e+00 106.8824388
+## beer          8.9197526 0.70998181 12.5633538 3.357917e-36   7.5282139
+## weight        0.4787242 0.04434383 10.7957345 3.605679e-27   0.3918119
+## sex          -0.2690508 0.82901143 -0.3245441 7.455261e-01  -1.8938833
+##                   97.5%
+## (Intercept) 117.4875501
+## beer         10.3112914
+## weight        0.5656366
+## sex           1.3557818
+```
 
 
 ## DAG tools in the package `dagitty`
@@ -141,6 +204,15 @@ Let's look at all possible paths from $C$ to $D$:
 ``` r
 paths(g, "C", "D")
 ```
+
+```
+## $paths
+## [1] "C -> Z -> D"           "C -> Z <- Y -> U -> D" "C <- S -> Y -> U -> D"
+## [4] "C <- S -> Y -> Z -> D" "C <- X -> D"          
+## 
+## $open
+## [1]  TRUE FALSE  TRUE  TRUE  TRUE
+```
 As you see, one path contains a collider and is therefore a *closed* path and the others are *open*.   
 
 Let's identify the minimal sets of variables needed to adjust the model for $D$ for, to obtain an unbiased estimate of the effect of $C$. You can specify, whether you want to estimate direct or total effect of $C$:
@@ -150,9 +222,22 @@ Let's identify the minimal sets of variables needed to adjust the model for $D$ 
 adjustmentSets(
   g, exposure = "C", outcome = "D", effect = "direct"
 )
+```
+
+```
+## { U, X, Z }
+## { X, Y, Z }
+```
+
+``` r
 adjustmentSets(
   g, exposure = "C", outcome = "D", effect = "total"
 )
+```
+
+```
+## { X, Y }
+## { S, X }
 ```
 
 Thus, for total effect estimation one should adjust for $X$ and either $Y$ or $S$, whereas for direct effect estimation, one would also need to adjust for $Z$.
@@ -162,11 +247,21 @@ You can verify that, these are the variables that will block all open paths from
 **Now try to do the *beer-weight* exercise using *dagitty*: **
 
 -  Create the DAG and plot it
-
+![](causal-s_files/figure-epub3/dagitty6-1.png)<!-- -->
 -  What are the paths from WEIGHT to BEER?
 
+```
+## $paths
+## [1] "BEER -> BP <- WEIGHT"  "BEER <- SEX -> WEIGHT"
+## 
+## $open
+## [1] FALSE  TRUE
+```
 -  Will you get the same recommendation for the adjustment variable selection as you found before?
 
+```
+## { SEX }
+```
 
 ## Identifying the true DAG for the data
 The following code creates three DAGs
@@ -428,6 +523,12 @@ n <- 10000
 mrdat <- data.frame(G = rbinom(n, 2, 0.2))
 table(mrdat$G)
 ```
+
+```
+## 
+##    0    1    2 
+## 6394 3243  363
+```
 -  Also generate the confounder variable U 
 
 ``` r
@@ -450,11 +551,26 @@ mrdat$Y <-
 -  Verify, that simple regression model for $Y$, with $BMI$ as a covariate, results in a biased 
 estimate of the causal effect (parameter estimate is different from what was generated) 
 
+```
+##              Estimate      StdErr         z P       2.5%      97.5%
+## (Intercept) 17.814562 0.097792556  182.1668 0 17.6228919 18.0062316
+## BMI         -0.486091 0.003850138 -126.2529 0 -0.4936372 -0.4785449
+```
 How different is the estimate from 0.1?  
 
 -   Estimate a regression model for $Y$ with two covariates, $G$ and $BMI$. Do you see a significant effect of $G$?
 Could you explain analytically, why one may see a significant parameter estimate for $G$ there?
 
+```
+##               Estimate      StdErr          z             P       2.5%
+## (Intercept) 18.0909026 0.094546402  191.34417  0.000000e+00 17.9055950
+## G            0.4322114 0.015159003   28.51186 8.349696e-179  0.4025003
+## BMI         -0.5037944 0.003754425 -134.18684  0.000000e+00 -0.5111529
+##                  97.5%
+## (Intercept) 18.2762101
+## G            0.4619225
+## BMI         -0.4964359
+```
 
 -  Find an IV (instrumental variables) estimate, using G as an instrument, by following the algorithm 
 in the lecture notes (use two linear models and find a ratio of the parameter estimates). 
@@ -463,12 +579,35 @@ Does the estimate get closer to the generated effect size?
 ``` r
 mgx <- lm(BMI ~ G, data = mrdat)
 ci.lin(mgx) # check the instrument effect
+```
+
+```
+##               Estimate     StdErr        z            P       2.5%     97.5%
+## (Intercept) 25.0344094 0.02728767 917.4255 0.000000e+00 24.9809266 25.087892
+## G            0.6677507 0.03982435  16.7674 4.226261e-63  0.5896964  0.745805
+```
+
+``` r
 bgx <- mgx$coef[2] # save the 2nd coefficient (coef of G)
 mgy <- lm(Y ~ G, data = mrdat)
 ci.lin(mgy)
+```
+
+```
+##               Estimate     StdErr          z            P       2.5%     97.5%
+## (Intercept) 5.47870698 0.01714404 319.569267 0.0000000000 5.44510528 5.5123087
+## G           0.09580235 0.02502046   3.828961 0.0001286856 0.04676316 0.1448416
+```
+
+``` r
 bgy <- mgy$coef[2]
 causeff <- bgy / bgx
 causeff # closer to 0.1?
+```
+
+```
+##         G 
+## 0.1434702
 ```
 
 -   A proper simulation study would require the analysis to be run several times, to see the extent of variability in the parameter estimates. 
@@ -502,6 +641,11 @@ Now look at the distribution of the parameter estimate:
 summary(mr)
 ```
 
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.03929 0.07114 0.09158 0.09942 0.12628 0.18344
+```
+
 -  (*optional*) Change the code of simulations so that the assumptions are violated: add a weak direct effect of the genotype G to the equation that generates $Y$:
 
 ``` r
@@ -520,6 +664,27 @@ causal effect and also the proper standard error. Do you get the same estimate a
 if (!("sem" %in% installed.packages())) install.packages("sem")
 library(sem)
 summary(tsls(Y ~ BMI, ~G, data = mrdat))
+```
+
+```
+## 
+##  2SLS Estimates
+## 
+## Model Formula: Y ~ BMI
+## 
+## Instruments: ~G
+## 
+## Residuals:
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -6.67516 -1.12096  0.01737  0.00000  1.14845  6.30438 
+## 
+##               Estimate Std. Error t value   Pr(>|t|)    
+## (Intercept) 1.82986792 1.05930298 1.72743 0.08412200 .  
+## BMI         0.14814836 0.04198705 3.52843 0.00041991 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1.6870674 on 9998 degrees of freedom
 ```
 (There are also several other R packages for IV estimation and Mendelian Randomization (*MendelianRandomization* for instance))
 

@@ -1,11 +1,17 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 
 
 # Estimation of effects: simple and more complex
 
 This exercise deals with analysis of metric and binary 
-response variables. 
+response variables in the framework of linear and 
+generalized linear models. 
 We start with simple estimation of effects of a binary, categorical or
-a numeric explanatory variable, the explanatory or exposure variable of interest. 
+a numeric explanatory or exposure variable of interest. 
 Then evaluation of potential  modification and/or confounding by other variables
 is considered by stratification by and adjustment/control for these variables.
 For such tasks we utilize functions `lm()` and `glm()`
@@ -28,16 +34,15 @@ to analysis. The main types are:
 All these response variable are numeric.
 
 Variables on which the response may depend are called *explanatory
-variables* or *regressors*. They can be categorical factors or numeric variables.
-A further important aspect of explanatory variables is the role they will play in the analysis.
-
+variables* or *regressors*. They can be categorical factors or
+numeric variables.
+A further important aspect of explanatory variables is the role they 
+will play in the analysis.
 
 -  Primary role: exposure.
 -  Secondary role: confounder and/or effect-measure modifier.
 
-
-
-The word **effect** 
+The word *effect* 
 is used here as a general term referring to ways of
 contrasting or comparing the expected values of the response variable at
 different levels of an explanatory 
@@ -47,7 +52,6 @@ variable. The main comparative measures or effect measures are:
 -  Ratios of odds for a binary response.
 -  Ratios of rates for a failure or count response.
 
-
 Other kinds of *contrasts* between exposure groups
 include (a) ratios of geometric means for positive-valued  
 metric outcomes,
@@ -56,7 +60,7 @@ metric outcomes,
 differences between incidence or mortality rates.
 
 Note that in spite of using the causally loaded word *effect*,
-we treat *outcome regression* modelling
+in this exercise we treat *outcome regression* modelling
 here primarily with descriptive or predictive aims in mind. 
 Traditionally, these types of models have also been used
 to estimate *causal effects* of exposure variables
@@ -95,11 +99,10 @@ str(births)
 ##  $ hyp    : num  0 0 0 0 1 0 0 0 0 0 ...
 ##  $ sex    : num  2 1 2 1 1 2 2 1 2 1 ...
 ```
-2. We perform similar housekeeping tasks as in a previous exercise. 
-<!-- %% Two of them are directly converted into factors. -->
-<!-- %% Categorical versions of two continuous variables are  -->
-<!-- %% created by function `cut()`. -->
-<!-- %% Also, express birth weights in kilograms -->
+2. We perform some housekeeping tasks by 
+by first converting directly two binary (0/1) variables into factors,
+and creating sategorical versions of two continuous variables are  -->
+ by function `cut()`.
 
 ``` r
 births$hyp <- factor(births$hyp, labels = c("normal", "hyper"))
@@ -109,8 +112,9 @@ births$gest4 <- cut(births$gestwks,
   breaks = c(20, 35, 37, 39, 45), right = FALSE)
 ```
 3. Have a look at univariate summaries of the different 
-variables in the data; especially
-the location and dispersion of the distribution of  `bweight`.
+variables in the data: 
+location (median and mean), quartiles and range. After that compute 
+the standard deviation of the distribution of  `bweight`.
 
 ``` r
 summary(births)
@@ -176,8 +180,7 @@ of the  null hypothesis that there is no effect of `hyp` on birth weight
  However, `t.test()` does not provide
 the point estimate for the effect of `hyp`; only the test result and a confidence interval. -- The estimated effect of `hyp` on birth weight, 
 measured as a difference in means between hypertensive and normotensive
-mothers, 
-is $3199-2768 = 431$ g.
+mothers, is $2768-3199 = -431$ g.
 
 2. The same task can easily be performed by `lm()` or by `glm()`. 
 The main argument in both 
@@ -185,9 +188,10 @@ is the *model formula*, the left hand side being the response variable
 and the right hand side
 after $\sim$ defines the explanatory variables and their 
 joint effects on the response. Here the only
-explanatory variable is the binary factor `hyp`. With `glm()` one specifies the
-`family`, i.e. the assumed distribution of the response variable. However,
-in case you use
+explanatory variable is the binary factor `hyp`. 
+With `glm()` one specifies the
+`family`, i.e. the assumed distribution of the response variable. 
+However, in case you use
 `lm()`, this argument is not needed, because `lm()` fits only 
 models for metric responses assuming Gaussian distribution.
 
@@ -236,7 +240,7 @@ We shall now examine whether and to what extent the
 *effect*  of `hyp`  on `bweight`, i.e. the 
  mean difference between hypertensive and normotensive mothers, 
  varies by `sex` without assigning 
- causal interpretation to the estimated contrasts.
+ any causal interpretation to the estimated contrasts.
 
 1. The following *interaction plot*
 shows how the mean `bweight` depends jointly on `hyp` and `gest4`
@@ -245,6 +249,8 @@ shows how the mean `bweight` depends jointly on `hyp` and `gest4`
 par(mfrow = c(1, 1))
 with(births, interaction.plot(sex, hyp, bweight))
 ```
+
+![](effects-s_files/figure-epub3/bweight-by-hyp-sex-1.png)<!-- -->
 
 At face value it appears that the mean difference in `bweight` between 
 hypertensive and normotensive 
@@ -301,7 +307,7 @@ describes the contrast in the effect of `hyp` on `bweight`
  the null hypothesis of 
   no interaction between `hyp` and `sex`. Thus, 
   there is insufficient evidence against
-  the possibility of *effect(-measure) modification* by
+  the possibility of *effect-measure modification* by
   `sex` on the effect of `hyp`.
 On the other hand, this test is not very sensitive given
 the small sample size. Thus, in spite of obtaining a "non-significant"
@@ -312,7 +318,7 @@ cannot be ignored based on these data only.
 ## Controlling or adjusting for the effect of `hyp` for `sex`
 
 The estimated effects of `hyp`: 
-$-496$ in boys and $-380$ in girls, look quite
+$-496$ g in boys and $-380$ g in girls, look quite
 similar (and the $P$-value against no interaction was quite large, too).
 Therefore, we may now proceed to estimate the overall effect of `hyp` 
  *controlling for* -- or *adjusting for* -- `sex`. 
@@ -353,7 +359,6 @@ weight then  `gestwks` is a numeric exposure variable.
 1. Assuming that the relationship 
 of the response with `gestwks` is roughly linear 
 (for a continuous response), 
-% or log-linear (for a binary or failure rate response) 
 we can estimate the linear effect of `gestwks` with `lm()` as follows:
 
 ``` r
@@ -368,7 +373,7 @@ ci.lin(m5)[, c(1, 5, 6)]
 ```
 We have fitted a simple linear regression model and 
 obtained estimates of the
-two regression coefficient: `intercept` and `slope`.
+two regression coefficients: `intercept` and `slope`.
 The linear effect of `gestwks` is thus estimated by the
 slope coefficient, which is $197$ g per each additional week of gestation.
 
@@ -377,30 +382,38 @@ our model assumptions using `plot()`. In particular, when the main argument
 for the *generic function* `plot()` is a fitted `lm` object,
 it will provide you some common diagnostic graphs.
 
-2. To check whether `bweight` goes up linearly with `gestwks` try
+2. To examine whether `bweight` goes up linearly with `gestwks`
+  by creating a basic scatterplot. See also lecture slide 4.
 
 ``` r
 with(births, plot(gestwks, bweight))
 abline(m5)
 ```
 
-3. Moreover, take a look at the basic diagnostic plots for the fitted model.
+![](effects-s_files/figure-epub3/Plot-bweight-by-gestwks-1.png)<!-- -->
+
+3. Moreover, take a look at the four 
+basic diagnostic plots for the fitted model.
+Compare with lecture slide 9.
 
 ``` r
 par(mfrow = c(2, 2))
 plot(m5)
 ```
-What can you say about the agreement with data of the assumptions of the 
-simple linear regression model, 
-like linearity of the systematic dependence, 
+
+![](effects-s_files/figure-epub3/bweight-gestwks-m5-diag-1.png)<!-- -->
+What can you say about the agreement with data of the 
+assumptions of the  simple linear regression model, 
+like linearity of the association, and 
 homoskedasticity and normality of the error terms? 
 
 
 
 ## Penalized spline model
 
-We shall now continue the analysis such that the apparently curved effect
-of `gestwks` is modelled by a *penalized spline*,
+We shall now continue the analysis such that the 
+apparently somewhat curved effect of `gestwks`, as indicated by 
+the first diagnostic plot, is modelled by a *penalized spline*,
 based on the recommendations of Martyn in his lecture today. 
 
 You cannot fit a penalized spline model with `lm()` or
@@ -409,7 +422,7 @@ You cannot fit a penalized spline model with `lm()` or
 this package.
 
 1.  When calling `gam()`, the model formula contains
-  expression '`s(X)`' for any explanatory variable `X`,
+  expression like `s(X)` for any explanatory variable `X`,
   for which you wish to fit a smooth function
 
 ``` r
@@ -462,17 +475,20 @@ sqrt(mPs$sig2)
 ```
 ## [1] 445.1808
 ```
-The degrees of freedom in this model are not computed as simply as in previous
+The degrees of freedom in this model are not 
+computed as simply as in previous
 models, and they typically are not integer-valued. However,
 the fitted spline seems to consume only a little more degrees of freedom
 as an 3rd degree polynomial model would take.
 
 2.  A graphical presentation of the fitted curve together with the
-  confidence and prediction intervals is more informative. 
+ pertinent confidence and prediction intervals is more informative. 
  Let us first write a
-  short function script to facilitate the task. We utilize function `matshade()` in `Epi`, which creates shaded areas, and function `matlines()` which draws 
-  lines joining the pertinent end points over the $x$-values for which the
-  predictions are computed.
+  short function script to facilitate the task. We utilize function
+  `matshade()` in the `Epi` package, which creates shaded areas, 
+  and function `matlines()` which draws 
+  lines joining the pertinent end points over the $x$-values 
+  for which the predictions and intervals are computed.
 
 ``` r
 plotFitPredInt <- function(xval, fit, pred, ...) {
@@ -485,8 +501,8 @@ plotFitPredInt <- function(xval, fit, pred, ...) {
 
 3.  Finally, create a vector of $x$-values and compute 
 the fitted/predicted values as well
-as the interval limits at these points from the fitted
-model object utilizing
+as the limits of the two types of interval 
+at these points from the fitted model object utilizing
 function `predict()`. 
 This function creates a matrix of three columns: (1) fitted/predicted
 values, (2) lower limits, (3) upper limits and 
@@ -495,7 +511,7 @@ make the graph:
 ``` r
 nd <- data.frame(gestwks = seq(24, 45, by = 0.25))
 pr.Ps <- predict(mPs, newdata = nd, se.fit = TRUE)
-str(pr.Ps) # with se.fit=TRUE, only two columns: fitted value and its SE
+str(pr.Ps) 
 ```
 
 ```
@@ -509,13 +525,22 @@ str(pr.Ps) # with se.fit=TRUE, only two columns: fitted value and its SE
 ```
 
 ``` r
+# With se.fit=TRUE, object pr.Ps has only two columns: 
+# the fitted values and their standard errors (SE).
+# We first take the fitted values and their SEs to compute the 95 % 
+# confidence interval for the expected value of the outcome at
+# each value of gewtwks.
 fit.Ps <- cbind(
   pr.Ps$fit,
   pr.Ps$fit - 2 * pr.Ps$se.fit,
   pr.Ps$fit + 2 * pr.Ps$se.fit
 )
+# For computing and plotting 95 % prediction intervals for individual
+# future observations of the outcome at each value of gestwks, we must 
+# add the residual variance of the fitted model to the square
+# of the standard error of the fitted value and 
 pred.Ps <- cbind(
-  pr.Ps$fit, # must add residual variance to se.fit^2
+  pr.Ps$fit, 
   pr.Ps$fit - 2 * sqrt(pr.Ps$se.fit^2 + mPs$sig2),
   pr.Ps$fit + 2 * sqrt(pr.Ps$se.fit^2 + mPs$sig2)
 )
@@ -526,7 +551,9 @@ with(births, plot(bweight ~ gestwks,
 ))
 plotFitPredInt(nd$gestwks, fit.Ps, pred.Ps)
 ```
-Compare this with the graph on slide 20 of the lecture we had. 
+
+![](effects-s_files/figure-epub3/bweight-gestwks-mPs-plot-1.png)<!-- -->
+Compare this with the graph on slide 20 of the lecture notes. 
 Are you happy with the end result?
 
 
@@ -570,8 +597,8 @@ stat.table(
 ##              88.0    12.0   100.0  
 ##  ---------------------------------
 ```
-It seems that the prevalence for hypertensive mothers
-is about 18 percent points higher,
+It seems that the prevalence of low birth weight 
+for hypertensive mothers is about 18 percent points higher,
 or about three times as high as that for normotensive mothers
 
 2. The three comparative measures of prevalences can be 
@@ -609,8 +636,8 @@ round(ci.lin(binOR, Exp = TRUE)[, c(1, 2, 5:7)], 3)
 ## (Intercept)   -2.272  0.166     0.103 0.074 0.143
 ## hyphyper       1.317  0.311     3.731 2.027 6.865
 ```
-Check that these results were quite compatible with the
-"about" estimates given in the previous item.
+Check that these results are more or less compatible with the
+"about" estimates suggested in the previous item.
 How well is the odds ratio approximating the risk ratio here?
 
 3. The prevalence of low birth weight is expected to be inversely related
@@ -682,14 +709,23 @@ summary(binm1)
 plot(binm1)
 ```
 
-Inspect the figure. Would you agree, that the logit of the prevalence
+![](effects-s_files/figure-epub3/lowbw-gestwks-spline-1.png)<!-- -->
+
+Inspect the figure. -- Would you agree, that the logit of the prevalence
 of outcome is almost linearly dependent on `gestwks`?
 
-5. Encouraged by the result of the previous item, we continue the analysis
-with `glm()` and assuming logit-linearity
+5. Encouraged by the result of the previous item, we continue 
+the analysis with `glm()` and assuming logit-linearity. Using
+the *insulate* function `I()` within the model formula 
+we make a centering transformation 
+of `gestwks` at the reference point of 40 weeks. 
+Insulation is needed so that the aritmetic minus operator 
+in the transformation would not be mixed with the similar
+operator in a model formula, which would remove an explanatory
+term from the model.
 
 ``` r
-binm2 <- glm(lowbw ~ I(gestwks - 40), family = binomial(link = "logit"), data = births)
+binm2 <- glm(lowbw ~ I(gestwks-40), family = binomial(link = "logit"), data = births)
 round(ci.lin(binm2, Exp = TRUE)[, c(1, 2, 5:7)], 3)
 ```
 
@@ -703,13 +739,16 @@ Inspect the results. How do you interpret the estimated coefficients
 and their exponentiated values?
 
 6.  Instead of fitted logits, it can be more informative
-to plot the fitted prevalences against `gestwks`,
+to plot the fitted prevalences of `lowbw` against `gestwks`,
 in which we utilize the previously created data frame `nd`
+as `newdata`.
 
 ``` r
 predm2 <- predict(binm2, newdata = nd, type = "response")
 plot(nd$gestwks, predm2, type = "l")
 ```
+
+![](effects-s_files/figure-epub3/lowbw-gestwks-pred-1.png)<!-- -->
 
  The curve seems to cover practically the whole range of
 the outcome probability scale with a relatively 

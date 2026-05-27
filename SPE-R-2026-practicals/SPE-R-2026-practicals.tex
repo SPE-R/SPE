@@ -146,7 +146,7 @@
 \makeatother
 \subtitle{SPE practicals}
 \author{Krista Fischer\footnote{Estonian Genome Center, University of Tartu, Estonia, \href{mailto:Krista.Fischer@ut.ee}{\nolinkurl{Krista.Fischer@ut.ee}}} \and Martyn Plummer\footnote{University of Warwick, UK, \href{mailto:martyn.plummer@warwick.ac.uk}{\nolinkurl{martyn.plummer@warwick.ac.uk}}} \and Janne Pitkäniemi\footnote{Finnish Cancer Registry, Helsinki, Finland, \href{mailto:janne.pitkaniemi@cancer.fi}{\nolinkurl{janne.pitkaniemi@cancer.fi}}} \and Bendix Carstensen\footnote{Steno Diabetes Center Copenhagen, Gentofte, Denmark, Dept. of Biostatistics, University of Copenhagen, Denmark, \href{mailto:b@bxc.dk}{\nolinkurl{b@bxc.dk}}, \url{http://BendixCarstensen.com}} \and Damien Georges\footnote{International Agency for Research on Cancer, Lyon, France, \href{mailto:georgesd@iarc.who.int}{\nolinkurl{georgesd@iarc.who.int}}} \and Esa Läärä\footnote{Department of Mathematical Sciences, University of Oulu, Finland, \href{mailto:Esa.Laara@oulu.fi}{\nolinkurl{Esa.Laara@oulu.fi}}, \url{http://www.oulu.fi/university/researcher/esa-laara}}}
-\date{1-5 June 2026}
+\date{1-5 June 2026 (built 27 May 2026 19:43 UTC)}
 
 \begin{document}
 \maketitle
@@ -3859,9 +3859,10 @@ Apply this method to the single rate calculations in 1.6.1, first creating the \
 \chapter{Estimation of effects: simple and more complex}\label{estimation-of-effects-simple-and-more-complex}
 
 This exercise deals with analysis of metric and binary
-response variables.
+response variables in the framework of linear and
+generalized linear models.
 We start with simple estimation of effects of a binary, categorical or
-a numeric explanatory variable, the explanatory or exposure variable of interest.
+a numeric explanatory or exposure variable of interest.
 Then evaluation of potential modification and/or confounding by other variables
 is considered by stratification by and adjustment/control for these variables.
 For such tasks we utilize functions \texttt{lm()} and \texttt{glm()}
@@ -3888,8 +3889,10 @@ to analysis. The main types are:
 All these response variable are numeric.
 
 Variables on which the response may depend are called \emph{explanatory
-variables} or \emph{regressors}. They can be categorical factors or numeric variables.
-A further important aspect of explanatory variables is the role they will play in the analysis.
+variables} or \emph{regressors}. They can be categorical factors or
+numeric variables.
+A further important aspect of explanatory variables is the role they
+will play in the analysis.
 
 \begin{itemize}
 \tightlist
@@ -3899,7 +3902,7 @@ A further important aspect of explanatory variables is the role they will play i
   Secondary role: confounder and/or effect-measure modifier.
 \end{itemize}
 
-The word \textbf{effect}
+The word \emph{effect}
 is used here as a general term referring to ways of
 contrasting or comparing the expected values of the response variable at
 different levels of an explanatory
@@ -3923,7 +3926,7 @@ metric outcomes,
 differences between incidence or mortality rates.
 
 Note that in spite of using the causally loaded word \emph{effect},
-we treat \emph{outcome regression} modelling
+in this exercise we treat \emph{outcome regression} modelling
 here primarily with descriptive or predictive aims in mind.
 Traditionally, these types of models have also been used
 to estimate \emph{causal effects} of exposure variables
@@ -3960,7 +3963,10 @@ different aspects in estimating effects of various exposures on a metric respons
 \setcounter{enumi}{1}
 \tightlist
 \item
-  We perform similar housekeeping tasks as in a previous exercise.
+  We perform some housekeeping tasks by
+  by first converting directly two binary (0/1) variables into factors,
+  and creating sategorical versions of two continuous variables are --\textgreater{}
+  by function \texttt{cut()}.
 \end{enumerate}
 
 \begin{Shaded}
@@ -3979,8 +3985,9 @@ different aspects in estimating effects of various exposures on a metric respons
 \tightlist
 \item
   Have a look at univariate summaries of the different
-  variables in the data; especially
-  the location and dispersion of the distribution of \texttt{bweight}.
+  variables in the data:
+  location (median and mean), quartiles and range. After that compute
+  the standard deviation of the distribution of \texttt{bweight}.
 \end{enumerate}
 
 \begin{Shaded}
@@ -4017,8 +4024,7 @@ of the null hypothesis that there is no effect of \texttt{hyp} on birth weight
 However, \texttt{t.test()} does not provide
 the point estimate for the effect of \texttt{hyp}; only the test result and a confidence interval. -- The estimated effect of \texttt{hyp} on birth weight,
 measured as a difference in means between hypertensive and normotensive
-mothers,
-is \(3199-2768 = 431\) g.
+mothers, is \(2768-3199 = -431\) g.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -4031,9 +4037,10 @@ is \(3199-2768 = 431\) g.
   and the right hand side
   after \(\sim\) defines the explanatory variables and their
   joint effects on the response. Here the only
-  explanatory variable is the binary factor \texttt{hyp}. With \texttt{glm()} one specifies the
-  \texttt{family}, i.e.~the assumed distribution of the response variable. However,
-  in case you use
+  explanatory variable is the binary factor \texttt{hyp}.
+  With \texttt{glm()} one specifies the
+  \texttt{family}, i.e.~the assumed distribution of the response variable.
+  However, in case you use
   \texttt{lm()}, this argument is not needed, because \texttt{lm()} fits only
   models for metric responses assuming Gaussian distribution.
 \end{enumerate}
@@ -4066,7 +4073,7 @@ We shall now examine whether and to what extent the
 \emph{effect} of \texttt{hyp} on \texttt{bweight}, i.e.~the
 mean difference between hypertensive and normotensive mothers,
 varies by \texttt{sex} without assigning
-causal interpretation to the estimated contrasts.
+any causal interpretation to the estimated contrasts.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -4140,7 +4147,7 @@ parameter suggest good compatibility of the data with
 the null hypothesis of
 no interaction between \texttt{hyp} and \texttt{sex}. Thus,
 there is insufficient evidence against
-the possibility of \emph{effect(-measure) modification} by
+the possibility of \emph{effect-measure modification} by
 \texttt{sex} on the effect of \texttt{hyp}.
 On the other hand, this test is not very sensitive given
 the small sample size. Thus, in spite of obtaining a ``non-significant''
@@ -4150,7 +4157,7 @@ cannot be ignored based on these data only.
 \section{\texorpdfstring{Controlling or adjusting for the effect of \texttt{hyp} for \texttt{sex}}{Controlling or adjusting for the effect of hyp for sex}}\label{controlling-or-adjusting-for-the-effect-of-hyp-for-sex}
 
 The estimated effects of \texttt{hyp}:
-\(-496\) in boys and \(-380\) in girls, look quite
+\(-496\) g in boys and \(-380\) g in girls, look quite
 similar (and the \(P\)-value against no interaction was quite large, too).
 Therefore, we may now proceed to estimate the overall effect of \texttt{hyp}
 \emph{controlling for} -- or \emph{adjusting for} -- \texttt{sex}.
@@ -4195,7 +4202,6 @@ weight then \texttt{gestwks} is a numeric exposure variable.
   Assuming that the relationship
   of the response with \texttt{gestwks} is roughly linear
   (for a continuous response),
-  \% or log-linear (for a binary or failure rate response)
   we can estimate the linear effect of \texttt{gestwks} with \texttt{lm()} as follows:
 \end{enumerate}
 
@@ -4208,7 +4214,7 @@ weight then \texttt{gestwks} is a numeric exposure variable.
 
 We have fitted a simple linear regression model and
 obtained estimates of the
-two regression coefficient: \texttt{intercept} and \texttt{slope}.
+two regression coefficients: \texttt{intercept} and \texttt{slope}.
 The linear effect of \texttt{gestwks} is thus estimated by the
 slope coefficient, which is \(197\) g per each additional week of gestation.
 
@@ -4222,7 +4228,8 @@ it will provide you some common diagnostic graphs.
 \setcounter{enumi}{1}
 \tightlist
 \item
-  To check whether \texttt{bweight} goes up linearly with \texttt{gestwks} try
+  To examine whether \texttt{bweight} goes up linearly with \texttt{gestwks}
+  by creating a basic scatterplot. See also lecture slide 4.
 \end{enumerate}
 
 \begin{Shaded}
@@ -4237,7 +4244,9 @@ it will provide you some common diagnostic graphs.
 \setcounter{enumi}{2}
 \tightlist
 \item
-  Moreover, take a look at the basic diagnostic plots for the fitted model.
+  Moreover, take a look at the four
+  basic diagnostic plots for the fitted model.
+  Compare with lecture slide 9.
 \end{enumerate}
 
 \begin{Shaded}
@@ -4247,15 +4256,16 @@ it will provide you some common diagnostic graphs.
 \end{Highlighting}
 \end{Shaded}
 
-What can you say about the agreement with data of the assumptions of the
-simple linear regression model,
-like linearity of the systematic dependence,
+What can you say about the agreement with data of the
+assumptions of the simple linear regression model,
+like linearity of the association, and
 homoskedasticity and normality of the error terms?
 
 \section{Penalized spline model}\label{penalized-spline-model}
 
-We shall now continue the analysis such that the apparently curved effect
-of \texttt{gestwks} is modelled by a \emph{penalized spline},
+We shall now continue the analysis such that the
+apparently somewhat curved effect of \texttt{gestwks}, as indicated by
+the first diagnostic plot, is modelled by a \emph{penalized spline},
 based on the recommendations of Martyn in his lecture today.
 
 You cannot fit a penalized spline model with \texttt{lm()} or
@@ -4268,7 +4278,7 @@ this package.
 \tightlist
 \item
   When calling \texttt{gam()}, the model formula contains
-  expression `\texttt{s(X)}' for any explanatory variable \texttt{X},
+  expression like \texttt{s(X)} for any explanatory variable \texttt{X},
   for which you wish to fit a smooth function
 \end{enumerate}
 
@@ -4293,7 +4303,8 @@ residual standard deviation: \(445.2\) g.
 \end{Highlighting}
 \end{Shaded}
 
-The degrees of freedom in this model are not computed as simply as in previous
+The degrees of freedom in this model are not
+computed as simply as in previous
 models, and they typically are not integer-valued. However,
 the fitted spline seems to consume only a little more degrees of freedom
 as an 3rd degree polynomial model would take.
@@ -4304,11 +4315,13 @@ as an 3rd degree polynomial model would take.
 \tightlist
 \item
   A graphical presentation of the fitted curve together with the
-  confidence and prediction intervals is more informative.
+  pertinent confidence and prediction intervals is more informative.
   Let us first write a
-  short function script to facilitate the task. We utilize function \texttt{matshade()} in \texttt{Epi}, which creates shaded areas, and function \texttt{matlines()} which draws
-  lines joining the pertinent end points over the \(x\)-values for which the
-  predictions are computed.
+  short function script to facilitate the task. We utilize function
+  \texttt{matshade()} in the \texttt{Epi} package, which creates shaded areas,
+  and function \texttt{matlines()} which draws
+  lines joining the pertinent end points over the \(x\)-values
+  for which the predictions and intervals are computed.
 \end{enumerate}
 
 \begin{Shaded}
@@ -4329,8 +4342,8 @@ as an 3rd degree polynomial model would take.
 \item
   Finally, create a vector of \(x\)-values and compute
   the fitted/predicted values as well
-  as the interval limits at these points from the fitted
-  model object utilizing
+  as the limits of the two types of interval
+  at these points from the fitted model object utilizing
   function \texttt{predict()}.
   This function creates a matrix of three columns: (1) fitted/predicted
   values, (2) lower limits, (3) upper limits and
@@ -4341,14 +4354,23 @@ as an 3rd degree polynomial model would take.
 \begin{Highlighting}[]
 \NormalTok{nd }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{gestwks =} \FunctionTok{seq}\NormalTok{(}\DecValTok{24}\NormalTok{, }\DecValTok{45}\NormalTok{, }\AttributeTok{by =} \FloatTok{0.25}\NormalTok{))}
 \NormalTok{pr.Ps }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(mPs, }\AttributeTok{newdata =}\NormalTok{ nd, }\AttributeTok{se.fit =} \ConstantTok{TRUE}\NormalTok{)}
-\FunctionTok{str}\NormalTok{(pr.Ps) }\CommentTok{\# with se.fit=TRUE, only two columns: fitted value and its SE}
+\FunctionTok{str}\NormalTok{(pr.Ps) }
+\CommentTok{\# With se.fit=TRUE, object pr.Ps has only two columns: }
+\CommentTok{\# the fitted values and their standard errors (SE).}
+\CommentTok{\# We first take the fitted values and their SEs to compute the 95 \% }
+\CommentTok{\# confidence interval for the expected value of the outcome at}
+\CommentTok{\# each value of gewtwks.}
 \NormalTok{fit.Ps }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(}
 \NormalTok{  pr.Ps}\SpecialCharTok{$}\NormalTok{fit,}
 \NormalTok{  pr.Ps}\SpecialCharTok{$}\NormalTok{fit }\SpecialCharTok{{-}} \DecValTok{2} \SpecialCharTok{*}\NormalTok{ pr.Ps}\SpecialCharTok{$}\NormalTok{se.fit,}
 \NormalTok{  pr.Ps}\SpecialCharTok{$}\NormalTok{fit }\SpecialCharTok{+} \DecValTok{2} \SpecialCharTok{*}\NormalTok{ pr.Ps}\SpecialCharTok{$}\NormalTok{se.fit}
 \NormalTok{)}
+\CommentTok{\# For computing and plotting 95 \% prediction intervals for individual}
+\CommentTok{\# future observations of the outcome at each value of gestwks, we must }
+\CommentTok{\# add the residual variance of the fitted model to the square}
+\CommentTok{\# of the standard error of the fitted value and }
 \NormalTok{pred.Ps }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(}
-\NormalTok{  pr.Ps}\SpecialCharTok{$}\NormalTok{fit, }\CommentTok{\# must add residual variance to se.fit\^{}2}
+\NormalTok{  pr.Ps}\SpecialCharTok{$}\NormalTok{fit, }
 \NormalTok{  pr.Ps}\SpecialCharTok{$}\NormalTok{fit }\SpecialCharTok{{-}} \DecValTok{2} \SpecialCharTok{*} \FunctionTok{sqrt}\NormalTok{(pr.Ps}\SpecialCharTok{$}\NormalTok{se.fit}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{+}\NormalTok{ mPs}\SpecialCharTok{$}\NormalTok{sig2),}
 \NormalTok{  pr.Ps}\SpecialCharTok{$}\NormalTok{fit }\SpecialCharTok{+} \DecValTok{2} \SpecialCharTok{*} \FunctionTok{sqrt}\NormalTok{(pr.Ps}\SpecialCharTok{$}\NormalTok{se.fit}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{+}\NormalTok{ mPs}\SpecialCharTok{$}\NormalTok{sig2)}
 \NormalTok{)}
@@ -4361,7 +4383,7 @@ as an 3rd degree polynomial model would take.
 \end{Highlighting}
 \end{Shaded}
 
-Compare this with the graph on slide 20 of the lecture we had.
+Compare this with the graph on slide 20 of the lecture notes.
 Are you happy with the end result?
 
 \section{Analysis of binary outcomes}\label{analysis-of-binary-outcomes}
@@ -4395,8 +4417,8 @@ and modelling binary outcome.
 \end{Highlighting}
 \end{Shaded}
 
-It seems that the prevalence for hypertensive mothers
-is about 18 percent points higher,
+It seems that the prevalence of low birth weight
+for hypertensive mothers is about 18 percent points higher,
 or about three times as high as that for normotensive mothers
 
 \begin{enumerate}
@@ -4419,8 +4441,8 @@ or about three times as high as that for normotensive mothers
 \end{Highlighting}
 \end{Shaded}
 
-Check that these results were quite compatible with the
-``about'' estimates given in the previous item.
+Check that these results are more or less compatible with the
+``about'' estimates suggested in the previous item.
 How well is the odds ratio approximating the risk ratio here?
 
 \begin{enumerate}
@@ -4458,7 +4480,7 @@ How well is the odds ratio approximating the risk ratio here?
 \end{Highlighting}
 \end{Shaded}
 
-Inspect the figure. Would you agree, that the logit of the prevalence
+Inspect the figure. -- Would you agree, that the logit of the prevalence
 of outcome is almost linearly dependent on \texttt{gestwks}?
 
 \begin{enumerate}
@@ -4466,13 +4488,20 @@ of outcome is almost linearly dependent on \texttt{gestwks}?
 \setcounter{enumi}{4}
 \tightlist
 \item
-  Encouraged by the result of the previous item, we continue the analysis
-  with \texttt{glm()} and assuming logit-linearity
+  Encouraged by the result of the previous item, we continue
+  the analysis with \texttt{glm()} and assuming logit-linearity. Using
+  the \emph{insulate} function \texttt{I()} within the model formula
+  we make a centering transformation
+  of \texttt{gestwks} at the reference point of 40 weeks.
+  Insulation is needed so that the aritmetic minus operator
+  in the transformation would not be mixed with the similar
+  operator in a model formula, which would remove an explanatory
+  term from the model.
 \end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{binm2 }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(lowbw }\SpecialCharTok{\textasciitilde{}} \FunctionTok{I}\NormalTok{(gestwks }\SpecialCharTok{{-}} \DecValTok{40}\NormalTok{), }\AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\AttributeTok{link =} \StringTok{"logit"}\NormalTok{), }\AttributeTok{data =}\NormalTok{ births)}
+\NormalTok{binm2 }\OtherTok{\textless{}{-}} \FunctionTok{glm}\NormalTok{(lowbw }\SpecialCharTok{\textasciitilde{}} \FunctionTok{I}\NormalTok{(gestwks}\DecValTok{{-}40}\NormalTok{), }\AttributeTok{family =} \FunctionTok{binomial}\NormalTok{(}\AttributeTok{link =} \StringTok{"logit"}\NormalTok{), }\AttributeTok{data =}\NormalTok{ births)}
 \FunctionTok{round}\NormalTok{(}\FunctionTok{ci.lin}\NormalTok{(binm2, }\AttributeTok{Exp =} \ConstantTok{TRUE}\NormalTok{)[, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{5}\SpecialCharTok{:}\DecValTok{7}\NormalTok{)], }\DecValTok{3}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -4486,8 +4515,9 @@ and their exponentiated values?
 \tightlist
 \item
   Instead of fitted logits, it can be more informative
-  to plot the fitted prevalences against \texttt{gestwks},
+  to plot the fitted prevalences of \texttt{lowbw} against \texttt{gestwks},
   in which we utilize the previously created data frame \texttt{nd}
+  as \texttt{newdata}.
 \end{enumerate}
 
 \begin{Shaded}
@@ -4504,12 +4534,13 @@ steep slope between 33 to 37 weeks.
 \chapter{Poisson regression \& analysis of curved effects}\label{poisson-regression-analysis-of-curved-effects}
 
 This exercise deals with modelling incidence rates
-using Poisson regression. Our special interest is in
-estimating and reporting curved effects of continuous
-explanatory variables on the hazard rate, i.e.~the theoretical incidence rate
+using Poisson regression, already briefly covered by
+Janne and Esa in this course. Our special interest is in
+estimating and reporting non-linear or curved effects of continuous
+explanatory variables on the hazard rate , i.e.~
+the theoretical incidence rate of the outcome.
 
-We analyse the \texttt{testisDK} data found in the
-\texttt{Epi} package.
+We analyse the \texttt{testisDK} data found in the \texttt{Epi} package.
 It contains the numbers of cases of testis cancer and mid-year
 populations (person-years) in 1-year age groups in Denmark during
 1943-96. In this analysis age and calendar time
@@ -4544,7 +4575,9 @@ but finally, a penalized spline model is fitted.
   There are nearly 5000 observations from 90 one-year age groups
   and 54 calendar years. To get a clearer picture of what's going on,
   we do some housekeeping. The age range will be limited to 15-79
-  years, and age and period are both categorized into 5-year intervals -- following to the time-honoured practice in epidemiology.
+  years, and age and period are both categorized into 5-year intervals
+  -- according to the traditional, time-honoured practice in
+  epidemiology and demography.
 \end{enumerate}
 
 \begin{Shaded}
@@ -4597,8 +4630,9 @@ presentation is more informative.
 \tightlist
 \item
   From the saved table object \texttt{tab} you can plot an
-  age-incidence curve for each period separately, after you have
-  checked the structure of the table, so that you know the relevant
+  age-incidence curve for each calendar period separately,
+  after you have checked the structure of the table given
+  in the previous item, so that you know the relevant
   dimensions in it. There is a function \texttt{rateplot()} in \texttt{Epi}
   that does default plotting of tables of rates (see the help page of
   \texttt{rateplot})
@@ -4606,7 +4640,6 @@ presentation is more informative.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{str}\NormalTok{(tab)}
 \FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
 \FunctionTok{rateplot}\NormalTok{(}
   \AttributeTok{rates =}\NormalTok{ tab[}\DecValTok{3}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\NormalTok{nAge, }\DecValTok{1}\SpecialCharTok{:}\NormalTok{nPer], }\AttributeTok{which =} \StringTok{"ap"}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{30}\NormalTok{),}
@@ -4616,16 +4649,25 @@ presentation is more informative.
 \end{Highlighting}
 \end{Shaded}
 
-What can you conclude about the trend in age-specific incidence rates
-over calendar time? What about the effect of age;
-is there any common pattern in the age-incidence curves across the periods?
+What is your broad impression about the trend in the
+the age-specific incidence rates over calendar time?
+What about the effect of age; is there any common pattern in the
+age-incidence curves across the periods?
 
 \section{Age and period as categorical factors}\label{age-and-period-as-categorical-factors}
 
 We shall first fit a Poisson regression model with log link
-on age and period model in the traditional way,
+on age and period in the traditional way,
 in which both factors are treated as categorical.
-The model is additive on the log-rate scale.
+The model is additive on the log-hazard scale:
+\[ \log(h_{jk}) = \mu + \alpha_j + \beta_k, \quad j=1, \dots, 14; k=1, \dots, 12, \]
+where \(h_{jk}\) is the hazard rate in age group \(j\) and period \(k\).
+Each \(\alpha_j\)s is the logarithm of the rate ratio between
+age group \(j\) and the reference age group \(1 = 15-19\) years,
+and \(\beta_k\) is the log(rate-ratio) between period \(k\) and
+period \(1 = 1943-47\). The intercept parameter is the log-hazard
+at the combination of the reference levels chosen
+for age and period --
 It is useful to scale the person-years to be expressed in \(10^5\) y.
 
 \begin{enumerate}
@@ -4653,7 +4695,8 @@ What do the estimated rate ratios tell about the age and period effects?
 \tightlist
 \item
   A graphical inspection of point estimates and confidence
-  intervals can be obtained as follows. In the beginning it is useful
+  intervals can be obtained using function \texttt{matplot()} in the
+  \texttt{graphics} package of R. In the beginning it is useful
   to define shorthands for the pertinent mid-age and mid-period values
   of the different intervals
 \end{enumerate}
@@ -4662,10 +4705,14 @@ What do the estimated rate ratios tell about the age and period effects?
 \begin{Highlighting}[]
 \NormalTok{aMid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\FloatTok{17.5}\NormalTok{, }\FloatTok{77.5}\NormalTok{, }\AttributeTok{by =} \DecValTok{5}\NormalTok{)}
 \NormalTok{pMid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\DecValTok{1945}\NormalTok{, }\DecValTok{1995}\NormalTok{, }\AttributeTok{by =} \DecValTok{5}\NormalTok{)}
-\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
 \FunctionTok{matplot}\NormalTok{(aMid, }\FunctionTok{rbind}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\FunctionTok{ci.exp}\NormalTok{(mCat)[}\DecValTok{2}\SpecialCharTok{:}\DecValTok{13}\NormalTok{, ]), }\AttributeTok{type =} \StringTok{"o"}\NormalTok{, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{,     }
    \AttributeTok{log =} \StringTok{"y"}\NormalTok{, }\AttributeTok{cex.lab =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{cex.axis =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{col=} \FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{),}
   \AttributeTok{xlab =} \StringTok{"Age (years)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Rate ratio"}\NormalTok{ )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{matplot}\NormalTok{(pMid, }\FunctionTok{rbind}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\FunctionTok{ci.exp}\NormalTok{(mCat)[}\DecValTok{14}\SpecialCharTok{:}\DecValTok{23}\NormalTok{, ]), }\AttributeTok{type =} \StringTok{"o"}\NormalTok{, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{,}
   \AttributeTok{log =} \StringTok{"y"}\NormalTok{, }\AttributeTok{cex.lab =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{cex.axis =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{col=}\FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{),}
   \AttributeTok{xlab =} \StringTok{"Calendar year {-} 1900"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Rate ratio"}\NormalTok{ )}
@@ -4680,9 +4727,11 @@ What do the estimated rate ratios tell about the age and period effects?
   In the fitted model the reference category for each factor was
   the first one. As age is the dominating factor, it may be more
   informative to remove the intercept from the model. As a
-  consequence the age effects describe fitted rates at the reference
-  level of the period factor. For the latter one could choose the
-  middle period 1968-72 using \texttt{Relevel()}.
+  consequence the exponentiated age parameters actually
+  describe fitted hazard rates for the age groups, each at a chosen
+  reference level of the period factor. For the latter
+  it is now convenient to choose the
+  middle period 1968-72 using function \texttt{Relevel()} in \texttt{Epi}.
 \end{enumerate}
 
 \begin{Shaded}
@@ -4720,24 +4769,32 @@ What do the estimated rate ratios tell about the age and period effects?
 
 It is obvious that the age effect on the log-rate scale is highly
 non-linear. Yet, it is less clear whether the true period effect
-deviates from linearity. Nevertheless, there are good reasons to
-try fitting smooth continuous functions for both time scales.
+essentally deviates from linearity. Nevertheless, there are
+good reasons to try fitting a \emph{generalized additive model} (GAM),
+the systematic part of which containing the sum of
+smooth continuous functions of the two time scales:
+\[ \log \{h(A,P)\} = \mu + s_1(A) + s_2(P), \]
+where the logarithm of the
+hazard \(h(A,P)\) depends on continuous age \(A\) (years)
+and calendar year \(P\) via smooth functions \(s_1(A)\)
+and \(s_2(B)\).
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  As the next task we fit a generalized additive model for the
-  log-rate on continuous age and period applying penalized splines
-  with default settings of function \texttt{gam()} in package
-  \texttt{mgcv}. In this fitting an \emph{optimal} value for the penalty
+  As the next task we fit the above defined GAM assuming
+  the Poisson family as before for the random component.
+  Here the principle of \emph{penalized splines} (see Martyn's lecture)
+  is applied using function \texttt{gam()} in package\texttt{mgcv}
+  with its default settings.
+  In this fitting an optimal value for the penalty
   parameter is chosen based on an AIC-like criterion known as UBRE
   (`Un-Biased Risk Estimator')
 \end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(mgcv)}
 \NormalTok{mPen }\OtherTok{\textless{}{-}}\NormalTok{ mgcv}\SpecialCharTok{::}\FunctionTok{gam}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(D, Y) }\SpecialCharTok{\textasciitilde{}} \FunctionTok{s}\NormalTok{(A) }\SpecialCharTok{+} \FunctionTok{s}\NormalTok{(P),}
   \AttributeTok{family =} \FunctionTok{poisreg}\NormalTok{(}\AttributeTok{link =}\NormalTok{ log), }\AttributeTok{data =}\NormalTok{ tdk}
 \NormalTok{)}
@@ -4746,10 +4803,11 @@ try fitting smooth continuous functions for both time scales.
 \end{Shaded}
 
 The summary is quite brief, and the only estimated coefficient is the
-intercept, which sets the baseline level for the log-rates, against
+intercept \(\mu\), which sets the baseline level
+for the log-rates, against
 which the relative age effects and period effects will be contrasted.
-On the rate scale the baseline level 5.53 per 100000 y is obtained by
-\texttt{exp(1.7096)}.
+On the hazard rate scale the baseline level 5.53 per 100000 y is
+obtained by\texttt{exp(1.7096)}.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -4768,16 +4826,20 @@ On the rate scale the baseline level 5.53 per 100000 y is obtained by
 \end{Highlighting}
 \end{Shaded}
 
-The dashed lines describe the approximate 95\% confidence band for the pertinent
-curve. One could get the impression that year 1968 would be some kind
-of reference value for the period effect, like period 1968-72
+The dashed lines describe the approximate 95\% confidence
+band for the pertinent
+curve. One could get the impression that 1968 were
+intentionally the
+reference year for the period effect, almost like period 1968-72
 chosen as the reference in the categorical
-model previously fitted. This is not the case, however, because
-\texttt{gam()} by default parametrizes the spline effects such that the
-reference level, at which the spline effect is nominally zero, is the
-overall \emph{grand mean} value of the log-rate in the data. This
+model that was previously fitted. This is not quite the case, however.
+By default \texttt{gam()} parametrizes the spline effects such that the
+intercept \(\mu\), at which the spline effects are nominally zero, is the
+overall \emph{grand mean} value of the log-hazard in the data. This
 corresponds to the principle of \emph{sum contrasts} (\texttt{contr.sum})
-for categorical explanatory factors.
+for categorical explanatory factors. It just happens here that
+the horizontal location of the grand mean for the period effect
+is approximately year 1968
 
 From the summary you will also find that the degrees of freedom value
 required for the age effect is nearly the same as the default
@@ -4851,33 +4913,37 @@ enough for the age effect.
   Graphical presentation of the effects using \texttt{plot.gam()}
   can be improved. For instance, we may present the
   age effect to describe the \emph{mean} incidence rates by age, averaged
-  over the whole time span of 54 years. This is obtained by adding
-  the estimated intercept
-  to the estimated smooth curve for the age effect and showing
-  the antilogarithms of the ordinates of the curve.
+  over the whole time span of 54 years. This is obtained by
+  adding the estimated \emph{grand mean} or intercept 1.71 = log(5.53)
+  to the estimated values of the smooth curve
+  describing the age effect and expressing the \(y\)-coordinates
+  on the hazard scale.
   For that purpose we need to extract the intercept and modify the
   labels of the \(y\)-axis accordingly. The estimated period curve
   can also be expressed in terms of
   relative indidence rates in relation to the fitted baseline rate,
-  as determined by the model intercept.
+  as determined by the model's intercept.
 \end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\NormalTok{icpt }\OtherTok{\textless{}{-}} \FunctionTok{coef}\NormalTok{(mPen2)[}\DecValTok{1}\NormalTok{]}
 \FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
-\NormalTok{icpt }\OtherTok{\textless{}{-}} \FunctionTok{coef}\NormalTok{(mPen2)[}\DecValTok{1}\NormalTok{] }\CommentTok{\#  estimated intecept}
-\FunctionTok{plot}\NormalTok{(mPen2,}
+\FunctionTok{plot}\NormalTok{(mPen2, }
   \AttributeTok{seWithMean =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{select =} \DecValTok{1}\NormalTok{, }\AttributeTok{rug =} \ConstantTok{FALSE}\NormalTok{,}
-  \AttributeTok{yaxt =} \StringTok{"n"}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\FunctionTok{log}\NormalTok{(}\DecValTok{1}\NormalTok{), }\FunctionTok{log}\NormalTok{(}\DecValTok{20}\NormalTok{)) }\SpecialCharTok{{-}}\NormalTok{ icpt,}
+  \AttributeTok{yaxt=}\StringTok{"n"}\NormalTok{,  }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\FunctionTok{log}\NormalTok{(}\DecValTok{1}\NormalTok{), }\FunctionTok{log}\NormalTok{(}\DecValTok{20}\NormalTok{)) }\SpecialCharTok{{-}}\NormalTok{ icpt,}
   \AttributeTok{xlab =} \StringTok{"Age (y)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Mean rate (/100000 y)"}
 \NormalTok{)}
-\FunctionTok{axis}\NormalTok{(}\DecValTok{2}\NormalTok{, }\AttributeTok{at =} \FunctionTok{log}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{10}\NormalTok{, }\DecValTok{20}\NormalTok{)) }\SpecialCharTok{{-}}\NormalTok{ icpt, }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{10}\NormalTok{, }\DecValTok{20}\NormalTok{))}
+\FunctionTok{axis}\NormalTok{(}\DecValTok{2}\NormalTok{, }\AttributeTok{at =} \FunctionTok{log}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{10}\NormalTok{, }\DecValTok{20}\NormalTok{)) }\SpecialCharTok{{-}}\NormalTok{ icpt, }
+     \AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{10}\NormalTok{, }\DecValTok{20}\NormalTok{))}
+\FunctionTok{abline}\NormalTok{(}\AttributeTok{h =} \DecValTok{0}\NormalTok{, }\AttributeTok{lty=}\DecValTok{3}\NormalTok{)}
 \FunctionTok{plot}\NormalTok{(mPen2,}
   \AttributeTok{seWithMean =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{select =} \DecValTok{2}\NormalTok{, }\AttributeTok{rug =} \ConstantTok{FALSE}\NormalTok{,}
   \AttributeTok{yaxt =} \StringTok{"n"}\NormalTok{, }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\FunctionTok{log}\NormalTok{(}\FloatTok{0.4}\NormalTok{), }\FunctionTok{log}\NormalTok{(}\DecValTok{2}\NormalTok{)),}
   \AttributeTok{xlab =} \StringTok{"Calendat year"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Relative rate"}
 \NormalTok{)}
-\FunctionTok{axis}\NormalTok{(}\DecValTok{2}\NormalTok{, }\AttributeTok{at =} \FunctionTok{log}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\FloatTok{0.5}\NormalTok{, }\FloatTok{0.75}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{1.5}\NormalTok{, }\DecValTok{2}\NormalTok{)), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.5}\NormalTok{, }\FloatTok{0.75}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{1.5}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\FunctionTok{axis}\NormalTok{(}\DecValTok{2}\NormalTok{, }\AttributeTok{at =} \FunctionTok{log}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\FloatTok{0.5}\NormalTok{, }\FloatTok{0.75}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{1.5}\NormalTok{, }\DecValTok{2}\NormalTok{)), }
+     \AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.5}\NormalTok{, }\FloatTok{0.75}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{1.5}\NormalTok{, }\DecValTok{2}\NormalTok{))}
 \FunctionTok{abline}\NormalTok{(}\AttributeTok{v =} \DecValTok{1968}\NormalTok{, }\AttributeTok{h =} \DecValTok{0}\NormalTok{, }\AttributeTok{lty =} \DecValTok{3}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -10019,7 +10085,7 @@ occurrence rate of remission itself.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{   user  system elapsed }
-\NormalTok{   2.83    3.38    2.31 }
+\NormalTok{   2.40    3.05    1.91 }
 \end{Highlighting}
 \end{Shaded}
 

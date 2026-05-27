@@ -468,6 +468,8 @@ with(subset(dd, x == 0), plot(density(PS), lty = 2))
 with(subset(dd, x == 1), lines(density(PS), lty = 1))
 ```
 
+![](causInf2-s_files/figure-epub3/propScore-1.png)<!-- -->
+
 How different are the distributions? Are they sufficiently overlapping?
 
 3.  Compute the weights
@@ -572,6 +574,8 @@ plot(density(dd$PS2[dd$x == 0]), lty = 2)
 lines(density(dd$PS2[dd$x == 1]), lty = 1)
 ```
 
+![](causInf2-s_files/figure-epub3/PSweight-1.png)<!-- -->
+
 Note that apart from ordinary IPW, other types of 
 weights can also also
 obtained. These are relevant when estimating other 
@@ -588,6 +592,8 @@ of the propensity scores, for instance
 ``` r
 plot(psw2, type = "balance", metric = "PSD")
 ```
+
+![](causInf2-s_files/figure-epub3/check balance-1.png)<!-- -->
 
 It is desirable that the horisontal values of 
 these measures for given weights are less than 0.1.

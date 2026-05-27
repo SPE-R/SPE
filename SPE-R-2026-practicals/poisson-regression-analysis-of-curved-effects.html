@@ -334,11 +334,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="poisson-regression-analysis-of-curved-effects" class="section level1 hasAnchor" number="8">
 <h1><span class="header-section-number">Chapter 8</span> Poisson regression &amp; analysis of curved effects<a href="poisson-regression-analysis-of-curved-effects.html#poisson-regression-analysis-of-curved-effects" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>This exercise deals with modelling incidence rates
-using Poisson regression. Our special interest is in
-estimating and reporting curved effects of continuous
-explanatory variables on the hazard rate, i.e. the theoretical incidence rate</p>
-<p>We analyse the <code>testisDK</code> data found in the
-<code>Epi</code> package.
+using Poisson regression, already briefly covered by
+Janne and Esa in this course. Our special interest is in
+estimating and reporting non-linear or curved effects of continuous
+explanatory variables on the hazard rate , i.e. 
+the theoretical incidence rate of the outcome.</p>
+<p>We analyse the <code>testisDK</code> data found in the <code>Epi</code> package.
 It contains the numbers of cases of testis cancer and mid-year
 populations (person-years) in 1-year age groups in Denmark during
 1943-96. In this analysis age and calendar time
@@ -359,7 +360,9 @@ but finally, a penalized spline model is fitted.</p>
 <li>There are nearly 5000 observations from 90 one-year age groups
 and 54 calendar years. To get a clearer picture of what’s going on,
 we do some housekeeping. The age range will be limited to 15-79
-years, and age and period are both categorized into 5-year intervals – following to the time-honoured practice in epidemiology.</li>
+years, and age and period are both categorized into 5-year intervals
+– according to the traditional, time-honoured practice in
+epidemiology and demography.</li>
 </ol>
 <div class="sourceCode" id="cb236"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb236-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb236-1" tabindex="-1"></a>tdk <span class="ot">&lt;-</span> <span class="fu">subset</span>(testisDK, A <span class="sc">&gt;</span> <span class="dv">14</span> <span class="sc">&amp;</span> A <span class="sc">&lt;</span> <span class="dv">80</span>)</span>
 <span id="cb236-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb236-2" tabindex="-1"></a>tdk<span class="sc">$</span>Age <span class="ot">&lt;-</span> <span class="fu">cut</span>(tdk<span class="sc">$</span>A, <span class="at">br =</span> <span class="dv">5</span> <span class="sc">*</span> (<span class="dv">3</span><span class="sc">:</span><span class="dv">16</span>), <span class="at">include.lowest =</span> <span class="cn">TRUE</span>, <span class="at">right =</span> <span class="cn">FALSE</span>)</span>
@@ -392,29 +395,38 @@ incidence rates (per 100,000 y) in each 5 y <span class="math inline">\(\times\)
 presentation is more informative.</p>
 <ol start="2" style="list-style-type: decimal">
 <li>From the saved table object <code>tab</code> you can plot an
-age-incidence curve for each period separately, after you have
-checked the structure of the table, so that you know the relevant
+age-incidence curve for each calendar period separately,
+after you have checked the structure of the table given
+in the previous item, so that you know the relevant
 dimensions in it. There is a function <code>rateplot()</code> in <code>Epi</code>
 that does default plotting of tables of rates (see the help page of
 <code>rateplot</code>)</li>
 </ol>
-<div class="sourceCode" id="cb238"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb238-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb238-1" tabindex="-1"></a><span class="fu">str</span>(tab)</span>
-<span id="cb238-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb238-2" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span>
-<span id="cb238-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb238-3" tabindex="-1"></a><span class="fu">rateplot</span>(</span>
-<span id="cb238-4"><a href="poisson-regression-analysis-of-curved-effects.html#cb238-4" tabindex="-1"></a>  <span class="at">rates =</span> tab[<span class="dv">3</span>, <span class="dv">1</span><span class="sc">:</span>nAge, <span class="dv">1</span><span class="sc">:</span>nPer], <span class="at">which =</span> <span class="st">&quot;ap&quot;</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">30</span>),</span>
-<span id="cb238-5"><a href="poisson-regression-analysis-of-curved-effects.html#cb238-5" tabindex="-1"></a>  <span class="at">age =</span> <span class="fu">seq</span>(<span class="dv">15</span>, <span class="dv">75</span>, <span class="dv">5</span>), <span class="at">per =</span> <span class="fu">seq</span>(<span class="dv">1943</span>, <span class="dv">1993</span>, <span class="dv">5</span>),</span>
-<span id="cb238-6"><a href="poisson-regression-analysis-of-curved-effects.html#cb238-6" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">heat.colors</span>(<span class="dv">16</span>), <span class="at">ann =</span> <span class="cn">TRUE</span></span>
-<span id="cb238-7"><a href="poisson-regression-analysis-of-curved-effects.html#cb238-7" tabindex="-1"></a>)</span></code></pre></div>
-<p>What can you conclude about the trend in age-specific incidence rates
-over calendar time? What about the effect of age;
-is there any common pattern in the age-incidence curves across the periods?</p>
+<div class="sourceCode" id="cb238"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb238-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb238-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb238-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb238-2" tabindex="-1"></a><span class="fu">rateplot</span>(</span>
+<span id="cb238-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb238-3" tabindex="-1"></a>  <span class="at">rates =</span> tab[<span class="dv">3</span>, <span class="dv">1</span><span class="sc">:</span>nAge, <span class="dv">1</span><span class="sc">:</span>nPer], <span class="at">which =</span> <span class="st">&quot;ap&quot;</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">30</span>),</span>
+<span id="cb238-4"><a href="poisson-regression-analysis-of-curved-effects.html#cb238-4" tabindex="-1"></a>  <span class="at">age =</span> <span class="fu">seq</span>(<span class="dv">15</span>, <span class="dv">75</span>, <span class="dv">5</span>), <span class="at">per =</span> <span class="fu">seq</span>(<span class="dv">1943</span>, <span class="dv">1993</span>, <span class="dv">5</span>),</span>
+<span id="cb238-5"><a href="poisson-regression-analysis-of-curved-effects.html#cb238-5" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">heat.colors</span>(<span class="dv">16</span>), <span class="at">ann =</span> <span class="cn">TRUE</span></span>
+<span id="cb238-6"><a href="poisson-regression-analysis-of-curved-effects.html#cb238-6" tabindex="-1"></a>)</span></code></pre></div>
+<p>What is your broad impression about the trend in the
+the age-specific incidence rates over calendar time?
+What about the effect of age; is there any common pattern in the
+age-incidence curves across the periods?</p>
 </div>
 <div id="age-and-period-as-categorical-factors" class="section level2 hasAnchor" number="8.3">
 <h2><span class="header-section-number">8.3</span> Age and period as categorical factors<a href="poisson-regression-analysis-of-curved-effects.html#age-and-period-as-categorical-factors" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>We shall first fit a Poisson regression model with log link
-on age and period model in the traditional way,
+on age and period in the traditional way,
 in which both factors are treated as categorical.
-The model is additive on the log-rate scale.
+The model is additive on the log-hazard scale:
+<span class="math display">\[ \log(h_{jk}) = \mu + \alpha_j + \beta_k, \quad j=1, \dots, 14; k=1, \dots, 12, \]</span>
+where <span class="math inline">\(h_{jk}\)</span> is the hazard rate in age group <span class="math inline">\(j\)</span> and period <span class="math inline">\(k\)</span>.
+Each <span class="math inline">\(\alpha_j\)</span>s is the logarithm of the rate ratio between
+age group <span class="math inline">\(j\)</span> and the reference age group <span class="math inline">\(1 = 15-19\)</span> years,
+and <span class="math inline">\(\beta_k\)</span> is the log(rate-ratio) between period <span class="math inline">\(k\)</span> and
+period <span class="math inline">\(1 = 1943-47\)</span>. The intercept parameter is the log-hazard
+at the combination of the reference levels chosen
+for age and period –
 It is useful to scale the person-years to be expressed in <span class="math inline">\(10^5\)</span> y.</p>
 <ol style="list-style-type: decimal">
 <li>In fitting the model we utilize the <code>poisreg</code> family object
@@ -427,89 +439,104 @@ found in package <code>Epi</code>.</li>
 <p>What do the estimated rate ratios tell about the age and period effects?</p>
 <ol start="2" style="list-style-type: decimal">
 <li>A graphical inspection of point estimates and confidence
-intervals can be obtained as follows. In the beginning it is useful
+intervals can be obtained using function <code>matplot()</code> in the
+<code>graphics</code> package of R. In the beginning it is useful
 to define shorthands for the pertinent mid-age and mid-period values
 of the different intervals</li>
 </ol>
 <div class="sourceCode" id="cb240"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb240-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb240-1" tabindex="-1"></a>aMid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">17.5</span>, <span class="fl">77.5</span>, <span class="at">by =</span> <span class="dv">5</span>)</span>
 <span id="cb240-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb240-2" tabindex="-1"></a>pMid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1945</span>, <span class="dv">1995</span>, <span class="at">by =</span> <span class="dv">5</span>)</span>
-<span id="cb240-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb240-3" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb240-4"><a href="poisson-regression-analysis-of-curved-effects.html#cb240-4" tabindex="-1"></a><span class="fu">matplot</span>(aMid, <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="fu">ci.exp</span>(mCat)[<span class="dv">2</span><span class="sc">:</span><span class="dv">13</span>, ]), <span class="at">type =</span> <span class="st">&quot;o&quot;</span>, <span class="at">pch =</span> <span class="dv">16</span>,     </span>
-<span id="cb240-5"><a href="poisson-regression-analysis-of-curved-effects.html#cb240-5" tabindex="-1"></a>   <span class="at">log =</span> <span class="st">&quot;y&quot;</span>, <span class="at">cex.lab =</span> <span class="fl">1.5</span>, <span class="at">cex.axis =</span> <span class="fl">1.5</span>, <span class="at">col=</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;blue&quot;</span>),</span>
-<span id="cb240-6"><a href="poisson-regression-analysis-of-curved-effects.html#cb240-6" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;Age (years)&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Rate ratio&quot;</span> )</span>
-<span id="cb240-7"><a href="poisson-regression-analysis-of-curved-effects.html#cb240-7" tabindex="-1"></a><span class="fu">matplot</span>(pMid, <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="fu">ci.exp</span>(mCat)[<span class="dv">14</span><span class="sc">:</span><span class="dv">23</span>, ]), <span class="at">type =</span> <span class="st">&quot;o&quot;</span>, <span class="at">pch =</span> <span class="dv">16</span>,</span>
-<span id="cb240-8"><a href="poisson-regression-analysis-of-curved-effects.html#cb240-8" tabindex="-1"></a>  <span class="at">log =</span> <span class="st">&quot;y&quot;</span>, <span class="at">cex.lab =</span> <span class="fl">1.5</span>, <span class="at">cex.axis =</span> <span class="fl">1.5</span>, <span class="at">col=</span><span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;blue&quot;</span>),</span>
-<span id="cb240-9"><a href="poisson-regression-analysis-of-curved-effects.html#cb240-9" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;Calendar year - 1900&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Rate ratio&quot;</span> )</span></code></pre></div>
+<span id="cb240-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb240-3" tabindex="-1"></a><span class="fu">matplot</span>(aMid, <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="fu">ci.exp</span>(mCat)[<span class="dv">2</span><span class="sc">:</span><span class="dv">13</span>, ]), <span class="at">type =</span> <span class="st">&quot;o&quot;</span>, <span class="at">pch =</span> <span class="dv">16</span>,     </span>
+<span id="cb240-4"><a href="poisson-regression-analysis-of-curved-effects.html#cb240-4" tabindex="-1"></a>   <span class="at">log =</span> <span class="st">&quot;y&quot;</span>, <span class="at">cex.lab =</span> <span class="fl">1.5</span>, <span class="at">cex.axis =</span> <span class="fl">1.5</span>, <span class="at">col=</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;blue&quot;</span>),</span>
+<span id="cb240-5"><a href="poisson-regression-analysis-of-curved-effects.html#cb240-5" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;Age (years)&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Rate ratio&quot;</span> )</span></code></pre></div>
+<div class="sourceCode" id="cb241"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb241-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb241-1" tabindex="-1"></a><span class="fu">matplot</span>(pMid, <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="fu">ci.exp</span>(mCat)[<span class="dv">14</span><span class="sc">:</span><span class="dv">23</span>, ]), <span class="at">type =</span> <span class="st">&quot;o&quot;</span>, <span class="at">pch =</span> <span class="dv">16</span>,</span>
+<span id="cb241-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb241-2" tabindex="-1"></a>  <span class="at">log =</span> <span class="st">&quot;y&quot;</span>, <span class="at">cex.lab =</span> <span class="fl">1.5</span>, <span class="at">cex.axis =</span> <span class="fl">1.5</span>, <span class="at">col=</span><span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;blue&quot;</span>),</span>
+<span id="cb241-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb241-3" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;Calendar year - 1900&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Rate ratio&quot;</span> )</span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
 <li>In the fitted model the reference category for each factor was
 the first one. As age is the dominating factor, it may be more
 informative to remove the intercept from the model. As a
-consequence the age effects describe fitted rates at the reference
-level of the period factor. For the latter one could choose the
-middle period 1968-72 using <code>Relevel()</code>.</li>
+consequence the exponentiated age parameters actually
+describe fitted hazard rates for the age groups, each at a chosen
+reference level of the period factor. For the latter
+it is now convenient to choose the
+middle period 1968-72 using function <code>Relevel()</code> in <code>Epi</code>.</li>
 </ol>
-<div class="sourceCode" id="cb241"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb241-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb241-1" tabindex="-1"></a>tdk<span class="sc">$</span>Per70 <span class="ot">&lt;-</span> <span class="fu">Relevel</span>(tdk<span class="sc">$</span>Per, <span class="at">ref =</span> <span class="dv">6</span>)</span>
-<span id="cb241-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb241-2" tabindex="-1"></a>mCat2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(D, Y) <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> Age <span class="sc">+</span> Per70,</span>
-<span id="cb241-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb241-3" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">poisreg</span>(<span class="at">link =</span> log), <span class="at">data =</span> tdk )</span>
-<span id="cb241-4"><a href="poisson-regression-analysis-of-curved-effects.html#cb241-4" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(mCat2), <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb242"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb242-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb242-1" tabindex="-1"></a>tdk<span class="sc">$</span>Per70 <span class="ot">&lt;-</span> <span class="fu">Relevel</span>(tdk<span class="sc">$</span>Per, <span class="at">ref =</span> <span class="dv">6</span>)</span>
+<span id="cb242-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb242-2" tabindex="-1"></a>mCat2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(<span class="fu">cbind</span>(D, Y) <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> Age <span class="sc">+</span> Per70,</span>
+<span id="cb242-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb242-3" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">poisreg</span>(<span class="at">link =</span> log), <span class="at">data =</span> tdk )</span>
+<span id="cb242-4"><a href="poisson-regression-analysis-of-curved-effects.html#cb242-4" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(mCat2), <span class="dv">2</span>)</span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
 <li>Let us also plot estimates from the latter model, too.</li>
 </ol>
-<div class="sourceCode" id="cb242"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb242-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb242-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb242-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb242-2" tabindex="-1"></a><span class="fu">matplot</span>(aMid, <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="fu">ci.exp</span>(mCat2)[<span class="dv">2</span><span class="sc">:</span><span class="dv">13</span>, ]), <span class="at">type =</span> <span class="st">&quot;o&quot;</span>, <span class="at">pch =</span> <span class="dv">16</span>,     </span>
-<span id="cb242-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb242-3" tabindex="-1"></a>   <span class="at">log =</span> <span class="st">&quot;y&quot;</span>, <span class="at">cex.lab =</span> <span class="fl">1.5</span>, <span class="at">cex.axis =</span> <span class="fl">1.5</span>, <span class="at">col=</span><span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;blue&quot;</span>),</span>
-<span id="cb242-4"><a href="poisson-regression-analysis-of-curved-effects.html#cb242-4" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;Age (years)&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Rate&quot;</span> )</span>
-<span id="cb242-5"><a href="poisson-regression-analysis-of-curved-effects.html#cb242-5" tabindex="-1"></a><span class="fu">matplot</span>(pMid, <span class="fu">rbind</span>(<span class="fu">ci.exp</span>(mCat2)[<span class="dv">14</span><span class="sc">:</span><span class="dv">18</span>, ], <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="fu">ci.exp</span>(mCat2)[<span class="dv">19</span><span class="sc">:</span><span class="dv">23</span>, ]),</span>
-<span id="cb242-6"><a href="poisson-regression-analysis-of-curved-effects.html#cb242-6" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&quot;o&quot;</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">log =</span> <span class="st">&quot;y&quot;</span>, <span class="at">cex.lab =</span> <span class="fl">1.5</span>, <span class="at">cex.axis =</span> <span class="fl">1.5</span>,</span>
-<span id="cb242-7"><a href="poisson-regression-analysis-of-curved-effects.html#cb242-7" tabindex="-1"></a>        <span class="at">col=</span><span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;blue&quot;</span>),</span>
-<span id="cb242-8"><a href="poisson-regression-analysis-of-curved-effects.html#cb242-8" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;Calendar year - 1900&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Rate ratio&quot;</span> )</span>
-<span id="cb242-9"><a href="poisson-regression-analysis-of-curved-effects.html#cb242-9" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">&quot;gray&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb243"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb243-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb243-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb243-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb243-2" tabindex="-1"></a><span class="fu">matplot</span>(aMid, <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="fu">ci.exp</span>(mCat2)[<span class="dv">2</span><span class="sc">:</span><span class="dv">13</span>, ]), <span class="at">type =</span> <span class="st">&quot;o&quot;</span>, <span class="at">pch =</span> <span class="dv">16</span>,     </span>
+<span id="cb243-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb243-3" tabindex="-1"></a>   <span class="at">log =</span> <span class="st">&quot;y&quot;</span>, <span class="at">cex.lab =</span> <span class="fl">1.5</span>, <span class="at">cex.axis =</span> <span class="fl">1.5</span>, <span class="at">col=</span><span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;blue&quot;</span>),</span>
+<span id="cb243-4"><a href="poisson-regression-analysis-of-curved-effects.html#cb243-4" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;Age (years)&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Rate&quot;</span> )</span>
+<span id="cb243-5"><a href="poisson-regression-analysis-of-curved-effects.html#cb243-5" tabindex="-1"></a><span class="fu">matplot</span>(pMid, <span class="fu">rbind</span>(<span class="fu">ci.exp</span>(mCat2)[<span class="dv">14</span><span class="sc">:</span><span class="dv">18</span>, ], <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="fu">ci.exp</span>(mCat2)[<span class="dv">19</span><span class="sc">:</span><span class="dv">23</span>, ]),</span>
+<span id="cb243-6"><a href="poisson-regression-analysis-of-curved-effects.html#cb243-6" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">&quot;o&quot;</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">log =</span> <span class="st">&quot;y&quot;</span>, <span class="at">cex.lab =</span> <span class="fl">1.5</span>, <span class="at">cex.axis =</span> <span class="fl">1.5</span>,</span>
+<span id="cb243-7"><a href="poisson-regression-analysis-of-curved-effects.html#cb243-7" tabindex="-1"></a>        <span class="at">col=</span><span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;blue&quot;</span>),</span>
+<span id="cb243-8"><a href="poisson-regression-analysis-of-curved-effects.html#cb243-8" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;Calendar year - 1900&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Rate ratio&quot;</span> )</span>
+<span id="cb243-9"><a href="poisson-regression-analysis-of-curved-effects.html#cb243-9" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">&quot;gray&quot;</span>)</span></code></pre></div>
 </div>
 <div id="generalized-additive-model-with-penalized-splines" class="section level2 hasAnchor" number="8.4">
 <h2><span class="header-section-number">8.4</span> Generalized additive model with penalized splines<a href="poisson-regression-analysis-of-curved-effects.html#generalized-additive-model-with-penalized-splines" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>It is obvious that the age effect on the log-rate scale is highly
 non-linear. Yet, it is less clear whether the true period effect
-deviates from linearity. Nevertheless, there are good reasons to
-try fitting smooth continuous functions for both time scales.</p>
+essentally deviates from linearity. Nevertheless, there are
+good reasons to try fitting a <em>generalized additive model</em> (GAM),
+the systematic part of which containing the sum of
+smooth continuous functions of the two time scales:
+<span class="math display">\[ \log \{h(A,P)\} = \mu + s_1(A) + s_2(P), \]</span>
+where the logarithm of the
+hazard <span class="math inline">\(h(A,P)\)</span> depends on continuous age <span class="math inline">\(A\)</span> (years)
+and calendar year <span class="math inline">\(P\)</span> via smooth functions <span class="math inline">\(s_1(A)\)</span>
+and <span class="math inline">\(s_2(B)\)</span>.</p>
 <ol style="list-style-type: decimal">
-<li>As the next task we fit a generalized additive model for the
-log-rate on continuous age and period applying penalized splines
-with default settings of function <code>gam()</code> in package
-<code>mgcv</code>. In this fitting an <em>optimal</em> value for the penalty
+<li>As the next task we fit the above defined GAM assuming
+the Poisson family as before for the random component.
+Here the principle of <em>penalized splines</em> (see Martyn’s lecture)
+is applied using function <code>gam()</code> in package<code>mgcv</code>
+with its default settings.
+In this fitting an optimal value for the penalty
 parameter is chosen based on an AIC-like criterion known as UBRE
 (‘Un-Biased Risk Estimator’)</li>
 </ol>
-<div class="sourceCode" id="cb243"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb243-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb243-1" tabindex="-1"></a><span class="fu">library</span>(mgcv)</span>
-<span id="cb243-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb243-2" tabindex="-1"></a>mPen <span class="ot">&lt;-</span> mgcv<span class="sc">::</span><span class="fu">gam</span>(<span class="fu">cbind</span>(D, Y) <span class="sc">~</span> <span class="fu">s</span>(A) <span class="sc">+</span> <span class="fu">s</span>(P),</span>
-<span id="cb243-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb243-3" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">poisreg</span>(<span class="at">link =</span> log), <span class="at">data =</span> tdk</span>
-<span id="cb243-4"><a href="poisson-regression-analysis-of-curved-effects.html#cb243-4" tabindex="-1"></a>)</span>
-<span id="cb243-5"><a href="poisson-regression-analysis-of-curved-effects.html#cb243-5" tabindex="-1"></a><span class="fu">summary</span>(mPen)</span></code></pre></div>
+<div class="sourceCode" id="cb244"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb244-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb244-1" tabindex="-1"></a>mPen <span class="ot">&lt;-</span> mgcv<span class="sc">::</span><span class="fu">gam</span>(<span class="fu">cbind</span>(D, Y) <span class="sc">~</span> <span class="fu">s</span>(A) <span class="sc">+</span> <span class="fu">s</span>(P),</span>
+<span id="cb244-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb244-2" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">poisreg</span>(<span class="at">link =</span> log), <span class="at">data =</span> tdk</span>
+<span id="cb244-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb244-3" tabindex="-1"></a>)</span>
+<span id="cb244-4"><a href="poisson-regression-analysis-of-curved-effects.html#cb244-4" tabindex="-1"></a><span class="fu">summary</span>(mPen)</span></code></pre></div>
 <p>The summary is quite brief, and the only estimated coefficient is the
-intercept, which sets the baseline level for the log-rates, against
+intercept <span class="math inline">\(\mu\)</span>, which sets the baseline level
+for the log-rates, against
 which the relative age effects and period effects will be contrasted.
-On the rate scale the baseline level 5.53 per 100000 y is obtained by
-<code>exp(1.7096)</code>.</p>
+On the hazard rate scale the baseline level 5.53 per 100000 y is
+obtained by<code>exp(1.7096)</code>.</p>
 <ol start="2" style="list-style-type: decimal">
 <li>See also the default plot for the fitted curves (solid lines)
 describing the age and the period effects which are interpreted as
 contrasts to the baseline level on the log-rate scale.</li>
 </ol>
-<div class="sourceCode" id="cb244"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb244-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb244-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb244-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb244-2" tabindex="-1"></a><span class="fu">plot</span>(mPen, <span class="at">se=</span><span class="dv">2</span>, <span class="at">seWithMean =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<p>The dashed lines describe the approximate 95% confidence band for the pertinent
-curve. One could get the impression that year 1968 would be some kind
-of reference value for the period effect, like period 1968-72
+<div class="sourceCode" id="cb245"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb245-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb245-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb245-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb245-2" tabindex="-1"></a><span class="fu">plot</span>(mPen, <span class="at">se=</span><span class="dv">2</span>, <span class="at">seWithMean =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>The dashed lines describe the approximate 95% confidence
+band for the pertinent
+curve. One could get the impression that 1968 were
+intentionally the
+reference year for the period effect, almost like period 1968-72
 chosen as the reference in the categorical
-model previously fitted. This is not the case, however, because
-<code>gam()</code> by default parametrizes the spline effects such that the
-reference level, at which the spline effect is nominally zero, is the
-overall <em>grand mean</em> value of the log-rate in the data. This
+model that was previously fitted. This is not quite the case, however.
+By default <code>gam()</code> parametrizes the spline effects such that the
+intercept <span class="math inline">\(\mu\)</span>, at which the spline effects are nominally zero, is the
+overall <em>grand mean</em> value of the log-hazard in the data. This
 corresponds to the principle of <em>sum contrasts</em> (<code>contr.sum</code>)
-for categorical explanatory factors.</p>
+for categorical explanatory factors. It just happens here that
+the horizontal location of the grand mean for the period effect
+is approximately year 1968
 <!-- % The confidence band indicates, namely, that there is uncertainty -->
 <!-- % about the true age effect curve about the overall (*grand mean*) -->
 <!-- % log-rate both in vertical and in horizontal direction, and there is -->
-<!-- % no fixed reference level. -->
+<!-- % no fixed reference level. --></p>
 <p>From the summary you will also find that the degrees of freedom value
 required for the age effect is nearly the same as the default
 dimension <span class="math inline">\(k-1 = 9\)</span> of the part of the model matrix (or basis)
@@ -521,8 +548,8 @@ hand the period effect takes just about 3 df.</p>
 <li>It is a good idea to do some diagnostic checking of the fitted
 model</li>
 </ol>
-<div class="sourceCode" id="cb245"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb245-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb245-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</span>
-<span id="cb245-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb245-2" tabindex="-1"></a><span class="fu">gam.check</span>(mPen)</span></code></pre></div>
+<div class="sourceCode" id="cb246"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb246-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb246-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</span>
+<span id="cb246-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb246-2" tabindex="-1"></a><span class="fu">gam.check</span>(mPen)</span></code></pre></div>
 <p>The four diagnostic plots are analogous to some of those used in
 the context of linear models for Gaussian responses, but not all of them
 may be as easy to interpret. – Pay attention to the note
@@ -530,18 +557,18 @@ given in the printed output about the value of <code>k</code>.</p>
 <ol start="4" style="list-style-type: decimal">
 <li>Let us refit the model but now with an increased <code>k</code> for age:</li>
 </ol>
-<div class="sourceCode" id="cb246"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb246-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb246-1" tabindex="-1"></a>mPen2 <span class="ot">&lt;-</span> mgcv<span class="sc">::</span><span class="fu">gam</span>(<span class="fu">cbind</span>(D, Y) <span class="sc">~</span> <span class="fu">s</span>(A, <span class="at">k =</span> <span class="dv">20</span>) <span class="sc">+</span> <span class="fu">s</span>(P),</span>
-<span id="cb246-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb246-2" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">poisreg</span>(<span class="at">link =</span> log), <span class="at">data =</span> tdk</span>
-<span id="cb246-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb246-3" tabindex="-1"></a>)</span>
-<span id="cb246-4"><a href="poisson-regression-analysis-of-curved-effects.html#cb246-4" tabindex="-1"></a><span class="fu">summary</span>(mPen2)</span>
-<span id="cb246-5"><a href="poisson-regression-analysis-of-curved-effects.html#cb246-5" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</span>
-<span id="cb246-6"><a href="poisson-regression-analysis-of-curved-effects.html#cb246-6" tabindex="-1"></a><span class="fu">gam.check</span>(mPen2)</span></code></pre></div>
+<div class="sourceCode" id="cb247"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb247-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb247-1" tabindex="-1"></a>mPen2 <span class="ot">&lt;-</span> mgcv<span class="sc">::</span><span class="fu">gam</span>(<span class="fu">cbind</span>(D, Y) <span class="sc">~</span> <span class="fu">s</span>(A, <span class="at">k =</span> <span class="dv">20</span>) <span class="sc">+</span> <span class="fu">s</span>(P),</span>
+<span id="cb247-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb247-2" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">poisreg</span>(<span class="at">link =</span> log), <span class="at">data =</span> tdk</span>
+<span id="cb247-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb247-3" tabindex="-1"></a>)</span>
+<span id="cb247-4"><a href="poisson-regression-analysis-of-curved-effects.html#cb247-4" tabindex="-1"></a><span class="fu">summary</span>(mPen2)</span>
+<span id="cb247-5"><a href="poisson-regression-analysis-of-curved-effects.html#cb247-5" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</span>
+<span id="cb247-6"><a href="poisson-regression-analysis-of-curved-effects.html#cb247-6" tabindex="-1"></a><span class="fu">gam.check</span>(mPen2)</span></code></pre></div>
 <p>With this choice of <code>k</code> the df value for age became about 11,
 which is well below <span class="math inline">\(k-1 = 19\)</span>. Let us plot the fitted curves from
 this fitting, too</p>
-<div class="sourceCode" id="cb247"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb247-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb247-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb247-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb247-2" tabindex="-1"></a><span class="fu">plot</span>(mPen2, <span class="at">seWithMean =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb247-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb247-3" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">1968</span>, <span class="at">h =</span> <span class="dv">0</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb248"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb248-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb248-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-2" tabindex="-1"></a><span class="fu">plot</span>(mPen2, <span class="at">seWithMean =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb248-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-3" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">1968</span>, <span class="at">h =</span> <span class="dv">0</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span></code></pre></div>
 <p>There does not seem to have happened any essential changes from the
 previously fitted curves, so maybe 8 df could, after all, be quite
 enough for the age effect.</p>
@@ -549,31 +576,35 @@ enough for the age effect.</p>
 <li>Graphical presentation of the effects using <code>plot.gam()</code>
 can be improved. For instance, we may present the
 age effect to describe the <em>mean</em> incidence rates by age, averaged
-over the whole time span of 54 years. This is obtained by adding
-the estimated intercept
-to the estimated smooth curve for the age effect and showing
-the antilogarithms of the ordinates of the curve.
+over the whole time span of 54 years. This is obtained by
+adding the estimated <em>grand mean</em> or intercept 1.71 = log(5.53)
+to the estimated values of the smooth curve
+describing the age effect and expressing the <span class="math inline">\(y\)</span>-coordinates
+on the hazard scale.
 For that purpose we need to extract the intercept and modify the
 labels of the <span class="math inline">\(y\)</span>-axis accordingly. The estimated period curve
 can also be expressed in terms of
 relative indidence rates in relation to the fitted baseline rate,
-as determined by the model intercept.</li>
+as determined by the model’s intercept.</li>
 </ol>
-<div class="sourceCode" id="cb248"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb248-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb248-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-2" tabindex="-1"></a>icpt <span class="ot">&lt;-</span> <span class="fu">coef</span>(mPen2)[<span class="dv">1</span>] <span class="co">#  estimated intecept</span></span>
-<span id="cb248-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-3" tabindex="-1"></a><span class="fu">plot</span>(mPen2,</span>
-<span id="cb248-4"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-4" tabindex="-1"></a>  <span class="at">seWithMean =</span> <span class="cn">TRUE</span>, <span class="at">select =</span> <span class="dv">1</span>, <span class="at">rug =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb248-5"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-5" tabindex="-1"></a>  <span class="at">yaxt =</span> <span class="st">&quot;n&quot;</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fu">log</span>(<span class="dv">1</span>), <span class="fu">log</span>(<span class="dv">20</span>)) <span class="sc">-</span> icpt,</span>
-<span id="cb248-6"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-6" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;Age (y)&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Mean rate (/100000 y)&quot;</span></span>
-<span id="cb248-7"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-7" tabindex="-1"></a>)</span>
-<span id="cb248-8"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-8" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="fu">log</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>)) <span class="sc">-</span> icpt, <span class="at">labels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>))</span>
-<span id="cb248-9"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-9" tabindex="-1"></a><span class="fu">plot</span>(mPen2,</span>
-<span id="cb248-10"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-10" tabindex="-1"></a>  <span class="at">seWithMean =</span> <span class="cn">TRUE</span>, <span class="at">select =</span> <span class="dv">2</span>, <span class="at">rug =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb248-11"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-11" tabindex="-1"></a>  <span class="at">yaxt =</span> <span class="st">&quot;n&quot;</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fu">log</span>(<span class="fl">0.4</span>), <span class="fu">log</span>(<span class="dv">2</span>)),</span>
-<span id="cb248-12"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-12" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;Calendat year&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Relative rate&quot;</span></span>
-<span id="cb248-13"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-13" tabindex="-1"></a>)</span>
-<span id="cb248-14"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-14" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="fu">log</span>(<span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="dv">1</span>, <span class="fl">1.5</span>, <span class="dv">2</span>)), <span class="at">labels =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="dv">1</span>, <span class="fl">1.5</span>, <span class="dv">2</span>))</span>
-<span id="cb248-15"><a href="poisson-regression-analysis-of-curved-effects.html#cb248-15" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">1968</span>, <span class="at">h =</span> <span class="dv">0</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb249"><pre class="sourceCode r custom-source"><code class="sourceCode r"><span id="cb249-1"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-1" tabindex="-1"></a>icpt <span class="ot">&lt;-</span> <span class="fu">coef</span>(mPen2)[<span class="dv">1</span>]</span>
+<span id="cb249-2"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-2" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb249-3"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-3" tabindex="-1"></a><span class="fu">plot</span>(mPen2, </span>
+<span id="cb249-4"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-4" tabindex="-1"></a>  <span class="at">seWithMean =</span> <span class="cn">TRUE</span>, <span class="at">select =</span> <span class="dv">1</span>, <span class="at">rug =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb249-5"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-5" tabindex="-1"></a>  <span class="at">yaxt=</span><span class="st">&quot;n&quot;</span>,  <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fu">log</span>(<span class="dv">1</span>), <span class="fu">log</span>(<span class="dv">20</span>)) <span class="sc">-</span> icpt,</span>
+<span id="cb249-6"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-6" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;Age (y)&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Mean rate (/100000 y)&quot;</span></span>
+<span id="cb249-7"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-7" tabindex="-1"></a>)</span>
+<span id="cb249-8"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-8" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="fu">log</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>)) <span class="sc">-</span> icpt, </span>
+<span id="cb249-9"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-9" tabindex="-1"></a>     <span class="at">labels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">20</span>))</span>
+<span id="cb249-10"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-10" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">lty=</span><span class="dv">3</span>)</span>
+<span id="cb249-11"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-11" tabindex="-1"></a><span class="fu">plot</span>(mPen2,</span>
+<span id="cb249-12"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-12" tabindex="-1"></a>  <span class="at">seWithMean =</span> <span class="cn">TRUE</span>, <span class="at">select =</span> <span class="dv">2</span>, <span class="at">rug =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb249-13"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-13" tabindex="-1"></a>  <span class="at">yaxt =</span> <span class="st">&quot;n&quot;</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fu">log</span>(<span class="fl">0.4</span>), <span class="fu">log</span>(<span class="dv">2</span>)),</span>
+<span id="cb249-14"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-14" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;Calendat year&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Relative rate&quot;</span></span>
+<span id="cb249-15"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-15" tabindex="-1"></a>)</span>
+<span id="cb249-16"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-16" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="fu">log</span>(<span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="dv">1</span>, <span class="fl">1.5</span>, <span class="dv">2</span>)), </span>
+<span id="cb249-17"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-17" tabindex="-1"></a>     <span class="at">labels =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="dv">1</span>, <span class="fl">1.5</span>, <span class="dv">2</span>))</span>
+<span id="cb249-18"><a href="poisson-regression-analysis-of-curved-effects.html#cb249-18" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">1968</span>, <span class="at">h =</span> <span class="dv">0</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span></code></pre></div>
 <p><strong>Homework</strong>
 You could continue the analysis of these data by fitting an age-cohort
 model as an alternative to the age-period model, as well as an
