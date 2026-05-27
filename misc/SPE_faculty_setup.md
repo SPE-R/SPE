@@ -277,13 +277,9 @@ setwd("pracs-book")
 Sys.setenv(SPE_SOLUTIONS = "0")
 bookdown::preview_chapter("oral-e.rmd")
 
-# With-solutions version (migrated chapters only — e.g. ggplot2-e.rmd):
+# With-solutions version
 Sys.setenv(SPE_SOLUTIONS = "1")
 bookdown::preview_chapter("ggplot2-e.rmd")
-
-# With-solutions version (legacy chapters: preview the auto-generated -s.rmd):
-source("../misc/from_e_to_s_rmd.R")    # (re)generate -s.rmd from -e.rmd
-bookdown::preview_chapter("oral-s.rmd")
 ```
 
 ### Full book (10–25 min)
