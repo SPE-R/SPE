@@ -1,5 +1,5 @@
 
-# SPE-R timetable (Tartu, Estonia, 1 to 5 June 2026)
+# SPE-R timetable (University of Tartu, 1 to 5 June 2026)
 
 
 ## Daily timetable
@@ -80,6 +80,7 @@
 |14:30 - 15:30 | [Causal inference 2: model-based estimation of causal contrasts](https://github.com/SPE-R/SPE/blob/gh-spe-material/lectures/causal-two.pdf) (EL)|
 |15:30 - 16:00 | Tea break. |
 |16:00 - 18:00 | [Practical: Causal inference 2: Model-based estimation of causal estimands](https://spe-r.github.io/SPE/SPE-R-2026-practicals/causal-inference-2-model-based-estimation-of-causal-estimands.html) |
+|19:00 - .. | Course Diner at [Vilde Ja Vine](https://vilde.ee/gb/)
 
 ## Friday 5 June -- Day 5
 
