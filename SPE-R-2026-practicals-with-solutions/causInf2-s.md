@@ -1,7 +1,7 @@
 ---
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 editor_options: 
   markdown: 
     wrap: 72
@@ -23,21 +23,34 @@ editor_options:
 
 <!-- ``` -->
 
-# Causal inference 2: Model-based estimation of causal estimands
+# Causal inference 2: Model-based estimation of causal parameters
 
-Sources of inspiration: [Luque Fernandez, M.A. et al.
-(2018)](https://doi.org/10.1002/sim.7628) *Stat Med*
-2018;37(16):2530-2546 and\
+Sources of inspiration when creating this practical: 
+[Luque Fernandez, M.A. et al. (2018)](https://doi.org/10.1002/sim.7628)
+*Stat Med* 2018;37(16):2530-2546 and\
 [Smith et al. (2022)](https://doi.org/10.1002/sim.9234) *Stat Med*
 2022;41(2):407-432.
 
 ## Introduction
 
-We shall illustrate with simulated data the estimation of causal effects
-of a binary exposure $X$ when the outcome $Y$ is also binary, and there
-is a set of four covariates $Z = (Z_1, Z_2, Z_3, Z_4)$. As a background
-story, we imagine a population of cancer patients, in whom the variables
-and the assumed marginal distributions of the covariates are
+In this exercise we learn to apply some R tools for estimating 
+interesting causal parameters 
+in the context of an observational study.
+The statistical methods to be introduced are
+(a) regression standardization or g-formula, (b) inverse probability
+weighting (IPW) with propensity scores and (c) double robust (DR)
+estimation combining approaches (a) and (b). 
+
+We illustrate these methods using simulated data.
+The exposure variable $X$ is binary (1/0) and 
+the outcome variable $Y$ is binary, too.  
+The interesting estimands are the causal risk difference (RD) and 
+the causal risk ratio (RR). 
+
+As a background story, we imagine a population of cancer patients, 
+in whom the exposure, and  four covariates 
+$Z = (Z_1, Z_2, Z_3, Z_4)$ plus the assumed marginal 
+distributions of the latter are described in the table below:
 
 | Variable | Description                                                           |
 |:--------------|:-------------------------------------------------------|
@@ -49,62 +62,12 @@ and the assumed marginal distributions of the covariates are
 | $Z_4$    | comorbidity score; 5 classes; $Z_3 \sim \text{DiscUnif}(1, \dots, 5)$ |
 
 For simplicity, covariates $Z_3$ and $Z_4$ are treated as continuous
-variables in the models. The assumed causal diagram 
-is drawn using `dagitty` and is shown below.
+variables with linear effects in the models. 
 
-![](causInf2-s_files/figure-epub3/dagitty-1.png)<!-- -->
-
-For more generic notation, the probabilities of $Y=1$ will be expressed
-as expectations, e.g. 
-$$E(Y^{X=x}) = P(Y^{X=x}=1) \quad \text{and} \quad 
-E(Y|X=x, Z=z) = P(Y=1|X=x, Z=z), $$
-where $Z$ is the vector of relevant
-covariates. 
-
-The same principle is applied in expressing the conditional
-probability of $X=1$, i.e. being exposed, given $Z=z$:
-$$ E(X|Z=z) = P(X=1|Z=z). $$
-The fitted or predicted probabilities
-of $Y=1$ are denoted as fitted $\widehat{Y}$ or predicted values
-$\widetilde{Y}$ of $Y$ with pertinent subscripts and/or superscripts.
--- Both $X$ and $Y$ are modelled by logistic regression. The expit-function
-or inverse of the logit function is defined:
-$\text{expit}(u) = 1/(1 + e^{-u})$, $u\in R$. This is equal to the
-cumulative distribution function of the standard logistic distribution,
-the values of which are returned in R by `plogis(u)`. The R function
-that returns values of the logit-function is `qlogis()`.
-
-The true model assumed for the dependence of exposure $X$ on covariates:
-$$ E(X|Z_1 = z_1, \dots, Z_4 = z_4) =
-      \text{expit}(-5 + 0.05z_2 + 0.25z_3 + 0.5z_4 + 0.4z_2z_4) . $$ The
-assumed true model for the outcome is
-$$ E(Y|X=x, Z_1 = z_1, \dots, Z_4 = z_4) =
-           \text{expit}(-1 + x - 0.1z_1 + 0.35z_2 + 0.25z_3 +
-                 0.20z_4 + 0.15z_2z_4) $$ 
-Note that $X$ does not depend on $Z_1$, and that in both models
-there is a product term $Z_2 Z_4$,
-the effect of which appears weaker for the outcome model.
-
-## Control of confounding
-
-1.  Based on inspection of the causal diagram, can you provide
-    justification for the claim that variables 
-    $Z_2, Z_3$ and $Z_4$ form
-    a proper subset of the four covariates, 
-    which is sufficient to block all backdoor paths between $X$
-    and $Y$ and thus remove confounding?
-
-2.  Even though we have such a minimal sufficient set 
-as indicated in item (a), why it still might be useful 
-to include covariate
-    $Z_1$, too, when modelling the outcome?
-
-## Generation of target population and true models
-
-1.  Load the necessary packages.
-
+1. First, load the packages needed in this exercise
 
 ``` r
+library(dagitty)
 library(Epi)
 ```
 
@@ -120,11 +83,73 @@ library(Epi)
 ```
 
 ``` r
-library(stdReg)
+library(stdReg2)
 library(PSweight)
 ```
 
-2.  Define two R-functions, which compute the expected values 
+2. The assumed causal diagram 
+is drawn using `dagitty` and is shown below.
+![](causInf2-s_files/figure-epub3/dagitty-1.png)<!-- -->
+3.  For a more generic notation, the risk of death, i.e. 
+the probability of $Y=1$, will be expressed
+as the expected value of the binary outcome $Y$, for instance 
+$$ E(Y^{X=x}) = P(Y^{X=x}=1) \quad \text{and} \quad 
+E(Y|X=x, Z=z) = P(Y=1|X=x, Z=z), $$
+where $Z$ is the vector of relevant
+covariates. 
+
+The same principle is applied in expressing the conditional
+probability of being exposed, i.e. that of $X=1$, 
+given a set of covariate values $Z=z$:
+$$ E(X|Z=z) = P(X=1|Z=z). $$
+The fitted and predicted probabilities
+of $Y=1$ are denoted as $\widehat{Y}$ and
+$\widetilde{Y}$, respectively,
+with pertinent subscripts and/or superscripts.
+
+Both $X$ and $Y$ are modelled by logistic regression. The expit-function
+or inverse of the logit function is defined:
+$\text{expit}(u) = 1/(1 + e^{-u})$, $u\in R$. This is equal to the
+cumulative distribution function of the standard logistic distribution,
+the values of which are returned in R by `plogis(u)`. The R function
+that returns values of the logit-function is `qlogis()`.
+
+The **true exposure model**  for the dependence of exposure $X$ on
+the covariates $Z$ is specified as
+$$ E(X|Z_1 = z_1, \dots, Z_4 = z_4) =
+      \text{expit}(-5 + 0.05z_2 + 0.25z_3 + 0.5z_4 + 0.4z_2z_4) . $$ 
+The assumed **true outcome model**
+$$ E(Y|X=x, Z_1 = z_1, \dots, Z_4 = z_4) =
+           \text{expit}(-1 + x - 0.1z_1 + 0.35z_2 + 0.25z_3 +
+                 0.20z_4 + 0.15z_2z_4) $$ 
+Note that $X$ does not depend on $Z_1$, and that in both models
+there is a product term $Z_2 Z_4$,
+the effect of which appears weaker in the outcome model.
+
+## Control of confounding
+
+1.  Based on inspection of the causal diagram, can you provide
+    justification for the claim that variables 
+    $Z_2, Z_3$ and $Z_4$ form
+    a proper subset of the four covariates, 
+    which is sufficient to block all backdoor paths between $X$
+    and $Y$ and thus remove confounding?
+    
+2. Look what dagitty offers for sufficient sets:
+
+```
+## { Z2, Z3, Z4 }
+```
+
+3.  Even though we have a sufficient set 
+as claimed above, why it still might be useful 
+to include covariate
+    $Z_1$, too, when modelling the outcome?
+
+## Generation of target population and true models
+
+
+1.  Define two R-functions, which compute the expected values 
 for the exposure and those for the outcome based on the assumed 
 true exposure model and the true outcome model, respectively.
 
@@ -139,9 +164,9 @@ EY <- function(x, z1, z2, z3, z4) {
 }
 ```
 
-3.  Define the function for the generation of data by 
+2.  Define a function for generation of data by 
 simulating random values from pertinent probability
-distributions based on the given    assumptions.
+distributions based on the given assumptions.
 
 
 ``` r
@@ -156,14 +181,14 @@ genData <- function(N) {
 }
 ```
 
-4.  Generate a data frame `dd` for a big target population of 
-500000  subjects
+3.  Generate a data frame `pop` for a big target population of 
+1000000  subjects
 
 
 ``` r
-N <- 500000
+N <- 1000000
 set.seed(7777)
-dd <- genData(N)
+pop <- genData(N)
 ```
 
 ## Factual and counterfactual risks - associational and causal contrasts
@@ -181,31 +206,39 @@ Contr <- function(mu1, mu0) {
   RD <- mu1 - mu0
   RR <- mu1 / mu0
   OR <- (mu1 / (1 - mu1)) / (mu0 / (1 - mu0))
-  return(c(mu1, mu0, RD = RD, RR = RR, OR = OR))
+  return(c(Risk1=mu1, Risk0=mu0, RD = RD, RR = RR, OR = OR))
 }
-Ey1fact <- with(dd, sum(y == 1 & x == 1) / sum(x == 1))
-Ey0fact <- with(dd, sum(y == 1 & x == 0) / sum(x == 0))
+Ey1fact <- with(pop, sum(y == 1 & x == 1) / sum(x == 1))
+Ey0fact <- with(pop, sum(y == 1 & x == 0) / sum(x == 0))
 round(Contr(Ey1fact, Ey0fact), 4)
 ```
 
 ```
-##                   RD     RR     OR 
-## 0.8949 0.6288 0.2661 1.4232 5.0286
+##  Risk1  Risk0     RD     RR     OR 
+## 0.8955 0.6280 0.2674 1.4258 5.0735
 ```
 
+The one-year mortality is quite high in both groups. --
 How much bigger is the risk of death of those factually exposed to
 radiotherapy only as compared with those receiving chemotherapy, too?
+
+*Comment*: With such a high baseline probability
+of the outcome the risk ratio cannot 
+become greater than 1/0.628 = 1.59. For relative comparisons one
+could also consider using *survival ratio*: SR = (1-\pi_1)/(1-\pi_0) 
+For instance, here the associational survival ratio is
+$$ \text{SR} = (1-0.8955)/(1-0.6280) = 0.1045/0.372 = 0.2809 = 1/3.56 $$ 
 
 2.  Compute now the true **counterfactual** or 
   **potential risks**  of death
     $$ E(Y_i^{X_i=x}) = P(Y_i^{X_i=x}=1) = \pi_i^{X_i=x} $$ 
     for each
     individual under the alternative treatments or exposure values
-    $x=0,1$ with given covariate values, then the 
+    $x=0,1$ with given covariate values,. After that derive the 
     average or overall counterfactual risks $E(Y^{X=1}) = \pi^1$
     and $E(Y^{X=0}) = \pi^0$ in the population, 
     and finally the true **marginal causal contrasts**
-    for the effect of $X$: 
+    describing the effect of $X$: 
     $$
     \begin{aligned}
      \text{RD} & = E(Y^{X=1})-E(Y^{X=0}), \qquad  \text{RR} = E(Y^{X=1})/E(Y^{X=0}), \\
@@ -215,125 +248,206 @@ radiotherapy only as compared with those receiving chemotherapy, too?
 
 
 ``` r
-dd <- transform(dd,
+pop <- transform(pop,
   EY1.ind = EY(x = 1, z1, z2, z3, z4),
   EY0.ind = EY(x = 0, z1, z2, z3, z4)
 )
-EY1pot <- mean(dd$EY1.ind)
-EY0pot <- mean(dd$EY0.ind)
+EY1pot <- mean(pop$EY1.ind)
+EY0pot <- mean(pop$EY0.ind)
 round(Contr(EY1pot, EY0pot), 4)
 ```
 
 ```
-##                   RD     RR     OR 
-## 0.8273 0.6530 0.1743 1.2670 2.5462
+##  Risk1  Risk0     RD     RR     OR 
+## 0.8274 0.6531 0.1743 1.2668 2.5455
 ```
 
-3.  Compare the associational contrasts computed in 
-   item 4.1 with the
-    causal contrasts in item 4.2. What do you conclude about
-    confoundedness of the associational contrasts?
+3.  Compare the associational contrasts (e.g. RD=0.2674) computed in 
+   item 1 with the causal contrasts here. What do you conclude about
+   the amount of confounding bias in the associational contrasts?
+    
+4. To illustrate what happens in 
+a realistic setting involving some random variability 
+we shall draw a random sample of 5000 patients 
+using systematic sampling. We also compute 
+the estimates of the counterfactual quantities from this
+sample based on the true models.
+
+``` r
+n <- 5000
+samp <- pop[seq(1,N, by=N/n), ]
+str(samp)
+```
+
+```
+## 'data.frame':	5000 obs. of  8 variables:
+##  $ z1     : int  0 0 1 1 1 1 1 1 0 0 ...
+##  $ z2     : int  1 1 1 1 1 0 1 1 0 1 ...
+##  $ z3     : num  4 1 1 4 4 4 3 1 1 4 ...
+##  $ z4     : num  1 2 2 3 2 1 5 3 3 3 ...
+##  $ x      : int  0 0 0 1 0 0 1 0 1 0 ...
+##  $ y      : int  0 0 0 1 0 1 1 1 1 0 ...
+##  $ EY1.ind: num  0.846 0.786 0.769 0.909 0.875 ...
+##  $ EY0.ind: num  0.668 0.574 0.55 0.786 0.721 ...
+```
+
+``` r
+EY1pot.samp <- mean(samp$EY1.ind)
+EY0pot.samp <- mean(samp$EY0.ind)
+round(Contr(EY1pot.samp, EY0pot.samp), 4)
+```
+
+```
+##  Risk1  Risk0     RD     RR     OR 
+## 0.8257 0.6500 0.1757 1.2704 2.5514
+```
+
+The sample estimates of the counterfactual risks
+and their contrasts based on the true models
+seem to be not too far from the true values of those
+estimands.
+
+5. Some perspective to the random variability in the
+estimation of parameters of interest is provided
+by the numbers of cases and non-casses
+in the two exposure groups of the sample
+
+``` r
+stat.table(index=list("Outcome"=factor(y), "Exposure"=factor(x)),
+           contents=list(count(), percent(y)),
+           margins=TRUE, data=samp  )
+```
+
+```
+##  ---------------------------------- 
+##           --------Exposure--------- 
+##  Outcome         0       1   Total  
+##  ---------------------------------- 
+##  0            1519      81    1600  
+##               36.3    10.0    32.0  
+##                                     
+##  1            2668     732    3400  
+##               63.7    90.0    68.0  
+##                                     
+##                                     
+##  Total        4187     813    5000  
+##              100.0   100.0   100.0  
+##  ----------------------------------
+```
+
+The group sizes are very different; only 
+16 \% of the patients were exposed to radiotherapy only.
+
+The Statistical precision in any comparison between the exposure groups
+based on the sample data is very much dominated by the 
+smallest count in this fourfold table, i.e.
+the number of non-cases among the exposed, which is not very big.
 
 ## Outcome modelling and estimation of causal contrasts by g-formula
 
 As the first approach for estimating causal contrasts of interest
-we apply the method of **standardization** or **g-formula**. 
+we apply the method of **regression standardization** or **g-formula**. 
 It is based on a hopefully realistic enough model for 
 $E(Y|X=x, Z=z)$, i.e. how the risk
-of outcome is expected to depend on the exposure variable 
+of the outcome is expected to depend on the exposure variable 
 $X$ and on a
 sufficient set $Z$ of confounders. The potential 
 or counterfactual risks
 $E(Y^{X=x}), x=0,1$, are marginal expectations of the above
-quantities, standardized over the joint distribution of the confounders $Z$ in the
-target population. 
+quantities, standardized over the joint distribution 
+of the confounders $Z$ in the target population. 
 $$ E(Y^{X=x}) = E_Z[E(Y|X=x,Z)]
        = \int E(Y|X=x, Z=z)dF_Z(z), \quad x=0,1. $$
 
 1.  Assume now a *slightly misspecified* model `mY` 
- for the outcome, which contains only main effect terms
+ for the outcome, which contains only the main effect terms
  of the explanatory variables:
   $$ \pi_i = E(Y_i|X_i=x_i, Z_{i1}=z_{i1}, \dots, Z_{i4}=z_{i4}) =
       \text{expit}\left(\beta_0 + \delta x_i +
-      \sum_{j=1}^4 \beta_j z_{ij} \right) $$ 
- Fit this model on the
+      \sum_{j=1}^4 \beta_j z_{ij} \right) . $$ 
+ Fit this model on the data of the whole 
     target population using function `glm()`
     <!-- % in order to have an accurate -->
-    <!-- % estimate of the possible bias due to misspecification of the outcome -->
+    <!-- % estimate of the possible bias due 
+    to misspecification of the outcome -->
     <!-- % model -->
 
 
 ``` r
-mY <- glm(y ~ x + z1 + z2 + z3 + z4, family = binomial, data = dd)
-round(ci.lin(mY, Exp = TRUE)[, c(1, 5)], 3)
+mY <- glm(y ~ x + z1 + z2 + z3 + z4, family = binomial, data = pop)
+round(ci.lin(mY, Exp = TRUE)[, c(1, 5:7)], 4)
 ```
 
 ```
-##             Estimate exp(Est.)
-## (Intercept)   -1.240     0.289
-## x              1.052     2.863
-## z1            -0.095     0.909
-## z2             0.767     2.153
-## z3             0.250     1.284
-## z4             0.279     1.322
+##             Estimate exp(Est.)   2.5%  97.5%
+## (Intercept)  -1.2545    0.2852 0.2806 0.2900
+## x             1.0560    2.8750 2.8267 2.9240
+## z1           -0.1012    0.9038 0.8958 0.9118
+## z2            0.7592    2.1366 2.1170 2.1563
+## z3            0.2525    1.2872 1.2821 1.2924
+## z4            0.2838    1.3282 1.3238 1.3327
 ```
+The point estimates for the intercept, $X, Z_1$ and $Z_3$ seem
+to be reasonably close to the given parameter values 
+in the true model, but those
+of $Z_2$ and $Z_4$ are different. This is because the fitted model
+ignored the product term $Z_2 Z_4$.
 
-There is not much idea in looking at the standard errors or
-confidence intervals in such a big population.
-
-2.  For each subject $i$, compute the fitted individual risk
-    $\widehat{Y_i}$ as well as the predicted potential
-    (counterfactual) risks
+2.  For each subject $i$, compute the **fitted individual risk**
+    $\widehat{Y_i}$ (which actually will be needed not until the 
+    end of this practical!) as well as the 
+    **predicted potential (counterfactual) risks**
     $\widetilde{Y_i}^{X_i=x}$ for both exposure levels $x=0,1$
     separately, keeping the individual values of the 
-    $Z$-variables as they are.
+    $Z$-variables as they are observed.
 
 
 ``` r
-dd$yh <- predict(mY, type = "response") #  fitted values
-dd$yp1 <- predict(mY, newdata = data.frame(
+pop$yh <- predict(mY, type = "response") #  fitted values
+pop$yp1 <- predict(mY, newdata = data.frame(
   x = rep(1, N), # x=1
-  dd[, c("z1", "z2", "z3", "z4")]
+  pop[, c("z1", "z2", "z3", "z4")]
 ), type = "response")
-dd$yp0 <- predict(mY, newdata = data.frame(
+pop$yp0 <- predict(mY, newdata = data.frame(
   x = rep(0, N), # x=0
-  dd[, c("z1", "z2", "z3", "z4")]
+  pop[, c("z1", "z2", "z3", "z4")]
 ), type = "response")
 ```
 
-3.  Applying the method of **standardization** or 
-**g-formula** compute now the
-    point estimates 
+3.  Applying the method of standardization or 
+  g-formula we now compute the point estimates 
     $$ \widehat{E}_g(Y^{X=x}) =
      \frac{1}{n} \sum_{i=1}^n \widetilde{Y}_i^{X_i=x}, \quad x=0,1. $$
     of the two counterfactual risks $E(Y^{X=1}) = \pi^1$ and
     $E(Y^{X=0})=\pi^0$ as well as  
-    those of the marginal causal contrasts
+    those of the marginal causal contrasts.
 
 
 ``` r
-EY1pot.g <- mean(dd$yp1)
-EY0pot.g <- mean(dd$yp0)
+EY1pot.g <- mean(pop$yp1)
+EY0pot.g <- mean(pop$yp0)
 round(Contr(EY1pot.g, EY0pot.g), 4)
 ```
 
 ```
-##                   RD     RR     OR 
-## 0.8330 0.6508 0.1822 1.2800 2.6763
+##  Risk1  Risk0     RD     RR     OR 
+## 0.8331 0.6503 0.1828 1.2811 2.6837
 ```
 
-The marginal expectations $E_Z[E(X=x, Z)]$ taken over the 
-joint distribution of
-the confounders $Z$ are empirically estimated from 
-the actual data representing the target population by simply
-computing the arithmetic means of the individually
+*Comment*:  The joint distribution of
+the confounders $Z$ in the target population is here represented by 
+the actual distribution of the data in that population.
+Thus, marginal expectations $E_Z[E(X=x, Z)]$ are obtained
+by simple computation of the arithmetic means of the individually
 predicted values $\widetilde{Y_i}^{X_i=x}$ of the 
 outcome for the two exposure levels.
 
-Compare the estimated contrasts with the true ones in
-item 4.2 above.
-How big is the bias due to slight misspecification 
+Compare the estimated contrasts with those
+obtained from applying the true model (RD = 0.1743) in
+item 4.4 above.
+How big is the bias due to misspecification 
 of the outcome model?
+
 Compare in particular the estimate of the marginal 
 OR here with the
 conditional OR obtained in item 5.1 from the
@@ -341,138 +455,141 @@ pertinent coefficient in
 the logistic model. Which one is closer to 1?
 
 4.  Perform the same calculations using the tools 
-in package `stdReg`
-(see [Sjölander 2016](https://doi.org/10.1007/s10654-016-0157-3))
+in package `stdReg2` but now on the sample data.
+(see [Sjölander 2016](https://doi.org/10.1007/s10654-016-0157-3) and
+[Sachs et al 2025](https://doi.org/10.1016/j.annepidem.2025.04.002)).
+Using function `standardize_glm()` the same logistic model is fitted,
+and the point estimates together with the confidence intervals
+for the causal risk difference and causal risk ratio are computed.
+The results are saved into a list, for which we give 
+the name `mY.std`. 
+
+The main results are shown in four small windows  
+after applying the basic print method on `mY.std`
 
 
 ``` r
-mY.std <- stdGlm(fit = mY, data = dd, X = "x")
-summary(mY.std)
+mY.std <- standardize_glm(
+ formula = y ~ x + z1 + z2 + z3 + z4,
+ family = "binomial",
+ data = samp,
+ values = list(x = 0:1),
+ contrasts = c("difference", "ratio"),
+ reference = 0
+)
+mY.std
 ```
 
 ```
-## 
-## Formula: y ~ x + z1 + z2 + z3 + z4
-## Family: binomial 
-## Link function: logit 
+## Outcome formula: y ~ x + z1 + z2 + z3 + z4
+## Outcome family: quasibinomial 
+## Outcome link function: logit 
 ## Exposure:  x 
 ## 
-##   Estimate Std. Error lower 0.95 upper 0.95
-## 0    0.651   0.000733      0.649      0.652
-## 1    0.833   0.001562      0.830      0.836
+## Tables: 
+##   x Estimate Std.Error lower.0.95 upper.0.95
+## 1 0    0.656   0.00731      0.641      0.670
+## 2 1    0.849   0.01533      0.819      0.879
+## 
+## Reference level:  x = 0 
+## Contrast:  difference 
+##   x Estimate Std.Error lower.0.95 upper.0.95
+## 1 0    0.000    0.0000      0.000      0.000
+## 2 1    0.193    0.0172      0.159      0.227
+## 
+## Reference level:  x = 0 
+## Contrast:  ratio 
+##   x Estimate Std.Error lower.0.95 upper.0.95
+## 1 0     1.00    0.0000       1.00       1.00
+## 2 1     1.29    0.0278       1.24       1.35
 ```
+The point estimates seem to be well within a resonable error margin
+when compared to those, which you got
+by explicit computations for the whole 
+population data (e.g. RD=0.1828) in the previous item.
+(You could also run `standardize_glm()` with `data=pop` to convince
+yourself that `stdReg2' indeed provides the same point estimates 
+as obtained above for the whole population from model `mY`).
 
-``` r
-round(summary(mY.std, contrast = "difference", reference = 0)$est.table, 4)
-```
-
-```
-##   Estimate Std. Error lower 0.95 upper 0.95
-## 0   0.0000     0.0000     0.0000     0.0000
-## 1   0.1822     0.0017     0.1788     0.1856
-```
-
-``` r
-round(summary(mY.std, contrast = "ratio", reference = 0)$est.table, 4)
-```
-
-```
-##   Estimate Std. Error lower 0.95 upper 0.95
-## 0     1.00     0.0000     1.0000     1.0000
-## 1     1.28     0.0028     1.2745     1.2855
-```
-
-``` r
-round(summary(mY.std, transform = "odds", 
-              contrast = "ratio", reference = 0)$est.table, 4)
-```
-
-```
-##   Estimate Std. Error lower 0.95 upper 0.95
-## 0   1.0000     0.0000     1.0000     1.0000
-## 1   2.6763     0.0315     2.6146     2.7379
-```
-
-Check that you got the same point estimates as 
-in the previous item.
-Again, the confidence intervals are not very 
-meaningful when analysing
-the data covering the whole big target population. 
-Of course, when
-applied to real sample data they are relevant. 
-In `stdReg` package, the
+In `stdReg2`, the 
 standard errors are obtained by the multivariate 
-delta method built upon
-M-estimation and robust sandwich estimator of the 
+delta method built upon M-estimation 
+([Stefanski \& Boos 2002](https://doi.org/10.1198/000313002753631330)) 
+and robust sandwich estimator of the 
 pertinent covariance
-matrix, and approximate confidence intervals are derived 
+matrix. Approximate confidence intervals are derived 
 from these in the usual way.
-
-
 
 ## Inverse probability weighting (IPW) by propensity scores
 
 
-The next method is based on weighting each individual 
+Our next method is based on weighting each individual 
 observation by the
 inverse of the probability of belonging to that 
 particular exposure group, which was realized, 
 this probability being predicted by the
 determinants of exposure.
 
-1.  Fit first a somewhat misspecified 
-model for the exposure including the main effects of the
-    $Z$-variables only. 
+1. First, we examine the validity of this approach 
+by fitting the true model on the whole population data.  
+To repeat, the model is
     $$ 
     p_i = E(X_i| Z_{1i} = z_{1i}, \dots, Z_{4i} = z_{4i})
-    = \text{expit}(\gamma_0 + \gamma_1 z_{1i} + \gamma_2 z_{2i} +
-       \gamma_3 z_{i3} + \gamma_4 z_{4i} ), \quad i=1, \dots N 
+    = \text{expit}(\gamma_0 + \gamma_2 z_{2i} +
+  \gamma_3 z_{i3} + \gamma_4 z_{4i} + \gamma_{24} z_{2i}z_{4i}), \quad i=1, \dots N 
     $$
 
 
 ``` r
-mX <- glm(x ~ z1 + z2 + z3 + z4,
-  family = binomial(link = logit), data = dd
-)
+mX <- glm(x ~ z2 + z3 + z4 + z2:z4,
+  family = binomial(link = logit), data = pop)
 round(ci.lin(mX, Exp = TRUE)[, c(1, 5)], 4)
 ```
 
 ```
 ##             Estimate exp(Est.)
-## (Intercept)  -6.3031    0.0018
-## z1           -0.0161    0.9840
-## z2            1.6260    5.0833
-## z3            0.2391    1.2702
-## z4            0.8369    2.3093
+## (Intercept)  -5.0196    0.0066
+## z2            0.0825    1.0860
+## z3            0.2474    1.2807
+## z4            0.5035    1.6544
+## z2:z4         0.3956    1.4852
 ```
 
-2.  Extract the **propensity scores**, i.e. 
-fitted probabilities of
+The estimated coefficients and ORs are quite close 
+to the true values as given in the introduction section.
+
+2.  From the fitted model we then extract the
+**propensity scores**, i.e. fitted probabilities of
     belonging to exposure group 1: 
-    $\text{PS}_i = \widehat{p_i}$, and
-    compare their distribution between the two groups.
+    $\text{PS}_i = \widehat{p_i}$.
+We also make a simple comparison
+of the distribution of the scores between the two groups
+by common summary measures.
 
 
 ``` r
-dd$PS <- predict(mX, type = "response")
-summary(dd$PS)
+pop$PS <- predict(mX, type = "response")
+tapply(pop$PS, pop$x, summary)
 ```
 
 ```
-##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
-## 0.005256 0.041532 0.112765 0.172440 0.248554 0.613993
+## $`0`
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.01381 0.03660 0.07509 0.13568 0.18053 0.63357 
+## 
+## $`1`
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.01381 0.18053 0.35460 0.35172 0.51319 0.63357
 ```
+How different are the distributions? Can one judge
+from these summaries, that they are sufficiently overlapping?
 
-``` r
-with(subset(dd, x == 0), plot(density(PS), lty = 2))
-with(subset(dd, x == 1), lines(density(PS), lty = 1))
-```
+Informative graphical tools for examining overlap and 
+covariate balance are contained in package `PSweight`,  
+and they are introduced in the next section.
 
-![](causInf2-s_files/figure-epub3/propScore-1.png)<!-- -->
-
-How different are the distributions? Are they sufficiently overlapping?
-
-3.  Compute the weights
+3.  We then compute the **inverse probability weights** (IPW), also
+known as **inverse probability treatment weights** (IPTW):
 $$
 \begin{aligned}
  W_i & = \frac{1}{\text{PS}_i}, \quad \text{when }\ X_i=1, \\
@@ -480,18 +597,20 @@ $$
 \end{aligned} 
 $$
  Look at the sum as well as
-    the distribution summary of the weights in the exposure groups. The
-    sum of weights should be close to $N$ in both groups.
+ the distribution summary of the weights in the exposure groups. 
+ In an ideal situation with a well-specified exposure model the
+sum of weights should be close to to the population size in both groups.
 
 
 ``` r
-dd$w <- ifelse(dd$x == 1, 1 / dd$PS, 1 / (1 - dd$PS))
-with(dd, tapply(w, x, sum))
+pop$w <- ifelse(pop$x == 1, 
+                     1 / pop$PS, 1 / (1 - pop$PS))
+with(pop, tapply(w, x, sum))
 ```
 
 ```
-##        0        1 
-## 498880.5 565237.5
+##         0         1 
+##  999884.4 1001553.5
 ```
 
 4.  Compute now the weighted estimates of the 
@@ -510,101 +629,138 @@ potential or counterfactual risks for
 
 
 ``` r
-EY1pot.w <- sum(dd$x * dd$w * dd$y) / sum(dd$x * dd$w)
-EY0pot.w <- sum((1 - dd$x) * dd$w * dd$y) / sum((1 - dd$x) * dd$w)
+EY1pot.w <- sum(pop$x * pop$w * pop$y) / sum(pop$x * pop$w)
+EY0pot.w <- sum((1 - pop$x) * pop$w * pop$y) / sum((1 - pop$x) * pop$w)
 round(Contr(EY1pot.w, EY0pot.w), 4)
 ```
 
 ```
-##                   RD     RR     OR 
-## 0.8037 0.6519 0.1518 1.2329 2.1868
+##  Risk1  Risk0     RD     RR     OR 
+## 0.8260 0.6522 0.1737 1.2664 2.5304
 ```
 
-These estimates seem to be somewhat downward biased when 
-comparing to
-true values. Could this be because of omitting 
-the relatively strong
-product term effect of $Z_2$ and $Z_4$?
+These results seem to be practically equal
+to the true values (e.g. true RD=0.1743). 
 
+*Comment*: If you apply the methods introduced in the
+next section but use the whole population data, i.e. putting 
+`data=pop`, you would see that the estimates of the
+causal contrasts would be the same as obtained here.
 
-## Improving IPW estimation and using R package `PSweight`
+##  IPW estimation using R package `PSweight`
 
-We now try to improve IPW-estimation by a richer exposure 
-model. In
-computations we shall utilize the R package 
-`PSweight` (see [PSweight
-vignette](https://cran.r-project.org/web/packages/PSweight/vignettes/vignette.pdf)).
+We shall now try IPW-estimation with a misspecified model, 
+such that we include all $Z$-variables but none of their
+pairwise interactions.
+We do this on the sample data only.
+In computations we utilize the R package 
+`PSweight` 
+(see [PSweight vignette](https://cran.rstudio.com/web//packages/PSweight/vignettes/Software_vig.pdf)).
 
-1.  First, we compute the propensity scores
-and weights from a more flexible exposure model,
-    which contains all pairwise product terms 
-    of the parents of $X$.
-    According to the causal diagram, $Z_1$ is 
-    not in that subset, so it
-    is left out. The exposure model is 
-    specified and the weights are
-    obtained as follows using function
-    `SumStat()` in `PSweight`:
+1.  The exposure model is fitted using `glm()`, and the weights are
+    obtained using function
+    `SumStat()` in package `PSweight`:
 
 
 ``` r
-mX2 <- glm(x ~ (z2 + z3 + z4)^2, family = binomial, data = dd)
-round(ci.lin(mX2, Exp = TRUE)[, c(1, 5)], 3)
+mX2 <- glm(x ~ z1 + z2 + z3 + z4, family = binomial, data = samp)
+round(ci.lin(mX2, Exp = TRUE)[, c(1:2, 5:7)], 3)
 ```
 
 ```
-##             Estimate exp(Est.)
-## (Intercept)   -5.085     0.006
-## z2             0.143     1.154
-## z3             0.243     1.275
-## z4             0.527     1.693
-## z2:z3         -0.003     0.997
-## z2:z4          0.376     1.456
-## z3:z4          0.001     1.001
+##             Estimate StdErr exp(Est.)  2.5% 97.5%
+## (Intercept)   -6.520  0.229     0.001 0.001 0.002
+## z1             0.115  0.086     1.121 0.948 1.327
+## z2             1.722  0.116     5.594 4.460 7.017
+## z3             0.227  0.038     1.255 1.164 1.353
+## z4             0.855  0.038     2.351 2.183 2.531
 ```
 
 ``` r
 psw2 <- SumStat(
-  ps.formula = mX2$formula, data = dd,
+  ps.formula = mX2$formula, data = samp,
   weight = c("IPW", "treated", "overlap")
 )
-dd$PS2 <- psw2$propensity[, 2] 
-dd$w2 <- ifelse(dd$x == 1, 1 / dd$PS2, 1 / (1 - dd$PS2)) 
-plot(density(dd$PS2[dd$x == 0]), lty = 2)
-lines(density(dd$PS2[dd$x == 1]), lty = 1)
 ```
 
-![](causInf2-s_files/figure-epub3/PSweight-1.png)<!-- -->
-
-Note that apart from ordinary IPW, other types of 
-weights can also also
-obtained. These are relevant when estimating other 
-kinds of causal
+Note that apart from weights `IPW` for the whole population, 
+other kinds of  weights can also be 
+computed. These are relevant when estimating other 
+types of causal
 contrasts, like "average treatment effect among the treated" 
 (ATT, see below) and "average treatment effect in the overlap 
 (or equipoise) population" (ATO).
 
 2.  `PSweight` includes some useful tools to examine the
-properties of the distribution and to check the balance 
-of the propensity scores, for instance
+properties of the distribution of the propensity scores. 
+First we draw density plots showing, how well the 
+distributions of propensity scores (and 1 - PS, too) are overlapping 
+between the exposure groups
+-- **NB.** You may get a warning about usage of a   
+  `ggplot2` aesthetic in the density plot implemented in 
+  `PSweight`,
+ this feature being now outdated in the newest version of `ggplot2`.
+Nonetheless, the density plot will after all be drawn, if you 
+go down on the Console window and "Press [enter] to continue"!
 
 
 ``` r
-plot(psw2, type = "balance", metric = "PSD")
+plot(psw2, type = "density")
+```
+
+```
+## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## ℹ Please use `linewidth` instead.
+## ℹ The deprecated feature was likely used in the PSweight package.
+##   Please report the issue to the authors.
+## This warning is displayed once per session.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
+```
+
+![](causInf2-s_files/figure-epub3/distributions of the scores-1.png)
+
+```
+## Propensity score for group 0
+```
+
+```
+## Press [enter] to continue
+```
+
+![](causInf2-s_files/figure-epub3/distributions of the scores-2.png)
+
+```
+## Propensity score for group 1
+```
+Are the distributions of the propensity scores very different?
+
+3. We then create a diagnostic plot to examine the covariate balance
+between the groups:
+
+``` r
+plot(psw2, type = "balance")
 ```
 
 ![](causInf2-s_files/figure-epub3/check balance-1.png)<!-- -->
 
-It is desirable that the horisontal values of 
-these measures for given weights are less than 0.1.
+In this plot, it would be desirable that the horisontal values of 
+the standardized mean differences for a given type of 
+weights are less than 0.1.
+-- There seems to be some issue with the balance in the estimation
+of our target parameters based on this exposure model.
 
-3.  Estimation and reporting of the causal contrasts. For relative
+
+4.  Estimation and reporting of the causal contrasts:
+   Weights must be `IPW` when estimating the causal effect 
+   generalized to the whole target population. For relative
     contrasts, the summary method provides the results 
-    on the log-scale; therefore $\exp$-transformation
+    on the log-scale; therefore $\exp$-transformation.
 
 
 ``` r
-ipw2est <- PSweight(ps.formula = mX2, yname = "y", data = dd, weight = "IPW")
+ipw2est <- PSweight(ps.formula = mX2, yname = "y", data = samp, 
+                    weight = "IPW")
 ipw2est
 ```
 
@@ -612,11 +768,11 @@ ipw2est
 ## Original group value:  0, 1 
 ## 
 ## Point estimate: 
-## 0.6526, 0.8255
+## 0.6565, 0.8027
 ```
 
 ``` r
-summary(ipw2est)
+summary(ipw2est, type="DIF")  # risk difference
 ```
 
 ```
@@ -629,14 +785,14 @@ summary(ipw2est)
 ##             0 1
 ## Contrast 1 -1 1
 ## 
-##             Estimate Std.Error       lwr     upr  Pr(>|z|)    
-## Contrast 1 0.1729179 0.0025636 0.1678934 0.17794 < 2.2e-16 ***
+##            Estimate Std.Error      lwr     upr  Pr(>|z|)    
+## Contrast 1 0.146179  0.036149 0.075329 0.21703 5.259e-05 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ``` r
-(logRR.ipw2 <- summary(ipw2est, type = "RR"))
+(logRR.ipw2 <- summary(ipw2est, type = "RR"))  # log(risk ratio)
 ```
 
 ```
@@ -650,30 +806,33 @@ summary(ipw2est)
 ##             0 1
 ## Contrast 1 -1 1
 ## 
-##             Estimate Std.Error       lwr     upr  Pr(>|z|)    
-## Contrast 1 0.2350512 0.0031789 0.2288207 0.24128 < 2.2e-16 ***
+##            Estimate Std.Error     lwr     upr  Pr(>|z|)    
+## Contrast 1  0.20103   0.04547 0.11191 0.29015 9.816e-06 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ``` r
-round(exp(logRR.ipw2$estimates[c(1, 4, 5)]), 3)
+round(exp(logRR.ipw2$estimates[c(1, 4, 5)]), 3) # risk ratio
 ```
 
 ```
-## [1] 1.265 1.257 1.273
+## [1] 1.223 1.118 1.337
 ```
 
 ``` r
-round(exp(summary(ipw2est, type = "OR")$estimates[c(1, 4, 5)]), 3)
+round(exp(summary(ipw2est, type = "OR")$estimates[c(1, 4, 5)]), 3) # OR
 ```
 
 ```
-## [1] 2.519 2.434 2.606
+## [1] 2.128 1.367 3.315
 ```
 
-Compare these with the previous IPW estimate  as
-well as the true values. Have we obtained nearly unbiased results?
+Comparing these with the previous IPW estimates (e.g. RD=0.1737) as
+well as the true values (RD=0.1743), there perhaps can be
+seen indication of some bias due to misspecification. Remember,
+though, that these estimates are from the sample data with
+relatively wide error margins.
 
 The standard errors provided by `PSweight` 
 are by default based on the
@@ -687,10 +846,11 @@ samples.
 ## Effect of exposure among those exposed 
 
 If we are interested in the 
-causal contrasts describing the **effect
-    of exposure among those exposed** (like ATE), 
+causal contrasts describing the 
+**effect of exposure among those exposed** (like ATE), 
     the relevant factual and
-    counterfactual risks in that subset are
+    counterfactual risks in that subset are conditional
+    on being exposed:
 
 $$
 \begin{aligned}
@@ -704,26 +864,33 @@ in which the
 $z$-specific risks in the unexposed are weighted by the
 distribution of
 $Z$ in the exposed subset of the target population. 
-The risks and their
-contrasts are estimated from the fit of the outcome model:
+
+1. We shall first estimate these $z$-specific 
+"observed" or factual and "expected" or counterfactual risks
+ and their contrasts conditional on being exposed from the 
+ slightly misspecified outcome model `mY` fitted on the
+ whole population data:
 
 
 ``` r
-EY1att.g <- mean(subset(dd, x == 1)$yp1)
-EY0att.g <- mean(subset(dd, x == 1)$yp0)
+EY1att.g <- mean(subset(pop, x == 1)$yp1)
+EY0att.g <- mean(subset(pop, x == 1)$yp0)
 round(Contr(EY1att.g, EY0att.g), 4)
 ```
 
 ```
-##                   RD     RR     OR 
-## 0.8949 0.7560 0.1389 1.1837 2.7488
+##  Risk1  Risk0     RD     RR     OR 
+## 0.8955 0.7565 0.1389 1.1836 2.7568
 ```
 
-Compare the results here with those for the whole target population. What do you observe? 
+Compare the results here with those (e.g. RD=0.1828)
+meant to describe the overall causal contrasts among the
+whole target population from the same model `mY`.
+What do you observe? 
 
 
-2. Have you any guess about the causal effect of exposure among
-the unexposed; is it bigger or smaller than among 
+2. What is your guess about the causal effect of exposure among
+the unexposed; is it bigger or smaller than it is among 
 the exposed or among the whole population?
 
 3.  Incidentally, the true causal contrasts among the 
@@ -732,28 +899,33 @@ from the quantities in item 4.2 above:
 
 
 ``` r
-EY1att <- mean(subset(dd, x == 1)$EY1.ind)
-EY0att <- mean(subset(dd, x == 1)$EY0.ind)
+EY1att <- mean(subset(pop, x == 1)$EY1.ind)
+EY0att <- mean(subset(pop, x == 1)$EY0.ind)
 round(Contr(EY1att, EY0att), 4)
 ```
 
 ```
-##                   RD     RR     OR 
-## 0.8955 0.7680 0.1275 1.1661 2.5896
+##  Risk1  Risk0     RD     RR     OR 
+## 0.8957 0.7684 0.1273 1.1657 2.5886
 ```
 
-Compare the estimates in the previous item with the 
-true values obtained here.
+Compare the estimates in the previous item (e.g. RD$_1$ = 0.1389) 
+with the  true values obtained here. 
+The misspecification
+of the outcome model implies some bias in these
+results, too.
 
 4.  When wishing to estimate 
 the effect of exposure among the exposed using the IPW
 approach, then the weights are $W_i = 1$ for the exposed and
     $W_i = \text{PS}_i/(1-\text{PS}_i)$ for the unexposed.
-    Call again `PSweight` but with another choice of weight:
+We shall again use `PSweight` with sample data
+but with another choice of weights:
 
 
 ``` r
-psatt <- PSweight(ps.formula = mX2, yname = "y", data = dd, weight = "treated")
+psatt <- PSweight(ps.formula = mX2, yname = "y", 
+                  data = samp, weight = "treated")
 psatt
 ```
 
@@ -762,47 +934,45 @@ psatt
 ## Treatment group value:  1 
 ## 
 ## Point estimate: 
-## 0.7667, 0.8949
+## 0.7579, 0.9004
 ```
 
 ``` r
-round(summary(psatt)$estimates[1], 4)
+round(summary(psatt)$estimates, 4)
 ```
 
 ```
-## [1] 0.1282
-```
-
-``` r
-round(exp(summary(psatt, type = "RR")$estimates[1]), 3)
-```
-
-```
-## [1] 1.167
+##            Estimate Std.Error z value    lwr    upr Pr(>|z|)
+## Contrast 1   0.1424    0.0147  9.6623 0.1135 0.1713        0
 ```
 
 ``` r
-round(exp(summary(psatt, type = "OR")$estimates[1]), 3)
+round(exp(summary(psatt, type = "RR")$estimates), 3)
 ```
 
 ```
-## [1] 2.592
+##            Estimate Std.Error  z value   lwr   upr Pr(>|z|)
+## Contrast 1    1.188     1.018 13678.08 1.147 1.231        1
 ```
 
 Compare the results here with those obtained by 
 g-formula in item 8.1
 and with the true contrasts above.
 
-## Double robust estimation by augmented IPW
+## Double robust (DR) estimation 
 
-Let us attempt to correct the estimates by a **double 
-robust** (DR) approach
-called **augmented IPW estimation** (AIPW), which 
-combines the g-formula and
-the IPW approach. The classical 
-AIPW-estimator can be expressed in two ways:
-either an IPW-corrected g-formula estimator, or a g-corrected
-IPW-estimator.
+We may try to reduce the bias in the estimation of the
+target parameters, which would be caused by
+possible specification error either in the outcome model
+or in the exposure model using some 
+**double robust** (DR) approach. These methods combine
+the principle of regression standardization with that
+of IPW/propensity scores. 
+
+A classical DR method is  *augmented IPW estimation* (AIPW), in 
+which the estimator can be expressed in two alternative ways:
+either an IPW-corrected g-formula estimator, or an 
+IPW-estimator corrected by standardization.
 
 $$
 \begin{aligned}
@@ -816,135 +986,138 @@ $$
 \end{aligned}
 $$
 
-1. We shall first combine the results from the slightly
-misspecified outcome model with those from the more 
-misspecified exposure model.
+1. We apply the AIPW method first in the whole population by
+direct combination of the results that we obtained from the slightly
+misspecified outcome model `mY` with those from the 
+well-specified exposure model `mX`.
 
 
 ``` r
-EY1pot.a <- EY1pot.g + mean( 1*(dd$x==1) * dd$w * (dd$y - dd$yp1) )
-EY0pot.a <- EY0pot.g + mean( 1*(dd$x==0) * dd$w * (dd$y - dd$yp0) )
+EY1pot.a <- EY1pot.g + mean( 1*(pop$x==1) * pop$w * (pop$y - pop$yp1) )
+EY0pot.a <- EY0pot.g + mean( 1*(pop$x==0) * pop$w * (pop$y - pop$yp0) )
 round(Contr(EY1pot.a, EY0pot.a), 4)
 ```
 
 ```
-##                   RD     RR     OR 
-## 0.8241 0.6523 0.1718 1.2634 2.4972
+##  Risk1  Risk0     RD     RR     OR 
+## 0.8259 0.6523 0.1737 1.2663 2.5296
 ```
 
-Compare these results with those obtained by g-formula and by
-non-augmented IPW method. Was augmentation successful?
-
-2. Let us then look, how close we get when combining the results
-from the slightly misspecified outcome model with the correct
-exposure model using the alternative AIPW-formula
-
+Compare these results with those obtained by g-formula 
+(e.g. RD=0.1828) and by
+the IPW method (RD=0.1737) as well as with the true values
+(RD = 0.1743) of the parameters. -- Was correction
+of the g-estimates by IPW successful?
 
 
-``` r
-EY1pot.w2 <- ipw2est$muhat[2]
-EY0pot.w2 <- ipw2est$muhat[1]
-EY1pot.a2 <- EY1pot.w2 + mean( (1 - 1*(dd$x==1) * dd$w2) * dd$yp1 )
-EY0pot.a2 <- EY0pot.w2 + mean( (1 - 1*(dd$x==0) * dd$w2) * dd$yp0 )
-round(Contr(EY1pot.a2, EY0pot.a2), 4)
-```
-
-```
-##      1      0   RD.1   RR.1   OR.1 
-## 0.8261 0.6526 0.1735 1.2658 2.5285
-```
-
-Compare the results with previous ones.
-How successful was augmentation now?
-
-AIPW-estimates and confidence
+2. AIPW-estimates and confidence
 intervals for the causal contrasts of interest can
-be obtained, for instance, using `PSweight` by adding
-the model formula of the outcome model
-as the value for the argument `out.formula`.
-
-## Double robust, targeted maximum likelihood estimation (TMLE)
-
-We now consider now another double robust approach, 
-known as **targeted
-maximum likelihood estimation** (TMLE). 
-It also corrects the estimator
-obtained from the outcome model by elements that are derived from the exposure model. The corrections are, though, not as
-intuitive as those in AIPW. See [Schuler and Rose
-(2017)](https://doi.org/10.1093/aje/kww165) for more details.
-
-1.  The first step is to utilize the propensity scores 
-obtained above for the correct exposure model 
-and define the "clever covariates"
-
+be obtained, for instance, using `PSweight`. 
+We will assign the outcome model `mY` into the argument `out.formula`. 
+We again combine this slightly misspecified outcome model with the
+correct exposure model `mX` and 
+perform the estimation on the sample data.
 
 ``` r
-dd$H1 <- dd$x / dd$PS2
-dd$H0 <- (1 - dd$x) / (1 - dd$PS2)
+aipw.psw <- PSweight(ps.formula = mX, out.formula = mY, yname = "y",
+                     data = samp, weight = "IPW")
+aipw.psw
 ```
 
-2.  Then, a working model is fitted for the outcome, 
-in which the clever
-    covariates are explanatory variables, but the model 
-    also includes
-    the previously fitted linear predictor
-    $\widehat{\eta}_i = \text{logit}(\widehat Y_i)$ 
-    from the original
-    outcome model `mY` as an offset term; see item 5.2.
-    Moreover, the intercept is removed.
-
+```
+## Original group value:  0, 1 
+## 
+## Point estimate: 
+## 0.6576, 0.8234
+```
 
 ``` r
-epsmod <- glm(y ~ -1 + H0 + H1 + offset(qlogis(yh)),
-  family = binomial(link = logit), data = dd
-)
-eps <- coef(epsmod)
-eps
+round(summary(aipw.psw)$estimates, 4)
 ```
 
 ```
-##           H0           H1 
-##  0.007197951 -0.002859654
+##            Estimate Std.Error z value    lwr    upr Pr(>|z|)
+## Contrast 1   0.1658    0.0262  6.3406 0.1146 0.2171        0
 ```
-
-3.  The logit-transformed predicted values $\widetilde{Y}_i^{X_i=1}$ and
-    $\widetilde{Y}_i^{X_i=0}$ of 
-    the potential or counterfactual individual risks from
-    the original outcome model are now corrected by the estimated
-    coefficients of the clever covariates, and the corrected
-    predictions are returned to the original scale.
-
 
 ``` r
-ypred0.H <- plogis(qlogis(dd$yp0) + eps[1] / (1 - dd$PS2))
-ypred1.H <- plogis(qlogis(dd$yp1) + eps[2] / dd$PS2)
+round(exp(summary(aipw.psw, type = "RR")$estimates), 3)
 ```
 
-4. Estimates of the causal contrasts:
+```
+##            Estimate Std.Error  z value   lwr   upr Pr(>|z|)
+## Contrast 1    1.252     1.033 1024.995 1.175 1.334        1
+```
+The estimates here are quite close to the true values, but
+the error margins are still relatively wide.
 
+3. Alternatively, `stdReg2` can also be utilized for double-robust
+estimation of causal contrasts. It leans, though, on a somewhat
+different approach. The method developed for the types of outcomes and
+models covered by generalized linear models (GLM) is known by its
+initialism  **IPTW GLM**. It is based on weighted maximum likelihood 
+fitting of the outcome model. The 
+weights are inverses of the propensity scores obtained from
+the pertinent exposure model. Computation of standard errors and
+confidence intervals uses the influence function approach,
+which among other things takes into account the fact
+that weighting is based on estimated propensity scores.
+-- See [Gabriel et al 2024](https://doi.org/10.1002/sim.9969) 
+for details of IPTW GLM.
 
+We shall try this method for the sample data with the script below:
 
 ``` r
-EY0pot.t <- mean(ypred0.H)
-EY1pot.t <- mean(ypred1.H)
-round(Contr(EY1pot.t, EY0pot.t), 4)
+dr.std <- standardize_glm_dr(
+          formula_outcome = y ~ x + z1 + z2 + z3 + z4, 
+          formula_exposure = x ~ z2 + z3 + z4 + z2:z4,
+          data = samp,
+          family_outcome = "binomial", 
+          family_exposure = "binomial",
+          values = list(x = 0:1), 
+          contrasts = c("difference", "ratio"), reference = 0)
+dr.std
 ```
 
 ```
-##                   RD     RR     OR 
-## 0.8246 0.6526 0.1720 1.2635 2.5020
+## Doubly robust estimator with: 
+## 
+## Exposure formula: x ~ z2 + z3 + z4 + z2:z4
+## Exposure link function: logit 
+## Outcome formula: y ~ x + z1 + z2 + z3 + z4
+## Outcome family: quasibinomial 
+## Outcome link function: logit 
+## Exposure:  x 
+## 
+## Tables: 
+##   x Estimate Std.Error lower.0.95 upper.0.95
+## 1 0    0.658   0.00732      0.643      0.672
+## 2 1    0.827   0.02500      0.778      0.876
+## 
+## Reference level:  x = 0 
+## Contrast:  difference 
+##   x Estimate Std.Error lower.0.95 upper.0.95
+## 1 0    0.000     0.000      0.000       0.00
+## 2 1    0.169     0.026      0.119       0.22
+## 
+## Reference level:  x = 0 
+## Contrast:  ratio 
+##   x Estimate Std.Error lower.0.95 upper.0.95
+## 1 0     1.00    0.0000       1.00       1.00
+## 2 1     1.26    0.0404       1.18       1.34
 ```
 
-Compare these with previous results and with the true values.
+The point estimates are not much different from
+those obtained above when applying AIPW estimation. 
 
-## Double robust estimation with `AIPW` and `tmle` packages
+## DR estimation with flexible learning algorithms
 
-It may be difficult to specify 
-conventional generalized linear models 
-or even generalized additive 
-models for exposure and outcome which are 
-sufficiently realistic, yet which do not suffer from overfitting.
- Modern approaches of **statistical learning**, aka
+It may not be easy to specify 
+a conventional generalized linear models 
+or even a generalized additive 
+model for exposure and outcome, which would be  
+sufficiently realistic, yet not suffering from overfitting.
+ Modern approaches of **statistical learning**, a.k.a.
 "machine learning" provide tools for flexible modelling,
 which may be used to reduce the risk of misspecification,
  if thoughtfully applied. 
@@ -960,7 +1133,8 @@ and then performs AIPW estimation  of the
 parameters of interest coupled with 
 calculation of confidence intervals. Package `tmle`
 (see [Karim and Frank, 2021](https://ehsanx.github.io/TMLEworkshop/))
-performs same tasks but uses the TMLE approach 
+performs same tasks but uses the 
+**targeted maximum likelihood estimation** (TMLE) approach 
 in estimation.
 
 Both `AIPW` and `tmle` lean on the
@@ -969,11 +1143,93 @@ Both `AIPW` and `tmle` lean on the
  Gradient Boosting, etc.) for constructing
  predictions of the counterfactual quantities, and 
  then creates an optimal weighted average of those models, 
- aka an "ensemble". These algorithms are computationally
+ a.k.a. an "ensemble". These algorithms are computationally
  highly intensive. Fitting models with only 3 or 4
  covariates as in this practical
- on our target cohort of 500,000 subjects
- would take hours on an ordinary laptop. With a study population
- of 5000 it takes several minutes. 
+ for our whole target cohort of 1,000,000 subjects
+ would take hours on an ordinary laptop. With a sample
+ of 5000 it woul still take several minutes. 
 
+## Extra: Computations in the TMLE method
+
+Finally, a few words on, how causal contrasts 
+are estimated using the TMLE, when we have fitted an outcome model,
+like `mY`, and an exposure model, like `mX`. 
+TMLE corrects the estimates obtained from the outcome model by some 
+elements derived from the
+exposure model. The correction, though, is not as
+intuitive and transparent as it is in AIPW. See 
+[Schuler and Rose (2017)](https://doi.org/10.1093/aje/kww165) 
+for more details. 
+
+We show the steps of computation 
+using the data covering the whole target population.
+
+1.  In the first step we utilize the propensity scores 
+previously obtained from fitting the correct exposure model 
+and compute from them the "**clever covariates**" `H1`and `H0`: 
+
+
+``` r
+pop$H1 <- pop$x / pop$PS
+pop$H0 <- (1 - pop$x) / (1 - pop$PS)
+```
+
+2.  Then, a **working model** is fitted for the outcome, 
+in which the clever
+    covariates are explanatory variables, but the model 
+    also includes  as an offset term 
+    the previously fitted linear predictor from the original
+    outcome model `mY`:
+    $\widehat{\eta}_i = \text{logit}(\widehat Y_i)$
+    based on the observed exposure $X_i=x$ for each subject $i$, 
+    where the fitted values $\widehat Y_i$ were saved into
+    vector `d$yh` already in item 5.2 above.
+    Moreover, the intercept is removed from the model.
+
+
+``` r
+epsmod <- glm(y ~ -1 + H0 + H1 + offset(qlogis(yh)),
+  family = binomial(link = logit), data = pop)
+eps <- coef(epsmod)
+eps
+```
+
+```
+##           H0           H1 
+##  0.007655093 -0.002475541
+```
+
+3.  The logit-transformed predicted values $\widetilde{Y}_i^{X_i=1}$ and
+    $\widetilde{Y}_i^{X_i=0}$ of 
+    the potential or counterfactual individual risks from
+    the original outcome model `mY` are now corrected by the estimated
+    coefficients of the clever covariates, and the corrected
+    predictions are returned to the original probability scale.
+
+
+``` r
+pop$ypred0.H <- plogis(qlogis(pop$yp0) + eps[1] / (1 - pop$PS))
+pop$ypred1.H <- plogis(qlogis(pop$yp1) + eps[2] / pop$PS)
+```
+
+4. Estimates of the causal contrasts are obtained
+as before
+
+
+``` r
+EY0pot.t <- mean(pop$ypred0.H)
+EY1pot.t <- mean(pop$ypred1.H)
+round(Contr(EY1pot.t, EY0pot.t), 4)
+```
+
+```
+##  Risk1  Risk0     RD     RR     OR 
+## 0.8260 0.6523 0.1737 1.2663 2.5301
+```
+These are  similar to previous results
+obtained by AIPW when computed for the whole population
+with the correct exposure model, and they are 
+very close to the true values
+(e.g. RD=0.1743), too.
 

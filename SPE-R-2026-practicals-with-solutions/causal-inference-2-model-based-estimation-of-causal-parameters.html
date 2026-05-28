@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 14 Causal inference 2: Model-based estimation of causal parameters | Statistical Practice in Epidemiology with R</title>
+  <meta name="description" content="This is the SPE-R 2026 exercises book with solutions" />
+  <meta name="generator" content="bookdown 0.46 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 14 Causal inference 2: Model-based estimation of causal parameters | Statistical Practice in Epidemiology with R" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This is the SPE-R 2026 exercises book with solutions" />
+  <meta name="github-repo" content="spe-r/spe" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 14 Causal inference 2: Model-based estimation of causal parameters | Statistical Practice in Epidemiology with R" />
+  
+  <meta name="twitter:description" content="This is the SPE-R 2026 exercises book with solutions" />
+  
+
+<meta name="author" content="Krista Fischer" />
+<meta name="author" content="Martyn Plummer" />
+<meta name="author" content="Janne Pitkäniemi" />
+<meta name="author" content="Bendix Carstensen" />
+<meta name="author" content="Damien Georges" />
+<meta name="author" content="Esa Läärä" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"/>
+<link rel="next" href="time-dependent-variables-and-multiple-states.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./index.html">SPE-R practicals</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>About</a></li>
+<li class="chapter" data-level="1" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html"><i class="fa fa-check"></i><b>1</b> Practice with basic R</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#the-working-directory"><i class="fa fa-check"></i><b>1.1</b> The working directory</a></li>
+<li class="chapter" data-level="1.2" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#the-workspace"><i class="fa fa-check"></i><b>1.2</b> The workspace</a></li>
+<li class="chapter" data-level="1.3" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#using-r-as-a-calculator"><i class="fa fa-check"></i><b>1.3</b> Using R as a calculator</a></li>
+<li class="chapter" data-level="1.4" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#vectors"><i class="fa fa-check"></i><b>1.4</b> Vectors</a></li>
+<li class="chapter" data-level="1.5" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#sequences"><i class="fa fa-check"></i><b>1.5</b> Sequences</a></li>
+<li class="chapter" data-level="1.6" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#displaying-and-changing-parts-of-a-vector-indexing"><i class="fa fa-check"></i><b>1.6</b> Displaying and changing parts of a vector (indexing)</a></li>
+<li class="chapter" data-level="1.7" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#lists"><i class="fa fa-check"></i><b>1.7</b> Lists</a></li>
+<li class="chapter" data-level="1.8" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#data-frames"><i class="fa fa-check"></i><b>1.8</b> Data frames</a></li>
+<li class="chapter" data-level="1.9" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#working-with-built-in-data-frames"><i class="fa fa-check"></i><b>1.9</b> Working with built-in data frames</a></li>
+<li class="chapter" data-level="1.10" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#referencing-parts-of-the-data-frame-indexing"><i class="fa fa-check"></i><b>1.10</b> Referencing parts of the data frame (indexing)</a></li>
+<li class="chapter" data-level="1.11" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#summaries"><i class="fa fa-check"></i><b>1.11</b> Summaries</a></li>
+<li class="chapter" data-level="1.12" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#generating-new-variables"><i class="fa fa-check"></i><b>1.12</b> Generating new variables</a></li>
+<li class="chapter" data-level="1.13" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#turning-a-variable-into-a-factor"><i class="fa fa-check"></i><b>1.13</b> Turning a variable into a factor</a></li>
+<li class="chapter" data-level="1.14" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#frequency-tables"><i class="fa fa-check"></i><b>1.14</b> Frequency tables</a></li>
+<li class="chapter" data-level="1.15" data-path="practice-with-basic-r.html"><a href="practice-with-basic-r.html#grouping-the-values-of-a-numeric-variable"><i class="fa fa-check"></i><b>1.15</b> Grouping the values of a numeric variable</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html"><i class="fa fa-check"></i><b>2</b> Reading data into <code>R</code></a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#introduction"><i class="fa fa-check"></i><b>2.1</b> Introduction</a></li>
+<li class="chapter" data-level="2.2" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#data-sources"><i class="fa fa-check"></i><b>2.2</b> Data sources</a></li>
+<li class="chapter" data-level="2.3" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#data-in-text-files"><i class="fa fa-check"></i><b>2.3</b> Data in text files</a></li>
+<li class="chapter" data-level="2.4" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#things-that-can-go-wrong"><i class="fa fa-check"></i><b>2.4</b> Things that can go wrong</a></li>
+<li class="chapter" data-level="2.5" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#forgetting-the-headers"><i class="fa fa-check"></i><b>2.5</b> Forgetting the headers</a></li>
+<li class="chapter" data-level="2.6" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#using-the-wrong-separator"><i class="fa fa-check"></i><b>2.6</b> Using the wrong separator</a></li>
+<li class="chapter" data-level="2.7" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#mis-specifying-the-representation-of-missing-values"><i class="fa fa-check"></i><b>2.7</b> Mis-specifying the representation of missing values</a></li>
+<li class="chapter" data-level="2.8" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#spreadsheet-data"><i class="fa fa-check"></i><b>2.8</b> Spreadsheet data</a></li>
+<li class="chapter" data-level="2.9" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#reading-data-from-the-internet"><i class="fa fa-check"></i><b>2.9</b> Reading data from the Internet</a></li>
+<li class="chapter" data-level="2.10" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#reading-from-the-clipboard"><i class="fa fa-check"></i><b>2.10</b> Reading from the clipboard</a></li>
+<li class="chapter" data-level="2.11" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#binary-data"><i class="fa fa-check"></i><b>2.11</b> Binary data</a></li>
+<li class="chapter" data-level="2.12" data-path="reading-data-into-r.html"><a href="reading-data-into-r.html#summary"><i class="fa fa-check"></i><b>2.12</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html"><i class="fa fa-check"></i><b>3</b> Data manipulation with <code>tidyverse</code></a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#introduction-1"><i class="fa fa-check"></i><b>3.1</b> Introduction</a></li>
+<li class="chapter" data-level="3.2" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#the-births-data"><i class="fa fa-check"></i><b>3.2</b> The <code>births</code> data</a></li>
+<li class="chapter" data-level="3.3" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#tibble-vs-data.frame"><i class="fa fa-check"></i><b>3.3</b> <code>tibble</code> vs <code>data.frame</code></a></li>
+<li class="chapter" data-level="3.4" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#piping-functions"><i class="fa fa-check"></i><b>3.4</b> Piping functions</a></li>
+<li class="chapter" data-level="3.5" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#mutate-columns"><i class="fa fa-check"></i><b>3.5</b> <code>mutate</code> columns</a></li>
+<li class="chapter" data-level="3.6" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#select-columns-filter-and-arrange-rows"><i class="fa fa-check"></i><b>3.6</b> <code>select</code> columns, <code>filter</code> and <code>arrange</code> rows</a></li>
+<li class="chapter" data-level="3.7" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#group_by-and-summarise-data"><i class="fa fa-check"></i><b>3.7</b> <code>group_by</code> and <code>summarise</code> data</a></li>
+<li class="chapter" data-level="3.8" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#multiple-grouping"><i class="fa fa-check"></i><b>3.8</b> Multiple grouping</a></li>
+<li class="chapter" data-level="3.9" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#bind-and-join-tables"><i class="fa fa-check"></i><b>3.9</b> Bind and join tables</a></li>
+<li class="chapter" data-level="3.10" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#data-visualization-with-ggplot2"><i class="fa fa-check"></i><b>3.10</b> Data Visualization with ggplot2</a></li>
+<li class="chapter" data-level="3.11" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#pivoting-data-with-tidyr"><i class="fa fa-check"></i><b>3.11</b> pivoting data with tidyr</a></li>
+<li class="chapter" data-level="3.12" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#reading-files-with-readr"><i class="fa fa-check"></i><b>3.12</b> reading files with readr</a></li>
+<li class="chapter" data-level="3.13" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#string-manipulation-with-stringr"><i class="fa fa-check"></i><b>3.13</b> String manipulation with stringr</a></li>
+<li class="chapter" data-level="3.14" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#purrr-package-to-apply-functions-to-list"><i class="fa fa-check"></i><b>3.14</b> purrr package to apply functions to list</a></li>
+<li class="chapter" data-level="3.15" data-path="data-manipulation-with-tidyverse.html"><a href="data-manipulation-with-tidyverse.html#bonus-rendering-tables"><i class="fa fa-check"></i><b>3.15</b> Bonus: Rendering tables</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="tabulation.html"><a href="tabulation.html"><i class="fa fa-check"></i><b>4</b> Tabulation</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="tabulation.html"><a href="tabulation.html#introduction-2"><i class="fa fa-check"></i><b>4.1</b> Introduction</a></li>
+<li class="chapter" data-level="4.2" data-path="tabulation.html"><a href="tabulation.html#the-births-data-1"><i class="fa fa-check"></i><b>4.2</b> The births data</a></li>
+<li class="chapter" data-level="4.3" data-path="tabulation.html"><a href="tabulation.html#one-way-tables"><i class="fa fa-check"></i><b>4.3</b> One-way tables</a></li>
+<li class="chapter" data-level="4.4" data-path="tabulation.html"><a href="tabulation.html#improving-the-presentation-of-tables"><i class="fa fa-check"></i><b>4.4</b> Improving the Presentation of Tables</a></li>
+<li class="chapter" data-level="4.5" data-path="tabulation.html"><a href="tabulation.html#two-way-tables"><i class="fa fa-check"></i><b>4.5</b> Two-way Tables</a></li>
+<li class="chapter" data-level="4.6" data-path="tabulation.html"><a href="tabulation.html#printing"><i class="fa fa-check"></i><b>4.6</b> Printing</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="graphics-in-r.html"><a href="graphics-in-r.html"><i class="fa fa-check"></i><b>5</b> Graphics in R</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="graphics-in-r.html"><a href="graphics-in-r.html#simple-plot-on-the-screen"><i class="fa fa-check"></i><b>5.1</b> Simple plot on the screen</a></li>
+<li class="chapter" data-level="5.2" data-path="graphics-in-r.html"><a href="graphics-in-r.html#colours"><i class="fa fa-check"></i><b>5.2</b> Colours</a></li>
+<li class="chapter" data-level="5.3" data-path="graphics-in-r.html"><a href="graphics-in-r.html#adding-to-a-plot"><i class="fa fa-check"></i><b>5.3</b> Adding to a plot</a></li>
+<li class="chapter" data-level="5.4" data-path="graphics-in-r.html"><a href="graphics-in-r.html#using-indexing-for-plot-elements"><i class="fa fa-check"></i><b>5.4</b> Using indexing for plot elements</a></li>
+<li class="chapter" data-level="5.5" data-path="graphics-in-r.html"><a href="graphics-in-r.html#generating-colours"><i class="fa fa-check"></i><b>5.5</b> Generating colours</a></li>
+<li class="chapter" data-level="5.6" data-path="graphics-in-r.html"><a href="graphics-in-r.html#saving-your-graphs-for-use-in-other-documents"><i class="fa fa-check"></i><b>5.6</b> Saving your graphs for use in other documents</a></li>
+<li class="chapter" data-level="5.7" data-path="graphics-in-r.html"><a href="graphics-in-r.html#interacting-with-a-plot"><i class="fa fa-check"></i><b>5.7</b> Interacting with a plot</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><i class="fa fa-check"></i><b>6</b> Analysis of hazard rates, their ratios and differences and binary regression</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#hand-calculations-for-a-single-rate"><i class="fa fa-check"></i><b>6.1</b> Hand calculations for a single rate</a></li>
+<li class="chapter" data-level="6.2" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-for-a-single-rate-with-logarithmic-link"><i class="fa fa-check"></i><b>6.2</b> Poisson model for a single rate with logarithmic link</a></li>
+<li class="chapter" data-level="6.3" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-for-a-single-rate-with-identity-link"><i class="fa fa-check"></i><b>6.3</b> Poisson model for a single rate with identity link</a></li>
+<li class="chapter" data-level="6.4" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#poisson-model-assuming-the-same-rate-for-several-periods"><i class="fa fa-check"></i><b>6.4</b> Poisson model assuming the same rate for several periods</a></li>
+<li class="chapter" data-level="6.5" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#analysis-of-rate-ratio"><i class="fa fa-check"></i><b>6.5</b> Analysis of rate ratio</a></li>
+<li class="chapter" data-level="6.6" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#analysis-of-rate-difference"><i class="fa fa-check"></i><b>6.6</b> Analysis of rate difference</a></li>
+<li class="chapter" data-level="6.7" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#binary-regression"><i class="fa fa-check"></i><b>6.7</b> Binary regression</a></li>
+<li class="chapter" data-level="6.8" data-path="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html"><a href="analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html#optionalhomework-hand-calculations-and-calculations-using-matrix-tools"><i class="fa fa-check"></i><b>6.8</b> Optional/Homework: Hand calculations and calculations using matrix tools</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html"><i class="fa fa-check"></i><b>7</b> Estimation of effects: simple and more complex</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#response-and-explanatory-variables"><i class="fa fa-check"></i><b>7.1</b> Response and explanatory variables</a></li>
+<li class="chapter" data-level="7.2" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#data-set-births"><i class="fa fa-check"></i><b>7.2</b> Data set <code>births</code></a></li>
+<li class="chapter" data-level="7.3" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#simple-estimation-with-lm-and-glm"><i class="fa fa-check"></i><b>7.3</b> Simple estimation with <code>lm()</code> and <code>glm()</code></a></li>
+<li class="chapter" data-level="7.4" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#stratified-effects-and-interaction-or-effect-measure-modification"><i class="fa fa-check"></i><b>7.4</b> Stratified effects, and interaction or effect-measure modification</a></li>
+<li class="chapter" data-level="7.5" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#controlling-or-adjusting-for-the-effect-of-hyp-for-sex"><i class="fa fa-check"></i><b>7.5</b> Controlling or adjusting for the effect of <code>hyp</code> for <code>sex</code></a></li>
+<li class="chapter" data-level="7.6" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#numeric-exposure-simple-linear-regression-and-checking-assumptions"><i class="fa fa-check"></i><b>7.6</b> Numeric exposure, simple linear regression and checking assumptions</a></li>
+<li class="chapter" data-level="7.7" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#penalized-spline-model"><i class="fa fa-check"></i><b>7.7</b> Penalized spline model</a></li>
+<li class="chapter" data-level="7.8" data-path="estimation-of-effects-simple-and-more-complex.html"><a href="estimation-of-effects-simple-and-more-complex.html#analysis-of-binary-outcomes"><i class="fa fa-check"></i><b>7.8</b> Analysis of binary outcomes</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html"><i class="fa fa-check"></i><b>8</b> Poisson regression &amp; analysis of curved effects</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html#testis-cancer-data-input-and-housekeeping"><i class="fa fa-check"></i><b>8.1</b> Testis cancer: Data input and housekeeping</a></li>
+<li class="chapter" data-level="8.2" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html#some-descriptive-analysis"><i class="fa fa-check"></i><b>8.2</b> Some descriptive analysis</a></li>
+<li class="chapter" data-level="8.3" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html#age-and-period-as-categorical-factors"><i class="fa fa-check"></i><b>8.3</b> Age and period as categorical factors</a></li>
+<li class="chapter" data-level="8.4" data-path="poisson-regression-analysis-of-curved-effects.html"><a href="poisson-regression-analysis-of-curved-effects.html#generalized-additive-model-with-penalized-splines"><i class="fa fa-check"></i><b>8.4</b> Generalized additive model with penalized splines</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="causal-inference.html"><a href="causal-inference.html"><i class="fa fa-check"></i><b>9</b> Causal inference</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="causal-inference.html"><a href="causal-inference.html#proper-adjustment-for-confounding-in-regression-models"><i class="fa fa-check"></i><b>9.1</b> Proper adjustment for confounding in regression models</a></li>
+<li class="chapter" data-level="9.2" data-path="causal-inference.html"><a href="causal-inference.html#dag-tools-in-the-package-dagitty"><i class="fa fa-check"></i><b>9.2</b> DAG tools in the package <code>dagitty</code></a></li>
+<li class="chapter" data-level="9.3" data-path="causal-inference.html"><a href="causal-inference.html#identifying-the-true-dag-for-the-data"><i class="fa fa-check"></i><b>9.3</b> Identifying the true DAG for the data</a></li>
+<li class="chapter" data-level="9.4" data-path="causal-inference.html"><a href="causal-inference.html#instrumental-variables-estimation-mendelian-randomization"><i class="fa fa-check"></i><b>9.4</b> Instrumental variables estimation: Mendelian randomization</a></li>
+<li class="chapter" data-level="9.5" data-path="causal-inference.html"><a href="causal-inference.html#why-are-simulation-exercises-useful-for-causal-inference"><i class="fa fa-check"></i><b>9.5</b> Why are simulation exercises useful for causal inference?</a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="graphics-with-ggplot2.html"><a href="graphics-with-ggplot2.html"><i class="fa fa-check"></i><b>10</b> Graphics with ggplot2</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="graphics-with-ggplot2.html"><a href="graphics-with-ggplot2.html#data"><i class="fa fa-check"></i><b>10.1</b> Data</a></li>
+<li class="chapter" data-level="10.2" data-path="graphics-with-ggplot2.html"><a href="graphics-with-ggplot2.html#building-the-plot"><i class="fa fa-check"></i><b>10.2</b> Building the plot</a>
+<ul>
+<li class="chapter" data-level="10.2.1" data-path="graphics-with-ggplot2.html"><a href="graphics-with-ggplot2.html#the-ggplot2-package"><i class="fa fa-check"></i><b>10.2.1</b> The ggplot2 package</a></li>
+<li class="chapter" data-level="10.2.2" data-path="graphics-with-ggplot2.html"><a href="graphics-with-ggplot2.html#geometries"><i class="fa fa-check"></i><b>10.2.2</b> Geometries</a></li>
+<li class="chapter" data-level="10.2.3" data-path="graphics-with-ggplot2.html"><a href="graphics-with-ggplot2.html#scales"><i class="fa fa-check"></i><b>10.2.3</b> Scales</a></li>
+<li class="chapter" data-level="10.2.4" data-path="graphics-with-ggplot2.html"><a href="graphics-with-ggplot2.html#themes"><i class="fa fa-check"></i><b>10.2.4</b> Themes</a></li>
+<li class="chapter" data-level="10.2.5" data-path="graphics-with-ggplot2.html"><a href="graphics-with-ggplot2.html#putting-everything-together"><i class="fa fa-check"></i><b>10.2.5</b> Putting everything together</a></li>
+</ul></li>
+<li class="chapter" data-level="10.3" data-path="graphics-with-ggplot2.html"><a href="graphics-with-ggplot2.html#self-study"><i class="fa fa-check"></i><b>10.3</b> Self study</a></li>
+<li class="chapter" data-level="10.4" data-path="graphics-with-ggplot2.html"><a href="graphics-with-ggplot2.html#adding-the-table-advanced-topic"><i class="fa fa-check"></i><b>10.4</b> Adding the table (advanced topic)</a></li>
+<li class="chapter" data-level="10.5" data-path="graphics-with-ggplot2.html"><a href="graphics-with-ggplot2.html#references"><i class="fa fa-check"></i><b>10.5</b> References</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html"><i class="fa fa-check"></i><b>11</b> Survival analysis with competing risks: Oral cancer patients</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#description-of-the-data"><i class="fa fa-check"></i><b>11.1</b> Description of the data</a></li>
+<li class="chapter" data-level="11.2" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#loading-the-packages-and-the-data"><i class="fa fa-check"></i><b>11.2</b> Loading the packages and the data</a></li>
+<li class="chapter" data-level="11.3" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#total-mortality-kaplanmeier-analyses"><i class="fa fa-check"></i><b>11.3</b> Total mortality: Kaplan–Meier analyses</a></li>
+<li class="chapter" data-level="11.4" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#total-mortality-by-stage"><i class="fa fa-check"></i><b>11.4</b> Total mortality by stage</a></li>
+<li class="chapter" data-level="11.5" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#event-specific-cumulative-mortality-curves"><i class="fa fa-check"></i><b>11.5</b> Event-specific cumulative mortality curves</a></li>
+<li class="chapter" data-level="11.6" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#regression-modelling-of-overall-mortality."><i class="fa fa-check"></i><b>11.6</b> Regression modelling of overall mortality.</a></li>
+<li class="chapter" data-level="11.7" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#modelling-event-specific-hazards"><i class="fa fa-check"></i><b>11.7</b> Modelling event-specific hazards</a></li>
+<li class="chapter" data-level="11.8" data-path="survival-analysis-with-competing-risks-oral-cancer-patients.html"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#lexis-object-with-multi-state-set-up"><i class="fa fa-check"></i><b>11.8</b> Lexis object with multi-state set-up</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html"><i class="fa fa-check"></i><b>12</b> Time-splitting, time-scales and SMR</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#age-specific-mortality"><i class="fa fa-check"></i><b>12.1</b> Age-specific mortality</a></li>
+<li class="chapter" data-level="12.2" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#smr"><i class="fa fa-check"></i><b>12.2</b> SMR</a></li>
+<li class="chapter" data-level="12.3" data-path="time-splitting-time-scales-and-smr.html"><a href="time-splitting-time-scales-and-smr.html#smr-modeling"><i class="fa fa-check"></i><b>12.3</b> SMR modeling</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><i class="fa fa-check"></i><b>13</b> Nested case-control study and case-cohort study: Risk factors of coronary heart disease</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#reading-the-cohort-data-illustrating-the-study-base-and-risk-sets"><i class="fa fa-check"></i><b>13.1</b> Reading the cohort data, illustrating the study base and risk sets</a></li>
+<li class="chapter" data-level="13.2" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#nested-case-control-study"><i class="fa fa-check"></i><b>13.2</b> Nested case-control study</a></li>
+<li class="chapter" data-level="13.3" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#case-cohort-study"><i class="fa fa-check"></i><b>13.3</b> Case-cohort study</a></li>
+<li class="chapter" data-level="13.4" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#full-cohort-analysis-and-comparisons"><i class="fa fa-check"></i><b>13.4</b> Full cohort analysis and comparisons</a></li>
+<li class="chapter" data-level="13.5" data-path="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#further-exercises-and-homework"><i class="fa fa-check"></i><b>13.5</b> Further exercises and homework</a></li>
+</ul></li>
+<li class="chapter" data-level="14" data-path="causal-inference-2-model-based-estimation-of-causal-parameters.html"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html"><i class="fa fa-check"></i><b>14</b> Causal inference 2: Model-based estimation of causal parameters</a>
+<ul>
+<li class="chapter" data-level="14.1" data-path="causal-inference-2-model-based-estimation-of-causal-parameters.html"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#introduction-3"><i class="fa fa-check"></i><b>14.1</b> Introduction</a></li>
+<li class="chapter" data-level="14.2" data-path="causal-inference-2-model-based-estimation-of-causal-parameters.html"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#control-of-confounding"><i class="fa fa-check"></i><b>14.2</b> Control of confounding</a></li>
+<li class="chapter" data-level="14.3" data-path="causal-inference-2-model-based-estimation-of-causal-parameters.html"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#generation-of-target-population-and-true-models"><i class="fa fa-check"></i><b>14.3</b> Generation of target population and true models</a></li>
+<li class="chapter" data-level="14.4" data-path="causal-inference-2-model-based-estimation-of-causal-parameters.html"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#factual-and-counterfactual-risks---associational-and-causal-contrasts"><i class="fa fa-check"></i><b>14.4</b> Factual and counterfactual risks - associational and causal contrasts</a></li>
+<li class="chapter" data-level="14.5" data-path="causal-inference-2-model-based-estimation-of-causal-parameters.html"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#outcome-modelling-and-estimation-of-causal-contrasts-by-g-formula"><i class="fa fa-check"></i><b>14.5</b> Outcome modelling and estimation of causal contrasts by g-formula</a></li>
+<li class="chapter" data-level="14.6" data-path="causal-inference-2-model-based-estimation-of-causal-parameters.html"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#inverse-probability-weighting-ipw-by-propensity-scores"><i class="fa fa-check"></i><b>14.6</b> Inverse probability weighting (IPW) by propensity scores</a></li>
+<li class="chapter" data-level="14.7" data-path="causal-inference-2-model-based-estimation-of-causal-parameters.html"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#ipw-estimation-using-r-package-psweight"><i class="fa fa-check"></i><b>14.7</b> IPW estimation using R package <code>PSweight</code></a></li>
+<li class="chapter" data-level="14.8" data-path="causal-inference-2-model-based-estimation-of-causal-parameters.html"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#effect-of-exposure-among-those-exposed"><i class="fa fa-check"></i><b>14.8</b> Effect of exposure among those exposed</a></li>
+<li class="chapter" data-level="14.9" data-path="causal-inference-2-model-based-estimation-of-causal-parameters.html"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#double-robust-dr-estimation"><i class="fa fa-check"></i><b>14.9</b> Double robust (DR) estimation</a></li>
+<li class="chapter" data-level="14.10" data-path="causal-inference-2-model-based-estimation-of-causal-parameters.html"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#dr-estimation-with-flexible-learning-algorithms"><i class="fa fa-check"></i><b>14.10</b> DR estimation with flexible learning algorithms</a></li>
+<li class="chapter" data-level="14.11" data-path="causal-inference-2-model-based-estimation-of-causal-parameters.html"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#extra-computations-in-the-tmle-method"><i class="fa fa-check"></i><b>14.11</b> Extra: Computations in the TMLE method</a></li>
+</ul></li>
+<li class="chapter" data-level="15" data-path="time-dependent-variables-and-multiple-states.html"><a href="time-dependent-variables-and-multiple-states.html"><i class="fa fa-check"></i><b>15</b> Time-dependent variables and multiple states</a>
+<ul>
+<li class="chapter" data-level="15.1" data-path="time-dependent-variables-and-multiple-states.html"><a href="time-dependent-variables-and-multiple-states.html#the-renal-failure-dataset"><i class="fa fa-check"></i><b>15.1</b> The renal failure dataset</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/SPE-R/SPE" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Statistical Practice in Epidemiology with R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="causal-inference-2-model-based-estimation-of-causal-parameters" class="section level1 hasAnchor" number="14">
+<h1><span class="header-section-number">Chapter 14</span> Causal inference 2: Model-based estimation of causal parameters<a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#causal-inference-2-model-based-estimation-of-causal-parameters" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Sources of inspiration when creating this practical:
+<a href="https://doi.org/10.1002/sim.7628">Luque Fernandez, M.A. et al. (2018)</a>
+<em>Stat Med</em> 2018;37(16):2530-2546 and<br />
+<a href="https://doi.org/10.1002/sim.9234">Smith et al. (2022)</a> <em>Stat Med</em>
+2022;41(2):407-432.</p>
+<div id="introduction-3" class="section level2 hasAnchor" number="14.1">
+<h2><span class="header-section-number">14.1</span> Introduction<a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#introduction-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In this exercise we learn to apply some R tools for estimating
+interesting causal parameters
+in the context of an observational study.
+The statistical methods to be introduced are
+(a) regression standardization or g-formula, (b) inverse probability
+weighting (IPW) with propensity scores and (c) double robust (DR)
+estimation combining approaches (a) and (b).</p>
+<p>We illustrate these methods using simulated data.
+The exposure variable <span class="math inline">\(X\)</span> is binary (1/0) and
+the outcome variable <span class="math inline">\(Y\)</span> is binary, too.<br />
+The interesting estimands are the causal risk difference (RD) and
+the causal risk ratio (RR).</p>
+<p>As a background story, we imagine a population of cancer patients,
+in whom the exposure, and four covariates
+<span class="math inline">\(Z = (Z_1, Z_2, Z_3, Z_4)\)</span> plus the assumed marginal
+distributions of the latter are described in the table below:</p>
+<table>
+<colgroup>
+<col width="21%" />
+<col width="78%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><span class="math inline">\(X\)</span></td>
+<td align="left">treatment; 1: radiotherapy only, 0: radiotherapy + chemotherapy</td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(Y\)</span></td>
+<td align="left">death during one year after diagnosis of cancer</td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(Z_1\)</span></td>
+<td align="left">sex; 0: man, 1: woman; <span class="math inline">\(Z_1 \sim \text{Bern}(0.5)\)</span></td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(Z_2\)</span></td>
+<td align="left">age group 0; <code>young</code>, 1: <code>old</code>; <span class="math inline">\(Z_2 \sim \text{Bern}(0.65)\)</span></td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(Z_3\)</span></td>
+<td align="left">stage of cancer; 4 classes; <span class="math inline">\(Z_3 \sim \text{DiscUnif}(1, \dots, 4)\)</span></td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(Z_4\)</span></td>
+<td align="left">comorbidity score; 5 classes; <span class="math inline">\(Z_3 \sim \text{DiscUnif}(1, \dots, 5)\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>For simplicity, covariates <span class="math inline">\(Z_3\)</span> and <span class="math inline">\(Z_4\)</span> are treated as continuous
+variables with linear effects in the models.</p>
+<ol style="list-style-type: decimal">
+<li>First, load the packages needed in this exercise</li>
+</ol>
+<div class="sourceCode" id="cb769"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb769-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb769-1" tabindex="-1"></a><span class="fu">library</span>(dagitty)</span>
+<span id="cb769-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb769-2" tabindex="-1"></a><span class="fu">library</span>(Epi)</span></code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;Epi&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dagitty&#39;:
+## 
+##     paths</code></pre>
+<div class="sourceCode" id="cb772"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb772-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb772-1" tabindex="-1"></a><span class="fu">library</span>(stdReg2)</span>
+<span id="cb772-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb772-2" tabindex="-1"></a><span class="fu">library</span>(PSweight)</span></code></pre></div>
+<ol start="2" style="list-style-type: decimal">
+<li>The assumed causal diagram
+is drawn using <code>dagitty</code> and is shown below.
+<img src="causInf2-s_files/figure-html/dagitty-1.png" alt="" width="672" /></li>
+<li>For a more generic notation, the risk of death, i.e. 
+the probability of <span class="math inline">\(Y=1\)</span>, will be expressed
+as the expected value of the binary outcome <span class="math inline">\(Y\)</span>, for instance
+<span class="math display">\[ E(Y^{X=x}) = P(Y^{X=x}=1) \quad \text{and} \quad
+E(Y|X=x, Z=z) = P(Y=1|X=x, Z=z), \]</span>
+where <span class="math inline">\(Z\)</span> is the vector of relevant
+covariates.</li>
+</ol>
+<p>The same principle is applied in expressing the conditional
+probability of being exposed, i.e. that of <span class="math inline">\(X=1\)</span>,
+given a set of covariate values <span class="math inline">\(Z=z\)</span>:
+<span class="math display">\[ E(X|Z=z) = P(X=1|Z=z). \]</span>
+The fitted and predicted probabilities
+of <span class="math inline">\(Y=1\)</span> are denoted as <span class="math inline">\(\widehat{Y}\)</span> and
+<span class="math inline">\(\widetilde{Y}\)</span>, respectively,
+with pertinent subscripts and/or superscripts.</p>
+<p>Both <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are modelled by logistic regression. The expit-function
+or inverse of the logit function is defined:
+<span class="math inline">\(\text{expit}(u) = 1/(1 + e^{-u})\)</span>, <span class="math inline">\(u\in R\)</span>. This is equal to the
+cumulative distribution function of the standard logistic distribution,
+the values of which are returned in R by <code>plogis(u)</code>. The R function
+that returns values of the logit-function is <code>qlogis()</code>.</p>
+<p>The <strong>true exposure model</strong> for the dependence of exposure <span class="math inline">\(X\)</span> on
+the covariates <span class="math inline">\(Z\)</span> is specified as
+<span class="math display">\[ E(X|Z_1 = z_1, \dots, Z_4 = z_4) =
+      \text{expit}(-5 + 0.05z_2 + 0.25z_3 + 0.5z_4 + 0.4z_2z_4) . \]</span>
+The assumed <strong>true outcome model</strong>
+<span class="math display">\[ E(Y|X=x, Z_1 = z_1, \dots, Z_4 = z_4) =
+           \text{expit}(-1 + x - 0.1z_1 + 0.35z_2 + 0.25z_3 +
+                 0.20z_4 + 0.15z_2z_4) \]</span>
+Note that <span class="math inline">\(X\)</span> does not depend on <span class="math inline">\(Z_1\)</span>, and that in both models
+there is a product term <span class="math inline">\(Z_2 Z_4\)</span>,
+the effect of which appears weaker in the outcome model.</p>
+</div>
+<div id="control-of-confounding" class="section level2 hasAnchor" number="14.2">
+<h2><span class="header-section-number">14.2</span> Control of confounding<a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#control-of-confounding" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<ol style="list-style-type: decimal">
+<li><p>Based on inspection of the causal diagram, can you provide
+justification for the claim that variables
+<span class="math inline">\(Z_2, Z_3\)</span> and <span class="math inline">\(Z_4\)</span> form
+a proper subset of the four covariates,
+which is sufficient to block all backdoor paths between <span class="math inline">\(X\)</span>
+and <span class="math inline">\(Y\)</span> and thus remove confounding?</p></li>
+<li><p>Look what dagitty offers for sufficient sets:</p></li>
+</ol>
+<pre><code>## { Z2, Z3, Z4 }</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>Even though we have a sufficient set
+as claimed above, why it still might be useful
+to include covariate
+<span class="math inline">\(Z_1\)</span>, too, when modelling the outcome?</li>
+</ol>
+</div>
+<div id="generation-of-target-population-and-true-models" class="section level2 hasAnchor" number="14.3">
+<h2><span class="header-section-number">14.3</span> Generation of target population and true models<a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#generation-of-target-population-and-true-models" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<ol style="list-style-type: decimal">
+<li>Define two R-functions, which compute the expected values
+for the exposure and those for the outcome based on the assumed
+true exposure model and the true outcome model, respectively.</li>
+</ol>
+<div class="sourceCode" id="cb774"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb774-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb774-1" tabindex="-1"></a>EX <span class="ot">&lt;-</span> <span class="cf">function</span>(z2, z3, z4) {</span>
+<span id="cb774-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb774-2" tabindex="-1"></a>  <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">5</span> <span class="sc">+</span> <span class="fl">0.05</span> <span class="sc">*</span> z2 <span class="sc">+</span> <span class="fl">0.25</span> <span class="sc">*</span> z3 <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> z4 <span class="sc">+</span> <span class="fl">0.4</span> <span class="sc">*</span> z2 <span class="sc">*</span> z4)</span>
+<span id="cb774-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb774-3" tabindex="-1"></a>}</span>
+<span id="cb774-4"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb774-4" tabindex="-1"></a>EY <span class="ot">&lt;-</span> <span class="cf">function</span>(x, z1, z2, z3, z4) {</span>
+<span id="cb774-5"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb774-5" tabindex="-1"></a>  <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> x <span class="sc">-</span> <span class="fl">0.1</span> <span class="sc">*</span> z1 <span class="sc">+</span> <span class="fl">0.35</span> <span class="sc">*</span> z2 <span class="sc">+</span> <span class="fl">0.25</span> <span class="sc">*</span> z3 <span class="sc">+</span></span>
+<span id="cb774-6"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb774-6" tabindex="-1"></a>    <span class="fl">0.20</span> <span class="sc">*</span> z4 <span class="sc">+</span> <span class="fl">0.15</span> <span class="sc">*</span> z2 <span class="sc">*</span> z4)</span>
+<span id="cb774-7"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb774-7" tabindex="-1"></a>}</span></code></pre></div>
+<ol start="2" style="list-style-type: decimal">
+<li>Define a function for generation of data by
+simulating random values from pertinent probability
+distributions based on the given assumptions.</li>
+</ol>
+<div class="sourceCode" id="cb775"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb775-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb775-1" tabindex="-1"></a>genData <span class="ot">&lt;-</span> <span class="cf">function</span>(N) {</span>
+<span id="cb775-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb775-2" tabindex="-1"></a>  z1 <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.5</span>) <span class="co"># Bern(0.5)</span></span>
+<span id="cb775-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb775-3" tabindex="-1"></a>  z2 <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.65</span>) <span class="co"># Bern(0.65)</span></span>
+<span id="cb775-4"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb775-4" tabindex="-1"></a>  z3 <span class="ot">&lt;-</span> <span class="fu">trunc</span>(<span class="fu">runif</span>(N, <span class="at">min =</span> <span class="dv">1</span>, <span class="at">max =</span> <span class="dv">5</span>), <span class="at">digits =</span> <span class="dv">0</span>) <span class="co"># DiscUnif(1,4)</span></span>
+<span id="cb775-5"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb775-5" tabindex="-1"></a>  z4 <span class="ot">&lt;-</span> <span class="fu">trunc</span>(<span class="fu">runif</span>(N, <span class="at">min =</span> <span class="dv">1</span>, <span class="at">max =</span> <span class="dv">6</span>), <span class="at">digits =</span> <span class="dv">0</span>) <span class="co"># DiscUnif(1,5)</span></span>
+<span id="cb775-6"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb775-6" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fu">EX</span>(z2, z3, z4))</span>
+<span id="cb775-7"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb775-7" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(N, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fu">EY</span>(x, z1, z2, z3, z4))</span>
+<span id="cb775-8"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb775-8" tabindex="-1"></a>  <span class="fu">data.frame</span>(z1, z2, z3, z4, x, y)</span>
+<span id="cb775-9"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb775-9" tabindex="-1"></a>}</span></code></pre></div>
+<ol start="3" style="list-style-type: decimal">
+<li>Generate a data frame <code>pop</code> for a big target population of
+1000000 subjects</li>
+</ol>
+<div class="sourceCode" id="cb776"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb776-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb776-1" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">1000000</span></span>
+<span id="cb776-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb776-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">7777</span>)</span>
+<span id="cb776-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb776-3" tabindex="-1"></a>pop <span class="ot">&lt;-</span> <span class="fu">genData</span>(N)</span></code></pre></div>
+</div>
+<div id="factual-and-counterfactual-risks---associational-and-causal-contrasts" class="section level2 hasAnchor" number="14.4">
+<h2><span class="header-section-number">14.4</span> Factual and counterfactual risks - associational and causal contrasts<a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#factual-and-counterfactual-risks---associational-and-causal-contrasts" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<ol style="list-style-type: decimal">
+<li>Compute the factual risks of death for the two exposure groups
+<span class="math display">\[ E(Y|X=x) = P(Y=1|X=x) = \frac{P(Y=1\ \&amp;\ X=x)}{P(X=x)},
+\quad x=0,1, \]</span>
+in the whole target population, as well as their
+associational contrasts: risk difference, risk ratio, and odds
+ratio. Before that define a useful function</li>
+</ol>
+<div class="sourceCode" id="cb777"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb777-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb777-1" tabindex="-1"></a>Contr <span class="ot">&lt;-</span> <span class="cf">function</span>(mu1, mu0) {</span>
+<span id="cb777-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb777-2" tabindex="-1"></a>  RD <span class="ot">&lt;-</span> mu1 <span class="sc">-</span> mu0</span>
+<span id="cb777-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb777-3" tabindex="-1"></a>  RR <span class="ot">&lt;-</span> mu1 <span class="sc">/</span> mu0</span>
+<span id="cb777-4"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb777-4" tabindex="-1"></a>  OR <span class="ot">&lt;-</span> (mu1 <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> mu1)) <span class="sc">/</span> (mu0 <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> mu0))</span>
+<span id="cb777-5"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb777-5" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">c</span>(<span class="at">Risk1=</span>mu1, <span class="at">Risk0=</span>mu0, <span class="at">RD =</span> RD, <span class="at">RR =</span> RR, <span class="at">OR =</span> OR))</span>
+<span id="cb777-6"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb777-6" tabindex="-1"></a>}</span>
+<span id="cb777-7"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb777-7" tabindex="-1"></a>Ey1fact <span class="ot">&lt;-</span> <span class="fu">with</span>(pop, <span class="fu">sum</span>(y <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> x <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="fu">sum</span>(x <span class="sc">==</span> <span class="dv">1</span>))</span>
+<span id="cb777-8"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb777-8" tabindex="-1"></a>Ey0fact <span class="ot">&lt;-</span> <span class="fu">with</span>(pop, <span class="fu">sum</span>(y <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> x <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">/</span> <span class="fu">sum</span>(x <span class="sc">==</span> <span class="dv">0</span>))</span>
+<span id="cb777-9"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb777-9" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(Ey1fact, Ey0fact), <span class="dv">4</span>)</span></code></pre></div>
+<pre><code>##  Risk1  Risk0     RD     RR     OR 
+## 0.8955 0.6280 0.2674 1.4258 5.0735</code></pre>
+<p>The one-year mortality is quite high in both groups. –
+How much bigger is the risk of death of those factually exposed to
+radiotherapy only as compared with those receiving chemotherapy, too?</p>
+<p><em>Comment</em>: With such a high baseline probability
+of the outcome the risk ratio cannot
+become greater than 1/0.628 = 1.59. For relative comparisons one
+could also consider using <em>survival ratio</em>: SR = (1-_1)/(1-_0)
+For instance, here the associational survival ratio is
+<span class="math display">\[ \text{SR} = (1-0.8955)/(1-0.6280) = 0.1045/0.372 = 0.2809 = 1/3.56 \]</span></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Compute now the true <strong>counterfactual</strong> or
+<strong>potential risks</strong> of death
+<span class="math display">\[ E(Y_i^{X_i=x}) = P(Y_i^{X_i=x}=1) = \pi_i^{X_i=x} \]</span>
+for each
+individual under the alternative treatments or exposure values
+<span class="math inline">\(x=0,1\)</span> with given covariate values,. After that derive the
+average or overall counterfactual risks <span class="math inline">\(E(Y^{X=1}) = \pi^1\)</span>
+and <span class="math inline">\(E(Y^{X=0}) = \pi^0\)</span> in the population,
+and finally the true <strong>marginal causal contrasts</strong>
+describing the effect of <span class="math inline">\(X\)</span>:
+<span class="math display">\[
+\begin{aligned}
+\text{RD} &amp; = E(Y^{X=1})-E(Y^{X=0}), \qquad  \text{RR} = E(Y^{X=1})/E(Y^{X=0}), \\
+\text{OR} &amp; = \frac{E(Y^{X=1})/[1 -  E(Y^{X=1})]}{E(Y^{X=0})/[1 -  E(Y^{X=0})] }
+\end{aligned}
+\]</span></li>
+</ol>
+<div class="sourceCode" id="cb779"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb779-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb779-1" tabindex="-1"></a>pop <span class="ot">&lt;-</span> <span class="fu">transform</span>(pop,</span>
+<span id="cb779-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb779-2" tabindex="-1"></a>  <span class="at">EY1.ind =</span> <span class="fu">EY</span>(<span class="at">x =</span> <span class="dv">1</span>, z1, z2, z3, z4),</span>
+<span id="cb779-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb779-3" tabindex="-1"></a>  <span class="at">EY0.ind =</span> <span class="fu">EY</span>(<span class="at">x =</span> <span class="dv">0</span>, z1, z2, z3, z4)</span>
+<span id="cb779-4"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb779-4" tabindex="-1"></a>)</span>
+<span id="cb779-5"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb779-5" tabindex="-1"></a>EY1pot <span class="ot">&lt;-</span> <span class="fu">mean</span>(pop<span class="sc">$</span>EY1.ind)</span>
+<span id="cb779-6"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb779-6" tabindex="-1"></a>EY0pot <span class="ot">&lt;-</span> <span class="fu">mean</span>(pop<span class="sc">$</span>EY0.ind)</span>
+<span id="cb779-7"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb779-7" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot, EY0pot), <span class="dv">4</span>)</span></code></pre></div>
+<pre><code>##  Risk1  Risk0     RD     RR     OR 
+## 0.8274 0.6531 0.1743 1.2668 2.5455</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li><p>Compare the associational contrasts (e.g. RD=0.2674) computed in
+item 1 with the causal contrasts here. What do you conclude about
+the amount of confounding bias in the associational contrasts?</p></li>
+<li><p>To illustrate what happens in
+a realistic setting involving some random variability
+we shall draw a random sample of 5000 patients
+using systematic sampling. We also compute
+the estimates of the counterfactual quantities from this
+sample based on the true models.</p></li>
+</ol>
+<div class="sourceCode" id="cb781"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb781-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb781-1" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">5000</span></span>
+<span id="cb781-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb781-2" tabindex="-1"></a>samp <span class="ot">&lt;-</span> pop[<span class="fu">seq</span>(<span class="dv">1</span>,N, <span class="at">by=</span>N<span class="sc">/</span>n), ]</span>
+<span id="cb781-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb781-3" tabindex="-1"></a><span class="fu">str</span>(samp)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    5000 obs. of  8 variables:
+##  $ z1     : int  0 0 1 1 1 1 1 1 0 0 ...
+##  $ z2     : int  1 1 1 1 1 0 1 1 0 1 ...
+##  $ z3     : num  4 1 1 4 4 4 3 1 1 4 ...
+##  $ z4     : num  1 2 2 3 2 1 5 3 3 3 ...
+##  $ x      : int  0 0 0 1 0 0 1 0 1 0 ...
+##  $ y      : int  0 0 0 1 0 1 1 1 1 0 ...
+##  $ EY1.ind: num  0.846 0.786 0.769 0.909 0.875 ...
+##  $ EY0.ind: num  0.668 0.574 0.55 0.786 0.721 ...</code></pre>
+<div class="sourceCode" id="cb783"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb783-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb783-1" tabindex="-1"></a>EY1pot.samp <span class="ot">&lt;-</span> <span class="fu">mean</span>(samp<span class="sc">$</span>EY1.ind)</span>
+<span id="cb783-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb783-2" tabindex="-1"></a>EY0pot.samp <span class="ot">&lt;-</span> <span class="fu">mean</span>(samp<span class="sc">$</span>EY0.ind)</span>
+<span id="cb783-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb783-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot.samp, EY0pot.samp), <span class="dv">4</span>)</span></code></pre></div>
+<pre><code>##  Risk1  Risk0     RD     RR     OR 
+## 0.8257 0.6500 0.1757 1.2704 2.5514</code></pre>
+<p>The sample estimates of the counterfactual risks
+and their contrasts based on the true models
+seem to be not too far from the true values of those
+estimands.</p>
+<ol start="5" style="list-style-type: decimal">
+<li>Some perspective to the random variability in the
+estimation of parameters of interest is provided
+by the numbers of cases and non-casses
+in the two exposure groups of the sample</li>
+</ol>
+<div class="sourceCode" id="cb785"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb785-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb785-1" tabindex="-1"></a><span class="fu">stat.table</span>(<span class="at">index=</span><span class="fu">list</span>(<span class="st">&quot;Outcome&quot;</span><span class="ot">=</span><span class="fu">factor</span>(y), <span class="st">&quot;Exposure&quot;</span><span class="ot">=</span><span class="fu">factor</span>(x)),</span>
+<span id="cb785-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb785-2" tabindex="-1"></a>           <span class="at">contents=</span><span class="fu">list</span>(<span class="fu">count</span>(), <span class="fu">percent</span>(y)),</span>
+<span id="cb785-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb785-3" tabindex="-1"></a>           <span class="at">margins=</span><span class="cn">TRUE</span>, <span class="at">data=</span>samp  )</span></code></pre></div>
+<pre><code>##  ---------------------------------- 
+##           --------Exposure--------- 
+##  Outcome         0       1   Total  
+##  ---------------------------------- 
+##  0            1519      81    1600  
+##               36.3    10.0    32.0  
+##                                     
+##  1            2668     732    3400  
+##               63.7    90.0    68.0  
+##                                     
+##                                     
+##  Total        4187     813    5000  
+##              100.0   100.0   100.0  
+##  ----------------------------------</code></pre>
+<p>The group sizes are very different; only
+16 % of the patients were exposed to radiotherapy only.</p>
+<p>The Statistical precision in any comparison between the exposure groups
+based on the sample data is very much dominated by the
+smallest count in this fourfold table, i.e.
+the number of non-cases among the exposed, which is not very big.</p>
+</div>
+<div id="outcome-modelling-and-estimation-of-causal-contrasts-by-g-formula" class="section level2 hasAnchor" number="14.5">
+<h2><span class="header-section-number">14.5</span> Outcome modelling and estimation of causal contrasts by g-formula<a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#outcome-modelling-and-estimation-of-causal-contrasts-by-g-formula" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>As the first approach for estimating causal contrasts of interest
+we apply the method of <strong>regression standardization</strong> or <strong>g-formula</strong>.
+It is based on a hopefully realistic enough model for
+<span class="math inline">\(E(Y|X=x, Z=z)\)</span>, i.e. how the risk
+of the outcome is expected to depend on the exposure variable
+<span class="math inline">\(X\)</span> and on a
+sufficient set <span class="math inline">\(Z\)</span> of confounders. The potential
+or counterfactual risks
+<span class="math inline">\(E(Y^{X=x}), x=0,1\)</span>, are marginal expectations of the above
+quantities, standardized over the joint distribution
+of the confounders <span class="math inline">\(Z\)</span> in the target population.
+<span class="math display">\[ E(Y^{X=x}) = E_Z[E(Y|X=x,Z)]
+       = \int E(Y|X=x, Z=z)dF_Z(z), \quad x=0,1. \]</span></p>
+<ol style="list-style-type: decimal">
+<li>Assume now a <em>slightly misspecified</em> model <code>mY</code>
+for the outcome, which contains only the main effect terms
+of the explanatory variables:
+<span class="math display">\[ \pi_i = E(Y_i|X_i=x_i, Z_{i1}=z_{i1}, \dots, Z_{i4}=z_{i4}) =
+  \text{expit}\left(\beta_0 + \delta x_i +
+  \sum_{j=1}^4 \beta_j z_{ij} \right) . \]</span>
+Fit this model on the data of the whole
+target population using function <code>glm()</code>
+<!-- % in order to have an accurate -->
+<!-- % estimate of the possible bias due 
+to misspecification of the outcome -->
+<!-- % model --></li>
+</ol>
+<div class="sourceCode" id="cb787"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb787-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb787-1" tabindex="-1"></a>mY <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> x <span class="sc">+</span> z1 <span class="sc">+</span> z2 <span class="sc">+</span> z3 <span class="sc">+</span> z4, <span class="at">family =</span> binomial, <span class="at">data =</span> pop)</span>
+<span id="cb787-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb787-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(mY, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span><span class="sc">:</span><span class="dv">7</span>)], <span class="dv">4</span>)</span></code></pre></div>
+<pre><code>##             Estimate exp(Est.)   2.5%  97.5%
+## (Intercept)  -1.2545    0.2852 0.2806 0.2900
+## x             1.0560    2.8750 2.8267 2.9240
+## z1           -0.1012    0.9038 0.8958 0.9118
+## z2            0.7592    2.1366 2.1170 2.1563
+## z3            0.2525    1.2872 1.2821 1.2924
+## z4            0.2838    1.3282 1.3238 1.3327</code></pre>
+<p>The point estimates for the intercept, <span class="math inline">\(X, Z_1\)</span> and <span class="math inline">\(Z_3\)</span> seem
+to be reasonably close to the given parameter values
+in the true model, but those
+of <span class="math inline">\(Z_2\)</span> and <span class="math inline">\(Z_4\)</span> are different. This is because the fitted model
+ignored the product term <span class="math inline">\(Z_2 Z_4\)</span>.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>For each subject <span class="math inline">\(i\)</span>, compute the <strong>fitted individual risk</strong>
+<span class="math inline">\(\widehat{Y_i}\)</span> (which actually will be needed not until the
+end of this practical!) as well as the
+<strong>predicted potential (counterfactual) risks</strong>
+<span class="math inline">\(\widetilde{Y_i}^{X_i=x}\)</span> for both exposure levels <span class="math inline">\(x=0,1\)</span>
+separately, keeping the individual values of the
+<span class="math inline">\(Z\)</span>-variables as they are observed.</li>
+</ol>
+<div class="sourceCode" id="cb789"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb789-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb789-1" tabindex="-1"></a>pop<span class="sc">$</span>yh <span class="ot">&lt;-</span> <span class="fu">predict</span>(mY, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>) <span class="co">#  fitted values</span></span>
+<span id="cb789-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb789-2" tabindex="-1"></a>pop<span class="sc">$</span>yp1 <span class="ot">&lt;-</span> <span class="fu">predict</span>(mY, <span class="at">newdata =</span> <span class="fu">data.frame</span>(</span>
+<span id="cb789-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb789-3" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">rep</span>(<span class="dv">1</span>, N), <span class="co"># x=1</span></span>
+<span id="cb789-4"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb789-4" tabindex="-1"></a>  pop[, <span class="fu">c</span>(<span class="st">&quot;z1&quot;</span>, <span class="st">&quot;z2&quot;</span>, <span class="st">&quot;z3&quot;</span>, <span class="st">&quot;z4&quot;</span>)]</span>
+<span id="cb789-5"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb789-5" tabindex="-1"></a>), <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb789-6"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb789-6" tabindex="-1"></a>pop<span class="sc">$</span>yp0 <span class="ot">&lt;-</span> <span class="fu">predict</span>(mY, <span class="at">newdata =</span> <span class="fu">data.frame</span>(</span>
+<span id="cb789-7"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb789-7" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">rep</span>(<span class="dv">0</span>, N), <span class="co"># x=0</span></span>
+<span id="cb789-8"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb789-8" tabindex="-1"></a>  pop[, <span class="fu">c</span>(<span class="st">&quot;z1&quot;</span>, <span class="st">&quot;z2&quot;</span>, <span class="st">&quot;z3&quot;</span>, <span class="st">&quot;z4&quot;</span>)]</span>
+<span id="cb789-9"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb789-9" tabindex="-1"></a>), <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span></code></pre></div>
+<ol start="3" style="list-style-type: decimal">
+<li>Applying the method of standardization or
+g-formula we now compute the point estimates
+<span class="math display">\[ \widehat{E}_g(Y^{X=x}) =
+\frac{1}{n} \sum_{i=1}^n \widetilde{Y}_i^{X_i=x}, \quad x=0,1. \]</span>
+of the two counterfactual risks <span class="math inline">\(E(Y^{X=1}) = \pi^1\)</span> and
+<span class="math inline">\(E(Y^{X=0})=\pi^0\)</span> as well as<br />
+those of the marginal causal contrasts.</li>
+</ol>
+<div class="sourceCode" id="cb790"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb790-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb790-1" tabindex="-1"></a>EY1pot.g <span class="ot">&lt;-</span> <span class="fu">mean</span>(pop<span class="sc">$</span>yp1)</span>
+<span id="cb790-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb790-2" tabindex="-1"></a>EY0pot.g <span class="ot">&lt;-</span> <span class="fu">mean</span>(pop<span class="sc">$</span>yp0)</span>
+<span id="cb790-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb790-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot.g, EY0pot.g), <span class="dv">4</span>)</span></code></pre></div>
+<pre><code>##  Risk1  Risk0     RD     RR     OR 
+## 0.8331 0.6503 0.1828 1.2811 2.6837</code></pre>
+<p><em>Comment</em>: The joint distribution of
+the confounders <span class="math inline">\(Z\)</span> in the target population is here represented by
+the actual distribution of the data in that population.
+Thus, marginal expectations <span class="math inline">\(E_Z[E(X=x, Z)]\)</span> are obtained
+by simple computation of the arithmetic means of the individually
+predicted values <span class="math inline">\(\widetilde{Y_i}^{X_i=x}\)</span> of the
+outcome for the two exposure levels.</p>
+<p>Compare the estimated contrasts with those
+obtained from applying the true model (RD = 0.1743) in
+item 4.4 above.
+How big is the bias due to misspecification
+of the outcome model?</p>
+<p>Compare in particular the estimate of the marginal
+OR here with the
+conditional OR obtained in item 5.1 from the
+pertinent coefficient in
+the logistic model. Which one is closer to 1?</p>
+<ol start="4" style="list-style-type: decimal">
+<li>Perform the same calculations using the tools
+in package <code>stdReg2</code> but now on the sample data.
+(see <a href="https://doi.org/10.1007/s10654-016-0157-3">Sjölander 2016</a> and
+<a href="https://doi.org/10.1016/j.annepidem.2025.04.002">Sachs et al 2025</a>).
+Using function <code>standardize_glm()</code> the same logistic model is fitted,
+and the point estimates together with the confidence intervals
+for the causal risk difference and causal risk ratio are computed.
+The results are saved into a list, for which we give
+the name <code>mY.std</code>.</li>
+</ol>
+<p>The main results are shown in four small windows<br />
+after applying the basic print method on <code>mY.std</code></p>
+<div class="sourceCode" id="cb792"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb792-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb792-1" tabindex="-1"></a>mY.std <span class="ot">&lt;-</span> <span class="fu">standardize_glm</span>(</span>
+<span id="cb792-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb792-2" tabindex="-1"></a> <span class="at">formula =</span> y <span class="sc">~</span> x <span class="sc">+</span> z1 <span class="sc">+</span> z2 <span class="sc">+</span> z3 <span class="sc">+</span> z4,</span>
+<span id="cb792-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb792-3" tabindex="-1"></a> <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>,</span>
+<span id="cb792-4"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb792-4" tabindex="-1"></a> <span class="at">data =</span> samp,</span>
+<span id="cb792-5"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb792-5" tabindex="-1"></a> <span class="at">values =</span> <span class="fu">list</span>(<span class="at">x =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">1</span>),</span>
+<span id="cb792-6"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb792-6" tabindex="-1"></a> <span class="at">contrasts =</span> <span class="fu">c</span>(<span class="st">&quot;difference&quot;</span>, <span class="st">&quot;ratio&quot;</span>),</span>
+<span id="cb792-7"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb792-7" tabindex="-1"></a> <span class="at">reference =</span> <span class="dv">0</span></span>
+<span id="cb792-8"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb792-8" tabindex="-1"></a>)</span>
+<span id="cb792-9"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb792-9" tabindex="-1"></a>mY.std</span></code></pre></div>
+<pre><code>## Outcome formula: y ~ x + z1 + z2 + z3 + z4
+## Outcome family: quasibinomial 
+## Outcome link function: logit 
+## Exposure:  x 
+## 
+## Tables: 
+##   x Estimate Std.Error lower.0.95 upper.0.95
+## 1 0    0.656   0.00731      0.641      0.670
+## 2 1    0.849   0.01533      0.819      0.879
+## 
+## Reference level:  x = 0 
+## Contrast:  difference 
+##   x Estimate Std.Error lower.0.95 upper.0.95
+## 1 0    0.000    0.0000      0.000      0.000
+## 2 1    0.193    0.0172      0.159      0.227
+## 
+## Reference level:  x = 0 
+## Contrast:  ratio 
+##   x Estimate Std.Error lower.0.95 upper.0.95
+## 1 0     1.00    0.0000       1.00       1.00
+## 2 1     1.29    0.0278       1.24       1.35</code></pre>
+<p>The point estimates seem to be well within a resonable error margin
+when compared to those, which you got
+by explicit computations for the whole
+population data (e.g. RD=0.1828) in the previous item.
+(You could also run <code>standardize_glm()</code> with <code>data=pop</code> to convince
+yourself that <code>stdReg2' indeed provides the same point estimates  as obtained above for the whole population from model</code>mY`).</p>
+<p>In <code>stdReg2</code>, the
+standard errors are obtained by the multivariate
+delta method built upon M-estimation
+(<a href="https://doi.org/10.1198/000313002753631330">Stefanski &amp; Boos 2002</a>)
+and robust sandwich estimator of the
+pertinent covariance
+matrix. Approximate confidence intervals are derived
+from these in the usual way.</p>
+</div>
+<div id="inverse-probability-weighting-ipw-by-propensity-scores" class="section level2 hasAnchor" number="14.6">
+<h2><span class="header-section-number">14.6</span> Inverse probability weighting (IPW) by propensity scores<a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#inverse-probability-weighting-ipw-by-propensity-scores" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Our next method is based on weighting each individual
+observation by the
+inverse of the probability of belonging to that
+particular exposure group, which was realized,
+this probability being predicted by the
+determinants of exposure.</p>
+<ol style="list-style-type: decimal">
+<li>First, we examine the validity of this approach
+by fitting the true model on the whole population data.<br />
+To repeat, the model is
+<span class="math display">\[
+p_i = E(X_i| Z_{1i} = z_{1i}, \dots, Z_{4i} = z_{4i})
+= \text{expit}(\gamma_0 + \gamma_2 z_{2i} +
+  \gamma_3 z_{i3} + \gamma_4 z_{4i} + \gamma_{24} z_{2i}z_{4i}), \quad i=1, \dots N
+\]</span></li>
+</ol>
+<div class="sourceCode" id="cb794"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb794-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb794-1" tabindex="-1"></a>mX <span class="ot">&lt;-</span> <span class="fu">glm</span>(x <span class="sc">~</span> z2 <span class="sc">+</span> z3 <span class="sc">+</span> z4 <span class="sc">+</span> z2<span class="sc">:</span>z4,</span>
+<span id="cb794-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb794-2" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> logit), <span class="at">data =</span> pop)</span>
+<span id="cb794-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb794-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(mX, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>)], <span class="dv">4</span>)</span></code></pre></div>
+<pre><code>##             Estimate exp(Est.)
+## (Intercept)  -5.0196    0.0066
+## z2            0.0825    1.0860
+## z3            0.2474    1.2807
+## z4            0.5035    1.6544
+## z2:z4         0.3956    1.4852</code></pre>
+<p>The estimated coefficients and ORs are quite close
+to the true values as given in the introduction section.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>From the fitted model we then extract the
+<strong>propensity scores</strong>, i.e. fitted probabilities of
+belonging to exposure group 1:
+<span class="math inline">\(\text{PS}_i = \widehat{p_i}\)</span>.
+We also make a simple comparison
+of the distribution of the scores between the two groups
+by common summary measures.</li>
+</ol>
+<div class="sourceCode" id="cb796"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb796-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb796-1" tabindex="-1"></a>pop<span class="sc">$</span>PS <span class="ot">&lt;-</span> <span class="fu">predict</span>(mX, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb796-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb796-2" tabindex="-1"></a><span class="fu">tapply</span>(pop<span class="sc">$</span>PS, pop<span class="sc">$</span>x, summary)</span></code></pre></div>
+<pre><code>## $`0`
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.01381 0.03660 0.07509 0.13568 0.18053 0.63357 
+## 
+## $`1`
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## 0.01381 0.18053 0.35460 0.35172 0.51319 0.63357</code></pre>
+<p>How different are the distributions? Can one judge
+from these summaries, that they are sufficiently overlapping?</p>
+<p>Informative graphical tools for examining overlap and
+covariate balance are contained in package <code>PSweight</code>,<br />
+and they are introduced in the next section.</p>
+<ol start="3" style="list-style-type: decimal">
+<li>We then compute the <strong>inverse probability weights</strong> (IPW), also
+known as <strong>inverse probability treatment weights</strong> (IPTW):
+<span class="math display">\[
+\begin{aligned}
+W_i &amp; = \frac{1}{\text{PS}_i}, \quad \text{when }\ X_i=1, \\
+W_i &amp; = \frac{1}{1-\text{PS}_i}, \quad \text{when }\ X_i=0 .
+\end{aligned}
+\]</span>
+Look at the sum as well as
+the distribution summary of the weights in the exposure groups.
+In an ideal situation with a well-specified exposure model the
+sum of weights should be close to to the population size in both groups.</li>
+</ol>
+<div class="sourceCode" id="cb798"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb798-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb798-1" tabindex="-1"></a>pop<span class="sc">$</span>w <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(pop<span class="sc">$</span>x <span class="sc">==</span> <span class="dv">1</span>, </span>
+<span id="cb798-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb798-2" tabindex="-1"></a>                     <span class="dv">1</span> <span class="sc">/</span> pop<span class="sc">$</span>PS, <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> pop<span class="sc">$</span>PS))</span>
+<span id="cb798-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb798-3" tabindex="-1"></a><span class="fu">with</span>(pop, <span class="fu">tapply</span>(w, x, sum))</span></code></pre></div>
+<pre><code>##         0         1 
+##  999884.4 1001553.5</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li>Compute now the weighted estimates of the
+potential or counterfactual risks for
+both exposure categories
+<span class="math display">\[ \widehat{E}_w(Y^{X = x}) =
+\frac{ \sum_{i=1}^n {\mathbf 1}_{ \{X_i=x\} } W_i Y_i }
+   {\sum_{i=1}^n {\mathbf 1}_{ \{X_i=x\} }W_i} =
+\frac{ \sum_{X_i = x} W_i Y_i }{\sum_{X_i=x} W_i}, \quad x = 0,1, \]</span>
+and their causal contrasts, for instance
+<span class="math display">\[ \widehat{\text{RD}}_{w} = \widehat{E}_w(Y^{X = 1}) -
+              \widehat{E}_w(Y^{X = 0})
+  =  \frac{ \sum_{i=1}^n X_i W_i Y_i }{\sum_{i=1}^n X_i W_i} -
+  \frac{ \sum_{i=1}^n (1-X_i) W_i Y_i }{\sum_{i=1}^n (1-X_i) W_i}
+\]</span></li>
+</ol>
+<div class="sourceCode" id="cb800"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb800-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb800-1" tabindex="-1"></a>EY1pot.w <span class="ot">&lt;-</span> <span class="fu">sum</span>(pop<span class="sc">$</span>x <span class="sc">*</span> pop<span class="sc">$</span>w <span class="sc">*</span> pop<span class="sc">$</span>y) <span class="sc">/</span> <span class="fu">sum</span>(pop<span class="sc">$</span>x <span class="sc">*</span> pop<span class="sc">$</span>w)</span>
+<span id="cb800-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb800-2" tabindex="-1"></a>EY0pot.w <span class="ot">&lt;-</span> <span class="fu">sum</span>((<span class="dv">1</span> <span class="sc">-</span> pop<span class="sc">$</span>x) <span class="sc">*</span> pop<span class="sc">$</span>w <span class="sc">*</span> pop<span class="sc">$</span>y) <span class="sc">/</span> <span class="fu">sum</span>((<span class="dv">1</span> <span class="sc">-</span> pop<span class="sc">$</span>x) <span class="sc">*</span> pop<span class="sc">$</span>w)</span>
+<span id="cb800-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb800-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot.w, EY0pot.w), <span class="dv">4</span>)</span></code></pre></div>
+<pre><code>##  Risk1  Risk0     RD     RR     OR 
+## 0.8260 0.6522 0.1737 1.2664 2.5304</code></pre>
+<p>These results seem to be practically equal
+to the true values (e.g. true RD=0.1743).</p>
+<p><em>Comment</em>: If you apply the methods introduced in the
+next section but use the whole population data, i.e. putting
+<code>data=pop</code>, you would see that the estimates of the
+causal contrasts would be the same as obtained here.</p>
+</div>
+<div id="ipw-estimation-using-r-package-psweight" class="section level2 hasAnchor" number="14.7">
+<h2><span class="header-section-number">14.7</span> IPW estimation using R package <code>PSweight</code><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#ipw-estimation-using-r-package-psweight" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We shall now try IPW-estimation with a misspecified model,
+such that we include all <span class="math inline">\(Z\)</span>-variables but none of their
+pairwise interactions.
+We do this on the sample data only.
+In computations we utilize the R package
+<code>PSweight</code>
+(see <a href="https://cran.rstudio.com/web//packages/PSweight/vignettes/Software_vig.pdf">PSweight vignette</a>).</p>
+<ol style="list-style-type: decimal">
+<li>The exposure model is fitted using <code>glm()</code>, and the weights are
+obtained using function
+<code>SumStat()</code> in package <code>PSweight</code>:</li>
+</ol>
+<div class="sourceCode" id="cb802"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb802-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb802-1" tabindex="-1"></a>mX2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(x <span class="sc">~</span> z1 <span class="sc">+</span> z2 <span class="sc">+</span> z3 <span class="sc">+</span> z4, <span class="at">family =</span> binomial, <span class="at">data =</span> samp)</span>
+<span id="cb802-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb802-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(mX2, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">5</span><span class="sc">:</span><span class="dv">7</span>)], <span class="dv">3</span>)</span></code></pre></div>
+<pre><code>##             Estimate StdErr exp(Est.)  2.5% 97.5%
+## (Intercept)   -6.520  0.229     0.001 0.001 0.002
+## z1             0.115  0.086     1.121 0.948 1.327
+## z2             1.722  0.116     5.594 4.460 7.017
+## z3             0.227  0.038     1.255 1.164 1.353
+## z4             0.855  0.038     2.351 2.183 2.531</code></pre>
+<div class="sourceCode" id="cb804"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb804-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb804-1" tabindex="-1"></a>psw2 <span class="ot">&lt;-</span> <span class="fu">SumStat</span>(</span>
+<span id="cb804-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb804-2" tabindex="-1"></a>  <span class="at">ps.formula =</span> mX2<span class="sc">$</span>formula, <span class="at">data =</span> samp,</span>
+<span id="cb804-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb804-3" tabindex="-1"></a>  <span class="at">weight =</span> <span class="fu">c</span>(<span class="st">&quot;IPW&quot;</span>, <span class="st">&quot;treated&quot;</span>, <span class="st">&quot;overlap&quot;</span>)</span>
+<span id="cb804-4"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb804-4" tabindex="-1"></a>)</span></code></pre></div>
+<p>Note that apart from weights <code>IPW</code> for the whole population,
+other kinds of weights can also be
+computed. These are relevant when estimating other
+types of causal
+contrasts, like “average treatment effect among the treated”
+(ATT, see below) and “average treatment effect in the overlap
+(or equipoise) population” (ATO).</p>
+<ol start="2" style="list-style-type: decimal">
+<li><code>PSweight</code> includes some useful tools to examine the
+properties of the distribution of the propensity scores.
+First we draw density plots showing, how well the
+distributions of propensity scores (and 1 - PS, too) are overlapping
+between the exposure groups
+– <strong>NB.</strong> You may get a warning about usage of a<br />
+<code>ggplot2</code> aesthetic in the density plot implemented in
+<code>PSweight</code>,
+this feature being now outdated in the newest version of <code>ggplot2</code>.
+Nonetheless, the density plot will after all be drawn, if you
+go down on the Console window and “Press [enter] to continue”!</li>
+</ol>
+<div class="sourceCode" id="cb805"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb805-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb805-1" tabindex="-1"></a><span class="fu">plot</span>(psw2, <span class="at">type =</span> <span class="st">&quot;density&quot;</span>)</span></code></pre></div>
+<pre><code>## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## ℹ Please use `linewidth` instead.
+## ℹ The deprecated feature was likely used in the PSweight package.
+##   Please report the issue to the authors.
+## This warning is displayed once per session.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.</code></pre>
+<p><img src="causInf2-s_files/figure-html/distributions%20of%20the%20scores-1.png" alt="" width="672" /></p>
+<pre><code>## Propensity score for group 0</code></pre>
+<pre><code>## Press [enter] to continue</code></pre>
+<p><img src="causInf2-s_files/figure-html/distributions%20of%20the%20scores-2.png" alt="" width="672" /></p>
+<pre><code>## Propensity score for group 1</code></pre>
+<p>Are the distributions of the propensity scores very different?</p>
+<ol start="3" style="list-style-type: decimal">
+<li>We then create a diagnostic plot to examine the covariate balance
+between the groups:</li>
+</ol>
+<div class="sourceCode" id="cb810"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb810-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb810-1" tabindex="-1"></a><span class="fu">plot</span>(psw2, <span class="at">type =</span> <span class="st">&quot;balance&quot;</span>)</span></code></pre></div>
+<p><img src="causInf2-s_files/figure-html/check%20balance-1.png" alt="" width="672" /></p>
+<p>In this plot, it would be desirable that the horisontal values of
+the standardized mean differences for a given type of
+weights are less than 0.1.
+– There seems to be some issue with the balance in the estimation
+of our target parameters based on this exposure model.</p>
+<ol start="4" style="list-style-type: decimal">
+<li>Estimation and reporting of the causal contrasts:
+Weights must be <code>IPW</code> when estimating the causal effect
+generalized to the whole target population. For relative
+contrasts, the summary method provides the results
+on the log-scale; therefore <span class="math inline">\(\exp\)</span>-transformation.</li>
+</ol>
+<div class="sourceCode" id="cb811"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb811-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb811-1" tabindex="-1"></a>ipw2est <span class="ot">&lt;-</span> <span class="fu">PSweight</span>(<span class="at">ps.formula =</span> mX2, <span class="at">yname =</span> <span class="st">&quot;y&quot;</span>, <span class="at">data =</span> samp, </span>
+<span id="cb811-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb811-2" tabindex="-1"></a>                    <span class="at">weight =</span> <span class="st">&quot;IPW&quot;</span>)</span>
+<span id="cb811-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb811-3" tabindex="-1"></a>ipw2est</span></code></pre></div>
+<pre><code>## Original group value:  0, 1 
+## 
+## Point estimate: 
+## 0.6565, 0.8027</code></pre>
+<div class="sourceCode" id="cb813"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb813-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb813-1" tabindex="-1"></a><span class="fu">summary</span>(ipw2est, <span class="at">type=</span><span class="st">&quot;DIF&quot;</span>)  <span class="co"># risk difference</span></span></code></pre></div>
+<pre><code>## 
+## Closed-form inference: 
+## 
+## Original group value:  0, 1 
+## 
+## Contrast: 
+##             0 1
+## Contrast 1 -1 1
+## 
+##            Estimate Std.Error      lwr     upr  Pr(&gt;|z|)    
+## Contrast 1 0.146179  0.036149 0.075329 0.21703 5.259e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<div class="sourceCode" id="cb815"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb815-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb815-1" tabindex="-1"></a>(logRR.ipw2 <span class="ot">&lt;-</span> <span class="fu">summary</span>(ipw2est, <span class="at">type =</span> <span class="st">&quot;RR&quot;</span>))  <span class="co"># log(risk ratio)</span></span></code></pre></div>
+<pre><code>## 
+## Closed-form inference: 
+## 
+## Inference in log scale: 
+## Original group value:  0, 1 
+## 
+## Contrast: 
+##             0 1
+## Contrast 1 -1 1
+## 
+##            Estimate Std.Error     lwr     upr  Pr(&gt;|z|)    
+## Contrast 1  0.20103   0.04547 0.11191 0.29015 9.816e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<div class="sourceCode" id="cb817"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb817-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb817-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">exp</span>(logRR.ipw2<span class="sc">$</span>estimates[<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">5</span>)]), <span class="dv">3</span>) <span class="co"># risk ratio</span></span></code></pre></div>
+<pre><code>## [1] 1.223 1.118 1.337</code></pre>
+<div class="sourceCode" id="cb819"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb819-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb819-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">summary</span>(ipw2est, <span class="at">type =</span> <span class="st">&quot;OR&quot;</span>)<span class="sc">$</span>estimates[<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">5</span>)]), <span class="dv">3</span>) <span class="co"># OR</span></span></code></pre></div>
+<pre><code>## [1] 2.128 1.367 3.315</code></pre>
+<p>Comparing these with the previous IPW estimates (e.g. RD=0.1737) as
+well as the true values (RD=0.1743), there perhaps can be
+seen indication of some bias due to misspecification. Remember,
+though, that these estimates are from the sample data with
+relatively wide error margins.</p>
+<p>The standard errors provided by <code>PSweight</code>
+are by default based on the
+empirical sandwich covariance matrix and application
+of delta method as
+appropriate. Bootstrapping is also possible but is
+computationally very
+intensive and is recommended to be used only in relatively small
+samples.</p>
+</div>
+<div id="effect-of-exposure-among-those-exposed" class="section level2 hasAnchor" number="14.8">
+<h2><span class="header-section-number">14.8</span> Effect of exposure among those exposed<a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#effect-of-exposure-among-those-exposed" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>If we are interested in the
+causal contrasts describing the
+<strong>effect of exposure among those exposed</strong> (like ATE),
+the relevant factual and
+counterfactual risks in that subset are conditional
+on being exposed:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\pi^1_1 &amp; = E(Y^{X=1}|X=1) = E(Y|X=1) = \pi_1, \\
+\pi^0_1 &amp; = E(Y^{X=0}|X=1) = \sum_{X_i=1} E(Y|X=0, Z=z)P(Z=z|X=1)
+\end{aligned}
+\]</span></p>
+<p>We are thus making and “observed vs. expected” comparison,
+in which the
+<span class="math inline">\(z\)</span>-specific risks in the unexposed are weighted by the
+distribution of
+<span class="math inline">\(Z\)</span> in the exposed subset of the target population.</p>
+<ol style="list-style-type: decimal">
+<li>We shall first estimate these <span class="math inline">\(z\)</span>-specific
+“observed” or factual and “expected” or counterfactual risks
+and their contrasts conditional on being exposed from the
+slightly misspecified outcome model <code>mY</code> fitted on the
+whole population data:</li>
+</ol>
+<div class="sourceCode" id="cb821"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb821-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb821-1" tabindex="-1"></a>EY1att.g <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">subset</span>(pop, x <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">$</span>yp1)</span>
+<span id="cb821-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb821-2" tabindex="-1"></a>EY0att.g <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">subset</span>(pop, x <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">$</span>yp0)</span>
+<span id="cb821-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb821-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1att.g, EY0att.g), <span class="dv">4</span>)</span></code></pre></div>
+<pre><code>##  Risk1  Risk0     RD     RR     OR 
+## 0.8955 0.7565 0.1389 1.1836 2.7568</code></pre>
+<p>Compare the results here with those (e.g. RD=0.1828)
+meant to describe the overall causal contrasts among the
+whole target population from the same model <code>mY</code>.
+What do you observe?</p>
+<ol start="2" style="list-style-type: decimal">
+<li><p>What is your guess about the causal effect of exposure among
+the unexposed; is it bigger or smaller than it is among
+the exposed or among the whole population?</p></li>
+<li><p>Incidentally, the true causal contrasts among the
+exposed based on the true model are similarly obtained
+from the quantities in item 4.2 above:</p></li>
+</ol>
+<div class="sourceCode" id="cb823"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb823-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb823-1" tabindex="-1"></a>EY1att <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">subset</span>(pop, x <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">$</span>EY1.ind)</span>
+<span id="cb823-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb823-2" tabindex="-1"></a>EY0att <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">subset</span>(pop, x <span class="sc">==</span> <span class="dv">1</span>)<span class="sc">$</span>EY0.ind)</span>
+<span id="cb823-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb823-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1att, EY0att), <span class="dv">4</span>)</span></code></pre></div>
+<pre><code>##  Risk1  Risk0     RD     RR     OR 
+## 0.8957 0.7684 0.1273 1.1657 2.5886</code></pre>
+<p>Compare the estimates in the previous item (e.g. RD<span class="math inline">\(_1\)</span> = 0.1389)
+with the true values obtained here.
+The misspecification
+of the outcome model implies some bias in these
+results, too.</p>
+<ol start="4" style="list-style-type: decimal">
+<li>When wishing to estimate
+the effect of exposure among the exposed using the IPW
+approach, then the weights are <span class="math inline">\(W_i = 1\)</span> for the exposed and
+<span class="math inline">\(W_i = \text{PS}_i/(1-\text{PS}_i)\)</span> for the unexposed.
+We shall again use <code>PSweight</code> with sample data
+but with another choice of weights:</li>
+</ol>
+<div class="sourceCode" id="cb825"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb825-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb825-1" tabindex="-1"></a>psatt <span class="ot">&lt;-</span> <span class="fu">PSweight</span>(<span class="at">ps.formula =</span> mX2, <span class="at">yname =</span> <span class="st">&quot;y&quot;</span>, </span>
+<span id="cb825-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb825-2" tabindex="-1"></a>                  <span class="at">data =</span> samp, <span class="at">weight =</span> <span class="st">&quot;treated&quot;</span>)</span>
+<span id="cb825-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb825-3" tabindex="-1"></a>psatt</span></code></pre></div>
+<pre><code>## Original group value:  0, 1 
+## Treatment group value:  1 
+## 
+## Point estimate: 
+## 0.7579, 0.9004</code></pre>
+<div class="sourceCode" id="cb827"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb827-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb827-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(psatt)<span class="sc">$</span>estimates, <span class="dv">4</span>)</span></code></pre></div>
+<pre><code>##            Estimate Std.Error z value    lwr    upr Pr(&gt;|z|)
+## Contrast 1   0.1424    0.0147  9.6623 0.1135 0.1713        0</code></pre>
+<div class="sourceCode" id="cb829"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb829-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb829-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">summary</span>(psatt, <span class="at">type =</span> <span class="st">&quot;RR&quot;</span>)<span class="sc">$</span>estimates), <span class="dv">3</span>)</span></code></pre></div>
+<pre><code>##            Estimate Std.Error  z value   lwr   upr Pr(&gt;|z|)
+## Contrast 1    1.188     1.018 13678.08 1.147 1.231        1</code></pre>
+<p>Compare the results here with those obtained by
+g-formula in item 8.1
+and with the true contrasts above.</p>
+</div>
+<div id="double-robust-dr-estimation" class="section level2 hasAnchor" number="14.9">
+<h2><span class="header-section-number">14.9</span> Double robust (DR) estimation<a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#double-robust-dr-estimation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We may try to reduce the bias in the estimation of the
+target parameters, which would be caused by
+possible specification error either in the outcome model
+or in the exposure model using some
+<strong>double robust</strong> (DR) approach. These methods combine
+the principle of regression standardization with that
+of IPW/propensity scores.</p>
+<p>A classical DR method is <em>augmented IPW estimation</em> (AIPW), in
+which the estimator can be expressed in two alternative ways:
+either an IPW-corrected g-formula estimator, or an
+IPW-estimator corrected by standardization.</p>
+<p><span class="math display">\[
+\begin{aligned}
+\widehat{E}_a(Y^{X=x})
+       &amp; = \widehat{E}_g(Y^{X=x}) +
+\frac{1}{n} \sum_{i=1}^n  {\mathbf 1}_{\{X_i=x\}} W_i
+                   ( Y_i - \widetilde{Y}_i^{X_i=x} )   \\
+       &amp; = \widehat{E}_w(Y^{X=x}) +
+\frac{1}{n} \sum_{i=1}^n ( 1 - {\mathbf 1}_{\{X_i=x\}} W_i )
+                      \widetilde{Y}_i^{X_i=x}.
+\end{aligned}
+\]</span></p>
+<ol style="list-style-type: decimal">
+<li>We apply the AIPW method first in the whole population by
+direct combination of the results that we obtained from the slightly
+misspecified outcome model <code>mY</code> with those from the
+well-specified exposure model <code>mX</code>.</li>
+</ol>
+<div class="sourceCode" id="cb831"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb831-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb831-1" tabindex="-1"></a>EY1pot.a <span class="ot">&lt;-</span> EY1pot.g <span class="sc">+</span> <span class="fu">mean</span>( <span class="dv">1</span><span class="sc">*</span>(pop<span class="sc">$</span>x<span class="sc">==</span><span class="dv">1</span>) <span class="sc">*</span> pop<span class="sc">$</span>w <span class="sc">*</span> (pop<span class="sc">$</span>y <span class="sc">-</span> pop<span class="sc">$</span>yp1) )</span>
+<span id="cb831-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb831-2" tabindex="-1"></a>EY0pot.a <span class="ot">&lt;-</span> EY0pot.g <span class="sc">+</span> <span class="fu">mean</span>( <span class="dv">1</span><span class="sc">*</span>(pop<span class="sc">$</span>x<span class="sc">==</span><span class="dv">0</span>) <span class="sc">*</span> pop<span class="sc">$</span>w <span class="sc">*</span> (pop<span class="sc">$</span>y <span class="sc">-</span> pop<span class="sc">$</span>yp0) )</span>
+<span id="cb831-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb831-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot.a, EY0pot.a), <span class="dv">4</span>)</span></code></pre></div>
+<pre><code>##  Risk1  Risk0     RD     RR     OR 
+## 0.8259 0.6523 0.1737 1.2663 2.5296</code></pre>
+<p>Compare these results with those obtained by g-formula
+(e.g. RD=0.1828) and by
+the IPW method (RD=0.1737) as well as with the true values
+(RD = 0.1743) of the parameters. – Was correction
+of the g-estimates by IPW successful?</p>
+<ol start="2" style="list-style-type: decimal">
+<li>AIPW-estimates and confidence
+intervals for the causal contrasts of interest can
+be obtained, for instance, using <code>PSweight</code>.
+We will assign the outcome model <code>mY</code> into the argument <code>out.formula</code>.
+We again combine this slightly misspecified outcome model with the
+correct exposure model <code>mX</code> and
+perform the estimation on the sample data.</li>
+</ol>
+<div class="sourceCode" id="cb833"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb833-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb833-1" tabindex="-1"></a>aipw.psw <span class="ot">&lt;-</span> <span class="fu">PSweight</span>(<span class="at">ps.formula =</span> mX, <span class="at">out.formula =</span> mY, <span class="at">yname =</span> <span class="st">&quot;y&quot;</span>,</span>
+<span id="cb833-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb833-2" tabindex="-1"></a>                     <span class="at">data =</span> samp, <span class="at">weight =</span> <span class="st">&quot;IPW&quot;</span>)</span>
+<span id="cb833-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb833-3" tabindex="-1"></a>aipw.psw</span></code></pre></div>
+<pre><code>## Original group value:  0, 1 
+## 
+## Point estimate: 
+## 0.6576, 0.8234</code></pre>
+<div class="sourceCode" id="cb835"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb835-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb835-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">summary</span>(aipw.psw)<span class="sc">$</span>estimates, <span class="dv">4</span>)</span></code></pre></div>
+<pre><code>##            Estimate Std.Error z value    lwr    upr Pr(&gt;|z|)
+## Contrast 1   0.1658    0.0262  6.3406 0.1146 0.2171        0</code></pre>
+<div class="sourceCode" id="cb837"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb837-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb837-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">exp</span>(<span class="fu">summary</span>(aipw.psw, <span class="at">type =</span> <span class="st">&quot;RR&quot;</span>)<span class="sc">$</span>estimates), <span class="dv">3</span>)</span></code></pre></div>
+<pre><code>##            Estimate Std.Error  z value   lwr   upr Pr(&gt;|z|)
+## Contrast 1    1.252     1.033 1024.995 1.175 1.334        1</code></pre>
+<p>The estimates here are quite close to the true values, but
+the error margins are still relatively wide.</p>
+<ol start="3" style="list-style-type: decimal">
+<li>Alternatively, <code>stdReg2</code> can also be utilized for double-robust
+estimation of causal contrasts. It leans, though, on a somewhat
+different approach. The method developed for the types of outcomes and
+models covered by generalized linear models (GLM) is known by its
+initialism <strong>IPTW GLM</strong>. It is based on weighted maximum likelihood
+fitting of the outcome model. The
+weights are inverses of the propensity scores obtained from
+the pertinent exposure model. Computation of standard errors and
+confidence intervals uses the influence function approach,
+which among other things takes into account the fact
+that weighting is based on estimated propensity scores.
+– See <a href="https://doi.org/10.1002/sim.9969">Gabriel et al 2024</a>
+for details of IPTW GLM.</li>
+</ol>
+<p>We shall try this method for the sample data with the script below:</p>
+<div class="sourceCode" id="cb839"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb839-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb839-1" tabindex="-1"></a>dr.std <span class="ot">&lt;-</span> <span class="fu">standardize_glm_dr</span>(</span>
+<span id="cb839-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb839-2" tabindex="-1"></a>          <span class="at">formula_outcome =</span> y <span class="sc">~</span> x <span class="sc">+</span> z1 <span class="sc">+</span> z2 <span class="sc">+</span> z3 <span class="sc">+</span> z4, </span>
+<span id="cb839-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb839-3" tabindex="-1"></a>          <span class="at">formula_exposure =</span> x <span class="sc">~</span> z2 <span class="sc">+</span> z3 <span class="sc">+</span> z4 <span class="sc">+</span> z2<span class="sc">:</span>z4,</span>
+<span id="cb839-4"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb839-4" tabindex="-1"></a>          <span class="at">data =</span> samp,</span>
+<span id="cb839-5"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb839-5" tabindex="-1"></a>          <span class="at">family_outcome =</span> <span class="st">&quot;binomial&quot;</span>, </span>
+<span id="cb839-6"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb839-6" tabindex="-1"></a>          <span class="at">family_exposure =</span> <span class="st">&quot;binomial&quot;</span>,</span>
+<span id="cb839-7"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb839-7" tabindex="-1"></a>          <span class="at">values =</span> <span class="fu">list</span>(<span class="at">x =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">1</span>), </span>
+<span id="cb839-8"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb839-8" tabindex="-1"></a>          <span class="at">contrasts =</span> <span class="fu">c</span>(<span class="st">&quot;difference&quot;</span>, <span class="st">&quot;ratio&quot;</span>), <span class="at">reference =</span> <span class="dv">0</span>)</span>
+<span id="cb839-9"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb839-9" tabindex="-1"></a>dr.std</span></code></pre></div>
+<pre><code>## Doubly robust estimator with: 
+## 
+## Exposure formula: x ~ z2 + z3 + z4 + z2:z4
+## Exposure link function: logit 
+## Outcome formula: y ~ x + z1 + z2 + z3 + z4
+## Outcome family: quasibinomial 
+## Outcome link function: logit 
+## Exposure:  x 
+## 
+## Tables: 
+##   x Estimate Std.Error lower.0.95 upper.0.95
+## 1 0    0.658   0.00732      0.643      0.672
+## 2 1    0.827   0.02500      0.778      0.876
+## 
+## Reference level:  x = 0 
+## Contrast:  difference 
+##   x Estimate Std.Error lower.0.95 upper.0.95
+## 1 0    0.000     0.000      0.000       0.00
+## 2 1    0.169     0.026      0.119       0.22
+## 
+## Reference level:  x = 0 
+## Contrast:  ratio 
+##   x Estimate Std.Error lower.0.95 upper.0.95
+## 1 0     1.00    0.0000       1.00       1.00
+## 2 1     1.26    0.0404       1.18       1.34</code></pre>
+<p>The point estimates are not much different from
+those obtained above when applying AIPW estimation.</p>
+</div>
+<div id="dr-estimation-with-flexible-learning-algorithms" class="section level2 hasAnchor" number="14.10">
+<h2><span class="header-section-number">14.10</span> DR estimation with flexible learning algorithms<a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#dr-estimation-with-flexible-learning-algorithms" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>It may not be easy to specify
+a conventional generalized linear models
+or even a generalized additive
+model for exposure and outcome, which would be<br />
+sufficiently realistic, yet not suffering from overfitting.
+Modern approaches of <strong>statistical learning</strong>, a.k.a.
+“machine learning” provide tools for flexible modelling,
+which may be used to reduce the risk of misspecification,
+if thoughtfully applied.</p>
+<p>There are a few R packages in which some general
+algorithmic approaches for supervised learning
+are implemented for estimating causal parameters.
+For instance, package <code>AIPW</code>
+(see <a href="https://doi.org/10.1093/aje/kwab207">Zhong et al., 2021</a>)
+utilizes
+several learning algorithms for exposure and outcome modelling
+and then performs AIPW estimation of the
+parameters of interest coupled with
+calculation of confidence intervals. Package <code>tmle</code>
+(see <a href="https://ehsanx.github.io/TMLEworkshop/">Karim and Frank, 2021</a>)
+performs same tasks but uses the
+<strong>targeted maximum likelihood estimation</strong> (TMLE) approach
+in estimation.</p>
+<p>Both <code>AIPW</code> and <code>tmle</code> lean on the
+<code>SuperLearner</code> package, which uses multiple learning
+algorithms (e.g. GLM, GAM, Random Forest, Recursive Partitioning,
+Gradient Boosting, etc.) for constructing
+predictions of the counterfactual quantities, and
+then creates an optimal weighted average of those models,
+a.k.a. an “ensemble”. These algorithms are computationally
+highly intensive. Fitting models with only 3 or 4
+covariates as in this practical
+for our whole target cohort of 1,000,000 subjects
+would take hours on an ordinary laptop. With a sample
+of 5000 it woul still take several minutes.</p>
+</div>
+<div id="extra-computations-in-the-tmle-method" class="section level2 hasAnchor" number="14.11">
+<h2><span class="header-section-number">14.11</span> Extra: Computations in the TMLE method<a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#extra-computations-in-the-tmle-method" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Finally, a few words on, how causal contrasts
+are estimated using the TMLE, when we have fitted an outcome model,
+like <code>mY</code>, and an exposure model, like <code>mX</code>.
+TMLE corrects the estimates obtained from the outcome model by some
+elements derived from the
+exposure model. The correction, though, is not as
+intuitive and transparent as it is in AIPW. See
+<a href="https://doi.org/10.1093/aje/kww165">Schuler and Rose (2017)</a>
+for more details.</p>
+<p>We show the steps of computation
+using the data covering the whole target population.</p>
+<ol style="list-style-type: decimal">
+<li>In the first step we utilize the propensity scores
+previously obtained from fitting the correct exposure model
+and compute from them the “<strong>clever covariates</strong>” <code>H1</code>and <code>H0</code>:</li>
+</ol>
+<div class="sourceCode" id="cb841"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb841-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb841-1" tabindex="-1"></a>pop<span class="sc">$</span>H1 <span class="ot">&lt;-</span> pop<span class="sc">$</span>x <span class="sc">/</span> pop<span class="sc">$</span>PS</span>
+<span id="cb841-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb841-2" tabindex="-1"></a>pop<span class="sc">$</span>H0 <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> pop<span class="sc">$</span>x) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> pop<span class="sc">$</span>PS)</span></code></pre></div>
+<ol start="2" style="list-style-type: decimal">
+<li>Then, a <strong>working model</strong> is fitted for the outcome,
+in which the clever
+covariates are explanatory variables, but the model
+also includes as an offset term
+the previously fitted linear predictor from the original
+outcome model <code>mY</code>:
+<span class="math inline">\(\widehat{\eta}_i = \text{logit}(\widehat Y_i)\)</span>
+based on the observed exposure <span class="math inline">\(X_i=x\)</span> for each subject <span class="math inline">\(i\)</span>,
+where the fitted values <span class="math inline">\(\widehat Y_i\)</span> were saved into
+vector <code>d$yh</code> already in item 5.2 above.
+Moreover, the intercept is removed from the model.</li>
+</ol>
+<div class="sourceCode" id="cb842"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb842-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb842-1" tabindex="-1"></a>epsmod <span class="ot">&lt;-</span> <span class="fu">glm</span>(y <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> H0 <span class="sc">+</span> H1 <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">qlogis</span>(yh)),</span>
+<span id="cb842-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb842-2" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> logit), <span class="at">data =</span> pop)</span>
+<span id="cb842-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb842-3" tabindex="-1"></a>eps <span class="ot">&lt;-</span> <span class="fu">coef</span>(epsmod)</span>
+<span id="cb842-4"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb842-4" tabindex="-1"></a>eps</span></code></pre></div>
+<pre><code>##           H0           H1 
+##  0.007655093 -0.002475541</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>The logit-transformed predicted values <span class="math inline">\(\widetilde{Y}_i^{X_i=1}\)</span> and
+<span class="math inline">\(\widetilde{Y}_i^{X_i=0}\)</span> of
+the potential or counterfactual individual risks from
+the original outcome model <code>mY</code> are now corrected by the estimated
+coefficients of the clever covariates, and the corrected
+predictions are returned to the original probability scale.</li>
+</ol>
+<div class="sourceCode" id="cb844"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb844-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb844-1" tabindex="-1"></a>pop<span class="sc">$</span>ypred0.H <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(pop<span class="sc">$</span>yp0) <span class="sc">+</span> eps[<span class="dv">1</span>] <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> pop<span class="sc">$</span>PS))</span>
+<span id="cb844-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb844-2" tabindex="-1"></a>pop<span class="sc">$</span>ypred1.H <span class="ot">&lt;-</span> <span class="fu">plogis</span>(<span class="fu">qlogis</span>(pop<span class="sc">$</span>yp1) <span class="sc">+</span> eps[<span class="dv">2</span>] <span class="sc">/</span> pop<span class="sc">$</span>PS)</span></code></pre></div>
+<ol start="4" style="list-style-type: decimal">
+<li>Estimates of the causal contrasts are obtained
+as before</li>
+</ol>
+<div class="sourceCode" id="cb845"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb845-1"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb845-1" tabindex="-1"></a>EY0pot.t <span class="ot">&lt;-</span> <span class="fu">mean</span>(pop<span class="sc">$</span>ypred0.H)</span>
+<span id="cb845-2"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb845-2" tabindex="-1"></a>EY1pot.t <span class="ot">&lt;-</span> <span class="fu">mean</span>(pop<span class="sc">$</span>ypred1.H)</span>
+<span id="cb845-3"><a href="causal-inference-2-model-based-estimation-of-causal-parameters.html#cb845-3" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">Contr</span>(EY1pot.t, EY0pot.t), <span class="dv">4</span>)</span></code></pre></div>
+<pre><code>##  Risk1  Risk0     RD     RR     OR 
+## 0.8260 0.6523 0.1737 1.2663 2.5301</code></pre>
+<p>These are similar to previous results
+obtained by AIPW when computed for the whole population
+with the correct exposure model, and they are
+very close to the true values
+(e.g. RD=0.1743), too.</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="time-dependent-variables-and-multiple-states.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/SPE-R/SPE/edit/master/pracs-book/causInf2-s.rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["SPE-R-2026-practicals-with-solutions.pdf", "SPE-R-2026-practicals-with-solutions.epub"],
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
