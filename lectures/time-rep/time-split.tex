@@ -23,7 +23,7 @@
     \end{itemize}
 
   \item Multiple timescales.
-  \item Multiple states (little boxes --- later)
+  \item Rates between multiple states (little boxes --- later)
   \end{itemize}
 
 \end{frame}
@@ -111,7 +111,7 @@ If follow-up is long, stratification by categories of\\
     \begin{itemize}
     \item status and time at entry
     \item status and time at exit
-    \item \ldots \textbf{observed} risk time and events (= change of status):\\
+    \item \ldots events (= change of status) and \textbf{observed} risk time:\\
         \textbf{empirical} occurrence rates $(d, y)$
     \end{itemize}
 
@@ -250,7 +250,7 @@ If follow-up is long, stratification by categories of\\
 \end{align*}
 \pause
 ---allows different rates ($\lambda_{\textcolor{forestgreen}{i}}$)
-\textbf{between} intervals, but constant
+\textbf{between} intervals,\\ but assumes constant rates
 \textbf{within} intervals
 \end{frame}
 
@@ -396,13 +396,12 @@ beginning of interval used as \textcolor{red}{quantitative variable}.
   \begin{itemize}
     \item Age at entry
     \item Date of entry
-    \item Time since treatment at entry\\
-          --- if time of treatment is the entry, this is $0$ for all.
+    \item Time since diagnosis at entry\\
+          --- if time of diagnosis is the entry, this is $0$ for all.
   \end{itemize}
 
   \item \alert<7->{Response variable} in analysis of rates:\\[-1em]
 \[ (d,y) \qquad (\alert<7->{\text{event}, \text{duration}}) \]
-
   \item \textcolor{forestgreen}{Covariates} in analysis of rates:
 
   \begin{itemize}[<+->]
@@ -680,7 +679,8 @@ From    Alive Dead Records: Events: Risk time: Persons:
 \end{Soutput}
 \begin{Sinput}
 > library(popEpi)
-> splx <- splitMulti(thL, age = seq(0, 100, 20), tfi = c(0, 1, 5, 20, 100))
+> splx <- splitMulti(thL, age = seq(0, 100, 20),
++                         tfi = c(0, 1, 5, 20, 100))
 > summary(splx)
 \end{Sinput}
 \begin{Soutput}
@@ -704,9 +704,11 @@ From    Alive Dead Records: Events: Risk time: Persons:
   \item Each \textbf{term} \alert<4->{looks like} a contribution from a Poisson variate
     (albeit with values only $0$ or $1$)
   \item So the likelihood from a single \textbf{person}
-    \alert<4->{looks like} the likelihood from several independent
-    Poisson variates
-  \item \ldots but the data are \textcolor{red}{neither} independent \textcolor{red}{nor} Poisson
+    \alert<4->{looks like} the likelihood from several
+    \textcolor{forestgreen}{independent Poisson} variates
+  \item \ldots but the data are \textcolor{red}{neither}
+    \textcolor{forestgreen}{independent} \textcolor{red}{nor}
+    \textcolor{forestgreen}{Poisson}
   %% \item Rates can vary along several timescales simultaneously
   %% \item Models can include fixed covariates, as well as the timescales
   %%   (the left end-points of the intervals) as quantitative variables
@@ -810,7 +812,7 @@ From    Alive Dead Records: Events: Risk time: Persons:
 \begin{frame}[fragile]{Analysis of time-split data}
 Observations (records) classified by $p$---person and $i$---interval
 \begin{itemize}[<+->]
-\item $d_{pi}$ --- events in the variable: \tcode{lex.Xst \& lex.Xst!=lex.Cst}
+\item $d_{pi}$ --- events: \tcode{lex.Xst=="Dead" \& lex.Xst!=lex.Cst}
 %     In the model as response: \tcode{lex.Xst==1}
 \item $y_{pi}$ --- risk time: \tcode{lex.dur} (\tcode{dur}ation)\\
 %     In the model as\\
@@ -823,10 +825,10 @@ Observations (records) classified by $p$---person and $i$---interval
 \item other variables for this person (constant in each interval).
 \end{itemize}
 
-\item Rate likelihood for one person is identical to a Poisson
-  likelihood for many independent Poisson variates
+\item Rate likelihood for \textbf{one person} is identical to a Poisson
+  likelihood for \textbf{many independent} Poisson variates
 \item Modeling rates using \tcode{glm} or \tcode{gam}:\\
-  time-scales and other covariates are treated alike
+  time-scales are treated as other covariates
 \end{itemize}
 \end{frame}
 
