@@ -13,6 +13,9 @@ jobs:
   bookdown:
     name: Render-Book
     runs-on: ubuntu-latest
+    env:
+      # Deterministic renv cache location, shared by the cache step and renv below.
+      RENV_PATHS_CACHE: ${{ github.workspace }}/.renv-cache
     steps:
       - uses: actions/checkout@v4
       # More detail here, https://github.com/r-lib/actions
@@ -30,8 +33,26 @@ jobs:
         env:
           # install full prebuilt version
           TINYTEX_INSTALLER: TinyTeX
-      - name: Install R packages
-        uses: r-lib/actions/setup-renv@v2.12.0
+      - name: Cache renv packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.renv-cache
+          key: ${{ runner.os }}-renv-R4.6.0-${{ hashFiles('renv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-renv-R4.6.0-
+            ${{ runner.os }}-renv-
+      - name: Install R packages with renv
+        run: |
+          # Posit Package Manager has not yet built a Linux binary of igraph for the
+          # just-released R 4.6.0. Its index still lists the package, so renv tries
+          # the (missing) binary and reports "failed to download" instead of falling
+          # back to source. Build igraph from source first (PPM disabled for this one
+          # call; the libglpk-dev/libxml2-dev system libs are installed above), then
+          # let renv::restore() install every other package as a fast PPM binary and
+          # skip the already-present igraph.
+          # (renv itself is bootstrapped automatically by the project .Rprofile.)
+          Rscript -e 'options(timeout = 600); Sys.setenv(RENV_CONFIG_PPM_ENABLED = "FALSE"); renv::install("igraph", type = "source")'
+          Rscript -e 'options(timeout = 600); renv::restore()'
       - name: Install rmarkdown
         run: Rscript -e 'install.packages(c("rmarkdown","bookdown"))'
       - name: Render html Book
