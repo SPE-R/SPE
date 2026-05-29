@@ -15,20 +15,20 @@
 
 %----------------------------------------------------------------------
 \begin{frame}
-  \includegraphics[width=0.45\textwidth]{simRenal-states-col} \hfill
+  \includegraphics[width=0.4\textwidth]{simRenal-states-col} \hfill
 % \end{frame}
 % %----------------------------------------------------------------------
 % \begin{frame}{Simulated probabilities}
-\includegraphics[width=0.50\textwidth]{simRenal-sP1}
+\includegraphics[width=0.57\textwidth]{simRenal-sP1}
 \end{frame}
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile]{Modeling rates in a multistate model}
 \pause
-Each transition modeled by a model for rates\\ (Cox-model or
-Poisson-model for split data: \texttt{glm} or \texttt{gam})
+Each transition modeled by a model for rates\\
+Cox-model or Poisson-model for split data: \code{glm} or \code{gam}
 
-Requires that follow-up is split in small intervals:
+---requires that follow-up is split in small intervals:
 \begin{Schunk}
 \begin{Sinput}
 > sLc <- splitLexis(Lc, "tfi", breaks = seq(0, 30, 1/12))
@@ -72,7 +72,7 @@ NRA->Rem
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]{\ldots using the \texttt{Lexis} properties}
+\begin{frame}[fragile]{\ldots using the \code{Lexis} properties}
 \vspace*{-1em}
 \begin{Schunk}
 \begin{Sinput}
@@ -132,12 +132,14 @@ Default is to model all transitions \textbf{to} absorbing states
 \[
    S(t) = \exp\bigl( -\Lambda(t) \bigr)
 \]
-   \item Simulate a survival probability $u \in [0,1]$:
+   \item Simulate a survival probability, uniform $u \in [0,1]$:
 \[
     u = S(t) \quad \Leftrightarrow \quad \Lambda(t) = -\log(u)
 \]
-   \item Knowledge of $\Lambda(t)$ makes it easy to find a survival time\\
-      --- essentially just linear interpolation.
+\item Knowledge of $\Lambda(t)$ makes it
+      easy to find a survival time $t$\\
+      --- essentially just linear interpolation
+\item $\Lambda(t)$ is just a vector of values at large set of times
    \end{itemize}
 \end{frame}
 
@@ -208,7 +210,7 @@ Default is to model all transitions \textbf{to} absorbing states
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile]{Transition objects are fitted
-    \texttt{coxph}/\texttt{glm}/\texttt{gam} models}
+    \code{coxph}/\code{glm}/\code{gam} models}
 \vspace*{-1ex}
 \includegraphics[width=0.45\textwidth]{simRenal-states-col}
 \vspace*{-1ex}
@@ -227,12 +229,12 @@ Default is to model all transitions \textbf{to} absorbing states
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}{\texttt{simLexis}}
+\begin{frame}{\code{simLexis}}
 Input required:
    \begin{itemize}
-   \item A \texttt{Lexis} object with the initial state of the
+   \item A \code{Lexis} object with the initial state of the
      persons to be simulated.\\
-     (\texttt{lex.dur} and \texttt{lex.Xst} will be ignored---they are
+     (\code{lex.dur} and \code{lex.Xst} will be ignored---they are
      outcomes to be simulated)
  \item A transition object with the estimated Poisson models collected
    in a list of lists.
@@ -241,18 +243,18 @@ Input required:
 Output produced:
 \pause
 \begin{itemize}
-\item A \texttt{Lexis} object with simulated event histories for many
+\item A \code{Lexis} object with simulated event histories for many
   persons
 \end{itemize}
 
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile,allowframebreaks]{Using \texttt{simLexis}}
-Put one record a new \texttt{Lexis} object (\texttt{init}, say).
-representing a person with the desired covariate values.
+\begin{frame}[fragile,allowframebreaks]{Using \code{simLexis}}
+A new \code{Lexis} object (\code{init}, say), where each row
+represents a person with desired covariate values.
 
-Must have same structure as the one used for estimation --- time
+\code{init} must have same structure as the one used for estimation --- time
 scales must be initiated even if not used in models\\[-1ex]
 \begin{Schunk}
 \begin{Sinput}
@@ -275,7 +277,7 @@ scales must be initiated even if not used in models\\[-1ex]
 \end{Sinput}
 \begin{Soutput}
   bruger   system forløbet 
-   20.55     1.50    22.28 
+   21.16     2.53    23.95 
 \end{Soutput}
 \begin{Sinput}
 > summary(sim1)
@@ -284,9 +286,9 @@ scales must be initiated even if not used in models\\[-1ex]
 Transitions:
      To
 From  NRA  Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:
-  NRA 928 1759 7313         0    10000    9072   72462.56    10000
-  Rem   0 1119    0       640     1759     640   14882.74     1759
-  Sum 928 2878 7313       640    11759    9712   87345.29    10000
+  NRA 942 1787 7271         0    10000    9058   71993.67    10000
+  Rem   0 1133    0       654     1787     654   15138.13     1787
+  Sum 942 2920 7271       654    11787    9712   87131.80    10000
 \end{Soutput}
 \end{Schunk}
 \pause
@@ -295,7 +297,7 @@ This is a simulated cohort of 10,000 persons with NRA, aged 40 in 1994.
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile,allowframebreaks]{Using a simulated \texttt{Lexis} object --- \texttt{pState}}
+\begin{frame}[fragile,allowframebreaks]{Using a simulated \code{Lexis} object --- \code{pState}}
 \begin{Schunk}
 \begin{Sinput}
 > NN <- nState(sim1, at = seq(0, 15, 0.1),
@@ -307,11 +309,11 @@ This is a simulated cohort of 10,000 persons with NRA, aged 40 in 1994.
      State
 when    NRA   Rem  ESRD ESRD(Rem)
   0   10000     0     0         0
-  0.1  9951    30    19         0
-  0.2  9891    61    48         0
-  0.3  9841    85    74         0
-  0.4  9786   117    97         0
-  0.5  9746   135   119         0
+  0.1  9944    29    27         0
+  0.2  9888    56    56         0
+  0.3  9844    80    76         0
+  0.4  9792   106   102         0
+  0.5  9735   130   134         1
 \end{Soutput}
 \begin{Sinput}
 > sP1 <- pState(NN, perm = c(1, 2, 4, 3))
@@ -321,8 +323,8 @@ when    NRA   Rem  ESRD ESRD(Rem)
      State
 when     NRA    Rem ESRD(Rem) ESRD
   0   1.0000 1.0000    1.0000    1
-  0.1 0.9951 0.9981    0.9981    1
-  0.2 0.9891 0.9952    0.9952    1
+  0.1 0.9944 0.9973    0.9973    1
+  0.2 0.9888 0.9944    0.9944    1
 \end{Soutput}
 \begin{Sinput}
 > tail(sP1, 3)
@@ -330,9 +332,9 @@ when     NRA    Rem ESRD(Rem) ESRD
 \begin{Soutput}
       State
 when      NRA    Rem ESRD(Rem) ESRD
-  14.8 0.0994 0.2134    0.2750    1
-  14.9 0.0972 0.2108    0.2729    1
-  15   0.0948 0.2075    0.2705    1
+  14.8 0.1019 0.2161    0.2799    1
+  14.9 0.0997 0.2138    0.2781    1
+  15   0.0965 0.2100    0.2752    1
 \end{Soutput}
 \begin{Sinput}
 > par(mar = c(3, 3, 0.5, 2), mgp = c(3, 1, 0) / 1.6, las = 1)
@@ -354,8 +356,8 @@ when      NRA    Rem ESRD(Rem) ESRD
      State
 when  ESRD(Rem)    Rem    NRA ESRD
   0           0 0.0000 1.0000    1
-  0.1         0 0.0030 0.9981    1
-  0.2         0 0.0061 0.9952    1
+  0.1         0 0.0029 0.9973    1
+  0.2         0 0.0056 0.9944    1
 \end{Soutput}
 \begin{Sinput}
 > tail(sP2, 3)
@@ -363,9 +365,9 @@ when  ESRD(Rem)    Rem    NRA ESRD
 \begin{Soutput}
       State
 when   ESRD(Rem)    Rem    NRA ESRD
-  14.8    0.0616 0.1756 0.2750    1
-  14.9    0.0621 0.1757 0.2729    1
-  15      0.0630 0.1757 0.2705    1
+  14.8    0.0638 0.1780 0.2799    1
+  14.9    0.0643 0.1784 0.2781    1
+  15      0.0652 0.1787 0.2752    1
 \end{Soutput}
 \begin{Sinput}
 > par(mar = c(3, 3, 0.5, 2), mgp = c(3, 1, 0) / 1.6, las = 1)
@@ -405,6 +407,7 @@ when   ESRD(Rem)    Rem    NRA ESRD
 \[
  \erf = \exp\bigl( 1.96 \times (1-p)/\sqrt{N p (1-p)} \bigr)
 \]
+\item 40,000
    \end{itemize}
 \end{frame}
 
@@ -416,7 +419,7 @@ when   ESRD(Rem)    Rem    NRA ESRD
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile,allowframebreaks]{Using a simulated
-    \texttt{Lexis} object --- sohourn time}
+    \code{Lexis} object --- sojourn time}
 \begin{Schunk}
 \begin{Sinput}
 > summary(sim1)
@@ -425,9 +428,9 @@ when   ESRD(Rem)    Rem    NRA ESRD
 Transitions:
      To
 From  NRA  Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:
-  NRA 928 1759 7313         0    10000    9072   72462.56    10000
-  Rem   0 1119    0       640     1759     640   14882.74     1759
-  Sum 928 2878 7313       640    11759    9712   87345.29    10000
+  NRA 942 1787 7271         0    10000    9058   71993.67    10000
+  Rem   0 1133    0       654     1787     654   15138.13     1787
+  Sum 942 2920 7271       654    11787    9712   87131.80    10000
 \end{Soutput}
 \begin{Sinput}
 > xtabs(lex.dur / 10000 ~ lex.Cst, data = sim1) |> addmargins()
@@ -435,11 +438,11 @@ From  NRA  Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:
 \begin{Soutput}
 lex.Cst
       NRA       Rem      ESRD ESRD(Rem)       Sum 
- 7.246256  1.488274  0.000000  0.000000  8.734529 
+ 7.199367  1.513813  0.000000  0.000000  8.713180 
 \end{Soutput}
 \end{Schunk}
 During the first 15 years after entry, the expected time in remission
-is 1.5 years out of an expected lifetime of 8.7 years, for a 40 year old man
+is 1.5 years out of an expected lifetime of 8.8 years, for a 40 year old man
 \end{frame}
 
 %----------------------------------------------------------------------
@@ -447,16 +450,17 @@ is 1.5 years out of an expected lifetime of 8.7 years, for a 40 year old man
    \frametitle{Multistate model overview}
 \pause
    \begin{itemize}[<+->]
-   \item Clarifies the relevant states and transitions are
+   \item Clarifies the relevant states and transitions
    \item Allows proper estimation of transition rates
    \item --- and relationships between them
    \item Separate model for each transition
    \item The usual survival methodology to compute probabilities breaks down
-   \item Simulation allows estimation of cumulative probabilities:
+   \item Using transition rates for simulation allows estimation of:
 
      \begin{itemize}[<+->]
-     \item Estimate transition rates (as usual)
-     \item Simulate probabilities (\textbf{not} quite as usual)
+     \item transition rates (as usual)
+     \item cumulative probabilities (\textbf{not} quite as usual)
+     \item sojourn times (how long in each state)
      \end{itemize}
 
    \end{itemize}

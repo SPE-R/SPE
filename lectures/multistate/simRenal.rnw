@@ -27,6 +27,7 @@ library(Epi)
 library(mgcv)
 library(foreign)
 renal <- read.dta("../../pracs-book/data/renal.dta")
+# renal <- read.dta("./data/renal.dta")
 # renal <- read.dta("https://raw.githubusercontent.com/SPE-R/SPE/master/pracs/data/renal.dta")
 subset(renal, dob > 2000)
 renal <- transform(renal,
@@ -65,20 +66,20 @@ boxes(Lc,
 
 %----------------------------------------------------------------------
 \begin{frame}
-  \includegraphics[width=0.45\textwidth]{simRenal-states-col} \hfill
+  \includegraphics[width=0.4\textwidth]{simRenal-states-col} \hfill
 % \end{frame}
 % %----------------------------------------------------------------------
 % \begin{frame}{Simulated probabilities}
-\includegraphics[width=0.50\textwidth]{simRenal-sP1}
+\includegraphics[width=0.57\textwidth]{simRenal-sP1}
 \end{frame}
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile]{Modeling rates in a multistate model}
 \pause
-Each transition modeled by a model for rates\\ (Cox-model or
-Poisson-model for split data: \texttt{glm} or \texttt{gam})
+Each transition modeled by a model for rates\\
+Cox-model or Poisson-model for split data: \code{glm} or \code{gam}
 
-Requires that follow-up is split in small intervals:
+---requires that follow-up is split in small intervals:
 <<>>=
 sLc <- splitLexis(Lc, "tfi", breaks = seq(0, 30, 1/12))
 summary(sLc, t = T)
@@ -101,7 +102,7 @@ mr <- gamLexis( sLc,
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile]{\ldots using the \texttt{Lexis} properties}
+\begin{frame}[fragile]{\ldots using the \code{Lexis} properties}
 \vspace*{-1em}
 <<>>=
 # ESRD-rates
@@ -153,12 +154,14 @@ Default is to model all transitions \textbf{to} absorbing states
 \[
    S(t) = \exp\bigl( -\Lambda(t) \bigr)
 \]
-   \item Simulate a survival probability $u \in [0,1]$:
+   \item Simulate a survival probability, uniform $u \in [0,1]$:
 \[
     u = S(t) \quad \Leftrightarrow \quad \Lambda(t) = -\log(u)
 \]
-   \item Knowledge of $\Lambda(t)$ makes it easy to find a survival time\\
-      --- essentially just linear interpolation.
+\item Knowledge of $\Lambda(t)$ makes it
+      easy to find a survival time $t$\\
+      --- essentially just linear interpolation
+\item $\Lambda(t)$ is just a vector of values at large set of times
    \end{itemize}
 \end{frame}
 
@@ -229,7 +232,7 @@ Default is to model all transitions \textbf{to} absorbing states
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile]{Transition objects are fitted
-    \texttt{coxph}/\texttt{glm}/\texttt{gam} models}
+    \code{coxph}/\code{glm}/\code{gam} models}
 \vspace*{-1ex}
 \includegraphics[width=0.45\textwidth]{simRenal-states-col}
 \vspace*{-1ex}
@@ -246,12 +249,12 @@ Tr <- list("NRA" = list("ESRD"      = mx,
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}{\texttt{simLexis}}
+\begin{frame}{\code{simLexis}}
 Input required:
    \begin{itemize}
-   \item A \texttt{Lexis} object with the initial state of the
+   \item A \code{Lexis} object with the initial state of the
      persons to be simulated.\\
-     (\texttt{lex.dur} and \texttt{lex.Xst} will be ignored---they are
+     (\code{lex.dur} and \code{lex.Xst} will be ignored---they are
      outcomes to be simulated)
  \item A transition object with the estimated Poisson models collected
    in a list of lists.
@@ -260,18 +263,18 @@ Input required:
 Output produced:
 \pause
 \begin{itemize}
-\item A \texttt{Lexis} object with simulated event histories for many
+\item A \code{Lexis} object with simulated event histories for many
   persons
 \end{itemize}
 
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile,allowframebreaks]{Using \texttt{simLexis}}
-Put one record a new \texttt{Lexis} object (\texttt{init}, say).
-representing a person with the desired covariate values.
+\begin{frame}[fragile,allowframebreaks]{Using \code{simLexis}}
+A new \code{Lexis} object (\code{init}, say), where each row
+represents a person with desired covariate values.
 
-Must have same structure as the one used for estimation --- time
+\code{init} must have same structure as the one used for estimation --- time
 scales must be initiated even if not used in models\\[-1ex]
 <<simul>>=
 init <- sLc[NULL, c(timeScales(sLc), "lex.Cst")]
@@ -292,7 +295,7 @@ This is a simulated cohort of 10,000 persons with NRA, aged 40 in 1994.
 \end{frame}
 
 %----------------------------------------------------------------------
-\begin{frame}[fragile,allowframebreaks]{Using a simulated \texttt{Lexis} object --- \texttt{pState}}
+\begin{frame}[fragile,allowframebreaks]{Using a simulated \code{Lexis} object --- \code{pState}}
 <<sP1,fig=TRUE,width=7>>=
 NN <- nState(sim1, at = seq(0, 15, 0.1),
                  from = 0,
@@ -350,6 +353,7 @@ axis(side = 4, at = 0:100/100, labels = NA, tcl = -0.2)
 \[
  \erf = \exp\bigl( 1.96 \times (1-p)/\sqrt{N p (1-p)} \bigr)
 \]
+\item 42,000
    \end{itemize}
 \end{frame}
 
@@ -361,13 +365,13 @@ axis(side = 4, at = 0:100/100, labels = NA, tcl = -0.2)
 
 %----------------------------------------------------------------------
 \begin{frame}[fragile,allowframebreaks]{Using a simulated
-    \texttt{Lexis} object --- sohourn time}
+    \code{Lexis} object --- sojourn time}
 <<>>=
 summary(sim1)
 xtabs(lex.dur / 10000 ~ lex.Cst, data = sim1) |> addmargins()
 @
 During the first 15 years after entry, the expected time in remission
-is 1.5 years out of an expected lifetime of 8.7 years, for a 40 year old man
+is 1.5 years out of an expected lifetime of 8.8 years, for a 40 year old man
 \end{frame}
 
 %----------------------------------------------------------------------
@@ -375,16 +379,17 @@ is 1.5 years out of an expected lifetime of 8.7 years, for a 40 year old man
    \frametitle{Multistate model overview}
 \pause
    \begin{itemize}[<+->]
-   \item Clarifies the relevant states and transitions are
+   \item Clarifies the relevant states and transitions
    \item Allows proper estimation of transition rates
    \item --- and relationships between them
    \item Separate model for each transition
    \item The usual survival methodology to compute probabilities breaks down
-   \item Simulation allows estimation of cumulative probabilities:
+   \item Using transition rates for simulation allows estimation of:
 
      \begin{itemize}[<+->]
-     \item Estimate transition rates (as usual)
-     \item Simulate probabilities (\textbf{not} quite as usual)
+     \item transition rates (as usual)
+     \item cumulative probabilities (\textbf{not} quite as usual)
+     \item sojourn times (how long in each state)
      \end{itemize}
 
    \end{itemize}
