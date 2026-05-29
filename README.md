@@ -12,7 +12,11 @@ The 2026 edition runs **1–5 June 2026 in Tartu, Estonia**.
 | [`pracs-book/`](pracs-book/) | The practicals, as R Markdown sources rendered to a `bookdown` book (HTML, PDF, EPUB), in two variants: exercise and with-solutions. Faculty edit only the `*-e.rmd` files. |
 | [`lectures/`](lectures/) | One sub-folder per lecture. Source files + the compiled `.pdf` that ships to students. Each lecturer maintains their own folder. |
 | [`adm/`](adm/) | Course timetable ([`prog.tex`](adm/prog.tex), [`SPE-R-timetable.md`](adm/SPE-R-timetable.md)) and historical post-mortems. |
-| [`misc/`](misc/) | Faculty onboarding and reference docs (see below) plus a couple of helper R scripts. |
+| [`misc/`](misc/) | Participant and faculty onboarding/reference docs (see below) plus a couple of helper R scripts. |
+
+## Participants: start here
+
+**[`misc/SPE_participant_setup.md`](misc/SPE_participant_setup.md)** is the setup guide for course participants. It covers, step by step: installing R and an editor (RStudio or Positron), creating the course project, downloading the practical data, installing the required R packages (`renv` by default, plain `install.packages()` as a fallback), checking the setup, and where to find the timetable, lectures and practicals book (with and without solutions).
 
 ## Faculty: start here
 
