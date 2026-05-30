@@ -97,6 +97,18 @@ matplot(t(intake),type="b",pch=1:11,col="black",
         lty="solid", xaxt="n")
 axis(1,at=1:2,labels=names(intake))
 
+library(tidyr)
+library(dplyr)
+ISwR::intake |>
+  mutate(id=cur_group_rows()) |>
+  pivot_longer(cols=c(pre,post)) |>
+  mutate(name=factor(name, levels=c("pre", "post"))) -> intake
+
+library(ggplot2)
+ggplot(intake, aes(x=name, y=value, group=id, shape=factor(id))) +
+  geom_point() +
+  geom_line()
+
 ### demo G.2 ###
 
 dev.off()
