@@ -128,6 +128,13 @@ in your call to `stat.table`.  Do this for the above table. Check
 that the percentages add up to 100 and the total for `count()` is the
 same as the number of rows of the data frame `births`.
 
+``` r
+stat.table(
+  index = sex, contents = list(count(), percent(sex)),
+  margin = TRUE, data = births
+)
+```
+
 ```
 ##  ----------------------------- 
 ##  sex     count() percent(sex)  
@@ -154,6 +161,13 @@ stat.table(index = sex, contents = mean(bweight), data = births)
 ```
 
 Add the count to this table. Add also the margin with `margin=TRUE`. 
+
+``` r
+stat.table(
+  index = sex, contents = list(count(), mean(bweight)),
+  margin = TRUE, data = births
+)
+```
 
 ```
 ##  ------------------------------ 
@@ -206,6 +220,10 @@ The final column is the percentage of babies with low birth weight by different 
 -  Show how the percentage of low birth weight babies changes with `gest4`.
 
 
+``` r
+stat.table(index = gest4, contents = count(), data = births)
+```
+
 ```
 ##  ------------------ 
 ##  gest4     count()  
@@ -217,6 +235,10 @@ The final column is the percentage of babies with low birth weight by different 
 ##  ------------------
 ```
 
+``` r
+stat.table(index = gest4, contents = mean(bweight), data = births)
+```
+
 ```
 ##  ------------------------ 
 ##  gest4     mean(bweight)  
@@ -226,6 +248,14 @@ The final column is the percentage of babies with low birth weight by different 
 ##  [37,39)         3093.77  
 ##  [39,45)         3401.26  
 ##  ------------------------
+```
+
+``` r
+stat.table(
+  index = list(lowbw, gest4), 
+  contents = percent(lowbw), 
+  data = births
+)
 ```
 
 ```
@@ -335,6 +365,14 @@ stat.table(
 Add the count to this table and repeat the function call using `margin = TRUE` to calculate the
 marginal tables.
 
+``` r
+stat.table(list(sex, hyp),
+  contents = list(count(), mean(bweight)),
+  margin = TRUE, 
+  data = births
+)
+```
+
 ```
 ##  -------------------------------- 
 ##         -----------hyp----------- 
@@ -353,6 +391,10 @@ marginal tables.
 ```
 Use `stat.table` with the ratio function to obtain a $2\times 2$ table of percent low birth weight by `sex` and `hyp`.
 
+``` r
+stat.table(list(sex, hyp), contents = list(count(), mean(bweight)), margin = TRUE, data = births)
+```
+
 ```
 ##  -------------------------------- 
 ##         -----------hyp----------- 
@@ -368,6 +410,10 @@ Use `stat.table` with the ratio function to obtain a $2\times 2$ table of percen
 ##  Total       428      72     500  
 ##          3198.90 2768.21 3136.88  
 ##  --------------------------------
+```
+
+``` r
+stat.table(list(sex, hyp), contents = list(count(), ratio(lowbw, 1, 100)), margin = TRUE, data = births)
 ```
 
 ```
@@ -428,6 +474,10 @@ print(odds.tab)
 ```
 shows a table of odds that the baby has low birth weight. Use
 `width=15` and `digits=3` and see the difference.
+
+``` r
+print(odds.tab, width = 15, digits = 3)
+```
 
 ```
 ##  -------------------------- 
