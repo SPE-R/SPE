@@ -8,7 +8,7 @@ author:
   - Bendix Carstensen^[Steno Diabetes Center Copenhagen, Gentofte, Denmark, Dept. of Biostatistics, University of Copenhagen, Denmark, b@bxc.dk, http://BendixCarstensen.com]
   - Damien Georges^[International Agency for Research on Cancer, Lyon, France, georgesd@iarc.who.int]
   - Esa Läärä^[Department of Mathematical Sciences, University of Oulu, Finland, Esa.Laara@oulu.fi, http://www.oulu.fi/university/researcher/esa-laara]
-date: "1-5 June 2026 (built 01 June 2026 11:52 UTC)"
+date: "1-5 June 2026 (built 01 June 2026 12:15 UTC)"
 site: bookdown::bookdown_site
 documentclass: book
 bibliography: [book.bib, packages.bib]
