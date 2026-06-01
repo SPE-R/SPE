@@ -812,11 +812,11 @@ age
 ## # A tibble: 6 × 2
 ##     pid   age
 ##   <int> <int>
-## 1     1    21
-## 2     2    18
-## 3     3    17
-## 4     4    21
-## 5     5    19
+## 1     1    25
+## 2     2    20
+## 3     3    24
+## 4     4    15
+## 5     5    21
 ## 6     6    25
 ```
 
@@ -847,11 +847,11 @@ bind_rows(age, center)
 ## # A tibble: 11 × 3
 ##      pid   age center
 ##    <dbl> <int> <chr> 
-##  1     1    21 <NA>  
-##  2     2    18 <NA>  
-##  3     3    17 <NA>  
-##  4     4    21 <NA>  
-##  5     5    19 <NA>  
+##  1     1    25 <NA>  
+##  2     2    20 <NA>  
+##  3     3    24 <NA>  
+##  4     4    15 <NA>  
+##  5     5    21 <NA>  
 ##  6     6    25 <NA>  
 ##  7     1    NA A     
 ##  8     2    NA B     
@@ -878,11 +878,11 @@ left_join(age, center, by = c("pid"))
 ## # A tibble: 6 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    21 A     
-## 2     2    18 B     
-## 3     3    17 A     
-## 4     4    21 B     
-## 5     5    19 <NA>  
+## 1     1    25 A     
+## 2     2    20 B     
+## 3     3    24 A     
+## 4     4    15 B     
+## 5     5    21 <NA>  
 ## 6     6    25 <NA>
 ```
 
@@ -895,11 +895,11 @@ full_join(age, center, by = c("pid"))
 ## # A tibble: 7 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    21 A     
-## 2     2    18 B     
-## 3     3    17 A     
-## 4     4    21 B     
-## 5     5    19 <NA>  
+## 1     1    25 A     
+## 2     2    20 B     
+## 3     3    24 A     
+## 4     4    15 B     
+## 5     5    21 <NA>  
 ## 6     6    25 <NA>  
 ## 7    10    NA C
 ```
@@ -913,10 +913,10 @@ inner_join(age, center, by = c("pid"))
 ## # A tibble: 4 × 3
 ##     pid   age center
 ##   <dbl> <int> <chr> 
-## 1     1    21 A     
-## 2     2    18 B     
-## 3     3    17 A     
-## 4     4    21 B
+## 1     1    25 A     
+## 2     2    20 B     
+## 3     3    24 A     
+## 4     4    15 B
 ```
 Can you spot the differences between the commands above?
 As an exercise, you can try to compute the individuals' mean age per center.
@@ -934,8 +934,8 @@ inner_join(age, center, by = c("pid")) |>
 ## # A tibble: 2 × 2
 ##   center mean_age
 ##   <chr>     <dbl>
-## 1 A          19  
-## 2 B          19.5
+## 1 A          24.5
+## 2 B          17.5
 ```
 
 **Note:** the `by` argument indicates which column should be use to make the *join*. In some 
@@ -966,7 +966,7 @@ birth_per_ageg <- births_tbl |>
   geom_bar(stat = "identity"))
 ```
 
-![](tidyverse-s_files/figure-epub3/unnamed-chunk-30-1.png)<!-- -->
+![](tidyverse-e_files/figure-epub3/unnamed-chunk-30-1.png)<!-- -->
 This graph can be customize adding labels and title to the plot:
 
 ``` r
@@ -977,7 +977,7 @@ This graph can be customize adding labels and title to the plot:
   ggtitle("Number of Births per Women Age Group"))
 ```
 
-![](tidyverse-s_files/figure-epub3/unnamed-chunk-31-1.png)<!-- -->
+![](tidyverse-e_files/figure-epub3/unnamed-chunk-31-1.png)<!-- -->
 As you can see, plots from `ggplot` family are built incrementally using the `+` operator for each additional element.
 
 ## pivoting data with tidyr

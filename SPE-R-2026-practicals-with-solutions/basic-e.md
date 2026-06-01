@@ -98,9 +98,34 @@ pressing the return key. Keeping that in mind, try the following:
 
 ``` r
 12 + 16
+```
+
+```
+## [1] 28
+```
+
+``` r
 (12 + 16) * 5
+```
+
+```
+## [1] 140
+```
+
+``` r
 sqrt((12 + 16) * 5) # square root
+```
+
+```
+## [1] 11.83216
+```
+
+``` r
 round(sqrt((12 + 16) * 5), 2) # round to two decimal places
+```
+
+```
+## [1] 11.83
 ```
 
 The hash symbol `#` denotes the start of a *comment*. 
@@ -161,8 +186,26 @@ e.g:
 
 ``` r
 exp(a)
+```
+
+```
+## [1] 137310.5
+```
+
+``` r
 log(a) # natural logarithm
+```
+
+```
+## [1] 2.470639
+```
+
+``` r
 log10(a) # log to the base 10
+```
+
+```
+## [1] 1.072985
 ```
 
 The left arrow expression `<-`, pronounced *gets*, is called
@@ -339,32 +382,61 @@ syntax and usage of the function `seq()`.
 
 1.  Create a vector `w` with components 1, -1, 2, -2
   
+  ``` r
+  w <- c(1, -1, 2, -2)
+  ```
 2.  Display this vector
+  
+  ``` r
+  w
+  ```
   
   ```
   ## [1]  1 -1  2 -2
   ```
 3.  Obtain a description of `w` using `str()`
   
+  ``` r
+  str(w)
+  ```
+  
   ```
   ##  num [1:4] 1 -1 2 -2
   ```
 4.  Create the vector `w+1`, and display it.
+  
+  ``` r
+  w + 1
+  ```
   
   ```
   ## [1]  2  0  3 -1
   ```
 5.  Create the vector `v` with components (5, 10, 15, ... , 75) using seq().
   
+  ``` r
+  v <- seq(5, 75, 5)
+  v
+  ```
+  
   ```
   ##  [1]  5 10 15 20 25 30 35 40 45 50 55 60 65 70 75
   ```
 6.  Now add the components 0 and 1 to the beginning of `v` using c().
   
+  ``` r
+  v <- c(0, 1, v)
+  v
+  ```
+  
   ```
   ##  [1]  0  1  5 10 15 20 25 30 35 40 45 50 55 60 65 70 75
   ```
 7.  Find the length of this vector.
+  
+  ``` r
+  length(v)
+  ```
   
   ```
   ## [1] 17
@@ -842,10 +914,10 @@ objects()
 ```
 
 ```
-##  [1] "births"        "exercise"      "m"             "mydata"       
-##  [5] "mylist"        "N"             "newdata"       "solution"     
-##  [9] "spe_solutions" "v"             "w"             "x"            
-## [13] "y"             "yourdata"
+##  [1] "a"             "births"        "exercise"      "m"            
+##  [5] "mydata"        "mylist"        "N"             "newdata"      
+##  [9] "solution"      "spe_solutions" "v"             "w"            
+## [13] "x"             "y"             "yourdata"
 ```
 
 The function `objects()` shows what is in your workspace. To
@@ -1129,10 +1201,18 @@ is shorter for more complicated expressions.
 
 1. Find the frequency distribution of `sex`.
   
+  ``` r
+  table(births$sex)
+  ```
+  
   ```
   ## 
   ##   M   F 
   ## 264 236
+  ```
+  
+  ``` r
+  with(births, table(sex))
   ```
   
   ```
@@ -1154,6 +1234,11 @@ is shorter for more complicated expressions.
 
 3.  Create a logical variable called `early` according to whether `gestwks` 
   is less than 30 or not. Make a frequency table of `early`.
+  
+  ``` r
+  early <- births$gestwks < 30
+  table(early)
+  ```
   
   ```
   ## early
@@ -1205,6 +1290,10 @@ largest value.
   length of gestation for the baby, and make a note of the range of
   values.
   
+  ``` r
+  with(births, summary(gestwks))
+  ```
+  
   ```
   ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.     NAs 
   ##   24.69   37.94   39.12   38.72   40.09   43.16      10
@@ -1214,5 +1303,8 @@ largest value.
   35, 37, 39, and  45 weeks, including the left hand end, but not the
   right hand. Make a table of the frequencies for the four levels of `gest4`.
 
+``` r
+births$gest4 <- cut(births$gestwks, breaks = c(20, 35, 37, 39, 45))
+```
 
 

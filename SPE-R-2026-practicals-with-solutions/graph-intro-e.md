@@ -44,7 +44,7 @@ Now look at the birth weight distribution with
 hist(births$bweight)
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-3-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-3-1.png)<!-- -->
 The histogram can be refined -- take a look at the possible options with
 
 ``` r
@@ -56,14 +56,14 @@ and try some of the options, for example:
 hist(births$bweight, col = "gray", border = "white")
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-5-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-5-1.png)<!-- -->
 To look at the relationship between birthweight and gestational weeks, try
 
 ``` r
 with(births, plot(gestwks, bweight))
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-6-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-6-1.png)<!-- -->
 You can change the plot-symbol by the option `pch=`. If you
 want to see all the plot symbols try:
 
@@ -71,7 +71,7 @@ want to see all the plot symbols try:
 plot(1:25, pch = 1:25)
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-7-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-7-1.png)<!-- -->
 
 
   -  Make a plot of the birth weight versus maternal age with
@@ -80,7 +80,7 @@ plot(1:25, pch = 1:25)
 with(births, plot(matage, bweight))
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-8-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-8-1.png)<!-- -->
 -  Label the axes with
 
 ``` r
@@ -91,7 +91,7 @@ with( births,
   ))
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-9-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-9-1.png)<!-- -->
 
 
 ## Colours
@@ -105,7 +105,7 @@ versus gestational weeks, try, for instance:
 with(births, plot(gestwks, bweight, pch = 16, col = "green"))
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-10-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-10-1.png)<!-- -->
 This creates a solid mass of colour in the centre of the cluster of
 points and it is no longer possible to see individual points.  You can
 recover this information by overwriting the points with black circles
@@ -116,7 +116,7 @@ with(births, plot(gestwks, bweight, pch = 16, col = "green"))
 with(births, points(gestwks, bweight, pch = 1))
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-11-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-11-1.png)<!-- -->
 Note: when the number of data points on a scatter plot is large, you may also want to decrease the point size: to get points that are 50% of the original size, add the parameter `cex=0.5` (or another number <1 for different sizes). 
 
 ## Adding to a plot
@@ -143,7 +143,7 @@ with(
 )
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-12-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-12-1.png)<!-- -->
 
 To add a legend explaining the colours, try
 
@@ -165,7 +165,7 @@ legend(
 )
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-13-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-13-1.png)<!-- -->
 which puts the legend in the top left hand corner.
 
 Finally we can add a title to the plot with
@@ -191,7 +191,7 @@ title(
 )
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-14-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-14-1.png)<!-- -->
 
 ## Using indexing for plot elements
 One of the most powerful features of R is the possibility to index
@@ -309,7 +309,7 @@ with(
 )
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-17-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-17-1.png)<!-- -->
 The same trick can be used if we want to have a separate symbol for
 different categories (use `pch=c(15,17)[sex]`, for instance).
 
@@ -335,7 +335,7 @@ with(
 )
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-19-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-19-1.png)<!-- -->
 so where `oldmum` is 1 we get `pch=16` (a dot) and where
 `oldmum` is 2 we get `pch=3` (a cross).
 
@@ -355,7 +355,7 @@ with(
 )
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-20-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-20-1.png)<!-- -->
 
 -  Make a three level factor for maternal age with cutpoints at
  30 and 40 years using the `cut` function.  (Recall that the
@@ -392,7 +392,7 @@ plot(0:10, pch = 16, cex = 3, col = gray(0:10 / 10))
 points(0:10, pch = 1, cex = 3)
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-22-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-22-1.png)<!-- -->
 -->
 
 ## Saving your graphs for use in other documents
@@ -486,7 +486,7 @@ plot,
 with(births, plot(gestwks, bweight, col = c("blue", "red")[sex]))
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-27-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-27-1.png)<!-- -->
 and then add the legend where you wish it to appear by typing
 
 ``` r
@@ -536,6 +536,6 @@ plot(0:100,0:100,type="n",axes=F, xlab=" ",ylab=" ") # create an invisible plot 
  text(45,50,expression(beta)) 
 ```
 
-![](graph-intro-s_files/figure-epub3/unnamed-chunk-31-1.png)<!-- -->
+![](graph-intro-e_files/figure-epub3/unnamed-chunk-31-1.png)<!-- -->
 
 
