@@ -65,7 +65,6 @@
 |14:30 - 15:30 | [Dates in R; follow-up representation in `Lexis` objects, time-splitting,  and SMR](https://github.com/SPE-R/SPE/blob/gh-spe-material/lectures/time-rep.pdf) (BxC)|
 |15:30 - 16:00 | Tea break. |
 |16:00 - 18:00 | [Practical: Time-splitting, time-scales and SMR](https://spe-r.github.io/SPE/SPE-R-2026-practicals/time-splitting-time-scales-and-smr.html)|
-|19:00 - 22:00 | Course dinner -- venue TBD |
 
 ## Thursday 4 June -- Day 4
 
