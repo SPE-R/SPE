@@ -1,8 +1,10 @@
 
 
-# Graphics in R
+# Base R graphics
 
-There are three kinds of plotting functions in R:
+In chapter 3.10 you saw a brief introduction to `ggplot2` graphics framework, that has been increasingly popular in the recent decades.  It is still useful to also be familiar with the base `R` graphics functionality that has existed long before `ggplot`, as both frameworks have their advantages and disadvantages. 
+
+There are three kinds of plotting functions in base `R`:
 
 -  Functions that generate a new plot, e.g. `hist()` and
   `plot()`.
@@ -11,7 +13,7 @@ There are three kinds of plotting functions in R:
 -  Functions that allow you to interact with the plot, e.g.
   `locator()` and `identify()`.
 
-The normal procedure for making a graph in R is to make a fairly
+The normal procedure for making a graph in `R` is to make a fairly
 simple initial plot and then add on points, lines, text etc.,
 preferably in a script.
 
@@ -82,15 +84,11 @@ with(births, plot(matage, bweight))
 -  Label the axes with
 
 ``` r
-with(
-  births, 
-  plot(
-    matage, 
-    bweight, 
+with( births, 
+  plot(matage, bweight, 
     xlab = "Maternal age", 
     ylab = "Birth weight (g)"
-  )
-)
+  ))
 ```
 
 ![](graph-intro-s_files/figure-epub3/unnamed-chunk-9-1.png)<!-- -->
@@ -100,8 +98,8 @@ with(
 
 There are many colours recognized by `R`. You can list them all by
 `colours()` or, equivalently, `colors()` (`R` allows you to
-use British or American spelling).  To colour the points of birthweight
-versus gestational weeks, try
+use British or American spelling). There are also some helpful webpages where you can actually see the available colors: for instance [https://r-charts.com/colors/](https://r-charts.com/colors/). To colour the points of birthweight
+versus gestational weeks, try, for instance: 
 
 ``` r
 with(births, plot(gestwks, bweight, pch = 16, col = "green"))
@@ -313,6 +311,9 @@ with(
 
 ![](graph-intro-s_files/figure-epub3/unnamed-chunk-17-1.png)<!-- -->
 The same trick can be used if we want to have a separate symbol for
+different categories (use `pch=c(15,17)[sex]`, for instance).
+
+<!---
 mothers over 40 say. We first generate the indexing variable:
 
 ``` r
@@ -356,7 +357,6 @@ with(
 
 ![](graph-intro-s_files/figure-epub3/unnamed-chunk-20-1.png)<!-- -->
 
-<!---
 -  Make a three level factor for maternal age with cutpoints at
  30 and 40 years using the `cut` function.  (Recall that the
   `breaks` argument must include lower and upper limits beyond
@@ -364,7 +364,6 @@ with(
 -  Use this to make the plot of bweight versus gestational weeks with three
   different plotting symbols. (Hint: Indexing with a factor
 automatically gives indexes 1,2,3 etc.).
--->
 
 ## Generating colours
 
@@ -394,6 +393,7 @@ points(0:10, pch = 1, cex = 3)
 ```
 
 ![](graph-intro-s_files/figure-epub3/unnamed-chunk-22-1.png)<!-- -->
+-->
 
 ## Saving your graphs for use in other documents
 
@@ -423,6 +423,7 @@ Instead of *pdf*, other formats can be used (*jpg, png, tiff, ...*). See `help(D
 In window-based environments (R GUI for Windows, R-Studio) you may also use the menu 
 (`File`$\rightarrow$`Save as ...` or `Export`) to save the active graph as a file and even copy-paste may work (from R graphics window to Word, for instance) -- however, writing it manually into the file is recommended for reproducibility purposes (in case you need to redraw your graph with some modifications). 
 
+<!---
 \subsection{The `par()` command}
 It is possible to manipulate any element in a graph, by using the
 graphics options. These are collected on the help page of
@@ -467,6 +468,8 @@ par(mfrow = c(1, 1))
 ```
 If you want a more detailed control over the layout of multiple graphs
 on a single page look at `?layout`.
+-->
+
 
 ## Interacting with a plot
 
@@ -516,4 +519,23 @@ corresponding records:
 ``` r
 with(births, births[identify(gestwks, bweight), ])
 ```
+
+## A completely custom plot
+
+A useful feature of base `R` graphics is that you can basically plot just anything, adding text or even mathematical formulas or symbols (see the help page for  `plotmath()`), even without any data. The following code creates one "pointless example with two points", just to give you an idea. That is possibly an advantage  over `ggplot2` that sometimes lacks flexibility. 
+
+
+
+``` r
+plot(0:100,0:100,type="n",axes=F, xlab=" ",ylab=" ") # create an invisible plot for coordinate system
+ points(30,30,pch=16,cex=10, col="blue")
+ text(30,50,"big blue dot")
+ points(60,60,pch=16,cex=2, col="red")
+ text(60,70,"small red dot")
+ arrows(40,40,55,55) # you can customize it for nicer arrows (see help)
+ text(45,50,expression(beta)) 
+```
+
+![](graph-intro-s_files/figure-epub3/unnamed-chunk-31-1.png)<!-- -->
+
 

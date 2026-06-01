@@ -146,7 +146,7 @@
 \makeatother
 \subtitle{SPE practicals}
 \author{Krista Fischer\footnote{Estonian Genome Center, University of Tartu, Estonia, \href{mailto:Krista.Fischer@ut.ee}{\nolinkurl{Krista.Fischer@ut.ee}}} \and Martyn Plummer\footnote{University of Warwick, UK, \href{mailto:martyn.plummer@warwick.ac.uk}{\nolinkurl{martyn.plummer@warwick.ac.uk}}} \and Janne Pitkäniemi\footnote{Finnish Cancer Registry, Helsinki, Finland, \href{mailto:janne.pitkaniemi@cancer.fi}{\nolinkurl{janne.pitkaniemi@cancer.fi}}} \and Bendix Carstensen\footnote{Steno Diabetes Center Copenhagen, Gentofte, Denmark, Dept. of Biostatistics, University of Copenhagen, Denmark, \href{mailto:b@bxc.dk}{\nolinkurl{b@bxc.dk}}, \url{http://BendixCarstensen.com}} \and Damien Georges\footnote{International Agency for Research on Cancer, Lyon, France, \href{mailto:georgesd@iarc.who.int}{\nolinkurl{georgesd@iarc.who.int}}} \and Esa Läärä\footnote{Department of Mathematical Sciences, University of Oulu, Finland, \href{mailto:Esa.Laara@oulu.fi}{\nolinkurl{Esa.Laara@oulu.fi}}, \url{http://www.oulu.fi/university/researcher/esa-laara}}}
-\date{1-5 June 2026 (built 31 May 2026 18:46 UTC)}
+\date{1-5 June 2026 (built 01 June 2026 07:07 UTC)}
 
 \begin{document}
 \maketitle
@@ -2800,9 +2800,11 @@ the number of digits printed after the decimal point. This table
 shows a table of odds that the baby has low birth weight. Use
 \texttt{width=15} and \texttt{digits=3} and see the difference.
 
-\chapter{Graphics in R}\label{graphics-in-r}
+\chapter{Base R graphics}\label{base-r-graphics}
 
-There are three kinds of plotting functions in R:
+In chapter 3.10 you saw a brief introduction to \texttt{ggplot2} graphics framework, that has been increasingly popular in the recent decades. It is still useful to also be familiar with the base \texttt{R} graphics functionality that has existed long before \texttt{ggplot}, as both frameworks have their advantages and disadvantages.
+
+There are three kinds of plotting functions in base \texttt{R}:
 
 \begin{itemize}
 \tightlist
@@ -2817,7 +2819,7 @@ There are three kinds of plotting functions in R:
   \texttt{locator()} and \texttt{identify()}.
 \end{itemize}
 
-The normal procedure for making a graph in R is to make a fairly
+The normal procedure for making a graph in \texttt{R} is to make a fairly
 simple initial plot and then add on points, lines, text etc.,
 preferably in a script.
 
@@ -2894,15 +2896,11 @@ want to see all the plot symbols try:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{with}\NormalTok{(}
-\NormalTok{  births, }
-  \FunctionTok{plot}\NormalTok{(}
-\NormalTok{    matage, }
-\NormalTok{    bweight, }
+\FunctionTok{with}\NormalTok{( births, }
+  \FunctionTok{plot}\NormalTok{(matage, bweight, }
     \AttributeTok{xlab =} \StringTok{"Maternal age"}\NormalTok{, }
     \AttributeTok{ylab =} \StringTok{"Birth weight (g)"}
-\NormalTok{  )}
-\NormalTok{)}
+\NormalTok{  ))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -2910,8 +2908,8 @@ want to see all the plot symbols try:
 
 There are many colours recognized by \texttt{R}. You can list them all by
 \texttt{colours()} or, equivalently, \texttt{colors()} (\texttt{R} allows you to
-use British or American spelling). To colour the points of birthweight
-versus gestational weeks, try
+use British or American spelling). There are also some helpful webpages where you can actually see the available colors: for instance \url{https://r-charts.com/colors/}. To colour the points of birthweight
+versus gestational weeks, try, for instance:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3057,80 +3055,7 @@ This can now be used in the plot:
 \end{Shaded}
 
 The same trick can be used if we want to have a separate symbol for
-mothers over 40 say. We first generate the indexing variable:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{births}\SpecialCharTok{$}\NormalTok{oldmum }\OtherTok{\textless{}{-}}\NormalTok{ (births}\SpecialCharTok{$}\NormalTok{matage }\SpecialCharTok{\textgreater{}=} \DecValTok{40}\NormalTok{) }\SpecialCharTok{+} \DecValTok{1}
-\end{Highlighting}
-\end{Shaded}
-
-Note we add 1 because \texttt{(\ matage\ \textgreater{}=\ 40\ )} generates a logic
-variable, so by adding 1 we get a numeric variable with values 1 and
-2, suitable for indexing:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{with}\NormalTok{(}
-\NormalTok{  births, }
-  \FunctionTok{plot}\NormalTok{(}
-\NormalTok{    gestwks, }
-\NormalTok{    bweight, }
-    \AttributeTok{pch =} \FunctionTok{c}\NormalTok{(}\DecValTok{16}\NormalTok{, }\DecValTok{3}\NormalTok{)[oldmum], }
-    \AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{, }\StringTok{"red"}\NormalTok{)[sex]}
-\NormalTok{  )}
-\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-so where \texttt{oldmum} is 1 we get \texttt{pch=16} (a dot) and where
-\texttt{oldmum} is 2 we get \texttt{pch=3} (a cross).
-
-R will accept any kind of complexity in the indexing as
-long as the result is a valid index, so you don't need to create the
-variable \texttt{oldmum}, you can create it on the fly:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{with}\NormalTok{(}
-\NormalTok{  births, }
-  \FunctionTok{plot}\NormalTok{(}
-\NormalTok{    gestwks, }
-\NormalTok{    bweight, }
-    \AttributeTok{pch =} \FunctionTok{c}\NormalTok{(}\DecValTok{16}\NormalTok{, }\DecValTok{3}\NormalTok{)[(matage }\SpecialCharTok{\textgreater{}=} \DecValTok{40}\NormalTok{) }\SpecialCharTok{+} \DecValTok{1}\NormalTok{], }
-    \AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{, }\StringTok{"red"}\NormalTok{)[sex]}
-\NormalTok{  )}
-\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\section{Generating colours}\label{generating-colours}
-
-R has functions that generate a vector of colours for you. For example,
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{rainbow}\NormalTok{(}\DecValTok{4}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-produces a vector with 4 colours (not immediately human readable,
-though). There are a few other functions that generates other
-sequences of colours, type \texttt{?rainbow} to see them. The
-\texttt{color} function (or \texttt{colour} function if you prefer)
-returns a vector of the colour names that R knows about. These
-names can also be used to specify colours.
-
-Gray-tones are produced by the function \texttt{gray} (or
-\texttt{grey}), which takes a numerical argument between 0 and 1;
-\texttt{gray(0)} is black and \texttt{gray(1)} is white. Try:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{plot}\NormalTok{(}\DecValTok{0}\SpecialCharTok{:}\DecValTok{10}\NormalTok{, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{cex =} \DecValTok{3}\NormalTok{, }\AttributeTok{col =} \FunctionTok{gray}\NormalTok{(}\DecValTok{0}\SpecialCharTok{:}\DecValTok{10} \SpecialCharTok{/} \DecValTok{10}\NormalTok{))}
-\FunctionTok{points}\NormalTok{(}\DecValTok{0}\SpecialCharTok{:}\DecValTok{10}\NormalTok{, }\AttributeTok{pch =} \DecValTok{1}\NormalTok{, }\AttributeTok{cex =} \DecValTok{3}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+different categories (use \texttt{pch=c(15,17){[}sex{]}}, for instance).
 
 \section{Saving your graphs for use in other documents}\label{saving-your-graphs-for-use-in-other-documents}
 
@@ -3162,61 +3087,6 @@ Instead of \emph{pdf}, other formats can be used (\emph{jpg, png, tiff, \ldots{}
 
 In window-based environments (R GUI for Windows, R-Studio) you may also use the menu
 (\texttt{File}\(\rightarrow\)\texttt{Save\ as\ ...} or \texttt{Export}) to save the active graph as a file and even copy-paste may work (from R graphics window to Word, for instance) -- however, writing it manually into the file is recommended for reproducibility purposes (in case you need to redraw your graph with some modifications).
-
-\subsection{The `par()` command}
-
-It is possible to manipulate any element in a graph, by using the
-graphics options. These are collected on the help page of
-\texttt{par()}. For example, if you want axis labels always to be
-horizontal, use the command \texttt{par(las=1)}. This will be in
-effect until a new graphics device is opened.
-
-Look at the typewriter-version of the help-page with
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{help}\NormalTok{(par)}
-\end{Highlighting}
-\end{Shaded}
-
-or better, use the the html-version through
-\texttt{Help} \(\rightarrow\) \texttt{Html\ help} \(\rightarrow\)
-\texttt{Packages} \(\rightarrow\) \texttt{graphics} \(\rightarrow\)
-\texttt{P}\(\rightarrow\) \texttt{par}.
-
-It is a good idea to take a print of this (having set the text
-size to \emph{smallest} because it is long) and carry it with you at any
-time to read in buses, cinema queues, during boring lectures etc.
-Don't despair, few R-users can understand what all the options are
-for.
-
-\texttt{par()} can also be used to ask about the current plot, for
-example \texttt{par("usr")} will give you the exact extent of the axes
-in the current plot.
-
-If you want more plots on a single page you can use the command
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-This will give you a layout of 2 rows by 3 columns for the next 6
-graphs you produce. The plots will appear by row, i.e.~in the top
-row first. If you want the plots to appear columnwise, use
-\texttt{par(\ mfcol=c(2,3)\ )} (you still get 2 rows by 3 columns).
-
-To restore the layout to a single plot per page use
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-If you want a more detailed control over the layout of multiple graphs
-on a single page look at \texttt{?layout}.
 
 \section{Interacting with a plot}\label{interacting-with-a-plot}
 
@@ -3275,6 +3145,22 @@ returns a vector of identified points.
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{with}\NormalTok{(births, births[}\FunctionTok{identify}\NormalTok{(gestwks, bweight), ])}
+\end{Highlighting}
+\end{Shaded}
+
+\section{A completely custom plot}\label{a-completely-custom-plot}
+
+A useful feature of base \texttt{R} graphics is that you can basically plot just anything, adding text or even mathematical formulas or symbols (see the help page for \texttt{plotmath()}), even without any data. The following code creates one ``pointless example with two points'', just to give you an idea. That is possibly an advantage over \texttt{ggplot2} that sometimes lacks flexibility.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(}\DecValTok{0}\SpecialCharTok{:}\DecValTok{100}\NormalTok{,}\DecValTok{0}\SpecialCharTok{:}\DecValTok{100}\NormalTok{,}\AttributeTok{type=}\StringTok{"n"}\NormalTok{,}\AttributeTok{axes=}\NormalTok{F, }\AttributeTok{xlab=}\StringTok{" "}\NormalTok{,}\AttributeTok{ylab=}\StringTok{" "}\NormalTok{) }\CommentTok{\# create an invisible plot for coordinate system}
+ \FunctionTok{points}\NormalTok{(}\DecValTok{30}\NormalTok{,}\DecValTok{30}\NormalTok{,}\AttributeTok{pch=}\DecValTok{16}\NormalTok{,}\AttributeTok{cex=}\DecValTok{10}\NormalTok{, }\AttributeTok{col=}\StringTok{"blue"}\NormalTok{)}
+ \FunctionTok{text}\NormalTok{(}\DecValTok{30}\NormalTok{,}\DecValTok{50}\NormalTok{,}\StringTok{"big blue dot"}\NormalTok{)}
+ \FunctionTok{points}\NormalTok{(}\DecValTok{60}\NormalTok{,}\DecValTok{60}\NormalTok{,}\AttributeTok{pch=}\DecValTok{16}\NormalTok{,}\AttributeTok{cex=}\DecValTok{2}\NormalTok{, }\AttributeTok{col=}\StringTok{"red"}\NormalTok{)}
+ \FunctionTok{text}\NormalTok{(}\DecValTok{60}\NormalTok{,}\DecValTok{70}\NormalTok{,}\StringTok{"small red dot"}\NormalTok{)}
+ \FunctionTok{arrows}\NormalTok{(}\DecValTok{40}\NormalTok{,}\DecValTok{40}\NormalTok{,}\DecValTok{55}\NormalTok{,}\DecValTok{55}\NormalTok{) }\CommentTok{\# you can customize it for nicer arrows (see help)}
+ \FunctionTok{text}\NormalTok{(}\DecValTok{45}\NormalTok{,}\DecValTok{50}\NormalTok{,}\FunctionTok{expression}\NormalTok{(beta)) }
 \end{Highlighting}
 \end{Shaded}
 
@@ -10299,7 +10185,7 @@ occurrence rate of remission itself.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{   user  system elapsed }
-\NormalTok{   2.46    3.05    1.98 }
+\NormalTok{   2.53    3.05    2.02 }
 \end{Highlighting}
 \end{Shaded}
 
