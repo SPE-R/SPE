@@ -64,7 +64,7 @@ files.in <-
     ##                directly in both _bookdown.yml and _bookdown-sol.yml, so it
     ##                is NOT auto-derived here.
     "graph-intro-e.rmd",
-    "rates-rrrd-e.rmd",
+    ## "rates-rrrd-e.rmd", -- migrated to single source
     "effects-e.rmd",
     "cont-eff-e.rmd",
     "causal-e.rmd",
