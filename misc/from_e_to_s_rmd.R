@@ -57,13 +57,13 @@ from_e_to_s_rmd <-
 
 files.in <-
   c(
-    "basic-e.rmd",
-    "dinput-e.rmd",
-    "tidyverse-e.rmd",
+    ## "basic-e.rmd", -- migrated
+    ## "dinput-e.rmd", -- migrated  
+    ## "tidyverse-e.rmd", -- migrated
     ## "tab-e.rmd" -- migrated to single-source (SPE_SOLUTIONS flag); included
     ##                directly in both _bookdown.yml and _bookdown-sol.yml, so it
     ##                is NOT auto-derived here.
-    "graph-intro-e.rmd",
+    ## "graph-intro-e.rmd", -- migrated
     ## "rates-rrrd-e.rmd", -- migrated to single source
     "effects-e.rmd",
     "cont-eff-e.rmd",
