@@ -526,7 +526,7 @@ ci.mat
 ##         (1 - alpha/2), format = "f", digits = 1), "%", sep = ""))
 ##     ciM
 ## }
-## <bytecode: 0x5570411c4f70>
+## <bytecode: 0x56423254ae20>
 ## <environment: namespace:Epi>
 ```
 
