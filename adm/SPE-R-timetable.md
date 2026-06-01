@@ -26,7 +26,7 @@
 | 9:00 -  9:15 | Welcome  |
 | 9:15 - 10:00 | [R History and Ecology](https://github.com/SPE-R/SPE/blob/gh-spe-material/lectures/R-history-ecology.pdf) (MP)|
 |10:00 - 10:30 | Coffee break |
-|10:30 - 11:30 | [Practical: Tabulation](https://spe-r.github.io/SPE/SPE-R-2026-practicals/tabulation-with-stat.html) & [Graphics in `R`](https://spe-r.github.io/SPE/SPE-R-2026-practicals/graphics-in-r.html) (KF)|
+|10:30 - 11:30 | [Practical: Tabulation](https://spe-r.github.io/SPE/SPE-R-2026-practicals/tabulation-with-stat.html) & [Graphics in `R`](https://spe-r.github.io/SPE/SPE-R-2026-practicals/base-r-graphics.html) (KF)|
 |11:30 - 12:00 | [Simple Poisson and binary regression](https://github.com/SPE-R/SPE/blob/gh-spe-material/lectures/SPE-Poisson-Logistic-Regression.pdf) (JP)|
 |12:00 - 13:00 | [Practical: Analysis of hazard rates, their ratios and differences and binary regression](https://spe-r.github.io/SPE/SPE-R-2026-practicals/analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html)|
 |13:00 - 14:00 | Lunch |
