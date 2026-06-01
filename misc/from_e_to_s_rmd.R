@@ -60,7 +60,9 @@ files.in <-
     "basic-e.rmd",
     "dinput-e.rmd",
     "tidyverse-e.rmd",
-    "tab-e.rmd",
+    ## "tab-e.rmd" -- migrated to single-source (SPE_SOLUTIONS flag); included
+    ##                directly in both _bookdown.yml and _bookdown-sol.yml, so it
+    ##                is NOT auto-derived here.
     "graph-intro-e.rmd",
     "rates-rrrd-e.rmd",
     "effects-e.rmd",

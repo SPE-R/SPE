@@ -26,7 +26,7 @@
 | 9:00 -  9:15 | Welcome  |
 | 9:15 - 10:00 | [R History and Ecology](https://github.com/SPE-R/SPE/blob/gh-spe-material/lectures/R-history-ecology.pdf) (MP)|
 |10:00 - 10:30 | Coffee break |
-|10:30 - 11:30 | [Practical: Tabulation](https://spe-r.github.io/SPE/SPE-R-2026-practicals/tabulation.html) & [Graphics in `R`](https://spe-r.github.io/SPE/SPE-R-2026-practicals/graphics-in-r.html) (KF)|
+|10:30 - 11:30 | [Practical: Tabulation](https://spe-r.github.io/SPE/SPE-R-2026-practicals/tabulation-with-stat.html) & [Graphics in `R`](https://spe-r.github.io/SPE/SPE-R-2026-practicals/graphics-in-r.html) (KF)|
 |11:30 - 12:00 | [Simple Poisson and binary regression](https://github.com/SPE-R/SPE/blob/gh-spe-material/lectures/SPE-Poisson-Logistic-Regression.pdf) (JP)|
 |12:00 - 13:00 | [Practical: Analysis of hazard rates, their ratios and differences and binary regression](https://spe-r.github.io/SPE/SPE-R-2026-practicals/analysis-of-hazard-rates-their-ratios-and-differences-and-binary-regression.html)|
 |13:00 - 14:00 | Lunch |
@@ -50,7 +50,7 @@
 |14:00 -  14:30 | Recap of morning practicals |
 |14:30 - 15:30 | [More advanced graphics in R, including `ggplot2`](https://github.com/SPE-R/SPE/blob/gh-spe-material/lectures/Graphics.pdf) (MP)| 
 |15:30 - 16:00 | Coffee break. |
-|16:00 - 18:00 | [Practical: Graphics meccano](https://spe-r.github.io/SPE/SPE-R-2026-practicals/graphics-meccano.html) |
+|16:00 - 18:00 | [Practical: Graphics with ggplot2](https://spe-r.github.io/SPE/SPE-R-2026-practicals/graphics-with-ggplot2.html) |
 
 ## Wednesday 3 June -- Day 3
 
@@ -79,7 +79,7 @@
 |14:00 - 14:30 | Recap of morning practical |
 |14:30 - 15:30 | [Causal inference 2: model-based estimation of causal contrasts](https://github.com/SPE-R/SPE/blob/gh-spe-material/lectures/causal-two.pdf) (EL)|
 |15:30 - 16:00 | Tea break. |
-|16:00 - 18:00 | [Practical: Causal inference 2: Model-based estimation of causal estimands](https://spe-r.github.io/SPE/SPE-R-2026-practicals/causal-inference-2-model-based-estimation-of-causal-estimands.html) |
+|16:00 - 18:00 | [Practical: Causal inference 2: Model-based estimation of causal parameters](https://spe-r.github.io/SPE/SPE-R-2026-practicals/causal-inference-2-model-based-estimation-of-causal-parameters.html) |
 |19:00 - .. | Course Diner at [Vilde Ja Vine](https://vilde.ee/gb/)
 
 ## Friday 5 June -- Day 5
