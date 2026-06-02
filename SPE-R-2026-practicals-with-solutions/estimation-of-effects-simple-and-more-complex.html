@@ -402,10 +402,10 @@ different aspects in estimating effects of various exposures on a metric respons
 <ol style="list-style-type: decimal">
 <li>Load the packages needed in this exercise and the data set, and look at its content</li>
 </ol>
-<div class="sourceCode" id="cb439"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb439-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb439-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
-<span id="cb439-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb439-2" tabindex="-1"></a><span class="fu">library</span>(mgcv)</span>
-<span id="cb439-3"><a href="estimation-of-effects-simple-and-more-complex.html#cb439-3" tabindex="-1"></a><span class="fu">data</span>(births)</span>
-<span id="cb439-4"><a href="estimation-of-effects-simple-and-more-complex.html#cb439-4" tabindex="-1"></a><span class="fu">str</span>(births)</span></code></pre></div>
+<div class="sourceCode" id="cb485"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb485-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb485-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
+<span id="cb485-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb485-2" tabindex="-1"></a><span class="fu">library</span>(mgcv)</span>
+<span id="cb485-3"><a href="estimation-of-effects-simple-and-more-complex.html#cb485-3" tabindex="-1"></a><span class="fu">data</span>(births)</span>
+<span id="cb485-4"><a href="estimation-of-effects-simple-and-more-complex.html#cb485-4" tabindex="-1"></a><span class="fu">str</span>(births)</span></code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    500 obs. of  8 variables:
 ##  $ id     : num  1 2 3 4 5 6 7 8 9 10 ...
 ##  $ bweight: num  2974 3270 2620 3751 3200 ...
@@ -421,18 +421,18 @@ by first converting directly two binary (0/1) variables into factors,
 and creating sategorical versions of two continuous variables are –&gt;
 by function <code>cut()</code>.</li>
 </ol>
-<div class="sourceCode" id="cb441"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb441-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb441-1" tabindex="-1"></a>births<span class="sc">$</span>hyp <span class="ot">&lt;-</span> <span class="fu">factor</span>(births<span class="sc">$</span>hyp, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;normal&quot;</span>, <span class="st">&quot;hyper&quot;</span>))</span>
-<span id="cb441-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb441-2" tabindex="-1"></a>births<span class="sc">$</span>sex <span class="ot">&lt;-</span> <span class="fu">factor</span>(births<span class="sc">$</span>sex, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>))</span>
-<span id="cb441-3"><a href="estimation-of-effects-simple-and-more-complex.html#cb441-3" tabindex="-1"></a>births<span class="sc">$</span>maged <span class="ot">&lt;-</span> <span class="fu">cut</span>(births<span class="sc">$</span>matage, <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">22</span>, <span class="dv">35</span>, <span class="dv">44</span>), <span class="at">right =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb441-4"><a href="estimation-of-effects-simple-and-more-complex.html#cb441-4" tabindex="-1"></a>births<span class="sc">$</span>gest4 <span class="ot">&lt;-</span> <span class="fu">cut</span>(births<span class="sc">$</span>gestwks,</span>
-<span id="cb441-5"><a href="estimation-of-effects-simple-and-more-complex.html#cb441-5" tabindex="-1"></a>  <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">35</span>, <span class="dv">37</span>, <span class="dv">39</span>, <span class="dv">45</span>), <span class="at">right =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb487"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb487-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb487-1" tabindex="-1"></a>births<span class="sc">$</span>hyp <span class="ot">&lt;-</span> <span class="fu">factor</span>(births<span class="sc">$</span>hyp, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;normal&quot;</span>, <span class="st">&quot;hyper&quot;</span>))</span>
+<span id="cb487-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb487-2" tabindex="-1"></a>births<span class="sc">$</span>sex <span class="ot">&lt;-</span> <span class="fu">factor</span>(births<span class="sc">$</span>sex, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;M&quot;</span>, <span class="st">&quot;F&quot;</span>))</span>
+<span id="cb487-3"><a href="estimation-of-effects-simple-and-more-complex.html#cb487-3" tabindex="-1"></a>births<span class="sc">$</span>maged <span class="ot">&lt;-</span> <span class="fu">cut</span>(births<span class="sc">$</span>matage, <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">22</span>, <span class="dv">35</span>, <span class="dv">44</span>), <span class="at">right =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb487-4"><a href="estimation-of-effects-simple-and-more-complex.html#cb487-4" tabindex="-1"></a>births<span class="sc">$</span>gest4 <span class="ot">&lt;-</span> <span class="fu">cut</span>(births<span class="sc">$</span>gestwks,</span>
+<span id="cb487-5"><a href="estimation-of-effects-simple-and-more-complex.html#cb487-5" tabindex="-1"></a>  <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">35</span>, <span class="dv">37</span>, <span class="dv">39</span>, <span class="dv">45</span>), <span class="at">right =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
 <li>Have a look at univariate summaries of the different
 variables in the data:
 location (median and mean), quartiles and range. After that compute
 the standard deviation of the distribution of <code>bweight</code>.</li>
 </ol>
-<div class="sourceCode" id="cb442"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb442-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb442-1" tabindex="-1"></a><span class="fu">summary</span>(births)</span></code></pre></div>
+<div class="sourceCode" id="cb488"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb488-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb488-1" tabindex="-1"></a><span class="fu">summary</span>(births)</span></code></pre></div>
 <pre><code>##        id           bweight         lowbw         gestwks         preterm      
 ##  Min.   :  1.0   Min.   : 628   Min.   :0.00   Min.   :24.69   Min.   :0.0000  
 ##  1st Qu.:125.8   1st Qu.:2862   1st Qu.:0.00   1st Qu.:37.94   1st Qu.:0.0000  
@@ -449,7 +449,7 @@ the standard deviation of the distribution of <code>bweight</code>.</li>
 ##  3rd Qu.:37.00                                      NAs    : 10  
 ##  Max.   :43.00                                                   
 ## </code></pre>
-<div class="sourceCode" id="cb444"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb444-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb444-1" tabindex="-1"></a><span class="fu">with</span>(births, <span class="fu">sd</span>(bweight))</span></code></pre></div>
+<div class="sourceCode" id="cb490"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb490-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb490-1" tabindex="-1"></a><span class="fu">with</span>(births, <span class="fu">sd</span>(bweight))</span></code></pre></div>
 <pre><code>## [1] 637.4515</code></pre>
 </div>
 <div id="simple-estimation-with-lm-and-glm" class="section level2 hasAnchor" number="7.3">
@@ -462,7 +462,7 @@ means for a metric response.</p>
 <li>Comparison of two groups is commonly done by the conventional <span class="math inline">\(t\)</span>-test and
 the associated confidence interval.</li>
 </ol>
-<div class="sourceCode" id="cb446"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb446-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb446-1" tabindex="-1"></a><span class="fu">with</span>(births, <span class="fu">t.test</span>(bweight <span class="sc">~</span> hyp, <span class="at">var.equal =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb492"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb492-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb492-1" tabindex="-1"></a><span class="fu">with</span>(births, <span class="fu">t.test</span>(bweight <span class="sc">~</span> hyp, <span class="at">var.equal =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
 <pre><code>## 
 ##  Two Sample t-test
 ## 
@@ -495,8 +495,8 @@ However, in case you use
 <code>lm()</code>, this argument is not needed, because <code>lm()</code> fits only
 models for metric responses assuming Gaussian distribution.</li>
 </ol>
-<div class="sourceCode" id="cb448"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb448-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb448-1" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(bweight <span class="sc">~</span> hyp, <span class="at">family =</span> gaussian, <span class="at">data =</span> births)</span>
-<span id="cb448-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb448-2" tabindex="-1"></a><span class="fu">summary</span>(m1)</span></code></pre></div>
+<div class="sourceCode" id="cb494"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb494-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb494-1" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(bweight <span class="sc">~</span> hyp, <span class="at">family =</span> gaussian, <span class="at">data =</span> births)</span>
+<span id="cb494-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb494-2" tabindex="-1"></a><span class="fu">summary</span>(m1)</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## glm(formula = bweight ~ hyp, family = gaussian, data = births)
@@ -519,7 +519,7 @@ models for metric responses assuming Gaussian distribution.</li>
 <li>Note the amount of output that <code>summary()</code> method produces.
 The point estimate plus confidence limits can, though, be concisely obtained by function <code>ci.lin()</code> found in <code>Epi</code> package.</li>
 </ol>
-<div class="sourceCode" id="cb450"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb450-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb450-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(m1)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">6</span>)], <span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb496"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb496-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb496-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(m1)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">6</span>)], <span class="dv">1</span>)</span></code></pre></div>
 <pre><code>##             Estimate   2.5%  97.5%
 ## (Intercept)   3198.9 3140.2 3257.6
 ## hyphyper      -430.7 -585.4 -275.9</code></pre>
@@ -535,9 +535,8 @@ any causal interpretation to the estimated contrasts.</p>
 <li>The following <em>interaction plot</em>
 shows how the mean <code>bweight</code> depends jointly on <code>hyp</code> and <code>gest4</code></li>
 </ol>
-<div class="sourceCode" id="cb452"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb452-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb452-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span>
-<span id="cb452-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb452-2" tabindex="-1"></a><span class="fu">with</span>(births, <span class="fu">interaction.plot</span>(sex, hyp, bweight))</span></code></pre></div>
-<p><img src="effects-s_files/figure-html/bweight-by-hyp-sex-1.png" alt="" width="672" /></p>
+<div class="sourceCode" id="cb498"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb498-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb498-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb498-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb498-2" tabindex="-1"></a><span class="fu">with</span>(births, <span class="fu">interaction.plot</span>(sex, hyp, bweight))</span></code></pre></div>
 <p>At face value it appears that the mean difference in <code>bweight</code> between
 hypertensive and normotensive
 mothers is somewhat bigger in boys than in girls.</p>
@@ -546,8 +545,8 @@ mothers is somewhat bigger in boys than in girls.</p>
 in the two levels of <code>sex</code>.
 Stratified estimation of effects can be done by <code>lm()</code> as follows:</li>
 </ol>
-<div class="sourceCode" id="cb453"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb453-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb453-1" tabindex="-1"></a>m3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(bweight <span class="sc">~</span> sex <span class="sc">/</span> hyp, <span class="at">data =</span> births)</span>
-<span id="cb453-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb453-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(m3)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">6</span>)], <span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb499"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb499-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb499-1" tabindex="-1"></a>m3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(bweight <span class="sc">~</span> sex <span class="sc">/</span> hyp, <span class="at">data =</span> births)</span>
+<span id="cb499-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb499-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(m3)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">6</span>)], <span class="dv">1</span>)</span></code></pre></div>
 <pre><code>##               Estimate   2.5%  97.5%
 ## (Intercept)     3310.7 3230.1 3391.4
 ## sexF            -231.2 -347.2 -115.3
@@ -561,8 +560,8 @@ The error margins of the two estimates are quite wide, though.</p>
 <em>interaction term</em> between <code>sex</code> and <code>hyp</code> is
 fitted as follows:</li>
 </ol>
-<div class="sourceCode" id="cb455"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb455-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb455-1" tabindex="-1"></a>m3I <span class="ot">&lt;-</span> <span class="fu">lm</span>(bweight <span class="sc">~</span> sex <span class="sc">+</span> hyp <span class="sc">+</span> sex<span class="sc">:</span>hyp, <span class="at">data =</span> births)</span>
-<span id="cb455-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb455-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(m3I)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>)], <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb501"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb501-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb501-1" tabindex="-1"></a>m3I <span class="ot">&lt;-</span> <span class="fu">lm</span>(bweight <span class="sc">~</span> sex <span class="sc">+</span> hyp <span class="sc">+</span> sex<span class="sc">:</span>hyp, <span class="at">data =</span> births)</span>
+<span id="cb501-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb501-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(m3I)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>)], <span class="dv">2</span>)</span></code></pre></div>
 <pre><code>##               Estimate    P    2.5%   97.5%
 ## (Intercept)    3310.75 0.00 3230.14 3391.35
 ## sexF           -231.25 0.00 -347.15 -115.35
@@ -599,8 +598,8 @@ Therefore, we may now proceed to estimate the overall effect of <code>hyp</code>
 <ol style="list-style-type: decimal">
 <li>Adjustment is done by adding <code>sex</code> to the model formula:</li>
 </ol>
-<div class="sourceCode" id="cb457"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb457-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb457-1" tabindex="-1"></a>m4 <span class="ot">&lt;-</span> <span class="fu">lm</span>(bweight <span class="sc">~</span> sex <span class="sc">+</span> hyp, <span class="at">data =</span> births)</span>
-<span id="cb457-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb457-2" tabindex="-1"></a><span class="fu">ci.lin</span>(m4)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">6</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb503"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb503-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb503-1" tabindex="-1"></a>m4 <span class="ot">&lt;-</span> <span class="fu">lm</span>(bweight <span class="sc">~</span> sex <span class="sc">+</span> hyp, <span class="at">data =</span> births)</span>
+<span id="cb503-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb503-2" tabindex="-1"></a><span class="fu">ci.lin</span>(m4)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">6</span>)]</span></code></pre></div>
 <pre><code>##              Estimate      2.5%     97.5%
 ## (Intercept) 3302.8845 3225.0823 3380.6867
 ## sexF        -214.9931 -322.4614 -107.5249
@@ -628,8 +627,8 @@ of the response with <code>gestwks</code> is roughly linear
 (for a continuous response),
 we can estimate the linear effect of <code>gestwks</code> with <code>lm()</code> as follows:</li>
 </ol>
-<div class="sourceCode" id="cb459"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb459-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb459-1" tabindex="-1"></a>m5 <span class="ot">&lt;-</span> <span class="fu">lm</span>(bweight <span class="sc">~</span> gestwks, <span class="at">data =</span> births)</span>
-<span id="cb459-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb459-2" tabindex="-1"></a><span class="fu">ci.lin</span>(m5)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">6</span>)]</span></code></pre></div>
+<div class="sourceCode" id="cb505"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb505-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb505-1" tabindex="-1"></a>m5 <span class="ot">&lt;-</span> <span class="fu">lm</span>(bweight <span class="sc">~</span> gestwks, <span class="at">data =</span> births)</span>
+<span id="cb505-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb505-2" tabindex="-1"></a><span class="fu">ci.lin</span>(m5)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">6</span>)]</span></code></pre></div>
 <pre><code>##               Estimate       2.5%      97.5%
 ## (Intercept) -4489.1398 -5157.2891 -3820.9905
 ## gestwks       196.9726   179.7482   214.1971</code></pre>
@@ -646,18 +645,16 @@ it will provide you some common diagnostic graphs.</p>
 <li>To examine whether <code>bweight</code> goes up linearly with <code>gestwks</code>
 by creating a basic scatterplot. See also lecture slide 4.</li>
 </ol>
-<div class="sourceCode" id="cb461"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb461-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb461-1" tabindex="-1"></a><span class="fu">with</span>(births, <span class="fu">plot</span>(gestwks, bweight))</span>
-<span id="cb461-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb461-2" tabindex="-1"></a><span class="fu">abline</span>(m5)</span></code></pre></div>
-<p><img src="effects-s_files/figure-html/Plot-bweight-by-gestwks-1.png" alt="" width="672" /></p>
+<div class="sourceCode" id="cb507"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb507-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb507-1" tabindex="-1"></a><span class="fu">with</span>(births, <span class="fu">plot</span>(gestwks, bweight))</span>
+<span id="cb507-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb507-2" tabindex="-1"></a><span class="fu">abline</span>(m5)</span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
 <li>Moreover, take a look at the four
 basic diagnostic plots for the fitted model.
 Compare with lecture slide 9.</li>
 </ol>
-<div class="sourceCode" id="cb462"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb462-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb462-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</span>
-<span id="cb462-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb462-2" tabindex="-1"></a><span class="fu">plot</span>(m5)</span></code></pre></div>
-<p><img src="effects-s_files/figure-html/bweight-gestwks-m5-diag-1.png" alt="" width="672" />
-What can you say about the agreement with data of the
+<div class="sourceCode" id="cb508"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb508-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb508-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</span>
+<span id="cb508-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb508-2" tabindex="-1"></a><span class="fu">plot</span>(m5)</span></code></pre></div>
+<p>What can you say about the agreement with data of the
 assumptions of the simple linear regression model,
 like linearity of the association, and
 homoskedasticity and normality of the error terms?</p>
@@ -677,8 +674,8 @@ this package.</p>
 expression like <code>s(X)</code> for any explanatory variable <code>X</code>,
 for which you wish to fit a smooth function</li>
 </ol>
-<div class="sourceCode" id="cb463"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb463-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb463-1" tabindex="-1"></a>mPs <span class="ot">&lt;-</span> mgcv<span class="sc">::</span><span class="fu">gam</span>(bweight <span class="sc">~</span> <span class="fu">s</span>(gestwks), <span class="at">data =</span> births)</span>
-<span id="cb463-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb463-2" tabindex="-1"></a><span class="fu">summary</span>(mPs)</span></code></pre></div>
+<div class="sourceCode" id="cb509"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb509-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb509-1" tabindex="-1"></a>mPs <span class="ot">&lt;-</span> mgcv<span class="sc">::</span><span class="fu">gam</span>(bweight <span class="sc">~</span> <span class="fu">s</span>(gestwks), <span class="at">data =</span> births)</span>
+<span id="cb509-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb509-2" tabindex="-1"></a><span class="fu">summary</span>(mPs)</span></code></pre></div>
 <pre><code>## 
 ## Family: gaussian 
 ## Link function: identity 
@@ -706,9 +703,9 @@ weight in the data. The estimated residual variance is given by
 <code>Scale est.</code> or from subobject <code>sig2</code> of the fitted
 <code>gam</code> object. Taking square root you will obtain the estimated
 residual standard deviation: <span class="math inline">\(445.2\)</span> g.</p>
-<div class="sourceCode" id="cb465"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb465-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb465-1" tabindex="-1"></a>mPs<span class="sc">$</span>sig2</span></code></pre></div>
+<div class="sourceCode" id="cb511"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb511-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb511-1" tabindex="-1"></a>mPs<span class="sc">$</span>sig2</span></code></pre></div>
 <pre><code>## [1] 198186</code></pre>
-<div class="sourceCode" id="cb467"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb467-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb467-1" tabindex="-1"></a><span class="fu">sqrt</span>(mPs<span class="sc">$</span>sig2)</span></code></pre></div>
+<div class="sourceCode" id="cb513"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb513-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb513-1" tabindex="-1"></a><span class="fu">sqrt</span>(mPs<span class="sc">$</span>sig2)</span></code></pre></div>
 <pre><code>## [1] 445.1808</code></pre>
 <p>The degrees of freedom in this model are not
 computed as simply as in previous
@@ -725,12 +722,12 @@ and function <code>matlines()</code> which draws
 lines joining the pertinent end points over the <span class="math inline">\(x\)</span>-values
 for which the predictions and intervals are computed.</li>
 </ol>
-<div class="sourceCode" id="cb469"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb469-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb469-1" tabindex="-1"></a>plotFitPredInt <span class="ot">&lt;-</span> <span class="cf">function</span>(xval, fit, pred, ...) {</span>
-<span id="cb469-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb469-2" tabindex="-1"></a>  <span class="fu">matshade</span>(xval, fit, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>)</span>
-<span id="cb469-3"><a href="estimation-of-effects-simple-and-more-complex.html#cb469-3" tabindex="-1"></a>  <span class="fu">matshade</span>(xval, pred, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>)</span>
-<span id="cb469-4"><a href="estimation-of-effects-simple-and-more-complex.html#cb469-4" tabindex="-1"></a>  <span class="fu">matlines</span>(xval, fit, <span class="at">lty =</span> <span class="dv">1</span>, <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">2</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;blue&quot;</span>))</span>
-<span id="cb469-5"><a href="estimation-of-effects-simple-and-more-complex.html#cb469-5" tabindex="-1"></a>  <span class="fu">matlines</span>(xval, pred, <span class="at">lty =</span> <span class="dv">1</span>, <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">2</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;brown&quot;</span>, <span class="st">&quot;brown&quot;</span>))</span>
-<span id="cb469-6"><a href="estimation-of-effects-simple-and-more-complex.html#cb469-6" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb515"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb515-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb515-1" tabindex="-1"></a>plotFitPredInt <span class="ot">&lt;-</span> <span class="cf">function</span>(xval, fit, pred, ...) {</span>
+<span id="cb515-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb515-2" tabindex="-1"></a>  <span class="fu">matshade</span>(xval, fit, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>)</span>
+<span id="cb515-3"><a href="estimation-of-effects-simple-and-more-complex.html#cb515-3" tabindex="-1"></a>  <span class="fu">matshade</span>(xval, pred, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>)</span>
+<span id="cb515-4"><a href="estimation-of-effects-simple-and-more-complex.html#cb515-4" tabindex="-1"></a>  <span class="fu">matlines</span>(xval, fit, <span class="at">lty =</span> <span class="dv">1</span>, <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">2</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;blue&quot;</span>))</span>
+<span id="cb515-5"><a href="estimation-of-effects-simple-and-more-complex.html#cb515-5" tabindex="-1"></a>  <span class="fu">matlines</span>(xval, pred, <span class="at">lty =</span> <span class="dv">1</span>, <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">2</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;brown&quot;</span>, <span class="st">&quot;brown&quot;</span>))</span>
+<span id="cb515-6"><a href="estimation-of-effects-simple-and-more-complex.html#cb515-6" tabindex="-1"></a>}</span></code></pre></div>
 <ol start="3" style="list-style-type: decimal">
 <li>Finally, create a vector of <span class="math inline">\(x\)</span>-values and compute
 the fitted/predicted values as well
@@ -741,9 +738,9 @@ This function creates a matrix of three columns: (1) fitted/predicted
 values, (2) lower limits, (3) upper limits and
 make the graph:</li>
 </ol>
-<div class="sourceCode" id="cb470"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb470-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb470-1" tabindex="-1"></a>nd <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">gestwks =</span> <span class="fu">seq</span>(<span class="dv">24</span>, <span class="dv">45</span>, <span class="at">by =</span> <span class="fl">0.25</span>))</span>
-<span id="cb470-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb470-2" tabindex="-1"></a>pr.Ps <span class="ot">&lt;-</span> <span class="fu">predict</span>(mPs, <span class="at">newdata =</span> nd, <span class="at">se.fit =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb470-3"><a href="estimation-of-effects-simple-and-more-complex.html#cb470-3" tabindex="-1"></a><span class="fu">str</span>(pr.Ps) </span></code></pre></div>
+<div class="sourceCode" id="cb516"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb516-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb516-1" tabindex="-1"></a>nd <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">gestwks =</span> <span class="fu">seq</span>(<span class="dv">24</span>, <span class="dv">45</span>, <span class="at">by =</span> <span class="fl">0.25</span>))</span>
+<span id="cb516-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb516-2" tabindex="-1"></a>pr.Ps <span class="ot">&lt;-</span> <span class="fu">predict</span>(mPs, <span class="at">newdata =</span> nd, <span class="at">se.fit =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb516-3"><a href="estimation-of-effects-simple-and-more-complex.html#cb516-3" tabindex="-1"></a><span class="fu">str</span>(pr.Ps) </span></code></pre></div>
 <pre><code>## List of 2
 ##  $ fit   : num [1:85(1d)] 350 385 421 456 491 ...
 ##   ..- attr(*, &quot;dimnames&quot;)=List of 1
@@ -751,33 +748,32 @@ make the graph:</li>
 ##  $ se.fit: num [1:85(1d)] 324 309 293 278 264 ...
 ##   ..- attr(*, &quot;dimnames&quot;)=List of 1
 ##   .. ..$ : chr [1:85] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...</code></pre>
-<div class="sourceCode" id="cb472"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb472-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-1" tabindex="-1"></a><span class="co"># With se.fit=TRUE, object pr.Ps has only two columns: </span></span>
-<span id="cb472-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-2" tabindex="-1"></a><span class="co"># the fitted values and their standard errors (SE).</span></span>
-<span id="cb472-3"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-3" tabindex="-1"></a><span class="co"># We first take the fitted values and their SEs to compute the 95 % </span></span>
-<span id="cb472-4"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-4" tabindex="-1"></a><span class="co"># confidence interval for the expected value of the outcome at</span></span>
-<span id="cb472-5"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-5" tabindex="-1"></a><span class="co"># each value of gewtwks.</span></span>
-<span id="cb472-6"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-6" tabindex="-1"></a>fit.Ps <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
-<span id="cb472-7"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-7" tabindex="-1"></a>  pr.Ps<span class="sc">$</span>fit,</span>
-<span id="cb472-8"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-8" tabindex="-1"></a>  pr.Ps<span class="sc">$</span>fit <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> pr.Ps<span class="sc">$</span>se.fit,</span>
-<span id="cb472-9"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-9" tabindex="-1"></a>  pr.Ps<span class="sc">$</span>fit <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> pr.Ps<span class="sc">$</span>se.fit</span>
-<span id="cb472-10"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-10" tabindex="-1"></a>)</span>
-<span id="cb472-11"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-11" tabindex="-1"></a><span class="co"># For computing and plotting 95 % prediction intervals for individual</span></span>
-<span id="cb472-12"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-12" tabindex="-1"></a><span class="co"># future observations of the outcome at each value of gestwks, we must </span></span>
-<span id="cb472-13"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-13" tabindex="-1"></a><span class="co"># add the residual variance of the fitted model to the square</span></span>
-<span id="cb472-14"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-14" tabindex="-1"></a><span class="co"># of the standard error of the fitted value and </span></span>
-<span id="cb472-15"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-15" tabindex="-1"></a>pred.Ps <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
-<span id="cb472-16"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-16" tabindex="-1"></a>  pr.Ps<span class="sc">$</span>fit, </span>
-<span id="cb472-17"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-17" tabindex="-1"></a>  pr.Ps<span class="sc">$</span>fit <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">sqrt</span>(pr.Ps<span class="sc">$</span>se.fit<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> mPs<span class="sc">$</span>sig2),</span>
-<span id="cb472-18"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-18" tabindex="-1"></a>  pr.Ps<span class="sc">$</span>fit <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">sqrt</span>(pr.Ps<span class="sc">$</span>se.fit<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> mPs<span class="sc">$</span>sig2)</span>
-<span id="cb472-19"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-19" tabindex="-1"></a>)</span>
-<span id="cb472-20"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-20" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span>
-<span id="cb472-21"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-21" tabindex="-1"></a><span class="fu">with</span>(births, <span class="fu">plot</span>(bweight <span class="sc">~</span> gestwks,</span>
-<span id="cb472-22"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-22" tabindex="-1"></a>  <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">24</span>, <span class="dv">45</span>),</span>
-<span id="cb472-23"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-23" tabindex="-1"></a>  <span class="at">cex.axis =</span> <span class="fl">1.5</span>, <span class="at">cex.lab =</span> <span class="fl">1.5</span></span>
-<span id="cb472-24"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-24" tabindex="-1"></a>))</span>
-<span id="cb472-25"><a href="estimation-of-effects-simple-and-more-complex.html#cb472-25" tabindex="-1"></a><span class="fu">plotFitPredInt</span>(nd<span class="sc">$</span>gestwks, fit.Ps, pred.Ps)</span></code></pre></div>
-<p><img src="effects-s_files/figure-html/bweight-gestwks-mPs-plot-1.png" alt="" width="672" />
-Compare this with the graph on slide 20 of the lecture notes.
+<div class="sourceCode" id="cb518"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb518-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-1" tabindex="-1"></a><span class="co"># With se.fit=TRUE, object pr.Ps has only two columns: </span></span>
+<span id="cb518-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-2" tabindex="-1"></a><span class="co"># the fitted values and their standard errors (SE).</span></span>
+<span id="cb518-3"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-3" tabindex="-1"></a><span class="co"># We first take the fitted values and their SEs to compute the 95 % </span></span>
+<span id="cb518-4"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-4" tabindex="-1"></a><span class="co"># confidence interval for the expected value of the outcome at</span></span>
+<span id="cb518-5"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-5" tabindex="-1"></a><span class="co"># each value of gewtwks.</span></span>
+<span id="cb518-6"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-6" tabindex="-1"></a>fit.Ps <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
+<span id="cb518-7"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-7" tabindex="-1"></a>  pr.Ps<span class="sc">$</span>fit,</span>
+<span id="cb518-8"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-8" tabindex="-1"></a>  pr.Ps<span class="sc">$</span>fit <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> pr.Ps<span class="sc">$</span>se.fit,</span>
+<span id="cb518-9"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-9" tabindex="-1"></a>  pr.Ps<span class="sc">$</span>fit <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> pr.Ps<span class="sc">$</span>se.fit</span>
+<span id="cb518-10"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-10" tabindex="-1"></a>)</span>
+<span id="cb518-11"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-11" tabindex="-1"></a><span class="co"># For computing and plotting 95 % prediction intervals for individual</span></span>
+<span id="cb518-12"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-12" tabindex="-1"></a><span class="co"># future observations of the outcome at each value of gestwks, we must </span></span>
+<span id="cb518-13"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-13" tabindex="-1"></a><span class="co"># add the residual variance of the fitted model to the square</span></span>
+<span id="cb518-14"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-14" tabindex="-1"></a><span class="co"># of the standard error of the fitted value and </span></span>
+<span id="cb518-15"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-15" tabindex="-1"></a>pred.Ps <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
+<span id="cb518-16"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-16" tabindex="-1"></a>  pr.Ps<span class="sc">$</span>fit, </span>
+<span id="cb518-17"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-17" tabindex="-1"></a>  pr.Ps<span class="sc">$</span>fit <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">sqrt</span>(pr.Ps<span class="sc">$</span>se.fit<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> mPs<span class="sc">$</span>sig2),</span>
+<span id="cb518-18"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-18" tabindex="-1"></a>  pr.Ps<span class="sc">$</span>fit <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">sqrt</span>(pr.Ps<span class="sc">$</span>se.fit<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> mPs<span class="sc">$</span>sig2)</span>
+<span id="cb518-19"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-19" tabindex="-1"></a>)</span>
+<span id="cb518-20"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-20" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb518-21"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-21" tabindex="-1"></a><span class="fu">with</span>(births, <span class="fu">plot</span>(bweight <span class="sc">~</span> gestwks,</span>
+<span id="cb518-22"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-22" tabindex="-1"></a>  <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">24</span>, <span class="dv">45</span>),</span>
+<span id="cb518-23"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-23" tabindex="-1"></a>  <span class="at">cex.axis =</span> <span class="fl">1.5</span>, <span class="at">cex.lab =</span> <span class="fl">1.5</span></span>
+<span id="cb518-24"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-24" tabindex="-1"></a>))</span>
+<span id="cb518-25"><a href="estimation-of-effects-simple-and-more-complex.html#cb518-25" tabindex="-1"></a><span class="fu">plotFitPredInt</span>(nd<span class="sc">$</span>gestwks, fit.Ps, pred.Ps)</span></code></pre></div>
+<p>Compare this with the graph on slide 20 of the lecture notes.
 Are you happy with the end result?</p>
 </div>
 <div id="analysis-of-binary-outcomes" class="section level2 hasAnchor" number="7.8">
@@ -796,11 +792,11 @@ and modelling binary outcome.</p>
 <li>We start with simple tabulation
 of the prevalence of <code>lowbw</code> by maternal hypertension</li>
 </ol>
-<div class="sourceCode" id="cb473"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb473-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb473-1" tabindex="-1"></a><span class="fu">stat.table</span>(</span>
-<span id="cb473-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb473-2" tabindex="-1"></a>  <span class="at">index =</span> <span class="fu">list</span>(hyp, lowbw),</span>
-<span id="cb473-3"><a href="estimation-of-effects-simple-and-more-complex.html#cb473-3" tabindex="-1"></a>  <span class="at">contents =</span> <span class="fu">list</span>(<span class="fu">count</span>(), <span class="fu">percent</span>(lowbw)),</span>
-<span id="cb473-4"><a href="estimation-of-effects-simple-and-more-complex.html#cb473-4" tabindex="-1"></a>  <span class="at">margins =</span> <span class="cn">TRUE</span>, <span class="at">data =</span> births</span>
-<span id="cb473-5"><a href="estimation-of-effects-simple-and-more-complex.html#cb473-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb519"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb519-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb519-1" tabindex="-1"></a><span class="fu">stat.table</span>(</span>
+<span id="cb519-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb519-2" tabindex="-1"></a>  <span class="at">index =</span> <span class="fu">list</span>(hyp, lowbw),</span>
+<span id="cb519-3"><a href="estimation-of-effects-simple-and-more-complex.html#cb519-3" tabindex="-1"></a>  <span class="at">contents =</span> <span class="fu">list</span>(<span class="fu">count</span>(), <span class="fu">percent</span>(lowbw)),</span>
+<span id="cb519-4"><a href="estimation-of-effects-simple-and-more-complex.html#cb519-4" tabindex="-1"></a>  <span class="at">margins =</span> <span class="cn">TRUE</span>, <span class="at">data =</span> births</span>
+<span id="cb519-5"><a href="estimation-of-effects-simple-and-more-complex.html#cb519-5" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>##  --------------------------------- 
 ##          ----------lowbw---------- 
 ##  hyp            0       1   Total  
@@ -822,18 +818,18 @@ or about three times as high as that for normotensive mothers</p>
 <li>The three comparative measures of prevalences can be
 estimated by <code>glm()</code> with different link functions:</li>
 </ol>
-<div class="sourceCode" id="cb475"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb475-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb475-1" tabindex="-1"></a>binRD <span class="ot">&lt;-</span> <span class="fu">glm</span>(lowbw <span class="sc">~</span> hyp, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">&quot;identity&quot;</span>), <span class="at">data =</span> births)</span>
-<span id="cb475-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb475-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(binRD)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span><span class="sc">:</span><span class="dv">6</span>)], <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb521"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb521-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb521-1" tabindex="-1"></a>binRD <span class="ot">&lt;-</span> <span class="fu">glm</span>(lowbw <span class="sc">~</span> hyp, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">&quot;identity&quot;</span>), <span class="at">data =</span> births)</span>
+<span id="cb521-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb521-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(binRD)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span><span class="sc">:</span><span class="dv">6</span>)], <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##             Estimate StdErr  2.5% 97.5%
 ## (Intercept)    0.093  0.014 0.066 0.121
 ## hyphyper       0.184  0.055 0.077 0.291</code></pre>
-<div class="sourceCode" id="cb477"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb477-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb477-1" tabindex="-1"></a>binRR <span class="ot">&lt;-</span> <span class="fu">glm</span>(lowbw <span class="sc">~</span> hyp, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">&quot;log&quot;</span>), <span class="at">data =</span> births)</span>
-<span id="cb477-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb477-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(binRR, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span><span class="sc">:</span><span class="dv">7</span>)], <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb523"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb523-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb523-1" tabindex="-1"></a>binRR <span class="ot">&lt;-</span> <span class="fu">glm</span>(lowbw <span class="sc">~</span> hyp, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">&quot;log&quot;</span>), <span class="at">data =</span> births)</span>
+<span id="cb523-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb523-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(binRR, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span><span class="sc">:</span><span class="dv">7</span>)], <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##             Estimate StdErr exp(Est.)  2.5% 97.5%
 ## (Intercept)   -2.370  0.151     0.093 0.070 0.126
 ## hyphyper       1.089  0.242     2.972 1.848 4.780</code></pre>
-<div class="sourceCode" id="cb479"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb479-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb479-1" tabindex="-1"></a>binOR <span class="ot">&lt;-</span> <span class="fu">glm</span>(lowbw <span class="sc">~</span> hyp, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">&quot;logit&quot;</span>), <span class="at">data =</span> births)</span>
-<span id="cb479-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb479-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(binOR, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span><span class="sc">:</span><span class="dv">7</span>)], <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb525"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb525-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb525-1" tabindex="-1"></a>binOR <span class="ot">&lt;-</span> <span class="fu">glm</span>(lowbw <span class="sc">~</span> hyp, <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">&quot;logit&quot;</span>), <span class="at">data =</span> births)</span>
+<span id="cb525-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb525-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(binOR, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span><span class="sc">:</span><span class="dv">7</span>)], <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##             Estimate StdErr exp(Est.)  2.5% 97.5%
 ## (Intercept)   -2.272  0.166     0.103 0.074 0.143
 ## hyphyper       1.317  0.311     3.731 2.027 6.865</code></pre>
@@ -844,11 +840,11 @@ How well is the odds ratio approximating the risk ratio here?</p>
 <li>The prevalence of low birth weight is expected to be inversely related
 to gestational age (weeks), as is evident from simple tabulation</li>
 </ol>
-<div class="sourceCode" id="cb481"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb481-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb481-1" tabindex="-1"></a><span class="fu">stat.table</span>(</span>
-<span id="cb481-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb481-2" tabindex="-1"></a>  <span class="at">index =</span> <span class="fu">list</span>(gest4, lowbw),</span>
-<span id="cb481-3"><a href="estimation-of-effects-simple-and-more-complex.html#cb481-3" tabindex="-1"></a>  <span class="at">contents =</span> <span class="fu">list</span>(<span class="fu">count</span>(), <span class="fu">percent</span>(lowbw)),</span>
-<span id="cb481-4"><a href="estimation-of-effects-simple-and-more-complex.html#cb481-4" tabindex="-1"></a>  <span class="at">margins =</span> <span class="cn">TRUE</span>, <span class="at">data =</span> births</span>
-<span id="cb481-5"><a href="estimation-of-effects-simple-and-more-complex.html#cb481-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb527"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb527-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb527-1" tabindex="-1"></a><span class="fu">stat.table</span>(</span>
+<span id="cb527-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb527-2" tabindex="-1"></a>  <span class="at">index =</span> <span class="fu">list</span>(gest4, lowbw),</span>
+<span id="cb527-3"><a href="estimation-of-effects-simple-and-more-complex.html#cb527-3" tabindex="-1"></a>  <span class="at">contents =</span> <span class="fu">list</span>(<span class="fu">count</span>(), <span class="fu">percent</span>(lowbw)),</span>
+<span id="cb527-4"><a href="estimation-of-effects-simple-and-more-complex.html#cb527-4" tabindex="-1"></a>  <span class="at">margins =</span> <span class="cn">TRUE</span>, <span class="at">data =</span> births</span>
+<span id="cb527-5"><a href="estimation-of-effects-simple-and-more-complex.html#cb527-5" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>##  ---------------------------------- 
 ##           ----------lowbw---------- 
 ##  gest4           0       1   Total  
@@ -872,8 +868,8 @@ to gestational age (weeks), as is evident from simple tabulation</li>
 <ol start="4" style="list-style-type: decimal">
 <li>Let’s jump right away to spline modelling of this relationship</li>
 </ol>
-<div class="sourceCode" id="cb483"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb483-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb483-1" tabindex="-1"></a>binm1 <span class="ot">&lt;-</span> mgcv<span class="sc">::</span><span class="fu">gam</span>(lowbw <span class="sc">~</span> <span class="fu">s</span>(gestwks), <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">&quot;logit&quot;</span>), <span class="at">data =</span> births)</span>
-<span id="cb483-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb483-2" tabindex="-1"></a><span class="fu">summary</span>(binm1)</span></code></pre></div>
+<div class="sourceCode" id="cb529"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb529-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb529-1" tabindex="-1"></a>binm1 <span class="ot">&lt;-</span> mgcv<span class="sc">::</span><span class="fu">gam</span>(lowbw <span class="sc">~</span> <span class="fu">s</span>(gestwks), <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">&quot;logit&quot;</span>), <span class="at">data =</span> births)</span>
+<span id="cb529-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb529-2" tabindex="-1"></a><span class="fu">summary</span>(binm1)</span></code></pre></div>
 <pre><code>## 
 ## Family: binomial 
 ## Link function: logit 
@@ -895,8 +891,7 @@ to gestational age (weeks), as is evident from simple tabulation</li>
 ## 
 ## R-sq.(adj) =  0.425   Deviance explained = 42.9%
 ## UBRE = -0.57194  Scale est. = 1         n = 490</code></pre>
-<div class="sourceCode" id="cb485"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb485-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb485-1" tabindex="-1"></a><span class="fu">plot</span>(binm1)</span></code></pre></div>
-<p><img src="effects-s_files/figure-html/lowbw-gestwks-spline-1.png" alt="" width="672" /></p>
+<div class="sourceCode" id="cb531"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb531-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb531-1" tabindex="-1"></a><span class="fu">plot</span>(binm1)</span></code></pre></div>
 <p>Inspect the figure. – Would you agree, that the logit of the prevalence
 of outcome is almost linearly dependent on <code>gestwks</code>?</p>
 <ol start="5" style="list-style-type: decimal">
@@ -910,8 +905,8 @@ in the transformation would not be mixed with the similar
 operator in a model formula, which would remove an explanatory
 term from the model.</li>
 </ol>
-<div class="sourceCode" id="cb486"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb486-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb486-1" tabindex="-1"></a>binm2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(lowbw <span class="sc">~</span> <span class="fu">I</span>(gestwks<span class="dv">-40</span>), <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">&quot;logit&quot;</span>), <span class="at">data =</span> births)</span>
-<span id="cb486-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb486-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(binm2, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span><span class="sc">:</span><span class="dv">7</span>)], <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb532"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb532-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb532-1" tabindex="-1"></a>binm2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(lowbw <span class="sc">~</span> <span class="fu">I</span>(gestwks<span class="dv">-40</span>), <span class="at">family =</span> <span class="fu">binomial</span>(<span class="at">link =</span> <span class="st">&quot;logit&quot;</span>), <span class="at">data =</span> births)</span>
+<span id="cb532-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb532-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.lin</span>(binm2, <span class="at">Exp =</span> <span class="cn">TRUE</span>)[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span><span class="sc">:</span><span class="dv">7</span>)], <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##                 Estimate StdErr exp(Est.)  2.5% 97.5%
 ## (Intercept)       -4.011  0.338     0.018 0.009 0.035
 ## I(gestwks - 40)   -0.896  0.108     0.408 0.330 0.505</code></pre>
@@ -923,9 +918,8 @@ to plot the fitted prevalences of <code>lowbw</code> against <code>gestwks</code
 in which we utilize the previously created data frame <code>nd</code>
 as <code>newdata</code>.</li>
 </ol>
-<div class="sourceCode" id="cb488"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb488-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb488-1" tabindex="-1"></a>predm2 <span class="ot">&lt;-</span> <span class="fu">predict</span>(binm2, <span class="at">newdata =</span> nd, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
-<span id="cb488-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb488-2" tabindex="-1"></a><span class="fu">plot</span>(nd<span class="sc">$</span>gestwks, predm2, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>)</span></code></pre></div>
-<p><img src="effects-s_files/figure-html/lowbw-gestwks-pred-1.png" alt="" width="672" /></p>
+<div class="sourceCode" id="cb534"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb534-1"><a href="estimation-of-effects-simple-and-more-complex.html#cb534-1" tabindex="-1"></a>predm2 <span class="ot">&lt;-</span> <span class="fu">predict</span>(binm2, <span class="at">newdata =</span> nd, <span class="at">type =</span> <span class="st">&quot;response&quot;</span>)</span>
+<span id="cb534-2"><a href="estimation-of-effects-simple-and-more-complex.html#cb534-2" tabindex="-1"></a><span class="fu">plot</span>(nd<span class="sc">$</span>gestwks, predm2, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>)</span></code></pre></div>
 <p>The curve seems to cover practically the whole range of
 the outcome probability scale with a relatively
 steep slope between 33 to 37 weeks.</p>
@@ -969,7 +963,7 @@ gitbook.start({
     "size": 2
   },
   "edit": {
-    "link": "https://github.com/SPE-R/SPE/edit/master/pracs-book/effects-s.rmd",
+    "link": "https://github.com/SPE-R/SPE/edit/master/pracs-book/effects-e.rmd",
     "text": "Edit"
   },
   "history": {

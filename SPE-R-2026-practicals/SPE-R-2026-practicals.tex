@@ -146,7 +146,7 @@
 \makeatother
 \subtitle{SPE practicals}
 \author{Krista Fischer\footnote{Estonian Genome Center, University of Tartu, Estonia, \href{mailto:Krista.Fischer@ut.ee}{\nolinkurl{Krista.Fischer@ut.ee}}} \and Martyn Plummer\footnote{University of Warwick, UK, \href{mailto:martyn.plummer@warwick.ac.uk}{\nolinkurl{martyn.plummer@warwick.ac.uk}}} \and Janne Pitkäniemi\footnote{Finnish Cancer Registry, Helsinki, Finland, \href{mailto:janne.pitkaniemi@cancer.fi}{\nolinkurl{janne.pitkaniemi@cancer.fi}}} \and Bendix Carstensen\footnote{Steno Diabetes Center Copenhagen, Gentofte, Denmark, Dept. of Biostatistics, University of Copenhagen, Denmark, \href{mailto:b@bxc.dk}{\nolinkurl{b@bxc.dk}}, \url{http://BendixCarstensen.com}} \and Damien Georges\footnote{International Agency for Research on Cancer, Lyon, France, \href{mailto:georgesd@iarc.who.int}{\nolinkurl{georgesd@iarc.who.int}}} \and Esa Läärä\footnote{Department of Mathematical Sciences, University of Oulu, Finland, \href{mailto:Esa.Laara@oulu.fi}{\nolinkurl{Esa.Laara@oulu.fi}}, \url{http://www.oulu.fi/university/researcher/esa-laara}}}
-\date{1-5 June 2026 (built 02 June 2026 10:05 UTC)}
+\date{1-5 June 2026 (built 02 June 2026 11:37 UTC)}
 
 \begin{document}
 \maketitle
@@ -4538,19 +4538,17 @@ steep slope between 33 to 37 weeks.
 
 \chapter{Poisson regression \& analysis of curved effects}\label{poisson-regression-analysis-of-curved-effects}
 
-This exercise deals with modelling incidence rates
-using Poisson regression, already briefly covered by
-Janne and Esa in this course. Our special interest is in
-estimating and reporting non-linear or curved effects of continuous
-explanatory variables on the hazard rate , i.e.~
+This exercise deals with modelling incidence rates using Poisson
+regression, already briefly covered by Janne and Esa in this course. Our
+special interest is in estimating and reporting non-linear or curved
+effects of continuous explanatory variables on the hazard rate , i.e.
 the theoretical incidence rate of the outcome.
 
-We analyse the \texttt{testisDK} data found in the \texttt{Epi} package.
-It contains the numbers of cases of testis cancer and mid-year
-populations (person-years) in 1-year age groups in Denmark during
-1943-96. In this analysis age and calendar time
-are first treated as categorical
-but finally, a penalized spline model is fitted.
+We analyse the \texttt{testisDK} data found in the \texttt{Epi} package. It contains
+the numbers of cases of testis cancer and mid-year populations
+(person-years) in 1-year age groups in Denmark during 1943-96. In this
+analysis age and calendar time are first treated as categorical but
+finally, a penalized spline model is fitted.
 
 \section{Testis cancer: Data input and housekeeping}\label{testis-cancer-data-input-and-housekeeping}
 
@@ -4577,12 +4575,12 @@ but finally, a penalized spline model is fitted.
 \setcounter{enumi}{1}
 \tightlist
 \item
-  There are nearly 5000 observations from 90 one-year age groups
-  and 54 calendar years. To get a clearer picture of what's going on,
-  we do some housekeeping. The age range will be limited to 15-79
-  years, and age and period are both categorized into 5-year intervals
-  -- according to the traditional, time-honoured practice in
-  epidemiology and demography.
+  There are nearly 5000 observations from 90 one-year age groups and
+  54 calendar years. To get a clearer picture of what's going on, we
+  do some housekeeping. The age range will be limited to 15-79 years,
+  and age and period are both categorized into 5-year intervals --
+  according to the traditional, time-honoured practice in epidemiology
+  and demography.
 \end{enumerate}
 
 \begin{Shaded}
@@ -4607,7 +4605,8 @@ Computation and tabulation of incidence rates
 \item
   Tabulate numbers of cases and person-years, and compute the
   incidence rates (per 100,000 y) in each 5 y \(\times\) 5 y cell using
-  \texttt{stat.table()}. Take a look at the structure of the thus created object
+  \texttt{stat.table()}. Take a look at the structure of the thus created
+  object
 \end{enumerate}
 
 \begin{Shaded}
@@ -4626,21 +4625,20 @@ Computation and tabulation of incidence rates
 \end{Highlighting}
 \end{Shaded}
 
-The table is too wide to be readable as such. A graphical
-presentation is more informative.
+The table is too wide to be readable as such. A graphical presentation
+is more informative.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \setcounter{enumi}{1}
 \tightlist
 \item
-  From the saved table object \texttt{tab} you can plot an
-  age-incidence curve for each calendar period separately,
-  after you have checked the structure of the table given
-  in the previous item, so that you know the relevant
-  dimensions in it. There is a function \texttt{rateplot()} in \texttt{Epi}
-  that does default plotting of tables of rates (see the help page of
-  \texttt{rateplot})
+  From the saved table object \texttt{tab} you can plot an age-incidence
+  curve for each calendar period separately, after you have checked
+  the structure of the table given in the previous item, so that you
+  know the relevant dimensions in it. There is a function \texttt{rateplot()}
+  in \texttt{Epi} that does default plotting of tables of rates (see the help
+  page of \texttt{rateplot})
 \end{enumerate}
 
 \begin{Shaded}
@@ -4654,33 +4652,30 @@ presentation is more informative.
 \end{Highlighting}
 \end{Shaded}
 
-What is your broad impression about the trend in the
-the age-specific incidence rates over calendar time?
-What about the effect of age; is there any common pattern in the
-age-incidence curves across the periods?
+What is your broad impression about the trend in the the age-specific
+incidence rates over calendar time? What about the effect of age; is
+there any common pattern in the age-incidence curves across the periods?
 
 \section{Age and period as categorical factors}\label{age-and-period-as-categorical-factors}
 
-We shall first fit a Poisson regression model with log link
-on age and period in the traditional way,
-in which both factors are treated as categorical.
-The model is additive on the log-hazard scale:
+We shall first fit a Poisson regression model with log link on age and
+period in the traditional way, in which both factors are treated as
+categorical. The model is additive on the log-hazard scale:
 \[ \log(h_{jk}) = \mu + \alpha_j + \beta_k, \quad j=1, \dots, 14; k=1, \dots, 12, \]
-where \(h_{jk}\) is the hazard rate in age group \(j\) and period \(k\).
-Each \(\alpha_j\)s is the logarithm of the rate ratio between
-age group \(j\) and the reference age group \(1 = 15-19\) years,
-and \(\beta_k\) is the log(rate-ratio) between period \(k\) and
-period \(1 = 1943-47\). The intercept parameter is the log-hazard
-at the combination of the reference levels chosen
-for age and period --
-It is useful to scale the person-years to be expressed in \(10^5\) y.
+where \(h_{jk}\) is the hazard rate in age group \(j\) and period \(k\). Each
+\(\alpha_j\)s is the logarithm of the rate ratio between age group \(j\) and
+the reference age group \(1 = 15-19\) years, and \(\beta_k\) is the
+log(rate-ratio) between period \(k\) and period \(1 = 1943-47\). The
+intercept parameter is the log-hazard at the combination of the
+reference levels chosen for age and period -- It is useful to scale the
+person-years to be expressed in \(10^5\) y.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  In fitting the model we utilize the \texttt{poisreg} family object
-  found in package \texttt{Epi}.
+  In fitting the model we utilize the \texttt{poisreg} family object found in
+  package \texttt{Epi}.
 \end{enumerate}
 
 \begin{Shaded}
@@ -4699,27 +4694,24 @@ What do the estimated rate ratios tell about the age and period effects?
 \setcounter{enumi}{1}
 \tightlist
 \item
-  A graphical inspection of point estimates and confidence
-  intervals can be obtained using function \texttt{matplot()} in the
-  \texttt{graphics} package of R. In the beginning it is useful
-  to define shorthands for the pertinent mid-age and mid-period values
-  of the different intervals
+  A graphical inspection of point estimates and confidence intervals
+  can be obtained using function \texttt{matplot()} in the \texttt{graphics} package
+  of R. In the beginning it is useful to define shorthands for the
+  pertinent mid-age and mid-period values of the different intervals
 \end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{aMid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\FloatTok{17.5}\NormalTok{, }\FloatTok{77.5}\NormalTok{, }\AttributeTok{by =} \DecValTok{5}\NormalTok{)}
 \NormalTok{pMid }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\DecValTok{1945}\NormalTok{, }\DecValTok{1995}\NormalTok{, }\AttributeTok{by =} \DecValTok{5}\NormalTok{)}
-\FunctionTok{matplot}\NormalTok{(aMid, }\FunctionTok{rbind}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\FunctionTok{ci.exp}\NormalTok{(mCat)[}\DecValTok{2}\SpecialCharTok{:}\DecValTok{13}\NormalTok{, ]), }\AttributeTok{type =} \StringTok{"o"}\NormalTok{, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{,     }
-   \AttributeTok{log =} \StringTok{"y"}\NormalTok{, }\AttributeTok{cex.lab =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{cex.axis =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{col=} \FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{),}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{))}
+\FunctionTok{matplot}\NormalTok{(aMid, }\FunctionTok{rbind}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\FunctionTok{ci.exp}\NormalTok{(mCat)[}\DecValTok{2}\SpecialCharTok{:}\DecValTok{13}\NormalTok{, ]), }\AttributeTok{type =} \StringTok{"o"}\NormalTok{, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{,}
+   \AttributeTok{log =} \StringTok{"y"}\NormalTok{, }\AttributeTok{cex.lab =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{cex.axis =} \FloatTok{1.5}\NormalTok{, }
+   \AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{),}
   \AttributeTok{xlab =} \StringTok{"Age (years)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Rate ratio"}\NormalTok{ )}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \FunctionTok{matplot}\NormalTok{(pMid, }\FunctionTok{rbind}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\FunctionTok{ci.exp}\NormalTok{(mCat)[}\DecValTok{14}\SpecialCharTok{:}\DecValTok{23}\NormalTok{, ]), }\AttributeTok{type =} \StringTok{"o"}\NormalTok{, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{,}
-  \AttributeTok{log =} \StringTok{"y"}\NormalTok{, }\AttributeTok{cex.lab =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{cex.axis =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{col=}\FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{),}
+   \AttributeTok{log =} \StringTok{"y"}\NormalTok{, }\AttributeTok{cex.lab =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{cex.axis =} \FloatTok{1.5}\NormalTok{, }
+   \AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{),}
   \AttributeTok{xlab =} \StringTok{"Calendar year {-} 1900"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Rate ratio"}\NormalTok{ )}
 \end{Highlighting}
 \end{Shaded}
@@ -4729,13 +4721,12 @@ What do the estimated rate ratios tell about the age and period effects?
 \setcounter{enumi}{2}
 \tightlist
 \item
-  In the fitted model the reference category for each factor was
-  the first one. As age is the dominating factor, it may be more
-  informative to remove the intercept from the model. As a
-  consequence the exponentiated age parameters actually
-  describe fitted hazard rates for the age groups, each at a chosen
-  reference level of the period factor. For the latter
-  it is now convenient to choose the
+  In the fitted model the reference category for each factor was the
+  first one. As age is the dominating factor, it may be more
+  informative to remove the intercept from the model. As a consequence
+  the exponentiated age parameters actually describe fitted hazard
+  rates for the age groups, each at a chosen reference level of the
+  period factor. For the latter it is now convenient to choose the
   middle period 1968-72 using function \texttt{Relevel()} in \texttt{Epi}.
 \end{enumerate}
 
@@ -4753,19 +4744,24 @@ What do the estimated rate ratios tell about the age and period effects?
 \setcounter{enumi}{3}
 \tightlist
 \item
-  Let us also plot estimates from the latter model, too.
+  Let us also plot estimates from the latter model, too. -- NB. The bug
+  in the previous version of the exercise is now fixed, so that
+  the estimated age-specific incidence rates averaged over the calendar
+  periods are now correctly plotted.
 \end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
-\FunctionTok{matplot}\NormalTok{(aMid, }\FunctionTok{rbind}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\FunctionTok{ci.exp}\NormalTok{(mCat2)[}\DecValTok{2}\SpecialCharTok{:}\DecValTok{13}\NormalTok{, ]), }\AttributeTok{type =} \StringTok{"o"}\NormalTok{, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{,     }
-   \AttributeTok{log =} \StringTok{"y"}\NormalTok{, }\AttributeTok{cex.lab =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{cex.axis =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{col=}\FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{),}
+\FunctionTok{matplot}\NormalTok{(aMid, }\FunctionTok{ci.exp}\NormalTok{(mCat2)[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{13}\NormalTok{, ], }\AttributeTok{type =} \StringTok{"o"}\NormalTok{, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{lwd=}\FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{),  }
+   \AttributeTok{log =} \StringTok{"y"}\NormalTok{, }\AttributeTok{cex.lab =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{cex.axis =} \FloatTok{1.5}\NormalTok{, }
+   \AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{),}
   \AttributeTok{xlab =} \StringTok{"Age (years)"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Rate"}\NormalTok{ )}
-\FunctionTok{matplot}\NormalTok{(pMid, }\FunctionTok{rbind}\NormalTok{(}\FunctionTok{ci.exp}\NormalTok{(mCat2)[}\DecValTok{14}\SpecialCharTok{:}\DecValTok{18}\NormalTok{, ], }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\FunctionTok{ci.exp}\NormalTok{(mCat2)[}\DecValTok{19}\SpecialCharTok{:}\DecValTok{23}\NormalTok{, ]),}
+\FunctionTok{matplot}\NormalTok{(pMid, }\FunctionTok{rbind}\NormalTok{(}\FunctionTok{ci.exp}\NormalTok{(mCat2)[}\DecValTok{14}\SpecialCharTok{:}\DecValTok{18}\NormalTok{, ], }
+                    \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{), }\FunctionTok{ci.exp}\NormalTok{(mCat2)[}\DecValTok{19}\SpecialCharTok{:}\DecValTok{23}\NormalTok{, ]),}
         \AttributeTok{type =} \StringTok{"o"}\NormalTok{, }\AttributeTok{pch =} \DecValTok{16}\NormalTok{, }\AttributeTok{log =} \StringTok{"y"}\NormalTok{, }\AttributeTok{cex.lab =} \FloatTok{1.5}\NormalTok{, }\AttributeTok{cex.axis =} \FloatTok{1.5}\NormalTok{,}
-        \AttributeTok{col=}\FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{),}
-  \AttributeTok{xlab =} \StringTok{"Calendar year {-} 1900"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Rate ratio"}\NormalTok{ )}
+         \AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{),}
+        \AttributeTok{xlab =} \StringTok{"Calendar year {-} 1900"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Rate ratio"}\NormalTok{ )}
 \FunctionTok{abline}\NormalTok{(}\AttributeTok{h =} \DecValTok{1}\NormalTok{, }\AttributeTok{col =} \StringTok{"gray"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -4774,28 +4770,23 @@ What do the estimated rate ratios tell about the age and period effects?
 
 It is obvious that the age effect on the log-rate scale is highly
 non-linear. Yet, it is less clear whether the true period effect
-essentally deviates from linearity. Nevertheless, there are
-good reasons to try fitting a \emph{generalized additive model} (GAM),
-the systematic part of which containing the sum of
-smooth continuous functions of the two time scales:
-\[ \log \{h(A,P)\} = \mu + s_1(A) + s_2(P), \]
-where the logarithm of the
-hazard \(h(A,P)\) depends on continuous age \(A\) (years)
-and calendar year \(P\) via smooth functions \(s_1(A)\)
-and \(s_2(B)\).
+essentally deviates from linearity. Nevertheless, there are good reasons
+to try fitting a \emph{generalized additive model} (GAM), the systematic part
+of which containing the sum of smooth continuous functions of the two
+time scales: \[ \log \{h(A,P)\} = \mu + s_1(A) + s_2(P), \] where the
+logarithm of the hazard \(h(A,P)\) depends on continuous age \(A\) (years)
+and calendar year \(P\) via smooth functions \(s_1(A)\) and \(s_2(B)\).
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  As the next task we fit the above defined GAM assuming
-  the Poisson family as before for the random component.
-  Here the principle of \emph{penalized splines} (see Martyn's lecture)
-  is applied using function \texttt{gam()} in package\texttt{mgcv}
-  with its default settings.
-  In this fitting an optimal value for the penalty
-  parameter is chosen based on an AIC-like criterion known as UBRE
-  (`Un-Biased Risk Estimator')
+  As the next task we fit the above defined GAM assuming the Poisson
+  family as before for the random component. Here the principle of
+  \emph{penalized splines} (see Martyn's lecture) is applied using function
+  \texttt{gam()} in package\texttt{mgcv} with its default settings. In this fitting
+  an optimal value for the penalty parameter is chosen based on an
+  AIC-like criterion known as UBRE (`Un-Biased Risk Estimator')
 \end{enumerate}
 
 \begin{Shaded}
@@ -4808,11 +4799,10 @@ and \(s_2(B)\).
 \end{Shaded}
 
 The summary is quite brief, and the only estimated coefficient is the
-intercept \(\mu\), which sets the baseline level
-for the log-rates, against
-which the relative age effects and period effects will be contrasted.
-On the hazard rate scale the baseline level 5.53 per 100000 y is
-obtained by\texttt{exp(1.7096)}.
+intercept \(\mu\), which sets the baseline level for the log-rates,
+against which the relative age effects and period effects will be
+contrasted. On the hazard rate scale the baseline level 5.53 per 100000
+y is obtained by\texttt{exp(1.7096)}.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -4831,36 +4821,32 @@ obtained by\texttt{exp(1.7096)}.
 \end{Highlighting}
 \end{Shaded}
 
-The dashed lines describe the approximate 95\% confidence
-band for the pertinent
-curve. One could get the impression that 1968 were
-intentionally the
-reference year for the period effect, almost like period 1968-72
-chosen as the reference in the categorical
-model that was previously fitted. This is not quite the case, however.
-By default \texttt{gam()} parametrizes the spline effects such that the
-intercept \(\mu\), at which the spline effects are nominally zero, is the
-overall \emph{grand mean} value of the log-hazard in the data. This
-corresponds to the principle of \emph{sum contrasts} (\texttt{contr.sum})
-for categorical explanatory factors. It just happens here that
-the horizontal location of the grand mean for the period effect
-is approximately year 1968
+The dashed lines describe the approximate 95\% confidence band for the
+pertinent curve. One could get the impression that 1968 were
+intentionally the reference year for the period effect, almost like
+period 1968-72 chosen as the reference in the categorical model that was
+previously fitted. This is not quite the case, however. By default
+\texttt{gam()} parametrizes the spline effects such that the intercept \(\mu\),
+at which the spline effects are nominally zero, is the overall \emph{grand
+mean} value of the log-hazard in the data. This corresponds to the
+principle of \emph{sum contrasts} (\texttt{contr.sum}) for categorical explanatory
+factors. It just happens here that the horizontal location of the grand
+mean for the period effect is approximately year 1968
 
 From the summary you will also find that the degrees of freedom value
-required for the age effect is nearly the same as the default
-dimension \(k-1 = 9\) of the part of the model matrix (or basis)
-initially allocated for each smooth function. (Here \(k\) refers to the
-relevant argument that determines the basis dimension when specifying
-a smooth term by \texttt{s()} in the model formula). On the other
-hand the period effect takes just about 3 df.
+required for the age effect is nearly the same as the default dimension
+\(k-1 = 9\) of the part of the model matrix (or basis) initially allocated
+for each smooth function. (Here \(k\) refers to the relevant argument that
+determines the basis dimension when specifying a smooth term by \texttt{s()} in
+the model formula). On the other hand the period effect takes just about
+3 df.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \setcounter{enumi}{2}
 \tightlist
 \item
-  It is a good idea to do some diagnostic checking of the fitted
-  model
+  It is a good idea to do some diagnostic checking of the fitted model
 \end{enumerate}
 
 \begin{Shaded}
@@ -4870,17 +4856,18 @@ hand the period effect takes just about 3 df.
 \end{Highlighting}
 \end{Shaded}
 
-The four diagnostic plots are analogous to some of those used in
-the context of linear models for Gaussian responses, but not all of them
-may be as easy to interpret. -- Pay attention to the note
-given in the printed output about the value of \texttt{k}.
+The four diagnostic plots are analogous to some of those used in the
+context of linear models for Gaussian responses, but not all of them may
+be as easy to interpret. -- Pay attention to the note given in the
+printed output about the value of \texttt{k}.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \setcounter{enumi}{3}
 \tightlist
 \item
-  Let us refit the model but now with an increased \texttt{k} for age:
+  Let us refit the model but now with an increased \texttt{k} for age.
+  Take a look at the summary, especially the degrees of freedom for age.
 \end{enumerate}
 
 \begin{Shaded}
@@ -4889,14 +4876,20 @@ given in the printed output about the value of \texttt{k}.
   \AttributeTok{family =} \FunctionTok{poisreg}\NormalTok{(}\AttributeTok{link =}\NormalTok{ log), }\AttributeTok{data =}\NormalTok{ tdk}
 \NormalTok{)}
 \FunctionTok{summary}\NormalTok{(mPen2)}
+\end{Highlighting}
+\end{Shaded}
+
+With this choice of \texttt{k} the df value for age became about 11, which is
+well below \(k-1 = 19\). -- Take a look at the diagnostic plots, too
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow =} \FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
 \FunctionTok{gam.check}\NormalTok{(mPen2)}
 \end{Highlighting}
 \end{Shaded}
 
-With this choice of \texttt{k} the df value for age became about 11,
-which is well below \(k-1 = 19\). Let us plot the fitted curves from
-this fitting, too
+Plot also the fitted curves obtained from this model.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -4907,27 +4900,26 @@ this fitting, too
 \end{Shaded}
 
 There does not seem to have happened any essential changes from the
-previously fitted curves, so maybe 8 df could, after all, be quite
-enough for the age effect.
+previously fitted curves. -- Maybe, after all,
+8 df could be quite enough for the age effect.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \setcounter{enumi}{4}
 \tightlist
 \item
-  Graphical presentation of the effects using \texttt{plot.gam()}
-  can be improved. For instance, we may present the
-  age effect to describe the \emph{mean} incidence rates by age, averaged
-  over the whole time span of 54 years. This is obtained by
-  adding the estimated \emph{grand mean} or intercept 1.71 = log(5.53)
-  to the estimated values of the smooth curve
-  describing the age effect and expressing the \(y\)-coordinates
-  on the hazard scale.
-  For that purpose we need to extract the intercept and modify the
-  labels of the \(y\)-axis accordingly. The estimated period curve
-  can also be expressed in terms of
-  relative indidence rates in relation to the fitted baseline rate,
-  as determined by the model's intercept.
+  Graphical presentation of the effects using \texttt{plot.gam()} can be
+  improved. For instance, we may present the age effect to describe
+  the \emph{mean} incidence rates by age, averaged over the whole time span
+  of 54 years. This is obtained by adding the estimated \emph{grand mean}
+  or intercept 1.71 = log(5.53) to the estimated values of the smooth
+  curve describing the age effect and expressing the \(y\)-coordinates
+  to represent the actual hazard (the scale still being logarithmic).
+  For that purpose we need to extract the
+  intercept and modify the labels of the \(y\)-axis accordingly. The
+  estimated period curve can also be expressed in terms of
+  indidence rate ratios in relation to the fitted baseline rate, as
+  determined by the model's intercept.
 \end{enumerate}
 
 \begin{Shaded}
@@ -4953,11 +4945,10 @@ enough for the age effect.
 \end{Highlighting}
 \end{Shaded}
 
-\textbf{Homework}
-You could continue the analysis of these data by fitting an age-cohort
-model as an alternative to the age-period model, as well as an
-age-cohort-period model utilizing function \texttt{apc.fit()} in
-\texttt{Epi}. See (\url{http://bendixcarstensen.com/APC/}) for details.
+\textbf{Homework} You could continue the analysis of these data by fitting an
+age-cohort model as an alternative to the age-period model, as well as
+an age-cohort-period model utilizing function \texttt{apc.fit()} in \texttt{Epi}. See
+(\url{http://bendixcarstensen.com/APC/}) for details.
 
 \chapter{Causal inference}\label{causal-inference}
 
@@ -5238,21 +5229,21 @@ Now, the following script generates a dataset:
 \NormalTok{\#\# lm(formula = Y \textasciitilde{} X + W + Z, data = dat)}
 \NormalTok{\#\# }
 \NormalTok{\#\# Residuals:}
-\NormalTok{\#\#     Min      1Q  Median      3Q     Max }
-\NormalTok{\#\# {-}3.9888 {-}0.7441  0.0096  0.7657  3.5928 }
+\NormalTok{\#\#    Min     1Q Median     3Q    Max }
+\NormalTok{\#\# {-}3.989 {-}0.744  0.010  0.766  3.593 }
 \NormalTok{\#\# }
 \NormalTok{\#\# Coefficients:}
-\NormalTok{\#\#              Estimate Std. Error t value Pr(\textgreater{}|t|)    }
-\NormalTok{\#\# (Intercept)  0.033168   0.024551   1.351    0.177    }
-\NormalTok{\#\# X           {-}0.001691   0.014877  {-}0.114    0.909    }
-\NormalTok{\#\# W           {-}2.599607   0.031987 {-}81.270   \textless{}2e{-}16 ***}
-\NormalTok{\#\# Z            1.014166   0.021197  47.846   \textless{}2e{-}16 ***}
+\NormalTok{\#\#             Estimate Std. Error t value Pr(\textgreater{}|t|)    }
+\NormalTok{\#\# (Intercept)  0.03317    0.02455    1.35     0.18    }
+\NormalTok{\#\# X           {-}0.00169    0.01488   {-}0.11     0.91    }
+\NormalTok{\#\# W           {-}2.59961    0.03199  {-}81.27   \textless{}2e{-}16 ***}
+\NormalTok{\#\# Z            1.01417    0.02120   47.85   \textless{}2e{-}16 ***}
 \NormalTok{\#\# {-}{-}{-}}
 \NormalTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
 \NormalTok{\#\# }
-\NormalTok{\#\# Residual standard error: 1.097 on 1996 degrees of freedom}
-\NormalTok{\#\# Multiple R{-}squared:  0.9686, Adjusted R{-}squared:  0.9686 }
-\NormalTok{\#\# F{-}statistic: 2.054e+04 on 3 and 1996 DF,  p{-}value: \textless{} 2.2e{-}16}
+\NormalTok{\#\# Residual standard error: 1.1 on 1996 degrees of freedom}
+\NormalTok{\#\# Multiple R{-}squared:  0.969,  Adjusted R{-}squared:  0.969 }
+\NormalTok{\#\# F{-}statistic: 2.05e+04 on 3 and 1996 DF,  p{-}value: \textless{}2e{-}16}
 \end{Highlighting}
 \end{Shaded}
 
@@ -5289,15 +5280,15 @@ Now, the following script generates a dataset:
 \NormalTok{\#\# }
 \NormalTok{\#\# Coefficients:}
 \NormalTok{\#\#             Estimate Std. Error t value Pr(\textgreater{}|t|)    }
-\NormalTok{\#\# (Intercept)  0.10067    0.05092   1.977   0.0482 *  }
-\NormalTok{\#\# X            1.13137    0.01077 105.040   \textless{}2e{-}16 ***}
-\NormalTok{\#\# Z            2.38032    0.02680  88.830   \textless{}2e{-}16 ***}
+\NormalTok{\#\# (Intercept)   0.1007     0.0509    1.98    0.048 *  }
+\NormalTok{\#\# X             1.1314     0.0108  105.04   \textless{}2e{-}16 ***}
+\NormalTok{\#\# Z             2.3803     0.0268   88.83   \textless{}2e{-}16 ***}
 \NormalTok{\#\# {-}{-}{-}}
 \NormalTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
 \NormalTok{\#\# }
-\NormalTok{\#\# Residual standard error: 2.277 on 1997 degrees of freedom}
-\NormalTok{\#\# Multiple R{-}squared:  0.8648, Adjusted R{-}squared:  0.8647 }
-\NormalTok{\#\# F{-}statistic:  6387 on 2 and 1997 DF,  p{-}value: \textless{} 2.2e{-}16}
+\NormalTok{\#\# Residual standard error: 2.28 on 1997 degrees of freedom}
+\NormalTok{\#\# Multiple R{-}squared:  0.865,  Adjusted R{-}squared:  0.865 }
+\NormalTok{\#\# F{-}statistic: 6.39e+03 on 2 and 1997 DF,  p{-}value: \textless{}2e{-}16}
 \end{Highlighting}
 \end{Shaded}
 
@@ -5329,22 +5320,22 @@ Now, the following script generates a dataset:
 \NormalTok{\#\# lm(formula = Y \textasciitilde{} X + Q + W + Z, data = dat)}
 \NormalTok{\#\# }
 \NormalTok{\#\# Residuals:}
-\NormalTok{\#\#     Min      1Q  Median      3Q     Max }
-\NormalTok{\#\# {-}3.7210 {-}0.6425  0.0031  0.6596  3.1985 }
+\NormalTok{\#\#    Min     1Q Median     3Q    Max }
+\NormalTok{\#\# {-}3.721 {-}0.642  0.003  0.660  3.199 }
 \NormalTok{\#\# }
 \NormalTok{\#\# Coefficients:}
-\NormalTok{\#\#              Estimate Std. Error t value Pr(\textgreater{}|t|)    }
-\NormalTok{\#\# (Intercept)  0.019576   0.022168   0.883    0.377    }
-\NormalTok{\#\# X           {-}0.006038   0.013429  {-}0.450    0.653    }
-\NormalTok{\#\# Q            1.071881   0.050242  21.335   \textless{}2e{-}16 ***}
-\NormalTok{\#\# W           {-}3.033392   0.035312 {-}85.903   \textless{}2e{-}16 ***}
-\NormalTok{\#\# Z            1.003544   0.019138  52.437   \textless{}2e{-}16 ***}
+\NormalTok{\#\#             Estimate Std. Error t value Pr(\textgreater{}|t|)    }
+\NormalTok{\#\# (Intercept)  0.01958    0.02217    0.88     0.38    }
+\NormalTok{\#\# X           {-}0.00604    0.01343   {-}0.45     0.65    }
+\NormalTok{\#\# Q            1.07188    0.05024   21.33   \textless{}2e{-}16 ***}
+\NormalTok{\#\# W           {-}3.03339    0.03531  {-}85.90   \textless{}2e{-}16 ***}
+\NormalTok{\#\# Z            1.00354    0.01914   52.44   \textless{}2e{-}16 ***}
 \NormalTok{\#\# {-}{-}{-}}
 \NormalTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
 \NormalTok{\#\# }
-\NormalTok{\#\# Residual standard error: 0.9903 on 1995 degrees of freedom}
-\NormalTok{\#\# Multiple R{-}squared:  0.9745, Adjusted R{-}squared:  0.9744 }
-\NormalTok{\#\# F{-}statistic: 1.902e+04 on 4 and 1995 DF,  p{-}value: \textless{} 2.2e{-}16}
+\NormalTok{\#\# Residual standard error: 0.99 on 1995 degrees of freedom}
+\NormalTok{\#\# Multiple R{-}squared:  0.974,  Adjusted R{-}squared:  0.974 }
+\NormalTok{\#\# F{-}statistic: 1.9e+04 on 4 and 1995 DF,  p{-}value: \textless{}2e{-}16}
 \end{Highlighting}
 \end{Shaded}
 
@@ -5375,17 +5366,17 @@ Now, the following script generates a dataset:
 \NormalTok{\#\# lm(formula = W \textasciitilde{} Z, data = dat)}
 \NormalTok{\#\# }
 \NormalTok{\#\# Residuals:}
-\NormalTok{\#\#     Min      1Q  Median      3Q     Max }
-\NormalTok{\#\# {-}9.5057 {-}1.5539  0.0044  1.4534  8.0072 }
+\NormalTok{\#\#    Min     1Q Median     3Q    Max }
+\NormalTok{\#\# {-}9.506 {-}1.554  0.004  1.453  8.007 }
 \NormalTok{\#\# }
 \NormalTok{\#\# Coefficients:}
 \NormalTok{\#\#             Estimate Std. Error t value Pr(\textgreater{}|t|)}
-\NormalTok{\#\# (Intercept) {-}0.02154    0.04919  {-}0.438    0.661}
-\NormalTok{\#\# Z            0.01908    0.02238   0.852    0.394}
+\NormalTok{\#\# (Intercept)  {-}0.0215     0.0492   {-}0.44     0.66}
+\NormalTok{\#\# Z             0.0191     0.0224    0.85     0.39}
 \NormalTok{\#\# }
 \NormalTok{\#\# Residual standard error: 2.2 on 1998 degrees of freedom}
-\NormalTok{\#\# Multiple R{-}squared:  0.0003635,  Adjusted R{-}squared:  {-}0.0001368 }
-\NormalTok{\#\# F{-}statistic: 0.7266 on 1 and 1998 DF,  p{-}value: 0.3941}
+\NormalTok{\#\# Multiple R{-}squared:  0.000364,   Adjusted R{-}squared:  {-}0.000137 }
+\NormalTok{\#\# F{-}statistic: 0.727 on 1 and 1998 DF,  p{-}value: 0.394}
 \end{Highlighting}
 \end{Shaded}
 
@@ -5421,16 +5412,16 @@ Now, the following script generates a dataset:
 \NormalTok{\#\# {-}2.5471 {-}0.4981  0.0016  0.5336  2.3622 }
 \NormalTok{\#\# }
 \NormalTok{\#\# Coefficients:}
-\NormalTok{\#\#              Estimate Std. Error  t value Pr(\textgreater{}|t|)    }
-\NormalTok{\#\# (Intercept) {-}0.025965   0.017165   {-}1.513    0.131    }
-\NormalTok{\#\# Z           {-}0.525522   0.009033  {-}58.178   \textless{}2e{-}16 ***}
-\NormalTok{\#\# X           {-}0.435859   0.003631 {-}120.044   \textless{}2e{-}16 ***}
+\NormalTok{\#\#             Estimate Std. Error t value Pr(\textgreater{}|t|)    }
+\NormalTok{\#\# (Intercept) {-}0.02596    0.01717   {-}1.51     0.13    }
+\NormalTok{\#\# Z           {-}0.52552    0.00903  {-}58.18   \textless{}2e{-}16 ***}
+\NormalTok{\#\# X           {-}0.43586    0.00363 {-}120.04   \textless{}2e{-}16 ***}
 \NormalTok{\#\# {-}{-}{-}}
 \NormalTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
 \NormalTok{\#\# }
-\NormalTok{\#\# Residual standard error: 0.7676 on 1997 degrees of freedom}
-\NormalTok{\#\# Multiple R{-}squared:  0.8783, Adjusted R{-}squared:  0.8782 }
-\NormalTok{\#\# F{-}statistic:  7208 on 2 and 1997 DF,  p{-}value: \textless{} 2.2e{-}16}
+\NormalTok{\#\# Residual standard error: 0.768 on 1997 degrees of freedom}
+\NormalTok{\#\# Multiple R{-}squared:  0.878,  Adjusted R{-}squared:  0.878 }
+\NormalTok{\#\# F{-}statistic: 7.21e+03 on 2 and 1997 DF,  p{-}value: \textless{}2e{-}16}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6505,242 +6496,6 @@ point at which you wish to have the box for \emph{Oral ca. death}, and click.
 Finally, do the same with the box for \emph{Other death}. If you are not
 happy with the outcome, run the command line again and repeat the
 necessary mouse moves and clicks.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\textless{}!{-}{-} \#\# Optional: Poisson regression as an alternative to Cox model  {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} It can be shown that the Cox model with an unspecified form for the  {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} baseline hazard $\textbackslash{}lambda\_0(t)$ is mathematically equivalent {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} to the following kind of Poisson regression model. {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} Time is treated as a categorical factor with {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} a dense division of the time axis {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} into disjoint intervals or *timebands* such that {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} only one outcome event occurs in each timeband. {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} The model formula contains this time factor plus the desired {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} explanatory terms. {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} A sufficient division of time axis is obtained by {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} first setting the break points {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} between adjacent timebands to be those time points at which an outcome event has been observed to occur. Then, {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} the pertinent \textasciigrave{}lexis\textasciigrave{} object is created {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} and after that it will be split according to those breakpoints. {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} Finally, the Poisson regression model is fitted {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} on the splitted \textasciigrave{}lexis\textasciigrave{} object using function \textasciigrave{}glm()\textasciigrave{} with appropriate specifications. {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} We shall now demonstrate the numerical equivalence of the Cox model {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \textasciigrave{}m2haz1\textasciigrave{} for oral cancer mortality that was fitted above, {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  and the corresponding Poisson regression. {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} {-}  First we form the necessary \textasciigrave{}lexis\textasciigrave{} object by just taking {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  the relevant subset of the already available \textasciigrave{}orca.lex\textasciigrave{} object. {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  Upon that the three{-}level stage factor \textasciigrave{}st3\textasciigrave{} is created {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  as above. {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \textasciigrave{}\textasciigrave{}\textasciigrave{}\{r split, echo=T,eval=TRUE\} {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} orca2.lex \textless{}{-} subset(orca.lex, stage != "unkn") {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} orca2.lex$st3 \textless{}{-} Relevel(orca2.lex$stage, list(1:2, 3, 4:5)) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} levels(orca2.lex$st3) \textless{}{-} c("I{-}II", "III", "IV") {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \textasciigrave{}\textasciigrave{}\textasciigrave{} {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  Then, the break points of time axis are taken from {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  the sorted event times, and the \textasciigrave{}lexis\textasciigrave{} object is {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  split by those breakpoints. The \textasciigrave{}timeband\textasciigrave{} factor {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  is defined according to the splitted survival times {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  stored in variable \textasciigrave{}stime\textasciigrave{}. {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \textasciigrave{}\textasciigrave{}\textasciigrave{}\{r split b, echo=T,eval=TRUE\} {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} cuts \textless{}{-} sort(orca2.lex$time[orca2.lex$event == 1]) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} orca2.spl \textless{}{-} {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}   splitLexis(orca2.lex, br = cuts, time.scale = "stime") {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} orca2.spl$timeband \textless{}{-} as.factor(orca2.spl$stime) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \textasciigrave{}\textasciigrave{}\textasciigrave{} {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} As a result we now have an expanded {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  \textasciigrave{}lexis\textasciigrave{} object in which each subject has several rows; {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  as many rows as there are such timebands {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  during which he/she is still at risk. {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  The outcome status \textasciigrave{}lex.Xst\textasciigrave{} has value 0 in all those {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  timebands, over which the subject stays alive, but assumes {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  the value 1 or 2 at his/her last interval ending at the time of death. {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  {-}{-} See now the structure of the splitted object. {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \textasciigrave{}\textasciigrave{}\textasciigrave{}\{r strsplit, echo=T,eval=TRUE\} {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} str(orca2.spl) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} head(orca2.spl) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \textasciigrave{}\textasciigrave{}\textasciigrave{} {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} {-}  We are ready to fit the desired Poisson model for oral cancer death {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} as the outcome. The splitted person{-}years are contained in \textasciigrave{}lex.dur\textasciigrave{}, {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} and the explanatory variables are the same as in model \textasciigrave{}m2haz1\textasciigrave{}. {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} {-}{-} This fitting may take some time .... {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \textasciigrave{}\textasciigrave{}\textasciigrave{}\{r poisson, echo=T,eval=TRUE\} {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} m2pois1 \textless{}{-} glm( {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}   1 * (lex.Xst == "Oral ca. death") \textasciitilde{} {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}     {-}1 + timeband + sex + I((age {-} 65) / 10) + st3, {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}   family = poisson, offset = log(lex.dur), data = orca2.spl {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} ) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \textasciigrave{}\textasciigrave{}\textasciigrave{} {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} We shall display the estimation results graphically for the baseline hazard (per 1000 person{-}years)  and numerically for the rate ratios associated with the covariates. {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} Before doing that it is useful to count the length \textasciigrave{}ntb\textasciigrave{} of the {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}  block occupied by baseline hazard in the whole vector of estimated parameters. {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} However, owing to how the splitting to timebands was done, the last regression {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} coefficient is necessarily {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} zero and better be omitted when displaying the results. Also, as each timeband {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} is quantitatively {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} named accoding to its leftmost point, it is good to compute the midpoint values \textasciigrave{}tbmid\textasciigrave{} {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} for the timebands {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \textasciigrave{}\textasciigrave{}\textasciigrave{}\{r poissonresults, echo=T, fig=T,eval=TRUE\} {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} tb \textless{}{-} as.numeric(levels(orca2.spl$timeband)) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} ntb \textless{}{-} length(tb) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} tbmid \textless{}{-} (tb[{-}ntb] + tb[{-}1]) / 2 \# midpoints of the intervals {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} round(ci.exp(m2pois1), 3) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} par(mfrow = c(1, 1)) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} plot(tbmid, 1000 * exp(coef(m2pois1)[1:(ntb {-} 1)]), {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}   ylim = c(5, 3000), log = "xy", type = "l" {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} ) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \textasciigrave{}\textasciigrave{}\textasciigrave{} {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} Compare the regression coefficients and their error margins {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} to those model \textasciigrave{}m2haz1\textasciigrave{}. Do you find any differences? {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} How does the estimated baseline hazard look like? {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} {-}  The estimated baseline looks quite ragged when based on 71 separate {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} parameters. A smoothed estimate may be obtained by spline modelling using the tools {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} contained in package mgcv With the following code you will be able to fit a {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} reasonable spline model for the baseline hazard and {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} draw the estimated curve (together with a band of the 95\% {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} confidence limits about the fitted values). {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} From the same model you should also obtain quite familiar results for the {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} rate ratios of interest. {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \textasciigrave{}\textasciigrave{}\textasciigrave{}\{r poissonspline, echo=T, fig=T,eval=TRUE\} {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} library(mgcv) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} m2pspli \textless{}{-} {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}   update( {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}     m2pois1, {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-}     . \textasciitilde{} gam(s(stime) + sex + I((age {-} 65) / 10) + st3)) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} plot(m2pspli,pages=1,type=seWithMean=T) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \#round(ci.exp(m2pspli), 3) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \#news \textless{}{-} data.frame( {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \#  stime = seq(0, 25, length = 301), {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \#  lex.dur = 1000, {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \#  sex = "Female", {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \#  age = 65, {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \#  st3 = "I{-}II" {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \#) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \# blhaz \textless{}{-} {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \#   predict(m2pspli, newdata = news, se.fit = TRUE, type = "link") {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \# blh95 \textless{}{-} cbind(blhaz$fit, blhaz$se.fit) \%*\% ci.mat() {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \# par(mfrow = c(1, 1)) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \# matplot(news$stime, exp(blh95), {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \#   type = "l", lty = c(1, 1, 1), lwd = c(2, 1, 1), {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \#   col = rep("black", 3), log = "xy", ylim = c(5, 3000) {-}{-}\textgreater{}}
-
-\CommentTok{\textless{}!{-}{-} \textasciigrave{}\textasciigrave{}\textasciigrave{} {-}{-}\textgreater{}}
-\end{Highlighting}
-\end{Shaded}
 
 \chapter{Time-splitting, time-scales and SMR}\label{time-splitting-time-scales-and-smr}
 
@@ -10536,7 +10291,7 @@ occurrence rate of remission itself.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{   user  system elapsed }
-\NormalTok{   2.66    3.15    2.02 }
+\NormalTok{   2.29    2.97    1.85 }
 \end{Highlighting}
 \end{Shaded}
 
