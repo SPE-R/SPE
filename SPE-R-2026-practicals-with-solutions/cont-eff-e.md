@@ -420,7 +420,7 @@ gam.check(mPen)
 ## 
 ##        k'  edf k-index p-value   
 ## s(A) 9.00 8.14    0.93   0.005 **
-## s(P) 9.00 3.05    0.95   0.080 . 
+## s(P) 9.00 3.05    0.95   0.050 * 
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -488,8 +488,8 @@ gam.check(mPen2)
 ## indicate that k is too low, especially if edf is close to k'.
 ## 
 ##         k'   edf k-index p-value   
-## s(A) 19.00 11.13    0.93   0.005 **
-## s(P)  9.00  3.05    0.95   0.085 . 
+## s(A) 19.00 11.13    0.93    0.01 **
+## s(P)  9.00  3.05    0.95    0.12   
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
