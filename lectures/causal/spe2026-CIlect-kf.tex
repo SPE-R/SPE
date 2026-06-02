@@ -119,167 +119,169 @@ Or: \textcolor{blue}{do coffee-drinkers live longer (for several reasons)?}
 \end{block}
 \end{frame}
 
-\begin{frame}
-	\frametitle{How to define causal effects (properly)?}
-	\begin{itemize}
-		\item One can think of some basic guidelines (sometimes called as ``criteria'') that must be satisfied for causal effect to be identifiable. 
-		\item Such principles may include temporality (cause preceding the outcome), consistency (reproducibility), monotonicity (dose-response), 
-		plausibility (e.g. biologically), etc. (Bradford Hill's guidelines)
-		\item \alert{Although sometimes useful for reasoning, they are never sufficient to establish causality!}
-	\end{itemize}
-\end{frame}
+%\begin{frame}
+	%\frametitle{How to define causal effects (properly)?}
+	%\begin{itemize}
+	%	\item One can think of some basic guidelines (sometimes called as ``criteria'') that must be satisfied for causal effect to be identifiable. 
+	%	\item Such principles may include temporality (cause preceding the outcome), consistency (reproducibility), monotonicity (dose-response), 
+	%	plausibility (e.g. biologically), etc. (Bradford Hill's guidelines)
+	%	\item \alert{Although sometimes useful for reasoning, they are never sufficient to establish causality!}
+	%\end{itemize}
+%\end{frame}
 
 \begin{frame}
 	\frametitle{What is a causal effect?}
 	\begin{block}{Possible questions \ldots}
 		 	\begin{enumerate}
-		\item In case I stop eating white bread, would my weight drop?  \quad \sini{or \ldots} 
-		\item In case white bread were eliminated from the world, would the average weight of all people decrease?  \quad \sini{or \ldots} 
-		\item If, in one of the two \sini{``parallel universes''} we could eliminate access to white bread (no-one gets any) and 
-		in the other, have everyone eating, say 200 grams of white bread per day -- would the average weight  differ (after a while)? 
+		\item %Would I lose weight, if I stop eating white bread?
+		Would I live longer, if I drank (more) coffee? \\	\sini{or} 
+		\item %Would the prevalence of obesity be lower, if there was no white bread available? 
+		Would life expectancy increase if everyone drank coffee? (Would it decrease, if no-one drank coffee?)  \\ \sini{or} 
+		\item If, there were two \sini{``parallel universes''} similar to ours: in the first one everyone drinks coffee;  in the second one, coffee does not exist. 
+		\\
+	\sini{	-- Would the people in the two universes have different average life expectancy?}
 	\end{enumerate}
 			\end{block}
-		Actually, question 3 is what we are going to explore next, but first let's define the counterfactual quantities of interest.
+%Question 1 is about \sini{individual causal effect}, question 3 about the \sini{population average causal effect}, question 2 about exposed or unexposed subsets. 
 \end{frame}
 
 \begin{frame}
-	\frametitle{Statistical association vs causality}
-	\begin{itemize}
-\item Suppose there is an outcome variable $Y$ (weight) and exposure variable $X$ (white bread consumption). 
-A regression model would estimate \sini{the conditional expectation} $E(Y|X)$. 
-\item We might find: $$E(Y|X=5) \ne E(Y|X=10).$$
-\item With a binary outcome $Y$, logistic regression may yield: 
-%enables such inferences about probabilities ($Y$: disease, coded as 1-present, 0-absent; $X$-and exposure, also 1-present, 0-absent), for instance, concluding that: \\
-$$P(Y=1|X=1)\ne P(Y=1|X=0).$$
-\item Both are statements about differences between groups of individuals. 
-\end{itemize}
-\sini{The groups that differ by the value of X, may also differ in many other ways. }
+	\begin{center}
+\includegraphics[width=10cm]{ass_vs_caus_hr2}
+	\end{center}
+(M. Hern\'an and J. Robins, ``Causal Inference. What If.''  \href{https://miguelhernan.org/whatifbook}{https://miguelhernan.org/whatifbook})
 \end{frame}
 
 \section{Causal effects using counterfactuals}
 
+
 \begin{frame}
 \frametitle{Causal effects and counterfactuals}
-
-
-To define valid causal contrasts, we \puna{counterfactual} (what-if) thinking is useful.
+To define valid causal contrasts, some \puna{counterfactual} (what-if) thinking is useful.
 \begin{block}{Counterfactual outcomes}
 \begin{itemize}
-\item Suppose $Y$ is the outcome of interest and  $X$ is a binary exposure (for simplicity), thus $X=1$ for exposed and $X=0$ for unexposed individuals.
-\item Define $Y^1=Y^{X=1}$ and $Y^0=Y^{X=0}$  as individual's \sini{potential (counterfactual)} outcomes if this individual's exposure level $X$ were \sini{set} to 1 or 0, respectively. 
+\item Suppose $Y$ is the outcome of interest and  $A$ is a binary exposure (for simplicity), thus $A=1$ for exposed and $A=0$ for unexposed individuals.
+\item Define $Y^1=Y^{A=1}$ and $Y^0=Y^{A=0}$  as individual's \sini{potential (counterfactual)} outcomes if this individual's exposure level 
+$A$ were \sini{set} to 1 or 0, respectively. 
 \item For a particular individual, either $Y^1$ or $Y^0$ can be observed at any moment. 
 \item Consistency: 
-$$\text{if} \quad X_i=x, \quad \text{then} \quad Y_i^x=Y_i^X=Y_i$$
-($X$ is a random variable for the actual treatment.)
+$$\text{if} \quad A_i=a, \quad \text{then} \quad Y_i^a=Y_i^A=Y_i$$
+($A$ is a random variable for the actual exposure.)
 %\item However, the contrast (difference, ratio, \ldots) between $Y^1$ or $Y^0$  is what we are actually interested in.
 \end{itemize}
 \end{block}
 Example: $Y^1$ individual's blood pressure, if he/she were a smoker; $Y^0$ individual's blood pressure, if he/she were a nonsmoker;
-
 \end{frame}
 
 \begin{frame}
 	\frametitle{Individual and average causal effects (ACE)}
 \begin{block}{The \puna{individual causal effect}}
-	The treatment X has a causal effect on an individual’s outcome Y if 
+	The treatment A has a causal effect on an individual’s outcome Y if 
 	\[Y^1 \ne Y^0.\]
 \end{block}
 	In epidemiology we are mostly interested in the averages.
 	\begin{block}{The (population) \puna{Average Causal Effect (ACE)}}
 		\begin{itemize}
-			\item An average causal effect of exposure $X$ on outcome
+			\item An average causal effect of exposure $A$ on outcome
 			$Y$ is present if
 			\[E(Y^{1}) \ne  E(Y^{0}).\] 
 			\item For binary $Y$, this would be:
 			\[P(Y^{1}=1) \ne  P(Y^{0}=1)\] 
 			\end{itemize}
 	\end{block}
-
 \end{frame}
 
-
 \begin{frame}
-\frametitle{Do we usually estimate causal effects?}
-Causal effects are easily estimable, if:  $ \  \ Y^x \indep X$, \\[2mm]  
-as in this case  $\E(Y|X=x) = E(Y^x |X=x) = E(Y^x) $. \\[2mm] 
-This condition is, however, rarely satisfied. 
-
-\nt{If $Y$ is weight and $X$ the quantity of bread consumed (slices/day),then:}
-	\begin{itemize}
-		\item \nt{ $\E(Y^x)$ would be the average weight in population, in case everyone eats exactly $x$ slices of bread a day;} 
-		\item\nt{ 
-		$\E(Y|X=x)$ would be the average weight in \sini{subset} who actually eat $x$ slices of bread a day;}
+	\begin{block}{Coffee example}
+		 	\begin{itemize}
+		 	%\item Suppose $Y$ corresponds to 10-year survival (1-dead, 0-alive)
+		\item 		Would I live longer, if I drank (more) coffee? \\[2mm]	\sini{-- individual causal effect of coffee-drinking: $Y^1 \ne Y^0$?} \\
+		\item If, there were two \sini{``parallel universes''} similar to ours: in the first one everyone drinks coffee;  
+		in the second one, coffee does not exist. 
+		Would the people in the two universes have different average life expectancy? \\[2mm]
+		\sini{-- average causal effect of coffee-drinking: $P(Y^{1}=1) \ne  P(Y^{0}=1)$?} 
 	\end{itemize}
-	The population can be divided into subsets with $X=0$, $X=1$, $X=2$, etc. $\E(Y|X=x)$ would be the average in one of such subsets, but \sini{$\E(Y^x)$ would be the average for the entire population} for each possible value of  $x$.
-	
+			\end{block}
+%Question 1 is about \sini{individual causal effect}, question 3 about the \sini{population average causal effect}, question 2 about exposed or unexposed subsets. 
+\mbox{ }\\[3mm]
+Here $Y$ could correspond to 10-year survival (1-dead, 0-alive), for instance, and $A$ to coffee-drinking (1-daily drinker, 0-non-drinker).
 \end{frame}
 
 
-\begin{frame}
-	\begin{center}
-\includegraphics[width=10cm]{ass_vs_caus_hr}
-	\end{center}
-(by: M. Hern\'an and J. Robins)
-\end{frame}
+%\begin{frame}
+	%\frametitle{Statistical association vs causality}
+%\begin{itemize}
+%\item Suppose there is an outcome variable $Y$ (weight) and exposure variable $A$ (white bread consumption). 
+%A regression model would estimate \sini{the conditional expectation} $E(Y|A)$. 
+%\item We might find: $$E(Y|A=0) \ne E(Y|A=5).$$
+%\item With a binary outcome $Y$ (10-year survival) and $A$ (coffee) logistic regression may yield: 
+%$$P(Y=1|A=1)\ne P(Y=1|A=0).$$
+%\item Both are statements about differences between groups of individuals. 
+%\end{itemize}
+%\sini{The groups that differ by the value of A, may also differ in many other ways. }
+%\end{frame}
 
 
 \begin{frame}
-	\frametitle{The ``na\"ive'' association analysis}
+	\frametitle{The conventional (``na\"ive'') statistical analysis}
 	{\small  \begin{itemize}
-			\item With a binary exposure $X$, compare average outcomes in exposed and unexposed populations:
-			\[E(Y|X=1) - E(Y|X=0)\]
+			\item A statistical test could compare average outcomes in exposed and unexposed populations:
+			\[E(Y|A=1) - E(Y|A=0)\]
 			\textcolor{blue}{Is cancer incidence different in smokers and nonsmokers?}
 			\item But mostly:
-			\[E(Y|X=1) \ne E(Y^1)\]
+			\[E(Y|A=1) \ne E(Y^1)\]
 			\textcolor{blue}{Cancer risk in smokers is not the same as the potential cancer risk in the population if everyone were smoking}
 			\item Similarly:
-			\[E(Y|X=0) \ne E(Y^0)\]
+			\[E(Y|A=0) \ne E(Y^0)\]
 			% \textit{Cancer risk in nonsmokers is not the same as the potential cancer risk in the population if there were no %smokers}
 			\item In most cases there is always some \alert{unobserved confounding} present and therefore the
-			na\"ive analysis does not provide causal effect estimates.  
+			simple association analysis does not provide causal effect estimates.  
 	\end{itemize}}
 \end{frame}
 
-
-
-
 \begin{frame}
-	\frametitle{Potential outcomes (counterfactuals) in different settings}
+	\frametitle{Counterfactual (potential) outcomes in different settings}
 	\begin{itemize}
-		\item \alert<1>{Randomized trials}: probably the easiest setting to imagine $Y^X$ for different $X$. \\[0.3cm]
-		\item \alert<2>{``Actionable'' exposures}: smoking level, vegetable consumption, \ldots -- potential interventions may alter exposure levels in future.\\[0.3cm]
+		\item \alert<1>{Randomized trials}: probably the easiest setting to imagine $Y^A$ for different $A$. \\[0.3cm]
+		\item \alert<2>{``Actionable'' exposures}: smoking level, coffee-drinking, vegetable consumption, 
+		\ldots -- potential interventions may alter exposure levels in future.\\[0.3cm]
 		\item \alert<3>{Non-actionable exposures}: e.g genotypes. It is difficult to ask \emph{``What if I had different genes?''}. Still useful concept to formalize genetic effects (heritability, attributable risk). \\[0.3cm]
-		\item \alert<4>{Combinations}: With X-- a behavioral intervention level, Z-- smoking level after intervention and Y--a disease outcome, one could formalize the effect of intervention on outcome by using $Y^{X, Z(X)}$
+		\item \alert<4>{Combinations}: With A-- a behavioral intervention level, Z-- smoking level after intervention and 
+		Y--a disease outcome, one could formalize the effect of intervention on outcome by using $Y^{A, Z(A)}$
 	\end{itemize}
 \end{frame}
 
 
 \begin{frame}
 	\frametitle{Estimability of causal effects in an ideal randomized trial}
-	Causal effect is estimable in a \puna{randomized trial (RCT)}, where the subjects are randomly assigned to two arms: $R=1$ and $R=0$. In an \sini{ideal} (but often not realistic) RCT: 
+	Causal effect is estimable in a \puna{randomized trial (RCT)}, where the subjects are randomly assigned to two arms: 
+	$R=1$ and $R=0$. In an \sini{ideal} (but often not realistic) RCT: 
 		$$\E(Y^0) = \E(Y^0|R=0) \equiv \E(Y|R=0),$$
-	because when $R=0$ then also $X=0$ and we observe $Y=Y^0$ (consistency!). \\  
+	because when $R=0$ then also $A=0$ and we observe $Y=Y^0$ (consistency!). \\  
 	Similarly: 
 	$$\E(Y^1) = \E(Y^1|R=1) \equiv \E(Y|R=1)$$ 
-	and thus we can estimate the causal effect of treatment in such study.
+	and thus we can estimate the causal effect of treatment in such study. \\[2mm]
+	In other words, in a randomized trial we can assume that $Y^a$ is independent of $A$: 
+$$Y^a \indep A$$
 	\begin{block}{}	
-		In epidemiology, however, exposures are not randomized and therefore the estimation of causal effects is complicated (and not always possible).
+		In epidemiology, however, exposures are not randomized and therefore 
+		the estimation of causal effects is complicated (and not always possible).
 	\end{block}
 \end{frame}
 
 
 \begin{frame}
 	\frametitle{Does adjustment for covariates help?}
-	Adjustment for confounders is helpful, if:
-	$$Y^x \not\indep X, \quad  \text{but } \quad Y^x \indep X | Z,$$ (\sini{conditional exchangeability}), implying 
-	$$E(Y^x) \ne E(Y|X=x), \quad \text{but } \
-	E(Y^x|Z) = E(Y|X=x, Z=z),$$
-	for a set of covariates $Z$. \\
-	(Within levels of $Z$, $X$ is randomly ``assigned''.)\\[5mm]
-	Under conditional exchangeability, one can \sini{test} for the causal effect by simple regression adjustment. For \sini{estimation} of the average causal effect, a few ``tricks'' can be used (Esa's lecture on Thursday). 
+	Adjustment for confounders is helpful, if $Y^a$ is independent ($\indep$) of $A$, conditional on covariates -- 
+	thus the exposure is ``randomized'' within levels of $L$:
+	$$Y^a \not\indep A, \quad  \text{but } \quad Y^a \indep A | L,$$ (\sini{conditional exchangeability}), implying 
+	$$E(Y^a) \ne E(Y|A=a), \quad \text{but } \
+	E(Y^a|L) = E(Y|A=a, L=\ell),$$
+	for a set of covariates $L$. \\
+	(Within levels of $L$, $A$ is randomly ``assigned''.)\\[5mm]
+	Under conditional exchangeability, one can \sini{test} for the causal effect by simple regression adjustment. 
+	For \sini{estimation} of the average causal effect, a few ``tricks'' can be used (Esa's lecture on Thursday). 
 \end{frame}
-
-
 
 
 \begin{frame}
@@ -298,7 +300,7 @@ This condition is, however, rarely satisfied.
 	\frametitle{DAGs: directed acyclic graphs}
 	\begin{itemize}
 		\item A Directed Acyclic Graph (DAG) is a graphical representation of the causal association structure in the data, where variables are presented as nodes (points) and the associations are presented as edges (lines, arrows);
-		%\item Thus an arrow pointing from variable $X$ to a variable $Y$ on such graph represents a causal effect of $X$ on $Y$.
+		%\item Thus an arrow pointing from variable $A$ to a variable $Y$ on such graph represents a causal effect of $A$ on $Y$.
 	\end{itemize}
 \begin{center} 
 {\includegraphics[width=0.3\textwidth]{pearlexample}}\\
@@ -328,12 +330,13 @@ $X_1$ is a parent of $X_2$ and $X_3$; $X_4$ is a child of $X_2$ and $X_3$. $X_1$
 \begin{frame}
 	
 	A causal DAG: \begin{enumerate}
-		\item  the lack of an arrow from node $V_j$ to $V_m$ can be interpreted as the absence
-		of a direct causal effect of $V_j$ on $V_m$  
+		\item  the \puna{lack of an arrow} from node $V_j$ to $V_m$ can be interpreted as \puna{the absence
+		of a direct causal effect} of $V_j$ on $V_m$  
 		\item  all (measured and unmeasured) common causes of any pair of variables on the graph are themselves on the graph 
-		\item any variable is a cause of its descendants.
+		\item any variable is a cause of its descendants. 
 	\end{enumerate}
-	\alert{The causal Markov assumption:} \\
+	\mbox{ }\\[2mm]
+	\puna{The causal Markov assumption:} \\
 	Conditional on its direct causes, any variable $V_j$ is independent of any variable for which it is not a cause (non-descendants). 
 \end{frame}
 
@@ -342,7 +345,7 @@ $X_1$ is a parent of $X_2$ and $X_3$; $X_4$ is a child of $X_2$ and $X_3$. $X_1$
 
 \begin{frame}
 	\frametitle{``Classical'' confounding}
-	There are  \sini{common causes} (confounders) $Z$ that have an effect on both, X and Y.  \\
+	There are  \sini{common causes} (confounders) $Z$ that have an effect on both, $X$ and $Y$.  \\
 	\includegraphics[width=4cm]{conf1}\\
 	Also called as \alert{backdoor path} between $X$ and $Y$. \\
 	
@@ -372,9 +375,9 @@ If $b_{zx} \ne 0$, then the correlation $\rho(Z,X)\ne 0$, and also:
 We see that $Y$ is associated with $X$, as now:
 $$\E(Y|X) =b_{0y} + b_{zy}\sini{\E(Z|X)} = b_{0y}^* + b_{zy}\sini{b_{xz}X}, $$
 with $b_{xz}b_{zy} = b_{xy} \ne 0$.
-\begin{block}{}\alert{One should adjust the analysis for $Z$, by fitting a regression model for $Y$ with covariates
+\begin{block}{}\puna{One should adjust the analysis for $Z$, by fitting a regression model for $Y$ with covariates
 	$X$  and $Z$.} 
-There is a causal effect between $X$ and $Y$, if the effect of $X$ is present in such model. \end{block}
+There is a causal effect of $X$ on $Y$, if the effect of $X$ is present in such model. \end{block}
 \end{column}
 \end{columns}
 \end{frame}
@@ -382,7 +385,7 @@ There is a causal effect between $X$ and $Y$, if the effect of $X$ is present in
 
 
 \begin{frame}
-	\frametitle{Causal chain (mediation, front-door path):}
+	\frametitle{Causal chain (mediation):}
 	The effect of X on Y is \alert{mediated} by  Z:   \\[0.5cm]
 	\includegraphics[width=4cm]{chain}\\[0.5cm]
 	
@@ -505,7 +508,7 @@ $X \rightarrow Z \rightarrow Y$ (open) and $X \rightarrow Z \leftarrow W \righta
 		\begin{block}{Example}
 			$X$: a genetic factor (SNP or a polygenic score) \\
 			$Y$: Type 2 Diabetes \\
-			$W$: Body Mass index (BMI) 
+			$Z$: Body Mass index (BMI) 
 		\end{block}
 	\end{column}
 \end{columns}
@@ -590,6 +593,9 @@ $\E(Y|X)= \alpha_y + \beta X + \gamma \E(U|X)$. \\[0.3cm]
 \item A webpage and a free online book by Miguel Hernan and Jamie Robins: 
 \href{http://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/}{http://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/}
 \item Judea Pearl, ``The Book of Why'' 
+\item A potentially useful webpage (work in progress): ``Causal Inference in R'':  \href{https://www.r-causal.org/}{https://www.r-causal.org/}
+\item Nick Huntington-Klein: ``The Effect'': \href{https://theeffectbook.net/}{https://theeffectbook.net/} 
+(easier to read for non-mathematical audience, but has a more social sciences/econometrics focus)
 %\item Mendelian randomization:  
 %Sheehan, N., Didelez, V., et al., Mendelian %Randomization and Causal Inference in Observational %Epidemiology, PLoS Med. 2008; papers by G.D. Smith, J. %Bowden, S. Burgess and others.  
 %\item \textit{An overview of Mendelian randomization}: 
@@ -602,21 +608,21 @@ $\E(Y|X)= \alpha_y + \beta X + \gamma \E(U|X)$. \\[0.3cm]
 \begin{frame}
 	\frametitle{A causal model in terms of potential outcomes}
 	\begin{itemize}
-		\item More generally $Y^x$ is defined as the potential outcome following the exposure level $X=x$
+		\item More generally $Y^a$ is defined as the potential outcome following the exposure level $X=x$
 		\item A \sini{Structural Mean Model} can be specified as 
-		\[Y^x_i -  Y^0_i=  x \beta_1 + \varepsilon_i, \ \; \mbox{ with } E(\varepsilon_i|x)=0\]
+		\[Y^a_i -  Y^0_i=  x \beta_1 + \varepsilon_i, \ \; \mbox{ with } E(\varepsilon_i|x)=0\]
 		\item Note that the observed outcome $Y_i = Y_i^{x}$ for individuals with $X_i=x$.   
 		\item The model could be generalized to include nonlinear terms or interactions with other covariates, or as a generalized linear model (logistic regression, survival model). 
-		\item However, as we don't observe $Y^0$ and $Y^x$ (with $x>0$) for the same individuals at the same time, thus it is not straightforward to actually fit the model on data.  
+		\item However, as we don't observe $Y^0$ and $Y^a$ (with $x>0$) for the same individuals at the same time, thus it is not straightforward to actually fit the model on data.  
 	\end{itemize}
 \end{frame}
 
 \begin{frame}
 	\frametitle{Statistical model vs causal model}
 	\begin{itemize}
-		\item More generally $Y^x$ is defined as the potential outcome following the exposure level $X=x$
+		\item More generally $Y^a$ is defined as the potential outcome following the exposure level $X=x$
 		\item A \alert{linear causal model} can be specified as 
-		\[Y^x_i -  Y^0_i=  x \beta_1 + \varepsilon_i, \ \; \mbox{ with } E(\varepsilon_i|x)=0\]
+		\[Y^a_i -  Y^0_i=  x \beta_1 + \varepsilon_i, \ \; \mbox{ with } E(\varepsilon_i|x)=0\]
 		\item Note that the observed outcome $Y_i = Y_i^{x}$ for individuals with $X_i=x$.   
 		\item  	A \alert{classical linear regression} model: 
 		\[Y_i = \beta_0 + X_i \beta_1 + \varepsilon_i, \ \; \mbox{ with } E(\varepsilon_i|X_i)=0\]
@@ -633,7 +639,7 @@ $\E(Y|X)= \alpha_y + \beta X + \gamma \E(U|X)$. \\[0.3cm]
 	\frametitle{Statistical model vs causal model}
 	\begin{itemize}
 		\item Rewrite the linear causal model as 
-		\[Y^x_i =  Y^0_i +  x \beta_1 + \varepsilon_i, \ \; \mbox{ with } E(\varepsilon_i|x)=0\]
+		\[Y^a_i =  Y^0_i +  x \beta_1 + \varepsilon_i, \ \; \mbox{ with } E(\varepsilon_i|x)=0\]
 		\item Note that this would be equivalent with the classical linear model, if 
 		$$E(Y^0_i + \varepsilon_i|X_i)= \beta_0,$$ 
 		\alert{thus when the potential exposure-free outcome $Y^0$ is not associated with the exposure $X$}

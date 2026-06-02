@@ -1,36 +1,34 @@
 ```{r, include=FALSE}
-knitr::opts_chunk$set(results = "hide", prefix.string = "./graph/tab")
+# results / fig.show defaults are handled globally in _common.R via the
+# SPE_SOLUTIONS flag (hidden in the exercise book, shown in the solutions book).
+knitr::opts_chunk$set(prefix.string = "./graph/tab")
 ```
 
-# Tabulation
+# Tabulation with `stat.table`
 
 ## Introduction
 
 `R` and its add-on packages provide several different
 tabulation functions with different capabilities.  The appropriate function
-to use depends on your goal. There are at least three different uses for
-tables.
+to use depends on your goal.
 
-The first use is to create simple summary statistics that will be used
-for further calculations in `R`. For example,
-a two-by-two table created by the `table` function can be passed
-to `fisher.test`, which will calculate odds ratios and confidence
-intervals.  The appearance of these tables may, however, be quite basic,
-as their principal goal is to create new objects for future calculations.
+There are at least three different uses for tables:
 
-A quite different use of tabulation is to make *production quality*
-tables for publication.  You may want to generate reports from for
-publication in paper form, or on the World Wide Web.  The package
-`xtable` provides this capability, but it is not covered by this course.
+- to create simple summary statistics that will be used for further calculations in `R`. For example, a two-by-two table created by the `table` function can be passed to `fisher.test`, which will calculate odds ratios and confidence intervals.  
+Similarly, the `group by` and `summarise` functions within the `tidyverse` framework can be used for such purposes (see 3.7). 
+The appearance of these tables may, however, be quite basic,
+as their principal goal is to create new objects for future calculations;
 
-An intermediate use of tabulation functions is to create human-readable
-tables for discussion within your work-group, but not for publication. The
+- to make *publication quality* tables for various reports, presentations and manuscripts.  In addition to the `kableExtra` 
+package that was briefly introduced in chapter 3.15 there are several others, like `xtable`, for instance (not covered by this course);
+
+- to create human-readable tables for discussion within your work-group, but not for publication. The
 `Epi` package provides a function `stat.table` for this purpose,
 and this practical is designed to introduce this function.
 
 ## The births data
 
-We shall use the births data which concern 500 mothers who had
+We shall again use the births data on 500 mothers who had
 singleton births in a large London hospital. The outcome of interest
 is the birth weight of the baby, also dichotomised as normal or low
 birth weight. These data are available in the Epi package:
@@ -93,7 +91,7 @@ You can also calculate marginal tables by specifying `margin=TRUE`
 in your call to `stat.table`.  Do this for the above table. Check
 that the percentages add up to 100 and the total for `count()` is the
 same as the number of rows of the data frame `births`.
-```{r sex3, echo=F}
+```{r sex3, solution = TRUE}
 stat.table(
   index = sex, contents = list(count(), percent(sex)),
   margin = TRUE, data = births
@@ -105,7 +103,7 @@ stat.table(index = sex, contents = mean(bweight), data = births)
 ```
 
 Add the count to this table. Add also the margin with `margin=TRUE`. 
-```{r bwsex2, echo=FALSE}
+```{r bwsex2, solution = TRUE}
 stat.table(
   index = sex, contents = list(count(), mean(bweight)),
   margin = TRUE, data = births
@@ -130,7 +128,7 @@ The final column is the percentage of babies with low birth weight by different 
 -  Show how the mean birth weight changes with `gest4`.
 -  Show how the percentage of low birth weight babies changes with `gest4`.
 
-```{r  exercise on tables, echo=F}
+```{r  exercise on tables, solution = TRUE}
 stat.table(index = gest4, contents = count(), data = births)
 stat.table(index = gest4, contents = mean(bweight), data = births)
 stat.table(
@@ -187,7 +185,7 @@ stat.table(
 ```
 Add the count to this table and repeat the function call using `margin = TRUE` to calculate the
 marginal tables.
-```{r twoway2, echo=F}
+```{r twoway2, solution = TRUE}
 stat.table(list(sex, hyp),
   contents = list(count(), mean(bweight)),
   margin = TRUE, 
@@ -195,7 +193,7 @@ stat.table(list(sex, hyp),
 )
 ```
 Use `stat.table` with the ratio function to obtain a $2\times 2$ table of percent low birth weight by `sex` and `hyp`.
-```{r  two way tables exc, echo=F} 
+```{r  two way tables exc, solution = TRUE}
 stat.table(list(sex, hyp), contents = list(count(), mean(bweight)), margin = TRUE, data = births)
 stat.table(list(sex, hyp), contents = list(count(), ratio(lowbw, 1, 100)), margin = TRUE, data = births)
 ```
@@ -228,7 +226,7 @@ print(odds.tab)
 ```
 shows a table of odds that the baby has low birth weight. Use
 `width=15` and `digits=3` and see the difference.
-```{r  printing2, echo=F}
+```{r  printing2, solution = TRUE}
 print(odds.tab, width = 15, digits = 3)
 ```
 
