@@ -102,12 +102,45 @@ library(dplyr)
 ISwR::intake |>
   mutate(id=cur_group_rows()) |>
   pivot_longer(cols=c(pre,post)) |>
-  mutate(name=factor(name, levels=c("pre", "post"))) -> intake
+  mutate(name=factor(name, levels=c("pre", "post"))) -> intake2
 
 library(ggplot2)
-ggplot(intake, aes(x=name, y=value, group=id, shape=factor(id))) +
+ggplot(intake2, aes(x=name, y=value, group=id, shape=factor(id))) +
   geom_point() +
   geom_line()
+
+ISwR::intake |>
+    arrange(pre) |>
+    mutate(id = cur_group_rows()) -> intake3
+
+ggplot(intake3, aes(y=id, colour=NA)) +
+    geom_linerange(aes(xmin=pre, xmax=post), colour="grey", linewidth=2) +
+    geom_point(aes(x=pre), colour="blue", size=3) +
+    geom_point(aes(x=post), colour="red", size=3) +
+    scale_y_continuous(breaks=1:11, labels=NULL) +
+    labs(x="Energy intake (kJ)", y="Participant") -> p2
+
+show(p2)
+
+p2 + cowplot::theme_cowplot()
+
+ggplot(intake3, aes(y=id, colour=NA)) +
+    geom_linerange(aes(xmin=pre, xmax=post), colour="grey", linewidth=2) +
+    geom_point(aes(x=pre, colour="blue"), size=3) +
+    geom_point(aes(x=post, colour="red"), size=3) +
+    scale_y_continuous(breaks=1:11, labels=NULL) +
+    labs(x="Energy intake (kJ)", y="Participant") +
+    cowplot::theme_cowplot() -> p3
+
+show(p3)
+
+p3 +  scale_colour_identity(breaks=c("blue","red"),
+                            name="Timing",
+                            labels=c("pre-menstrual", "post-menstrual"),
+                            guide="legend")
+
+
+
 
 ### demo G.2 ###
 

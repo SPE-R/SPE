@@ -43,7 +43,7 @@
 }
 
 \date[SPE 2026] % (optional)
-{1 June 2026}
+{3 June 2026}
 
 
 %% Does this do anything with Singapore theme??
@@ -189,15 +189,30 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Base x-y Plots}
+  \frametitle{The plot() function}
+
+  The \texttt{plot()} function is a {\bf generic} function.
   \begin{itemize}
-  \item The \code{plot} function with one or two numeric arguments
-  \item Scatterplot or line plot (or both) depending on \code{type}
-    argument: \code{"l"} for \underline{l}ines, \code{"p"} for
-    \underline{p}oints (the default), \code{"b"} for \underline{b}oth, plus
-    quite a few more
-  \item Also: formula interface, \code{plot(y\textasciitilde x)}, with
-    arguments similar to the modeling functions like \code{lm}
+  \item It does different things depending on what arguments you give it.
+  \item The actual work is done by a {\bf method} function. See \texttt{methods(plot)}.
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Scatter plots}
+
+  If the first argument to \code{plot()} is numeric, you get a scatter plot
+  \begin{itemize}
+  \item \code{plot(y)} Plot values of \code{y} against index ({\em i.e.} position in vector)
+  \item \code{plot(x, y)} Plog values of \code{y} against corresponding values of \code{x}
+  \end{itemize}
+  Change the behaviour with the \code{type} argument
+  \begin{itemize}
+  \item \code{"l"} for \underline{l}ines
+  \item \code{"p"} for \underline{p}oints (the default)
+  \item \code{"b"} for \underline{b}oth
+  \item plus  quite a few more...
   \end{itemize}
 \end{frame}
 
@@ -237,13 +252,17 @@
 
   ~\\
   
-  Use the formula method, which admits a \texttt{data} argument
+  Use the \code{formula} method, which admits a \texttt{data} argument
   \begin{verbatim}
   plot(y ~ x, data=mydata)
   \end{verbatim}
   Or wrap the plotting function in a call to \texttt{with()}
   \begin{verbatim}
   with(mydata, plot(x, y))
+  \end{verbatim}
+  Or extract variables from the data frame
+  \begin{verbatim}
+  plot(mydata$x, mydata$y)
   \end{verbatim}
 
 \end{frame}
@@ -310,6 +329,46 @@ matplot(t(intake),type="b",pch=1:11,col="black",
         lty="solid", xaxt="n")
 axis(1,at=1:2,labels=names(intake))
 \end{vcode}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Margins}
+  \begin{itemize}
+  \item R sometimes seems to leave too much empty space around plots
+    (especially in multi-frame layouts).
+  \item There is a good reason for it: You might want to put something
+    there (titles, axes).
+  \item This is controlled by the \code{mar} parameter. By default, it is
+    \code{c(5,4,4,2)+0.1}
+    \begin{itemize}
+      \item The units are \emph{lines of text}, so depend on the setting of
+      \code{pointsize} and \code{cex}
+      \item The sides are indexed in clockwise order, starting at the bottom
+      (1=bottom, 2=left, 3=top, 4=right)
+      \end{itemize}   
+  \item The \code{mtext} function is designed to write in the margins
+    of the plot
+  \item There is also an \emph{outer margin} settable via the
+    \code{oma} parameter. Useful for adding overall titles etc. to
+    multiframe plots
+  \end{itemize}
+\end{frame}
+
+%\addtocounter{framenumber}{-1} %% workaround for beamer buglet
+\begin{frame}[fragile]
+  \frametitle{Second Base Graphics Demo}
+  \begin{vcode}
+x <- runif(50,0,2)
+y <- runif(50,0,2)
+plot(x, y, main="Main title", sub="subtitle",
+     xlab="x-label", ylab="y-label")
+text(0.6,0.6,"text at (0.6,0.6)")
+abline(h=.6,v=.6)
+for (side in 1:4) 
+   mtext(-1:4,side=side,at=.7,line=-1:4)
+mtext(paste("side",1:4), side=1:4, line=-1,font=2)
+  \end{vcode}
 \end{frame}
 
 \section{Grammar of Graphics}
@@ -555,45 +614,6 @@ ggplot(intake,
 \end{document}
 
 
-
-\begin{frame}
-  \frametitle{Margins}
-  \begin{itemize}
-  \item R sometimes seems to leave too much empty space around plots
-    (especially in multi-frame layouts).
-  \item There is a good reason for it: You might want to put something
-    there (titles, axes).
-  \item This is controlled by the \code{mar} parameter. By default, it is
-    \code{c(5,4,4,2)+0.1}
-    \begin{itemize}
-      \item The units are \emph{lines of text}, so depend on the setting of
-      \code{pointsize} and \code{cex}
-      \item The sides are indexed in clockwise order, starting at the bottom
-      (1=bottom, 2=left, 3=top, 4=right)
-      \end{itemize}   
-  \item The \code{mtext} function is designed to write in the margins
-    of the plot
-  \item There is also an \emph{outer margin} settable via the
-    \code{oma} parameter. Useful for adding overall titles etc. to
-    multiframe plots
-  \end{itemize}
-\end{frame}
-
-%\addtocounter{framenumber}{-1} %% workaround for beamer buglet
-\begin{frame}[fragile]
-  \Demo
-  \begin{vcode}
-x <- runif(50,0,2)
-y <- runif(50,0,2)
-plot(x, y, main="Main title", sub="subtitle",
-     xlab="x-label", ylab="y-label")
-text(0.6,0.6,"text at (0.6,0.6)")
-abline(h=.6,v=.6)
-for (side in 1:4) 
-   mtext(-1:4,side=side,at=.7,line=-1:4)
-mtext(paste("side",1:4), side=1:4, line=-1,font=2)
-  \end{vcode}
-\end{frame}
 
 %\addtocounter{framenumber}{-1} %% workaround for beamer buglet
 \begin{frame}[fragile,plain]
