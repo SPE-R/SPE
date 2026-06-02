@@ -250,6 +250,8 @@ par(mfrow = c(1, 1))
 with(births, interaction.plot(sex, hyp, bweight))
 ```
 
+![](effects-e_files/figure-epub3/bweight-by-hyp-sex-1.png)<!-- -->
+
 At face value it appears that the mean difference in `bweight` between 
 hypertensive and normotensive 
 mothers is somewhat bigger in boys than in girls.
@@ -388,6 +390,8 @@ with(births, plot(gestwks, bweight))
 abline(m5)
 ```
 
+![](effects-e_files/figure-epub3/Plot-bweight-by-gestwks-1.png)<!-- -->
+
 3. Moreover, take a look at the four 
 basic diagnostic plots for the fitted model.
 Compare with lecture slide 9.
@@ -396,6 +400,8 @@ Compare with lecture slide 9.
 par(mfrow = c(2, 2))
 plot(m5)
 ```
+
+![](effects-e_files/figure-epub3/bweight-gestwks-m5-diag-1.png)<!-- -->
 What can you say about the agreement with data of the 
 assumptions of the  simple linear regression model, 
 like linearity of the association, and 
@@ -545,6 +551,8 @@ with(births, plot(bweight ~ gestwks,
 ))
 plotFitPredInt(nd$gestwks, fit.Ps, pred.Ps)
 ```
+
+![](effects-e_files/figure-epub3/bweight-gestwks-mPs-plot-1.png)<!-- -->
 Compare this with the graph on slide 20 of the lecture notes. 
 Are you happy with the end result?
 
@@ -701,6 +709,8 @@ summary(binm1)
 plot(binm1)
 ```
 
+![](effects-e_files/figure-epub3/lowbw-gestwks-spline-1.png)<!-- -->
+
 Inspect the figure. -- Would you agree, that the logit of the prevalence
 of outcome is almost linearly dependent on `gestwks`?
 
@@ -737,6 +747,8 @@ as `newdata`.
 predm2 <- predict(binm2, newdata = nd, type = "response")
 plot(nd$gestwks, predm2, type = "l")
 ```
+
+![](effects-e_files/figure-epub3/lowbw-gestwks-pred-1.png)<!-- -->
 
  The curve seems to cover practically the whole range of
 the outcome probability scale with a relatively 

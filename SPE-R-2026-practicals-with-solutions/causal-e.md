@@ -53,25 +53,41 @@ bdat$bp <-
 -  Adjusted for sex and blood pressure
 
 
-```
-##              Estimate    StdErr          z            P      2.5%     97.5%
-## (Intercept) 62.686398 0.3417572 183.423776 0.000000e+00 62.016566 63.356229
-## beer         4.825821 0.5211749   9.259505 2.053828e-20  3.804337  5.847305
-```
-
-```
-##               Estimate    StdErr           z            P       2.5%     97.5%
-## (Intercept) 59.9392175 0.3302530 181.4948376 0.000000e+00 59.2919335 60.586501
-## beer         0.3115854 0.5117625   0.6088477 5.426254e-01 -0.6914507  1.314622
-## sex          9.3766029 0.5067224  18.5044161 1.902293e-76  8.3834452 10.369761
+``` r
+library(Epi)
+m1a <- lm(weight ~ beer, data = bdat)
+m2a <- lm(weight ~ beer + sex, data = bdat)
+m3a <- lm(weight ~ beer + sex + bp, data = bdat)
+ci.lin(m1a)
 ```
 
 ```
-##               Estimate     StdErr         z            P       2.5%      97.5%
-## (Intercept) 29.1170108 2.79718995 10.409379 2.246821e-25 23.6346192 34.5994023
-## beer        -2.1498046 0.53163515 -4.043759 5.260092e-05 -3.1917903 -1.1078188
-## sex          8.3594615 0.48703127 17.164116 4.929271e-66  7.4048978  9.3140253
-## bp           0.2201563 0.01985525 11.088064 1.433570e-28  0.1812407  0.2590719
+##             Estimate    StdErr          z            P      2.5%     97.5%
+## (Intercept) 62.83279 0.3672666 171.082248 0.000000e+00 62.112963 63.552622
+## beer         5.09159 0.5462761   9.320543 1.157461e-20  4.020909  6.162271
+```
+
+``` r
+ci.lin(m2a)
+```
+
+```
+##               Estimate    StdErr           z             P      2.5%      97.5%
+## (Intercept) 59.7727958 0.3357399 178.0330568  0.000000e+00 59.114758 60.4308338
+## beer        -0.4229677 0.5200453  -0.8133286  4.160297e-01 -1.442238  0.5963023
+## sex         11.1051534 0.5176434  21.4532909 4.254613e-102 10.090591 12.1197158
+```
+
+``` r
+ci.lin(m3a)
+```
+
+```
+##              Estimate     StdErr         z            P       2.5%      97.5%
+## (Intercept) 28.719792 2.68696006 10.688582 1.151177e-26 23.4534475 33.9861374
+## beer        -2.422344 0.51752591 -4.680624 2.860035e-06 -3.4366762 -1.4080119
+## sex          9.597139 0.50290255 19.083497 3.462970e-81  8.6114683 10.5828101
+## bp           0.221975 0.01907452 11.637257 2.664469e-31  0.1845897  0.2593604
 ```
 
 -  What would be the conclusions on the effect of beer on weight, based on the three models? Do they agree? 
@@ -91,47 +107,74 @@ bdat$weight <-
 ```
 
 
-```
-##              Estimate    StdErr         z            P      2.5%     97.5%
-## (Intercept) 63.091101 0.3455151 182.60011 0.000000e+00 62.413904 63.768298
-## beer         6.817871 0.5269056  12.93945 2.695397e-38  5.785155  7.850587
-```
-
-```
-##              Estimate    StdErr          z            P      2.5%    97.5%
-## (Intercept) 60.078999 0.3236267 185.642904 0.000000e+00 59.444702 60.71330
-## beer         1.868309 0.5014943   3.725483 1.949412e-04  0.885398  2.85122
-## sex         10.280828 0.4965554  20.704293 3.168519e-95  9.307597 11.25406
+``` r
+bdat$bp <- 
+  110 + 0.5 * bdat$weight + 10 * bdat$beer + rnorm(1000, 0, 10) 
+m1b <- lm(weight ~ beer, data = bdat)
+m2b <- lm(weight ~ beer + sex, data = bdat)
+m3b <- lm(weight ~ beer + sex + bp, data = bdat)
+ci.lin(m1b)
 ```
 
 ```
-##               Estimate     StdErr         z            P       2.5%      97.5%
-## (Intercept) 29.2472836 2.85231365 10.253881 1.136855e-24 23.6568516 34.8377157
-## beer        -0.7725818 0.53295743 -1.449613 1.471666e-01 -1.8171592  0.2719956
-## sex          9.4103769 0.47648775 19.749462 8.107641e-87  8.4764780 10.3442757
-## bp           0.2201933 0.02025292 10.872172 1.564324e-27  0.1804983  0.2598883
+##              Estimate    StdErr         z           P      2.5%     97.5%
+## (Intercept) 62.864416 0.3487751 180.24340 0.00000e+00 62.180829 63.548003
+## beer         6.696059 0.5187717  12.90753 4.08206e-38  5.679286  7.712833
+```
+
+``` r
+ci.lin(m2b) # the correct model
+```
+
+```
+##              Estimate    StdErr          z             P      2.5%     97.5%
+## (Intercept) 59.982229 0.3200311 187.426225  0.000000e+00 59.354980 60.609479
+## beer         1.501941 0.4957132   3.029859  2.446681e-03  0.530361  2.473521
+## sex         10.459857 0.4934237  21.198531 9.852352e-100  9.492764 11.426949
+```
+
+``` r
+ci.lin(m3b)
+```
+
+```
+##               Estimate    StdErr         z            P       2.5%      97.5%
+## (Intercept) 31.9029080 2.8246184 11.294591 1.395529e-29 26.3667577 37.4390582
+## beer        -0.8399370 0.5276237 -1.591924 1.114017e-01 -1.8740604  0.1941864
+## sex          9.3815379 0.4828104 19.431100 4.212393e-84  8.4352468 10.3278290
+## bp           0.2011716 0.0201182  9.999482 1.531961e-23  0.1617407  0.2406026
 ```
 
 -  Suppose one is interested in the effect of beer-drinking on blood pressure instead, and is fitting a) an unadjusted model  for blood pressure, with beer as an only covariate; b) a model with beer and sex as covariates. Would either a) or b) give an unbiased estimate for the effect? (You may double-check whether the simulated data is consistent with your answer).
 
 
-```
-##              Estimate    StdErr        z            P     2.5%     97.5%
-## (Intercept) 141.17936 0.4335650 325.6244 0.000000e+00 140.3296 142.02913
-## beer         13.89669 0.6611805  21.0180 4.489935e-98  12.6008  15.19258
+``` r
+m1bp <- lm(bp ~ beer, data = bdat)
+m2bp <- lm(bp ~ beer + weight + sex, data = bdat)
+ci.lin(m1bp)
 ```
 
 ```
-##                Estimate     StdErr         z            P        2.5%
-## (Intercept) 111.0752974 2.70061697 41.129601 0.000000e+00 105.7821854
-## beer         11.0933679 0.70658302 15.700020 1.511932e-55   9.7084906
-## weight        0.4817967 0.04431467 10.872172 1.564324e-27   0.3949416
-## sex          -1.0001469 0.83085334 -1.203759 2.286829e-01  -2.6285896
+##              Estimate    StdErr         z            P      2.5%     97.5%
+## (Intercept) 141.05593 0.4460383 316.24175  0.00000e+00 140.18171 141.93015
+## beer         14.30294 0.6634420  21.55869 4.38829e-103  13.00262  15.60326
+```
+
+``` r
+ci.lin(m2bp) # the correct model
+```
+
+```
+##                Estimate     StdErr          z            P        2.5%
+## (Intercept) 112.3767173 2.75869750 40.7354257 0.000000e+00 106.9697695
+## beer         10.9600577 0.71313654 15.3688068 2.650046e-53   9.5623358
+## weight        0.4535048 0.04535283  9.9994821 1.531961e-23   0.3646149
+## sex           0.6165989 0.85106983  0.7244986 4.687597e-01  -1.0514673
 ##                   97.5%
-## (Intercept) 116.3684094
-## beer         12.4782452
-## weight        0.5686519
-## sex           0.6282957
+## (Intercept) 117.7836650
+## beer         12.3577796
+## weight        0.5423947
+## sex           2.2846651
 ```
 
 
@@ -243,7 +286,25 @@ You can verify that, these are the variables that will block all open paths from
 
 -  Create the DAG and plot it
 
+``` r
+bg <- dagitty("dag {
+  SEX -> BEER -> BP
+  SEX -> WEIGHT -> BP
+  }")
+coordinates(bg) <- 
+  list(
+    x = c(BEER = 1, SEX = 2, BP = 2, WEIGHT = 3), 
+    y = c(SEX = 1, BEER = 2, WEIGHT = 2, BP = 3)
+  )
+plot(bg)
+```
+
+![](causal-e_files/figure-epub3/dagitty6-1.png)<!-- -->
 -  What are the paths from WEIGHT to BEER?
+
+``` r
+paths(bg, "BEER", "WEIGHT")
+```
 
 ```
 ## $paths
@@ -253,6 +314,10 @@ You can verify that, these are the variables that will block all open paths from
 ## [1] FALSE  TRUE
 ```
 -  Will you get the same recommendation for the adjustment variable selection as you found before?
+
+``` r
+adjustmentSets(bg, exposure = "BEER", outcome = "WEIGHT")
+```
 
 ```
 ## { SEX }
@@ -546,6 +611,11 @@ mrdat$Y <-
 -  Verify, that simple regression model for $Y$, with $BMI$ as a covariate, results in a biased 
 estimate of the causal effect (parameter estimate is different from what was generated) 
 
+``` r
+mxy <- lm(Y ~ BMI, data = mrdat)
+ci.lin(mxy)
+```
+
 ```
 ##              Estimate      StdErr         z P       2.5%      97.5%
 ## (Intercept) 17.814562 0.097792556  182.1668 0 17.6228919 18.0062316
@@ -555,6 +625,11 @@ How different is the estimate from 0.1?
 
 -   Estimate a regression model for $Y$ with two covariates, $G$ and $BMI$. Do you see a significant effect of $G$?
 Could you explain analytically, why one may see a significant parameter estimate for $G$ there?
+
+``` r
+mxyg <- lm(Y ~ G + BMI, data = mrdat)
+ci.lin(mxyg)
+```
 
 ```
 ##               Estimate      StdErr          z             P       2.5%

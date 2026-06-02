@@ -156,6 +156,8 @@ rateplot(
 )
 ```
 
+![](cont-eff-e_files/figure-epub3/plot-rates-1.png)<!-- -->
+
 What is your broad impression about the trend in the the age-specific
 incidence rates over calendar time? What about the effect of age; is
 there any common pattern in the age-incidence curves across the periods?
@@ -234,6 +236,8 @@ matplot(pMid, rbind(c(1,1,1), ci.exp(mCat)[14:23, ]), type = "o", pch = 16,
   xlab = "Calendar year - 1900", ylab = "Rate ratio" )
 ```
 
+![](cont-eff-e_files/figure-epub3/mCat-est-1.png)<!-- -->
+
 3.  In the fitted model the reference category for each factor was the
     first one. As age is the dominating factor, it may be more
     informative to remove the intercept from the model. As a consequence
@@ -296,6 +300,8 @@ matplot(pMid, rbind(ci.exp(mCat2)[14:18, ],
         xlab = "Calendar year - 1900", ylab = "Rate ratio" )
 abline(h = 1, col = "gray")
 ```
+
+![](cont-eff-e_files/figure-epub3/mCat2-plot-1.png)<!-- -->
 
 ## Generalized additive model with penalized splines
 
@@ -364,6 +370,8 @@ par(mfrow = c(1, 2))
 plot(mPen, se=2, seWithMean = TRUE)
 ```
 
+![](cont-eff-e_files/figure-epub3/mPen-plot-1.png)<!-- -->
+
 The dashed lines describe the approximate 95% confidence band for the
 pertinent curve. One could get the impression that 1968 were
 intentionally the reference year for the period effect, almost like
@@ -396,6 +404,8 @@ par(mfrow = c(2, 2))
 gam.check(mPen)
 ```
 
+![](cont-eff-e_files/figure-epub3/mPen-check-1.png)<!-- -->
+
 ```
 ## 
 ## Method: UBRE   Optimizer: outer newton
@@ -408,9 +418,9 @@ gam.check(mPen)
 ## Basis dimension (k) checking results. Low p-value (k-index<1) may
 ## indicate that k is too low, especially if edf is close to k'.
 ## 
-##        k'  edf k-index p-value    
-## s(A) 9.00 8.14    0.93  <2e-16 ***
-## s(P) 9.00 3.05    0.95    0.08 .  
+##        k'  edf k-index p-value   
+## s(A) 9.00 8.14    0.93   0.005 **
+## s(P) 9.00 3.05    0.95   0.080 . 
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -463,6 +473,8 @@ par(mfrow = c(2, 2))
 gam.check(mPen2)
 ```
 
+![](cont-eff-e_files/figure-epub3/diagnostics of model mPen2-1.png)<!-- -->
+
 ```
 ## 
 ## Method: UBRE   Optimizer: outer newton
@@ -477,7 +489,7 @@ gam.check(mPen2)
 ## 
 ##         k'   edf k-index p-value   
 ## s(A) 19.00 11.13    0.93   0.005 **
-## s(P)  9.00  3.05    0.95   0.125   
+## s(P)  9.00  3.05    0.95   0.085 . 
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -489,6 +501,8 @@ par(mfrow = c(1, 2))
 plot(mPen2, seWithMean = TRUE)
 abline(v = 1968, h = 0, lty = 3)
 ```
+
+![](cont-eff-e_files/figure-epub3/mPen2-plot-1.png)<!-- -->
 
 There does not seem to have happened any essential changes from the
 previously fitted curves. -- Maybe, after all,
@@ -528,6 +542,8 @@ axis(2, at = log(c(0.5, 0.75, 1, 1.5, 2)),
      labels = c(0.5, 0.75, 1, 1.5, 2))
 abline(v = 1968, h = 0, lty = 3)
 ```
+
+![](cont-eff-e_files/figure-epub3/mPen2-newplot-1.png)<!-- -->
 
 **Homework** You could continue the analysis of these data by fitting an
 age-cohort model as an alternative to the age-period model, as well as
