@@ -41,10 +41,6 @@ SE.rate <- rate / sqrt(D)
 c(rate, SE.rate, rate + c(-1.96, 1.96) * SE.rate)
 ```
 
-```
-## [1] 2.7115 0.7001 1.3393 4.0837
-```
-
 
 
 ## Poisson model for a single rate with logarithmic link
@@ -65,21 +61,11 @@ of `offset` is needed.
 mreg <- glm(cbind(D, Y) ~ 1, family = poisreg(link = log))
 ci.exp(mreg)
 ```
-
-```
-##             exp(Est.)  2.5% 97.5%
-## (Intercept)     2.711 1.635 4.498
-```
 -  If you want confidence interval for log rate
 
 ``` r
 mreg <- glm(cbind(D, Y) ~ 1, family = poisreg(link = log))
 ci.lin(mreg)[, c(1, 5, 6)]
-```
-
-```
-## Estimate     2.5%    97.5% 
-##   0.9975   0.4914   1.5036
 ```
 
 In this course we endorse the use of family `poisreg` because of its advantages in more general settings.
@@ -101,20 +87,7 @@ use `ci.lin()` to produce the estimate and the
 ``` r
 mid <- glm(cbind(D, Y) ~ 1, family = poisreg(link = "identity"))
 ci.lin(mid)
-```
-
-```
-##             Estimate StdErr     z         P  2.5% 97.5%
-## (Intercept)    2.711 0.7001 3.873 0.0001075 1.339 4.084
-```
-
-``` r
 ci.lin(mid)[, c(1, 5, 6)]
-```
-
-```
-## Estimate     2.5%    97.5% 
-##    2.711    1.339    4.084
 ```
 How is the coefficient of this model interpreted?
 Verify that you actually get the same rate estimate and CI as in section 1.6.1, item 1.
@@ -134,10 +107,6 @@ Px <- 1:3
 rates <- Dx / Yx
 rates
 ```
-
-```
-## [1] 2.125 2.515 3.740
-```
 -  Using these data, 
 fit the same model with log link as in section 1.6.2, assuming a common single hazard $\lambda$ 
   for the separate periods. Compare the result from the previous ones
@@ -147,11 +116,6 @@ m3 <- glm(cbind(Dx, Yx) ~ 1, family = poisreg(link = log))
 ci.exp(m3)
 ```
 
-```
-##             exp(Est.)  2.5% 97.5%
-## (Intercept)     2.711 1.635 4.498
-```
-
 -  Now test whether the rates are the same in the three periods:
   Try to fit a model with the period as a factor in the model:
 
@@ -159,28 +123,11 @@ ci.exp(m3)
 mp <- glm(cbind(Dx, Yx) ~ factor(Px), family = poisreg(link = log))
 ci.exp(mp)
 ```
-
-```
-##             exp(Est.)   2.5% 97.5%
-## (Intercept)     2.125 0.6852 6.588
-## factor(Px)2     1.184 0.3061 4.578
-## factor(Px)3     1.760 0.4207 7.365
-```
 Compare the goodness-of-fit of the two models using `anova()` with the argument
 `test="Chisq"`:
 
 ``` r
 anova(m3, mp, test = "Chisq")
-```
-
-```
-## Analysis of Deviance Table
-## 
-## Model 1: cbind(Dx, Yx) ~ 1
-## Model 2: cbind(Dx, Yx) ~ factor(Px)
-##   Resid. Df Resid. Dev Df Deviance Pr(>Chi)
-## 1         2        0.7                     
-## 2         0        0.0  2      0.7      0.7
 ```
 Compare the test statistic to the deviance of the model `mp`.
 -- What is the deviance indicating?
@@ -247,22 +194,7 @@ What do the parameters mean in this model?
 
 ``` r
 ci.exp(mm)
-```
-
-```
-##                exp(Est.)  2.5% 97.5%
-## (Intercept)        2.711 1.635 4.498
-## factor(expos)1     2.159 1.153 4.042
-```
-
-``` r
 ci.lin(mm, Exp = TRUE)[, 5:7]
-```
-
-```
-##                exp(Est.)  2.5% 97.5%
-## (Intercept)        2.711 1.635 4.498
-## factor(expos)1     2.159 1.153 4.042
 ```
 
 
@@ -284,10 +216,6 @@ RD <- diff(D / Y)
 SED <- sqrt(sum(D / Y^2))
 c(R1, R0, RD, SED, RD + c(-1, 1) * 1.96 * SED)
 ```
-
-```
-## [1] 5.8541 2.7115 3.1426 1.3092 0.5765 5.7087
-```
 -  Verify that this is the confidence interval you get when you fit
   an additive model (obtained by identity link) with exposure as a factor:
 
@@ -296,12 +224,6 @@ ma <- glm(cbind(D, Y) ~ factor(expos),
   family = poisreg(link = identity)
 )
 ci.lin(ma)[, c(1, 5, 6)]
-```
-
-```
-##                Estimate   2.5% 97.5%
-## (Intercept)       2.711 1.3393 4.084
-## factor(expos)1    3.143 0.5765 5.709
 ```
 
 
@@ -316,41 +238,9 @@ Load the `Epi` package and the data set and look at its content
 
 ``` r
 library(dplyr)
-```
-
-```
-## 
-## Attaching package: 'dplyr'
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-```
-
-``` r
 library(Epi)
 data(births)
 str(births)
-```
-
-```
-## 'data.frame':	500 obs. of  8 variables:
-##  $ id     : num  1 2 3 4 5 6 7 8 9 10 ...
-##  $ bweight: num  2974 3270 2620 3751 3200 ...
-##  $ lowbw  : num  0 0 0 0 0 0 0 0 0 0 ...
-##  $ gestwks: num  38.5 NA 38.2 39.8 38.9 ...
-##  $ preterm: num  0 NA 0 0 0 0 0 0 0 0 ...
-##  $ matage : num  34 30 35 31 33 33 29 37 36 39 ...
-##  $ hyp    : num  0 0 0 0 1 0 0 0 0 0 ...
-##  $ sex    : num  2 1 2 1 1 2 2 1 2 1 ...
 ```
 
 -  Because all variables are numeric we need first to do a little housekeeping. 
@@ -378,29 +268,12 @@ births %>%
   mutate(prop = prop.table(n))
 ```
 
-```
-## # A tibble: 4 × 4
-## # Groups:   hyp [2]
-##   hyp    lowbw     n   prop
-##   <fct>  <dbl> <int>  <dbl>
-## 1 normal     0   388 0.907 
-## 2 normal     1    40 0.0935
-## 3 hyper      0    52 0.722 
-## 4 hyper      1    20 0.278
-```
-
 
 -  Estimate relative risk of low birth weight for mothers with hypertension compared to those without using binary regression.
 
 ``` r
 m <- glm(lowbw ~ hyp, family = binomial(link = log), data = births)
 ci.exp(m)
-```
-
-```
-##             exp(Est.)    2.5%  97.5%
-## (Intercept)   0.09346 0.06958 0.1255
-## hyphyper      2.97222 1.84808 4.7802
 ```
 
 
@@ -411,13 +284,6 @@ m <- glm(lowbw ~ sex + hyp, family = binomial(link = log), data = births)
 ci.exp(m)
 ```
 
-```
-##             exp(Est.)    2.5%  97.5%
-## (Intercept)    0.0781 0.05242 0.1164
-## sexF           1.4113 0.88609 2.2480
-## hyphyper       3.0148 1.87400 4.8500
-```
-
 
 
 -  Adjust relative risk of low birth and hypertension with the sex of children and mother beeing over 35 years.
@@ -425,14 +291,6 @@ ci.exp(m)
 ``` r
 m <- glm(lowbw ~ maged + sex + hyp, family = binomial(link = log), data = births)
 ci.exp(m)
-```
-
-```
-##             exp(Est.)   2.5%  97.5%
-## (Intercept)   0.07134 0.0443 0.1149
-## maged         1.18711 0.7452 1.8912
-## sexF          1.42652 0.8947 2.2744
-## hyphyper      3.06590 1.8992 4.9493
 ```
 
 
@@ -461,10 +319,6 @@ SE.rate <- rate / sqrt(D)
 c(rate, SE.rate, rate + c(-1.96, 1.96) * SE.rate)
 ```
 
-```
-## [1] 2.7115 0.7001 1.3393 4.0837
-```
-
 -  Compute now the approximate confidence interval using the method
 based on log-transformation and compare the result with that in the previous item.
 
@@ -472,18 +326,7 @@ based on log-transformation and compare the result with that in the previous ite
 SE.logr <- 1 / sqrt(D)
 EF <- exp(1.96 * SE.logr)
 c(log(rate), SE.logr)
-```
-
-```
-## [1] 0.9975 0.2582
-```
-
-``` r
 c(rate, EF, rate / EF, rate * EF)
-```
-
-```
-## [1] 2.711 1.659 1.635 4.498
 ```
 
 
@@ -503,10 +346,6 @@ EF <- exp(1.96 * SE.lrr)
 c(R1, R0, RR, RR / EF, RR * EF)
 ```
 
-```
-## [1] 5.854 2.711 2.159 1.153 4.042
-```
-
 
 -  Explore the function `ci.mat()`, which lets you use
   matrix multiplication (operator `'%*%'`
@@ -515,29 +354,7 @@ c(R1, R0, RR, RR / EF, RR * EF)
 
 ``` r
 ci.mat
-```
-
-```
-## function (alpha = 0.05, df = Inf) 
-## {
-##     ciM <- rbind(c(1, 1, 1), qt(1 - alpha/2, df) * c(0, -1, 1))
-##     colnames(ciM) <- c("Estimate", paste(formatC(100 * alpha/2, 
-##         format = "f", digits = 1), "%", sep = ""), paste(formatC(100 * 
-##         (1 - alpha/2), format = "f", digits = 1), "%", sep = ""))
-##     ciM
-## }
-## <bytecode: 0x56515f94be20>
-## <environment: namespace:Epi>
-```
-
-``` r
 ci.mat()
-```
-
-```
-##      Estimate  2.5% 97.5%
-## [1,]        1  1.00  1.00
-## [2,]        0 -1.96  1.96
 ```
 As you see, this function returns a $2\times 3$ matrix (2 rows, 3 columns) containing familiar numbers.
 
@@ -552,19 +369,7 @@ Apply this method to the single rate calculations in 1.6.1, first creating the $
 ``` r
 rateandSE <- c(rate, SE.rate)
 rateandSE
-```
-
-```
-## [1] 2.7115 0.7001
-```
-
-``` r
 rateandSE %*% ci.mat()
-```
-
-```
-##      Estimate  2.5% 97.5%
-## [1,]    2.711 1.339 4.084
 ```
 -  When the confidence interval is based on the log-rate and its
   standard error, the result is obtained by appropriate application of
@@ -573,19 +378,7 @@ rateandSE %*% ci.mat()
 ``` r
 lograndSE <- c(log(rate), SE.logr)
 lograndSE
-```
-
-```
-## [1] 0.9975 0.2582
-```
-
-``` r
 exp(lograndSE %*% ci.mat())
-```
-
-```
-##      Estimate  2.5% 97.5%
-## [1,]    2.711 1.635 4.498
 ```
 -  For computing the rate ratio and its CI as in 1.6.5, matrix
   multiplication with `ci.mat()` should give the same result as
@@ -593,11 +386,6 @@ exp(lograndSE %*% ci.mat())
 
 ``` r
 exp(c(log(RR), SE.lrr) %*% ci.mat())
-```
-
-```
-##      Estimate  2.5% 97.5%
-## [1,]    2.159 1.153 4.042
 ```
 -  The main argument in function `ci.mat()` is `alpha`,
   which sets the confidence level: $1 - \alpha$. The default value is
@@ -608,21 +396,7 @@ exp(c(log(RR), SE.lrr) %*% ci.mat())
 
 ``` r
 ci.mat(alpha = 0.1)
-```
-
-```
-##      Estimate   5.0% 95.0%
-## [1,]        1  1.000 1.000
-## [2,]        0 -1.645 1.645
-```
-
-``` r
 exp(c(log(RR), SE.lrr) %*% ci.mat(alpha = 0.1))
-```
-
-```
-##      Estimate  5.0% 95.0%
-## [1,]    2.159 1.275 3.654
 ```
 -  Now achieve this using a Poisson model. For that we first combine
 the group-specific numbers into pertinent vectors and specify a factor to represent the contrast between the exposed and the unexposed group
@@ -642,27 +416,10 @@ expos <- 0:1
 CM <- rbind(c(1, 0), c(1, 1), c(0, 1))
 rownames(CM) <- c("rate 0", "rate 1", "RR 1 vs. 0")
 CM
-```
-
-```
-##            [,1] [,2]
-## rate 0        1    0
-## rate 1        1    1
-## RR 1 vs. 0    0    1
-```
-
-``` r
 mm <- glm(D ~ factor(expos),
   family = poisson(link = log), offset = log(Y)
 )
 ci.exp(mm, ctr.mat = CM)
-```
-
-```
-##            exp(Est.)  2.5% 97.5%
-## rate 0         2.711 1.635 4.498
-## rate 1         5.854 4.042 8.479
-## RR 1 vs. 0     2.159 1.153 4.042
 ```
 -  Use the same machinery to the additive model to get the rates
   and the rate-difference in one go. Note that the annotation of the
@@ -674,11 +431,4 @@ ma <- glm(cbind(D, Y) ~ factor(expos),
   family = poisreg(link = identity)
 )
 ci.lin(ma, ctr.mat = CM)[, c(1, 5, 6)]
-```
-
-```
-##            Estimate   2.5% 97.5%
-## rate 0        2.711 1.3393 4.084
-## rate 1        5.854 3.6857 8.022
-## RD 1 vs. 0    3.143 0.5765 5.709
 ```

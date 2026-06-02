@@ -335,16 +335,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1><span class="header-section-number">Chapter 11</span> Survival analysis with competing risks: Oral cancer patients<a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#survival-analysis-with-competing-risks-oral-cancer-patients" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <div id="description-of-the-data" class="section level2 hasAnchor" number="11.1">
 <h2><span class="header-section-number">11.1</span> Description of the data<a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#description-of-the-data" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>File <code>oralca2.txt</code>, that you may
-access from a url address to be given in the practical, contains data from 338
-patients having an oral squamous cell carcinoma diagnosed and treated
-in one tertiary level oncological clinic in Finland since 1985, followed-up
-for mortality until 31 December 2008.</p>
+<p>File <code>oralca2.txt</code>, that you may access from a url address to be given
+in the practical, contains data from 338 patients having an oral
+squamous cell carcinoma diagnosed and treated in one tertiary level
+oncological clinic in Finland since 1985, followed-up for mortality
+until 31 December 2008.</p>
 <p>The dataset contains the following variables:</p>
 <table>
 <colgroup>
-<col width="12%" />
-<col width="87%" />
+<col width="31%" />
+<col width="68%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -381,22 +381,21 @@ for mortality until 31 December 2008.</p>
 <ul>
 <li>Load the R packages <code>Epi</code>, and <code>survival</code> needed in this exercise.</li>
 </ul>
-<div class="sourceCode" id="cb645"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb645-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb645-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
-<span id="cb645-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb645-2" tabindex="-1"></a><span class="fu">library</span>(survival)</span>
-<span id="cb645-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb645-3" tabindex="-1"></a>cB8  <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;#000000&quot;</span>, <span class="st">&quot;#E69F00&quot;</span>, <span class="st">&quot;#56B4E9&quot;</span>, <span class="st">&quot;#009E73&quot;</span>, </span>
-<span id="cb645-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb645-4" tabindex="-1"></a>          <span class="st">&quot;#F0E442&quot;</span>, <span class="st">&quot;#0072B2&quot;</span>, <span class="st">&quot;#D55E00&quot;</span>, <span class="st">&quot;#CC79A7&quot;</span>) <span class="co">#colors chosen</span></span>
-<span id="cb645-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb645-5" tabindex="-1"></a><span class="fu">options</span>(<span class="at">digits=</span><span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb599"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb599-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb599-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
+<span id="cb599-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb599-2" tabindex="-1"></a><span class="fu">library</span>(survival)</span>
+<span id="cb599-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb599-3" tabindex="-1"></a>cB8  <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;#000000&quot;</span>, <span class="st">&quot;#E69F00&quot;</span>, <span class="st">&quot;#56B4E9&quot;</span>, <span class="st">&quot;#009E73&quot;</span>, </span>
+<span id="cb599-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb599-4" tabindex="-1"></a>          <span class="st">&quot;#F0E442&quot;</span>, <span class="st">&quot;#0072B2&quot;</span>, <span class="st">&quot;#D55E00&quot;</span>, <span class="st">&quot;#CC79A7&quot;</span>) <span class="co">#colors chosen</span></span>
+<span id="cb599-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb599-5" tabindex="-1"></a><span class="fu">options</span>(<span class="at">digits=</span><span class="dv">3</span>)</span></code></pre></div>
 <ul>
-<li>Read the datafile <code>oralca2.txt</code> from
-a website, whose precise address will be given in the practical,
-into an R data frame named <code>orca</code>.
-Look at the head, structure and the summary of the data frame.
-Using function <code>table()</code> count the numbers of censorings
-as well as deaths from oral cancer and other causes, respectively,
-from the <code>event</code> variable.</li>
+<li>Read the datafile <code>oralca2.txt</code> from a website, whose precise address
+will be given in the practical, into an R data frame named <code>orca</code>.
+Look at the head, structure and the summary of the data frame. Using
+function <code>table()</code> count the numbers of censorings as well as deaths
+from oral cancer and other causes, respectively, from the <code>event</code>
+variable.</li>
 </ul>
-<div class="sourceCode" id="cb646"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb646-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb646-1" tabindex="-1"></a>orca <span class="ot">&lt;-</span>  <span class="fu">read.table</span>(<span class="at">file =</span> <span class="st">&#39;https://raw.githubusercontent.com/SPE-R/SPE/master/pracs-book/data/oralca2.txt&#39;</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">sep =</span> <span class="st">&quot; &quot;</span>,<span class="at">row.names =</span> <span class="dv">1</span> )</span>
-<span id="cb646-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb646-2" tabindex="-1"></a><span class="fu">head</span>(orca)</span></code></pre></div>
+<div class="sourceCode" id="cb600"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb600-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb600-1" tabindex="-1"></a>orca <span class="ot">&lt;-</span>  <span class="fu">read.table</span>(<span class="at">file =</span> <span class="st">&#39;https://raw.githubusercontent.com/SPE-R/SPE/master/pracs-book/data/oralca2.txt&#39;</span>, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">sep =</span> <span class="st">&quot; &quot;</span>,<span class="at">row.names =</span> <span class="dv">1</span> )</span>
+<span id="cb600-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb600-2" tabindex="-1"></a><span class="fu">head</span>(orca)</span></code></pre></div>
 <pre><code>##      sex  age stage  time event
 ## 1   Male 65.4  unkn 5.081     0
 ## 2 Female 83.1   III 0.419     1
@@ -404,16 +403,16 @@ from the <code>event</code> variable.</li>
 ## 4   Male 77.1     I 2.480     2
 ## 5   Male 80.3    IV 2.500     1
 ## 6 Female 82.6    IV 0.167     2</code></pre>
-<div class="sourceCode" id="cb648"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb648-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb648-1" tabindex="-1"></a>orca<span class="sc">$</span>stage<span class="ot">&lt;-</span><span class="fu">as.factor</span>(orca<span class="sc">$</span>stage)</span>
-<span id="cb648-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb648-2" tabindex="-1"></a>orca<span class="sc">$</span>sex<span class="ot">&lt;-</span><span class="fu">factor</span>(orca<span class="sc">$</span>sex,<span class="at">levels=</span><span class="fu">c</span>(<span class="st">&quot;Male&quot;</span>,<span class="st">&quot;Female&quot;</span>))</span>
-<span id="cb648-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb648-3" tabindex="-1"></a><span class="fu">str</span>(orca)</span></code></pre></div>
+<div class="sourceCode" id="cb602"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb602-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb602-1" tabindex="-1"></a>orca<span class="sc">$</span>stage<span class="ot">&lt;-</span><span class="fu">as.factor</span>(orca<span class="sc">$</span>stage)</span>
+<span id="cb602-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb602-2" tabindex="-1"></a>orca<span class="sc">$</span>sex<span class="ot">&lt;-</span><span class="fu">factor</span>(orca<span class="sc">$</span>sex,<span class="at">levels=</span><span class="fu">c</span>(<span class="st">&quot;Male&quot;</span>,<span class="st">&quot;Female&quot;</span>))</span>
+<span id="cb602-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb602-3" tabindex="-1"></a><span class="fu">str</span>(orca)</span></code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    338 obs. of  5 variables:
 ##  $ sex  : Factor w/ 2 levels &quot;Male&quot;,&quot;Female&quot;: 1 2 1 1 1 2 1 1 2 1 ...
 ##  $ age  : num  65.4 83.1 52.6 77.1 80.3 ...
 ##  $ stage: Factor w/ 5 levels &quot;I&quot;,&quot;II&quot;,&quot;III&quot;,..: 5 3 2 1 4 4 2 5 4 2 ...
 ##  $ time : num  5.081 0.419 7.915 2.48 2.5 ...
 ##  $ event: int  0 1 2 2 1 2 0 1 1 0 ...</code></pre>
-<div class="sourceCode" id="cb650"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb650-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb650-1" tabindex="-1"></a><span class="fu">summary</span>(orca)</span></code></pre></div>
+<div class="sourceCode" id="cb604"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb604-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb604-1" tabindex="-1"></a><span class="fu">summary</span>(orca)</span></code></pre></div>
 <pre><code>##      sex           age        stage         time            event      
 ##  Male  :186   Min.   :15.2   I   :50   Min.   : 0.085   Min.   :0.000  
 ##  Female:152   1st Qu.:53.2   II  :77   1st Qu.: 1.333   1st Qu.:0.000  
@@ -425,20 +424,19 @@ from the <code>event</code> variable.</li>
 <div id="total-mortality-kaplanmeier-analyses" class="section level2 hasAnchor" number="11.3">
 <h2><span class="header-section-number">11.3</span> Total mortality: Kaplan–Meier analyses<a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#total-mortality-kaplanmeier-analyses" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <ul>
-<li>We start our analysis of total mortality pooling the two causes of death into
-a single outcome.
-First, construct a <em>survival object</em> <code>orca$suob</code> from
-the event variable and the follow-up time using function <code>Surv()</code>.
-Look at the structure and summary of <code>suob</code> .</li>
+<li>We start our analysis of total mortality pooling the two causes of
+death into a single outcome. First, construct a <em>survival object</em>
+<code>orca$suob</code> from the event variable and the follow-up time using
+function <code>Surv()</code>. Look at the structure and summary of <code>suob</code> .</li>
 </ul>
-<div class="sourceCode" id="cb652"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb652-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb652-1" tabindex="-1"></a>suob <span class="ot">&lt;-</span> <span class="fu">Surv</span>(orca<span class="sc">$</span>time, <span class="dv">1</span> <span class="sc">*</span> (orca<span class="sc">$</span>event <span class="sc">&gt;</span> <span class="dv">0</span>))</span>
-<span id="cb652-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb652-2" tabindex="-1"></a><span class="fu">str</span>(suob)</span></code></pre></div>
+<div class="sourceCode" id="cb606"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb606-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb606-1" tabindex="-1"></a>suob <span class="ot">&lt;-</span> <span class="fu">Surv</span>(orca<span class="sc">$</span>time, <span class="dv">1</span> <span class="sc">*</span> (orca<span class="sc">$</span>event <span class="sc">&gt;</span> <span class="dv">0</span>))</span>
+<span id="cb606-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb606-2" tabindex="-1"></a><span class="fu">str</span>(suob)</span></code></pre></div>
 <pre><code>##  &#39;Surv&#39; num [1:338, 1:2]  5.081+  0.419   7.915   2.480   2.500   0.167   5.925+  1.503  13.333   7.666+ ...
 ##  - attr(*, &quot;dimnames&quot;)=List of 2
 ##   ..$ : NULL
 ##   ..$ : chr [1:2] &quot;time&quot; &quot;status&quot;
 ##  - attr(*, &quot;type&quot;)= chr &quot;right&quot;</code></pre>
-<div class="sourceCode" id="cb654"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb654-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb654-1" tabindex="-1"></a><span class="fu">summary</span>(suob)</span></code></pre></div>
+<div class="sourceCode" id="cb608"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb608-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb608-1" tabindex="-1"></a><span class="fu">summary</span>(suob)</span></code></pre></div>
 <pre><code>##       time            status     
 ##  Min.   : 0.085   Min.   :0.000  
 ##  1st Qu.: 1.333   1st Qu.:0.000  
@@ -447,19 +445,18 @@ Look at the structure and summary of <code>suob</code> .</li>
 ##  3rd Qu.: 8.417   3rd Qu.:1.000  
 ##  Max.   :23.258   Max.   :1.000</code></pre>
 <ul>
-<li>Create a <code>survfit</code> object <code>s.all</code>, which does the
-default calculations for a Kaplan–Meier
-analysis of the overall (marginal) survival curve.</li>
+<li>Create a <code>survfit</code> object <code>s.all</code>, which does the default calculations
+for a Kaplan–Meier analysis of the overall (marginal) survival curve.</li>
 </ul>
-<div class="sourceCode" id="cb656"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb656-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb656-1" tabindex="-1"></a>s.all <span class="ot">&lt;-</span> <span class="fu">survfit</span>(suob <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> orca)</span></code></pre></div>
+<div class="sourceCode" id="cb610"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb610-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb610-1" tabindex="-1"></a>s.all <span class="ot">&lt;-</span> <span class="fu">survfit</span>(suob <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> orca)</span></code></pre></div>
 <p>See the structure of this object and apply <code>print()</code> method on it, too.
 Look at the results; what do you find?</p>
-<div class="sourceCode" id="cb657"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb657-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb657-1" tabindex="-1"></a>s.all</span></code></pre></div>
+<div class="sourceCode" id="cb611"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb611-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb611-1" tabindex="-1"></a>s.all</span></code></pre></div>
 <pre><code>## Call: survfit(formula = suob ~ 1, data = orca)
 ## 
 ##        n events median 0.95LCL 0.95UCL
 ## [1,] 338    229   5.42    4.33    6.92</code></pre>
-<div class="sourceCode" id="cb659"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb659-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb659-1" tabindex="-1"></a><span class="fu">str</span>(s.all)</span></code></pre></div>
+<div class="sourceCode" id="cb613"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb613-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb613-1" tabindex="-1"></a><span class="fu">str</span>(s.all)</span></code></pre></div>
 <pre><code>## List of 17
 ##  $ n        : int 338
 ##  $ time     : num [1:251] 0.085 0.162 0.167 0.17 0.246 0.249 0.252 0.329 0.334 0.413 ...
@@ -480,24 +477,24 @@ Look at the results; what do you find?</p>
 ##  $ call     : language survfit(formula = suob ~ 1, data = orca)
 ##  - attr(*, &quot;class&quot;)= chr &quot;survfit&quot;</code></pre>
 <ul>
-<li>The <code>summary</code> method for
-a <code>survfit</code> object would return a lengthy life table.
-However, the <code>plot</code> method with default
-arguments offers the Kaplan–Meier curve
-for a conventional illustration of the survival experience in the whole patient group.
-Alternatively, instead of graphing survival proportions,
-one can draw a curve describing their complements: the cumulative mortality proportions. This curve is drawn together with the survival curve as the
-result of the second command line below.</li>
+<li>The <code>summary</code> method for a <code>survfit</code> object would return a lengthy
+life table. However, the <code>plot</code> method with default arguments offers
+the Kaplan–Meier curve for a conventional illustration of the
+survival experience in the whole patient group. Alternatively, instead
+of graphing survival proportions, one can draw a curve describing
+their complements: the cumulative mortality proportions. This curve is
+drawn together with the survival curve as the result of the second
+command line below.</li>
 </ul>
-<div class="sourceCode" id="cb661"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb661-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-1" tabindex="-1"></a><span class="fu">plot</span>(s.all,<span class="at">main=</span><span class="st">&quot;KM estimate of the survival</span></span>
-<span id="cb661-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-2" tabindex="-1"></a><span class="st">     and cum. mortality proportions&quot;</span>,</span>
-<span id="cb661-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-3" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">&quot;years&quot;</span>, <span class="at">ylab=</span><span class="st">&quot;Survival&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb615"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb615-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb615-1" tabindex="-1"></a><span class="fu">plot</span>(s.all,<span class="at">main=</span><span class="st">&quot;KM estimate of the survival</span></span>
+<span id="cb615-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb615-2" tabindex="-1"></a><span class="st">     and cum. mortality proportions&quot;</span>,</span>
+<span id="cb615-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb615-3" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">&quot;years&quot;</span>, <span class="at">ylab=</span><span class="st">&quot;Survival&quot;</span>)</span></code></pre></div>
 <p><img src="oral-s_files/figure-html/survcdf1-1.png" alt="" width="672" /></p>
-<div class="sourceCode" id="cb662"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb662-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb662-1" tabindex="-1"></a><span class="fu">plot</span>(s.all)</span>
-<span id="cb662-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb662-2" tabindex="-1"></a><span class="fu">lines</span>(s.all, <span class="at">fun =</span> <span class="st">&quot;event&quot;</span>, <span class="at">mark.time =</span> F, <span class="at">conf.int =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb616"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb616-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb616-1" tabindex="-1"></a><span class="fu">plot</span>(s.all)</span>
+<span id="cb616-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb616-2" tabindex="-1"></a><span class="fu">lines</span>(s.all, <span class="at">fun =</span> <span class="st">&quot;event&quot;</span>, <span class="at">mark.time =</span> F, <span class="at">conf.int =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <p><img src="oral-s_files/figure-html/survcdf1-2.png" alt="" width="672" /></p>
-<p>The effect of option <code>mark.time=F</code> is to omit
-marking the times when censorings occurred.</p>
+<p>The effect of option <code>mark.time=F</code> is to omit marking the times when
+censorings occurred.</p>
 </div>
 <div id="total-mortality-by-stage" class="section level2 hasAnchor" number="11.4">
 <h2><span class="header-section-number">11.4</span> Total mortality by stage<a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#total-mortality-by-stage" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -507,52 +504,50 @@ marking the times when censorings occurred.</p>
 stage II: cancer has grown but not spread<br />
 stage III:cancer has grown larger but not spread<br />
 stage IV cancer has spread to other organs or areas</p></li>
-<li><p>Plot separate cumulative mortality curves for the different stage groups
-marking them with different colors, the order which you may define yourself.
-Also find the median survival time for each stage.</p></li>
+<li><p>Plot separate cumulative mortality curves for the different stage
+groups marking them with different colors, the order which you may
+define yourself. Also find the median survival time for each stage.</p></li>
 </ul>
-<div class="sourceCode" id="cb663"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb663-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb663-1" tabindex="-1"></a>s.stg <span class="ot">&lt;-</span> <span class="fu">survfit</span>(suob <span class="sc">~</span> stage, <span class="at">data =</span> orca)</span>
-<span id="cb663-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb663-2" tabindex="-1"></a>col5 <span class="ot">&lt;-</span> cB8[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
-<span id="cb663-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb663-3" tabindex="-1"></a><span class="fu">plot</span>(s.stg, <span class="at">col =</span> col5, <span class="at">fun =</span> <span class="st">&quot;event&quot;</span>, <span class="at">main=</span><span class="st">&quot;Cum. mortality by stage&quot;</span>,<span class="at">mark.time =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb663-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb663-4" tabindex="-1"></a><span class="fu">legend</span>(<span class="dv">15</span>, <span class="fl">0.6</span>, <span class="at">title=</span><span class="st">&quot;stage&quot;</span>,<span class="at">legend=</span><span class="fu">levels</span>(orca<span class="sc">$</span>stage),<span class="at">col =</span> col5,<span class="at">lty=</span><span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">5</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb617"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb617-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb617-1" tabindex="-1"></a>s.stg <span class="ot">&lt;-</span> <span class="fu">survfit</span>(suob <span class="sc">~</span> stage, <span class="at">data =</span> orca)</span>
+<span id="cb617-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb617-2" tabindex="-1"></a>col5 <span class="ot">&lt;-</span> cB8[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb617-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb617-3" tabindex="-1"></a><span class="fu">plot</span>(s.stg, <span class="at">col =</span> col5, <span class="at">fun =</span> <span class="st">&quot;event&quot;</span>, <span class="at">main=</span><span class="st">&quot;Cum. mortality by stage&quot;</span>,<span class="at">mark.time =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb617-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb617-4" tabindex="-1"></a><span class="fu">legend</span>(<span class="dv">15</span>, <span class="fl">0.6</span>, <span class="at">title=</span><span class="st">&quot;stage&quot;</span>,<span class="at">legend=</span><span class="fu">levels</span>(orca<span class="sc">$</span>stage),<span class="at">col =</span> col5,<span class="at">lty=</span><span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">5</span>))</span></code></pre></div>
 <p><img src="oral-s_files/figure-html/cdfstage-1.png" alt="" width="672" /></p>
 <ul>
 <li>Create now two parallel plots of which the first one describes the
-cumulative hazards
-and the second one graphs the log-cumulative hazards against log-time
-for the different stages. Compare the two presentations
-with each other and with the one in the previous item.</li>
+cumulative hazards and the second one graphs the log-cumulative
+hazards against log-time for the different stages. Compare the two
+presentations with each other and with the one in the previous item.</li>
 </ul>
-<div class="sourceCode" id="cb664"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb664-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb664-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb664-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb664-2" tabindex="-1"></a><span class="fu">plot</span>(s.stg, <span class="at">col =</span> col5, <span class="at">fun =</span> <span class="st">&quot;cumhaz&quot;</span>, <span class="at">main =</span> <span class="st">&quot;Cumulative hazards&quot;</span>)</span>
-<span id="cb664-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb664-3" tabindex="-1"></a><span class="fu">legend</span>(<span class="dv">1</span>, <span class="fl">3.5</span>, <span class="at">title=</span><span class="st">&quot;stage&quot;</span>,<span class="at">legend=</span><span class="fu">levels</span>(orca<span class="sc">$</span>stage),<span class="at">col =</span> col5,<span class="at">lty=</span><span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">5</span>), <span class="at">cex=</span><span class="fl">0.8</span>)</span>
-<span id="cb664-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb664-4" tabindex="-1"></a><span class="fu">plot</span>(s.stg, <span class="at">col =</span> col5, <span class="at">fun =</span> <span class="st">&quot;cloglog&quot;</span>,<span class="at">main =</span> <span class="st">&quot;cloglog: log cum.haz&quot;</span>)</span>
-<span id="cb664-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb664-5" tabindex="-1"></a><span class="fu">legend</span>(<span class="dv">3</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="at">title=</span><span class="st">&quot;stage&quot;</span>,<span class="at">legend=</span><span class="fu">levels</span>(orca<span class="sc">$</span>stage),<span class="at">col =</span> col5,<span class="at">lty=</span><span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">5</span>), <span class="at">cex=</span><span class="fl">0.7</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb618"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb618-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb618-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb618-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb618-2" tabindex="-1"></a><span class="fu">plot</span>(s.stg, <span class="at">col =</span> col5, <span class="at">fun =</span> <span class="st">&quot;cumhaz&quot;</span>, <span class="at">main =</span> <span class="st">&quot;Cumulative hazards&quot;</span>)</span>
+<span id="cb618-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb618-3" tabindex="-1"></a><span class="fu">legend</span>(<span class="dv">1</span>, <span class="fl">3.5</span>, <span class="at">title=</span><span class="st">&quot;stage&quot;</span>,<span class="at">legend=</span><span class="fu">levels</span>(orca<span class="sc">$</span>stage),<span class="at">col =</span> col5,<span class="at">lty=</span><span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">5</span>), <span class="at">cex=</span><span class="fl">0.8</span>)</span>
+<span id="cb618-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb618-4" tabindex="-1"></a><span class="fu">plot</span>(s.stg, <span class="at">col =</span> col5, <span class="at">fun =</span> <span class="st">&quot;cloglog&quot;</span>,<span class="at">main =</span> <span class="st">&quot;cloglog: log cum.haz&quot;</span>)</span>
+<span id="cb618-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb618-5" tabindex="-1"></a><span class="fu">legend</span>(<span class="dv">3</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="at">title=</span><span class="st">&quot;stage&quot;</span>,<span class="at">legend=</span><span class="fu">levels</span>(orca<span class="sc">$</span>stage),<span class="at">col =</span> col5,<span class="at">lty=</span><span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">5</span>), <span class="at">cex=</span><span class="fl">0.7</span>)</span></code></pre></div>
 <p><img src="oral-s_files/figure-html/chstage-1.png" alt="" width="672" /></p>
 <ul>
-<li><p>If the survival times were <em>exponentially</em>
-distributed in a given (sub)population
-the corresponding cloglog-curve should follow an approximately linear pattern.
-Could this be the case here in the different stages?</p></li>
-<li><p>Also, if the survival distributions of the different subpopulations would
-obey the <em>proportional hazards</em> model, the vertical distance between the
-cloglog-curves should be approximately constant over the time axis.
-Do these curves indicate serious deviation from the proportional hazards assumption?</p></li>
-<li><p>In the lecture handouts it was observed that
-the crude contrast between males and females in total mortality appears
-unclear, but the age-adjustment in the Cox model provided a more
-expected hazard ratio estimate.
-We shall examine the confounding by age somewhat closer.
-First categorize the continuous age variable
-into, say, three categories by function <code>cut()</code>
-using suitable breakpoints, like 55 and 75 years, and
-cross-tabulate sex and age group:</p></li>
+<li><p>If the survival times were <em>exponentially</em> distributed in a given
+(sub)population the corresponding cloglog-curve should follow an
+approximately linear pattern. Could this be the case here in the
+different stages?</p></li>
+<li><p>Also, if the survival distributions of the different subpopulations
+would obey the <em>proportional hazards</em> model, the vertical distance
+between the cloglog-curves should be approximately constant over the
+time axis. Do these curves indicate serious deviation from the
+proportional hazards assumption?</p></li>
+<li><p>In the lecture handouts it was observed that the crude contrast
+between males and females in total mortality appears unclear, but the
+age-adjustment in the Cox model provided a more expected hazard ratio
+estimate. We shall examine the confounding by age somewhat closer.
+First categorize the continuous age variable into, say, three
+categories by function <code>cut()</code> using suitable breakpoints, like 55 and
+75 years, and cross-tabulate sex and age group:</p></li>
 </ul>
-<div class="sourceCode" id="cb665"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb665-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb665-1" tabindex="-1"></a>orca<span class="sc">$</span>agegr <span class="ot">&lt;-</span> <span class="fu">cut</span>(orca<span class="sc">$</span>age, <span class="at">br =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">55</span>, <span class="dv">75</span>, <span class="dv">95</span>))</span>
-<span id="cb665-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb665-2" tabindex="-1"></a><span class="fu">stat.table</span>(<span class="fu">list</span>(sex, agegr), <span class="fu">list</span>(<span class="fu">count</span>(), <span class="fu">percent</span>(agegr)),</span>
-<span id="cb665-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb665-3" tabindex="-1"></a>  <span class="at">margins =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb665-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb665-4" tabindex="-1"></a>  <span class="at">data =</span> orca</span>
-<span id="cb665-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb665-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb619"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb619-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb619-1" tabindex="-1"></a>orca<span class="sc">$</span>agegr <span class="ot">&lt;-</span> <span class="fu">cut</span>(orca<span class="sc">$</span>age, <span class="at">br =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">55</span>, <span class="dv">75</span>, <span class="dv">95</span>))</span>
+<span id="cb619-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb619-2" tabindex="-1"></a><span class="fu">stat.table</span>(<span class="fu">list</span>(sex, agegr), <span class="fu">list</span>(<span class="fu">count</span>(), <span class="fu">percent</span>(agegr)),</span>
+<span id="cb619-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb619-3" tabindex="-1"></a>  <span class="at">margins =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb619-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb619-4" tabindex="-1"></a>  <span class="at">data =</span> orca</span>
+<span id="cb619-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb619-5" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>##  ----------------------------------------- 
 ##          --------------agegr-------------- 
 ##  sex       (0,55] (55,75] (75,95]   Total  
@@ -569,34 +564,32 @@ cross-tabulate sex and age group:</p></li>
 ##  -----------------------------------------</code></pre>
 <p>Male patients are clearly younger than females in these data.</p>
 <p>Now, plot Kaplan–Meier curves jointly classified by sex and age.</p>
-<div class="sourceCode" id="cb667"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb667-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb667-1" tabindex="-1"></a>s.agrx <span class="ot">&lt;-</span> <span class="fu">survfit</span>(suob <span class="sc">~</span> agegr <span class="sc">+</span> sex, <span class="at">data=</span>orca)</span>
-<span id="cb667-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb667-2" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</span>
-<span id="cb667-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb667-3" tabindex="-1"></a><span class="fu">plot</span>(s.agrx, <span class="at">fun=</span><span class="st">&quot;event&quot;</span>, <span class="at">main=</span><span class="st">&quot;Cumulative mortality (KM) by age and sex&quot;</span>,<span class="at">xlab=</span><span class="st">&quot;Time since oral cancer diagnosis (years)&quot;</span>,<span class="at">ylab=</span><span class="st">&quot;Cum. mortality&quot;</span>,<span class="at">mark.time=</span>F, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">15</span>), <span class="at">lwd=</span><span class="dv">2</span>,</span>
-<span id="cb667-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb667-4" tabindex="-1"></a>             <span class="at">col=</span><span class="fu">rep</span>(<span class="fu">c</span>(cB8[<span class="dv">7</span>], cB8[<span class="dv">6</span>]),<span class="dv">3</span>), <span class="at">lty=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>, <span class="dv">1</span>,<span class="dv">1</span>, <span class="dv">5</span>,<span class="dv">5</span>),</span>
-<span id="cb667-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb667-5" tabindex="-1"></a>     <span class="at">xaxs=</span><span class="st">&quot;i&quot;</span>,<span class="at">yaxs=</span><span class="st">&quot;i&quot;</span>)</span>
-<span id="cb667-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb667-6" tabindex="-1"></a><span class="fu">legend</span>(<span class="dv">12</span>,<span class="fl">0.35</span>, <span class="at">legend=</span><span class="fu">c</span>(<span class="st">&quot;(0,55] Female &quot;</span>,<span class="st">&quot; (0,55] Male&quot;</span>,</span>
-<span id="cb667-7"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb667-7" tabindex="-1"></a>                       <span class="st">&quot;(55,75] Female &quot;</span>,<span class="st">&quot; (55,75] Male&quot;</span>,</span>
-<span id="cb667-8"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb667-8" tabindex="-1"></a>                       <span class="st">&quot;(75,95] Female &quot;</span>,<span class="st">&quot; (75,95] Male&quot;</span> ),</span>
-<span id="cb667-9"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb667-9" tabindex="-1"></a>       <span class="at">col=</span><span class="fu">rep</span>(<span class="fu">c</span>(cB8[<span class="dv">7</span>], cB8[<span class="dv">6</span>]),<span class="dv">3</span>), <span class="at">lty=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>, <span class="dv">1</span>,<span class="dv">1</span>, <span class="dv">5</span>,<span class="dv">5</span>),<span class="at">cex=</span><span class="fl">0.65</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb621"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb621-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb621-1" tabindex="-1"></a>s.agrx <span class="ot">&lt;-</span> <span class="fu">survfit</span>(suob <span class="sc">~</span> agegr <span class="sc">+</span> sex, <span class="at">data=</span>orca)</span>
+<span id="cb621-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb621-2" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb621-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb621-3" tabindex="-1"></a><span class="fu">plot</span>(s.agrx, <span class="at">fun=</span><span class="st">&quot;event&quot;</span>, <span class="at">main=</span><span class="st">&quot;Cumulative mortality (KM) by age and sex&quot;</span>,<span class="at">xlab=</span><span class="st">&quot;Time since oral cancer diagnosis (years)&quot;</span>,<span class="at">ylab=</span><span class="st">&quot;Cum. mortality&quot;</span>,<span class="at">mark.time=</span>F, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">15</span>), <span class="at">lwd=</span><span class="dv">2</span>,</span>
+<span id="cb621-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb621-4" tabindex="-1"></a>             <span class="at">col=</span><span class="fu">rep</span>(<span class="fu">c</span>(cB8[<span class="dv">6</span>], cB8[<span class="dv">7</span>]),<span class="dv">3</span>), <span class="at">lty=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>, <span class="dv">1</span>,<span class="dv">1</span>, <span class="dv">6</span>,<span class="dv">6</span>),</span>
+<span id="cb621-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb621-5" tabindex="-1"></a>     <span class="at">xaxs=</span><span class="st">&quot;i&quot;</span>,<span class="at">yaxs=</span><span class="st">&quot;i&quot;</span>)</span>
+<span id="cb621-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb621-6" tabindex="-1"></a><span class="fu">legend</span>(<span class="dv">10</span>,<span class="fl">0.35</span>, <span class="at">legend=</span><span class="fu">names</span>(s.agrx<span class="sc">$</span>strata),</span>
+<span id="cb621-7"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb621-7" tabindex="-1"></a>       <span class="at">col=</span><span class="fu">rep</span>(<span class="fu">c</span>(cB8[<span class="dv">6</span>], cB8[<span class="dv">7</span>]),<span class="dv">3</span>), <span class="at">lty=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>, <span class="dv">1</span>,<span class="dv">1</span>, <span class="dv">6</span>,<span class="dv">6</span>),<span class="at">cex=</span><span class="fl">0.65</span>)</span></code></pre></div>
 <p><img src="oral-s_files/figure-html/cdfsexage-1.png" alt="" width="672" /></p>
 <p>In each age band the mortality curve for males is on a higher level
 than that for females.</p>
 </div>
 <div id="event-specific-cumulative-mortality-curves" class="section level2 hasAnchor" number="11.5">
 <h2><span class="header-section-number">11.5</span> Event-specific cumulative mortality curves<a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#event-specific-cumulative-mortality-curves" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>We move on to analysing cumulative mortalities for the
-two causes of death separately, first overall and then
-by prognostic factors.</p>
+<p>We move on to analysing cumulative mortalities for the two causes of
+death separately, first overall and then by prognostic factors.</p>
 <ul>
-<li>Use the <code>survfit</code>-function in <code>survival</code> package with option <code>type="mstate"</code>.</li>
+<li>Use the <code>survfit</code>-function in <code>survival</code> package with option
+<code>type="mstate"</code>.</li>
 </ul>
-<div class="sourceCode" id="cb668"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb668-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb668-1" tabindex="-1"></a><span class="fu">library</span>(survival)</span>
-<span id="cb668-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb668-2" tabindex="-1"></a>cif1 <span class="ot">&lt;-</span> <span class="fu">survfit</span>(<span class="fu">Surv</span>(time, event, <span class="at">type =</span> <span class="st">&quot;mstate&quot;</span>) <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb668-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb668-3" tabindex="-1"></a>  <span class="at">data =</span> orca</span>
-<span id="cb668-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb668-4" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb622"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb622-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb622-1" tabindex="-1"></a><span class="fu">library</span>(survival)</span>
+<span id="cb622-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb622-2" tabindex="-1"></a>cif1 <span class="ot">&lt;-</span> <span class="fu">survfit</span>(<span class="fu">Surv</span>(time, event, <span class="at">type =</span> <span class="st">&quot;mstate&quot;</span>) <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb622-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb622-3" tabindex="-1"></a>  <span class="at">data =</span> orca</span>
+<span id="cb622-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb622-4" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>## Warning in Surv(time, event, type = &quot;mstate&quot;): type= &#39;mstate&#39; is deprecated,
 ## use a factor variable as status</code></pre>
-<div class="sourceCode" id="cb670"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb670-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb670-1" tabindex="-1"></a><span class="fu">str</span>(cif1)</span></code></pre></div>
+<div class="sourceCode" id="cb624"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb624-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb624-1" tabindex="-1"></a><span class="fu">str</span>(cif1)</span></code></pre></div>
 <pre><code>## List of 23
 ##  $ n           : int 338
 ##  $ time        : num [1:251] 0.085 0.162 0.167 0.17 0.246 0.249 0.252 0.329 0.334 0.413 ...
@@ -653,8 +646,8 @@ by prognostic factors.</p>
 <ul>
 <li>One could apply here the plot method of the survfit object to plot the
 cumulative incidences for each cause. However, we suggest that you use
-instead a simple function <code>plotCIF()</code> found in the <code>Epi</code> package.
-The main arguments are</li>
+instead a simple function <code>plotCIF()</code> found in the <code>Epi</code> package. The
+main arguments are</li>
 </ul>
 <table>
 <tbody>
@@ -670,28 +663,28 @@ The main arguments are</li>
 </table>
 <p>Other arguments are like in the ordinary <code>plot()</code> function.</p>
 <ul>
-<li>Draw two parallel plots describing
-the overall cumulative incidence curves for both causes of death</li>
+<li>Draw two parallel plots describing the overall cumulative incidence
+curves for both causes of death</li>
 </ul>
-<div class="sourceCode" id="cb672"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb672-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb672-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb672-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb672-2" tabindex="-1"></a><span class="fu">plotCIF</span>(cif1, <span class="dv">1</span>, <span class="at">main =</span> <span class="st">&quot;Cancer death&quot;</span>,<span class="at">xlab=</span><span class="st">&quot;Time since oral cancer diagnosis (years)&quot;</span>)</span>
-<span id="cb672-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb672-3" tabindex="-1"></a><span class="fu">plotCIF</span>(cif1, <span class="dv">2</span>, <span class="at">main =</span> <span class="st">&quot;Other deaths&quot;</span>,<span class="at">xlab=</span><span class="st">&quot;Time since oral cancer diagnosis (years)&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb626"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb626-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb626-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb626-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb626-2" tabindex="-1"></a><span class="fu">plotCIF</span>(cif1, <span class="dv">1</span>, <span class="at">main =</span> <span class="st">&quot;Cancer death&quot;</span>,<span class="at">xlab=</span><span class="st">&quot;Time since oral cancer diagnosis (years)&quot;</span>)</span>
+<span id="cb626-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb626-3" tabindex="-1"></a><span class="fu">plotCIF</span>(cif1, <span class="dv">2</span>, <span class="at">main =</span> <span class="st">&quot;Other deaths&quot;</span>,<span class="at">xlab=</span><span class="st">&quot;Time since oral cancer diagnosis (years)&quot;</span>)</span></code></pre></div>
 <p><img src="oral-s_files/figure-html/plotcif1-1.png" alt="" width="672" /></p>
 <ul>
-<li>Compute the estimated
-cumulative incidences by stage for both causes of death.
-Now you have to add variable <code>stage</code> to survfit-function.</li>
+<li>Compute the estimated cumulative incidences by stage for both causes
+of death. Now you have to add variable <code>stage</code> to survfit-function.</li>
 </ul>
-<p>See the structure of the resulting object, in which you should
-observe strata variable containing the stage grouping variable. Plot the pertinent curves in two parallel graphs.
-Cut the <span class="math inline">\(y\)</span>-axis for a more efficient graphical presentation</p>
-<div class="sourceCode" id="cb673"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb673-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb673-1" tabindex="-1"></a>col5 <span class="ot">&lt;-</span> col5</span>
-<span id="cb673-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb673-2" tabindex="-1"></a>cif2 <span class="ot">&lt;-</span> <span class="fu">survfit</span>(<span class="fu">Surv</span>(time, event, <span class="at">type =</span> <span class="st">&quot;mstate&quot;</span>) <span class="sc">~</span> stage,</span>
-<span id="cb673-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb673-3" tabindex="-1"></a>  <span class="at">data =</span> orca</span>
-<span id="cb673-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb673-4" tabindex="-1"></a>)</span></code></pre></div>
+<p>See the structure of the resulting object, in which you should observe
+strata variable containing the stage grouping variable. Plot the
+pertinent curves in two parallel graphs. Cut the <span class="math inline">\(y\)</span>-axis for a more
+efficient graphical presentation</p>
+<div class="sourceCode" id="cb627"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb627-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb627-1" tabindex="-1"></a>col5 <span class="ot">&lt;-</span> col5</span>
+<span id="cb627-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb627-2" tabindex="-1"></a>cif2 <span class="ot">&lt;-</span> <span class="fu">survfit</span>(<span class="fu">Surv</span>(time, event, <span class="at">type =</span> <span class="st">&quot;mstate&quot;</span>) <span class="sc">~</span> stage,</span>
+<span id="cb627-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb627-3" tabindex="-1"></a>  <span class="at">data =</span> orca</span>
+<span id="cb627-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb627-4" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>## Warning in Surv(time, event, type = &quot;mstate&quot;): type= &#39;mstate&#39; is deprecated,
 ## use a factor variable as status</code></pre>
-<div class="sourceCode" id="cb675"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb675-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb675-1" tabindex="-1"></a><span class="fu">str</span>(cif2)</span></code></pre></div>
+<div class="sourceCode" id="cb629"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb629-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb629-1" tabindex="-1"></a><span class="fu">str</span>(cif2)</span></code></pre></div>
 <pre><code>## List of 24
 ##  $ n           : int [1:5] 50 77 72 68 71
 ##  $ time        : num [1:307] 0.17 0.498 0.665 0.832 1.166 ...
@@ -749,52 +742,50 @@ Cut the <span class="math inline">\(y\)</span>-axis for a more efficient graphic
 ##  $ t0          : num 0
 ##  $ call        : language survfit(formula = Surv(time, event, type = &quot;mstate&quot;) ~ stage, data = orca)
 ##  - attr(*, &quot;class&quot;)= chr [1:2] &quot;survfitms&quot; &quot;survfit&quot;</code></pre>
-<div class="sourceCode" id="cb677"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb677-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb677-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb677-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb677-2" tabindex="-1"></a><span class="fu">plotCIF</span>(cif2, <span class="dv">1</span>,</span>
-<span id="cb677-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb677-3" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">&quot;Cancer death by stage&quot;</span>,</span>
-<span id="cb677-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb677-4" tabindex="-1"></a>  <span class="at">col =</span> col5, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.7</span>)</span>
-<span id="cb677-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb677-5" tabindex="-1"></a>)</span>
-<span id="cb677-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb677-6" tabindex="-1"></a><span class="fu">plotCIF</span>(cif2, <span class="dv">2</span>,</span>
-<span id="cb677-7"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb677-7" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">&quot;Other deaths by stage&quot;</span>,</span>
-<span id="cb677-8"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb677-8" tabindex="-1"></a>  <span class="at">col =</span> col5, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.7</span>)</span>
-<span id="cb677-9"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb677-9" tabindex="-1"></a>)</span>
-<span id="cb677-10"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb677-10" tabindex="-1"></a></span>
-<span id="cb677-11"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb677-11" tabindex="-1"></a><span class="fu">legend</span>(<span class="dv">3</span>, <span class="fl">0.7</span>, <span class="at">title=</span><span class="st">&quot;stage&quot;</span>,<span class="at">legend=</span><span class="fu">levels</span>(orca<span class="sc">$</span>stage),<span class="at">col =</span> col5,<span class="at">lty=</span><span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">5</span>), <span class="at">cex=</span><span class="fl">0.7</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb631"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb631-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb631-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb631-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb631-2" tabindex="-1"></a><span class="fu">plotCIF</span>(cif2, <span class="dv">1</span>,</span>
+<span id="cb631-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb631-3" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">&quot;Cancer death by stage&quot;</span>,</span>
+<span id="cb631-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb631-4" tabindex="-1"></a>  <span class="at">col =</span> col5, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.7</span>)</span>
+<span id="cb631-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb631-5" tabindex="-1"></a>)</span>
+<span id="cb631-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb631-6" tabindex="-1"></a><span class="fu">plotCIF</span>(cif2, <span class="dv">2</span>,</span>
+<span id="cb631-7"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb631-7" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">&quot;Other deaths by stage&quot;</span>,</span>
+<span id="cb631-8"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb631-8" tabindex="-1"></a>  <span class="at">col =</span> col5, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.7</span>)</span>
+<span id="cb631-9"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb631-9" tabindex="-1"></a>)</span>
+<span id="cb631-10"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb631-10" tabindex="-1"></a></span>
+<span id="cb631-11"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb631-11" tabindex="-1"></a><span class="fu">legend</span>(<span class="dv">3</span>, <span class="fl">0.7</span>, <span class="at">title=</span><span class="st">&quot;stage&quot;</span>,<span class="at">legend=</span><span class="fu">levels</span>(orca<span class="sc">$</span>stage),<span class="at">col =</span> col5,<span class="at">lty=</span><span class="fu">rep</span>(<span class="dv">1</span>,<span class="dv">5</span>), <span class="at">cex=</span><span class="fl">0.7</span>)</span></code></pre></div>
 <p><img src="oral-s_files/figure-html/plotcif2-1.png" alt="" width="672" /></p>
-<p>Compare the two plots. What would you conclude about the
-effect of stage on the two causes of death?</p>
+<p>Compare the two plots. What would you conclude about the effect of stage
+on the two causes of death?</p>
 <ul>
-<li>Using another function <code>stackedCIF()</code> in <code>Epi</code> you can
-put the two cumulative incidence curves in one graph but stacked upon one another such that
-the lower curve is for the cancer deaths and the upper curve is for total mortality,
-and the vertical difference between the two curves describes the
-cumulative mortality from other causes. You can also add some colours for the different zones:</li>
+<li>Using another function <code>stackedCIF()</code> in <code>Epi</code> you can put the two
+cumulative incidence curves in one graph but stacked upon one another
+such that the lower curve is for the cancer deaths and the upper curve
+is for total mortality, and the vertical difference between the two
+curves describes the cumulative mortality from other causes. You can
+also add some colours for the different zones:</li>
 </ul>
-<div class="sourceCode" id="cb678"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb678-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb678-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">xaxs=</span><span class="st">&quot;i&quot;</span>, <span class="at">yaxs=</span><span class="st">&quot;i&quot;</span>) <span class="co"># make plot start 0,0</span></span>
-<span id="cb678-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb678-2" tabindex="-1"></a><span class="fu">stackedCIF</span>(cif1,<span class="at">xlim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">20</span>),</span>
-<span id="cb678-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb678-3" tabindex="-1"></a>           <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>),</span>
-<span id="cb678-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb678-4" tabindex="-1"></a>           <span class="at">fill=</span><span class="fu">c</span>(cB8[<span class="dv">6</span>],cB8[<span class="dv">8</span>],cB8[<span class="dv">2</span>])) <span class="co">#choosing some colors </span></span>
-<span id="cb678-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb678-5" tabindex="-1"></a><span class="fu">text</span>( <span class="dv">10</span>, <span class="fl">0.10</span>, <span class="st">&quot;Oral ca death &quot;</span>, <span class="at">pos =</span> <span class="dv">4</span>)</span>
-<span id="cb678-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb678-6" tabindex="-1"></a><span class="fu">text</span>( <span class="dv">10</span>, <span class="fl">0.5</span>, <span class="st">&quot; Other death &quot;</span>, <span class="at">pos =</span> <span class="dv">4</span>)</span>
-<span id="cb678-7"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb678-7" tabindex="-1"></a><span class="fu">text</span>( <span class="dv">10</span>, <span class="fl">0.80</span>, <span class="st">&quot; Alive &quot;</span>, <span class="at">pos =</span> <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb632"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb632-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb632-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">xaxs=</span><span class="st">&quot;i&quot;</span>, <span class="at">yaxs=</span><span class="st">&quot;i&quot;</span>) <span class="co"># make plot start 0,0</span></span>
+<span id="cb632-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb632-2" tabindex="-1"></a><span class="fu">stackedCIF</span>(cif1,<span class="at">xlim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">20</span>),</span>
+<span id="cb632-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb632-3" tabindex="-1"></a>           <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>),</span>
+<span id="cb632-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb632-4" tabindex="-1"></a>           <span class="at">fill=</span><span class="fu">c</span>(cB8[<span class="dv">6</span>],cB8[<span class="dv">8</span>],cB8[<span class="dv">2</span>])) <span class="co">#choosing some colors </span></span>
+<span id="cb632-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb632-5" tabindex="-1"></a><span class="fu">text</span>( <span class="dv">10</span>, <span class="fl">0.10</span>, <span class="st">&quot;Oral ca death &quot;</span>, <span class="at">pos =</span> <span class="dv">4</span>)</span>
+<span id="cb632-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb632-6" tabindex="-1"></a><span class="fu">text</span>( <span class="dv">10</span>, <span class="fl">0.5</span>, <span class="st">&quot; Other death &quot;</span>, <span class="at">pos =</span> <span class="dv">4</span>)</span>
+<span id="cb632-7"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb632-7" tabindex="-1"></a><span class="fu">text</span>( <span class="dv">10</span>, <span class="fl">0.80</span>, <span class="st">&quot; Alive &quot;</span>, <span class="at">pos =</span> <span class="dv">4</span>)</span></code></pre></div>
 <p><img src="oral-s_files/figure-html/stackedcif1-1.png" alt="" width="672" /></p>
 </div>
 <div id="regression-modelling-of-overall-mortality." class="section level2 hasAnchor" number="11.6">
 <h2><span class="header-section-number">11.6</span> Regression modelling of overall mortality.<a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#regression-modelling-of-overall-mortality." class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <ul>
-<li>Fit the semiparametric proportional hazards
-regression model, a.k.a. the Cox model, on all deaths including
-sex, age and stage as covariates. Use function
-<code>coxph()</code> in package <code>survival</code>.
-It is often useful to center and scale
-continuous covariates like <code>age</code> here.
-The estimated rate ratios and their confidence intervals
-can also here be displayed by applying <code>ci.lin()</code>
-on the fitted model object.</li>
+<li>Fit the semiparametric proportional hazards regression model, a.k.a.
+the Cox model, on all deaths including sex, age and stage as
+covariates. Use function <code>coxph()</code> in package <code>survival</code>. It is often
+useful to center and scale continuous covariates like <code>age</code> here. The
+estimated rate ratios and their confidence intervals can also here be
+displayed by applying <code>ci.lin()</code> on the fitted model object.</li>
 </ul>
-<div class="sourceCode" id="cb679"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb679-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb679-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">show.signif.stars =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb679-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb679-2" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">coxph</span>(suob <span class="sc">~</span> sex <span class="sc">+</span> <span class="fu">I</span>((age <span class="sc">-</span> <span class="dv">65</span>) <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> stage, <span class="at">data =</span> orca)</span>
-<span id="cb679-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb679-3" tabindex="-1"></a><span class="fu">summary</span>(m1)</span></code></pre></div>
+<div class="sourceCode" id="cb633"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb633-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb633-1" tabindex="-1"></a><span class="fu">options</span>(<span class="at">show.signif.stars =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb633-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb633-2" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">coxph</span>(suob <span class="sc">~</span> sex <span class="sc">+</span> <span class="fu">I</span>((age <span class="sc">-</span> <span class="dv">65</span>) <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> stage, <span class="at">data =</span> orca)</span>
+<span id="cb633-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb633-3" tabindex="-1"></a><span class="fu">summary</span>(m1)</span></code></pre></div>
 <pre><code>## Call:
 ## coxph(formula = suob ~ sex + I((age - 65)/10) + stage, data = orca)
 ## 
@@ -820,7 +811,7 @@ on the fitted model object.</li>
 ## Likelihood ratio test= 86.8  on 6 df,   p=&lt;2e-16
 ## Wald test            = 80.5  on 6 df,   p=3e-15
 ## Score (logrank) test = 82.9  on 6 df,   p=9e-16</code></pre>
-<div class="sourceCode" id="cb681"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb681-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb681-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(m1),<span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb635"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb635-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb635-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(m1),<span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##                  exp(Est.)  2.5% 97.5%
 ## sexFemale            0.704 0.533 0.928
 ## I((age - 65)/10)     1.516 1.357 1.693
@@ -830,31 +821,30 @@ on the fitted model object.</li>
 ## stageunkn            1.794 1.096 2.935</code></pre>
 <p>Look at the results. What are the main findings?</p>
 <ul>
-<li>Check whether the data are sufficiently consistent with the
-assumption of proportional hazards with respect to each of
-the variables separately
-as well as globally, using the <code>cox.zph()</code> function.</li>
+<li>Check whether the data are sufficiently consistent with the assumption
+of proportional hazards with respect to each of the variables
+separately as well as globally, using the <code>cox.zph()</code> function.</li>
 </ul>
-<div class="sourceCode" id="cb683"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb683-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb683-1" tabindex="-1"></a><span class="fu">cox.zph</span>(m1)</span></code></pre></div>
+<div class="sourceCode" id="cb637"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb637-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb637-1" tabindex="-1"></a><span class="fu">cox.zph</span>(m1)</span></code></pre></div>
 <pre><code>##                  chisq df    p
 ## sex              0.275  1 0.60
 ## I((age - 65)/10) 1.706  1 0.19
 ## stage            3.648  4 0.46
 ## GLOBAL           5.144  6 0.53</code></pre>
 <ul>
-<li>No evidence against proportionality assumption could apparently be found.
-Moreover, no difference can be observed between stages I and II in the estimates.
-On the other hand, the
-group with stage unknown is a complex mixture of patients from various
-true stages. Therefore, it may be prudent to exclude these subjects from the data
-and to pool the first two stage groups into one. After that fit a model in
-the reduced data with the new stage variable.</li>
+<li>No evidence against proportionality assumption could apparently be
+found. Moreover, no difference can be observed between stages I and II
+in the estimates. On the other hand, the group with stage unknown is a
+complex mixture of patients from various true stages. Therefore, it
+may be prudent to exclude these subjects from the data and to pool the
+first two stage groups into one. After that fit a model in the reduced
+data with the new stage variable.</li>
 </ul>
-<div class="sourceCode" id="cb685"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb685-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb685-1" tabindex="-1"></a>orca2 <span class="ot">&lt;-</span> <span class="fu">subset</span>(orca, stage <span class="sc">!=</span> <span class="st">&quot;unkn&quot;</span>)</span>
-<span id="cb685-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb685-2" tabindex="-1"></a>orca2<span class="sc">$</span>st3 <span class="ot">&lt;-</span> <span class="fu">Relevel</span>(orca2<span class="sc">$</span>stage, <span class="fu">list</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span><span class="sc">:</span><span class="dv">5</span>))</span>
-<span id="cb685-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb685-3" tabindex="-1"></a><span class="fu">levels</span>(orca2<span class="sc">$</span>st3) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;I-II&quot;</span>, <span class="st">&quot;III&quot;</span>, <span class="st">&quot;IV&quot;</span>)</span>
-<span id="cb685-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb685-4" tabindex="-1"></a>m2 <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(orca2<span class="sc">$</span>time, <span class="dv">1</span> <span class="sc">*</span> (orca2<span class="sc">$</span>event <span class="sc">&gt;</span> <span class="dv">0</span>)) <span class="sc">~</span> sex <span class="sc">+</span> <span class="fu">I</span>((age <span class="sc">-</span> <span class="dv">65</span>) <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> st3, <span class="at">data =</span> orca2)</span>
-<span id="cb685-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb685-5" tabindex="-1"></a><span class="fu">summary</span>(m2)</span></code></pre></div>
+<div class="sourceCode" id="cb639"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb639-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb639-1" tabindex="-1"></a>orca2 <span class="ot">&lt;-</span> <span class="fu">subset</span>(orca, stage <span class="sc">!=</span> <span class="st">&quot;unkn&quot;</span>)</span>
+<span id="cb639-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb639-2" tabindex="-1"></a>orca2<span class="sc">$</span>st3 <span class="ot">&lt;-</span> <span class="fu">Relevel</span>(orca2<span class="sc">$</span>stage, <span class="fu">list</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span><span class="sc">:</span><span class="dv">5</span>))</span>
+<span id="cb639-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb639-3" tabindex="-1"></a><span class="fu">levels</span>(orca2<span class="sc">$</span>st3) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;I-II&quot;</span>, <span class="st">&quot;III&quot;</span>, <span class="st">&quot;IV&quot;</span>)</span>
+<span id="cb639-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb639-4" tabindex="-1"></a>m2 <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(orca2<span class="sc">$</span>time, <span class="dv">1</span> <span class="sc">*</span> (orca2<span class="sc">$</span>event <span class="sc">&gt;</span> <span class="dv">0</span>)) <span class="sc">~</span> sex <span class="sc">+</span> <span class="fu">I</span>((age <span class="sc">-</span> <span class="dv">65</span>) <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> st3, <span class="at">data =</span> orca2)</span>
+<span id="cb639-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb639-5" tabindex="-1"></a><span class="fu">summary</span>(m2)</span></code></pre></div>
 <pre><code>## Call:
 ## coxph(formula = Surv(orca2$time, 1 * (orca2$event &gt; 0)) ~ sex + 
 ##     I((age - 65)/10) + st3, data = orca2)
@@ -877,27 +867,26 @@ the reduced data with the new stage variable.</li>
 ## Likelihood ratio test= 64.8  on 4 df,   p=3e-13
 ## Wald test            = 62.3  on 4 df,   p=1e-12
 ## Score (logrank) test = 64.3  on 4 df,   p=4e-13</code></pre>
-<div class="sourceCode" id="cb687"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb687-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb687-1" tabindex="-1"></a><span class="co">#m2 &lt;- update(m1, . ~ . - stage + st3, data = orca2) #do not work</span></span>
-<span id="cb687-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb687-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(m2), <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb641"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb641-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb641-1" tabindex="-1"></a><span class="co">#m2 &lt;- update(m1, . ~ . - stage + st3, data = orca2) #do not work</span></span>
+<span id="cb641-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb641-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(m2), <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##                  exp(Est.)  2.5% 97.5%
 ## sexFemale            0.753 0.553  1.02
 ## I((age - 65)/10)     1.464 1.296  1.65
 ## st3III               1.366 0.955  1.95
 ## st3IV                2.390 1.684  3.39</code></pre>
 <ul>
-<li>Plot the predicted cumulative mortality curves by stage,
-jointly stratified by sex and age, focusing
-only on 40 and 80 year old patients, respectively,
-based on the fitted model <code>m2</code>.
-You need to create a new artificial data frame
-containing the desired values for the covariates.</li>
+<li>Plot the predicted cumulative mortality curves by stage, jointly
+stratified by sex and age, focusing only on 40 and 80 year old
+patients, respectively, based on the fitted model <code>m2</code>. You need to
+create a new artificial data frame containing the desired values for
+the covariates.</li>
 </ul>
-<div class="sourceCode" id="cb689"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb689-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb689-1" tabindex="-1"></a>newd <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb689-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb689-2" tabindex="-1"></a>  <span class="at">sex =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;Male&quot;</span>, <span class="dv">6</span>), <span class="fu">rep</span>(<span class="st">&quot;Female&quot;</span>, <span class="dv">6</span>)),</span>
-<span id="cb689-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb689-3" tabindex="-1"></a>  <span class="at">age =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">40</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="dv">80</span>, <span class="dv">3</span>)), <span class="dv">2</span>),</span>
-<span id="cb689-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb689-4" tabindex="-1"></a>  <span class="at">st3 =</span> <span class="fu">rep</span>(<span class="fu">levels</span>(orca2<span class="sc">$</span>st3), <span class="dv">4</span>)</span>
-<span id="cb689-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb689-5" tabindex="-1"></a>)</span>
-<span id="cb689-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb689-6" tabindex="-1"></a>newd</span></code></pre></div>
+<div class="sourceCode" id="cb643"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb643-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb643-1" tabindex="-1"></a>newd <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb643-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb643-2" tabindex="-1"></a>  <span class="at">sex =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;Male&quot;</span>, <span class="dv">6</span>), <span class="fu">rep</span>(<span class="st">&quot;Female&quot;</span>, <span class="dv">6</span>)),</span>
+<span id="cb643-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb643-3" tabindex="-1"></a>  <span class="at">age =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">40</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="dv">80</span>, <span class="dv">3</span>)), <span class="dv">2</span>),</span>
+<span id="cb643-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb643-4" tabindex="-1"></a>  <span class="at">st3 =</span> <span class="fu">rep</span>(<span class="fu">levels</span>(orca2<span class="sc">$</span>st3), <span class="dv">4</span>)</span>
+<span id="cb643-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb643-5" tabindex="-1"></a>)</span>
+<span id="cb643-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb643-6" tabindex="-1"></a>newd</span></code></pre></div>
 <pre><code>##       sex age  st3
 ## 1    Male  40 I-II
 ## 2    Male  40  III
@@ -911,255 +900,395 @@ containing the desired values for the covariates.</li>
 ## 10 Female  80 I-II
 ## 11 Female  80  III
 ## 12 Female  80   IV</code></pre>
-<div class="sourceCode" id="cb691"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb691-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb691-1" tabindex="-1"></a>col3 <span class="ot">&lt;-</span> cB8[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>] <span class="co">#pre-setting color palette</span></span>
-<span id="cb691-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb691-2" tabindex="-1"></a>leg<span class="ot">&lt;-</span><span class="fu">levels</span>(<span class="fu">interaction</span>(<span class="fu">levels</span>(<span class="fu">factor</span>(orca2<span class="sc">$</span>sex)),<span class="fu">levels</span>(orca2<span class="sc">$</span>st3))) <span class="co">#legend labels by sex and stage</span></span></code></pre></div>
+<div class="sourceCode" id="cb645"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb645-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb645-1" tabindex="-1"></a>col3 <span class="ot">&lt;-</span> cB8[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>] <span class="co">#pre-setting color palette</span></span>
+<span id="cb645-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb645-2" tabindex="-1"></a>leg<span class="ot">&lt;-</span><span class="fu">levels</span>(<span class="fu">interaction</span>(<span class="fu">levels</span>(<span class="fu">factor</span>(orca2<span class="sc">$</span>sex)),<span class="fu">levels</span>(orca2<span class="sc">$</span>st3))) <span class="co">#legend labels by sex and stage</span></span></code></pre></div>
 <pre><code>## Warning in ay * as.numeric(nx) + ax: longer object length is not a multiple of
 ## shorter object length</code></pre>
-<div class="sourceCode" id="cb693"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb693-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb693-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-2" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb693-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-3" tabindex="-1"></a>  <span class="fu">survfit</span>(m2, <span class="at">newdata =</span> <span class="fu">subset</span>(newd, sex <span class="sc">==</span> <span class="st">&quot;Male&quot;</span> <span class="sc">&amp;</span> age <span class="sc">==</span> <span class="dv">40</span>)),</span>
-<span id="cb693-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-4" tabindex="-1"></a>  <span class="at">col =</span> col3, </span>
-<span id="cb693-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-5" tabindex="-1"></a>  <span class="at">lty=</span> <span class="dv">1</span>,</span>
-<span id="cb693-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-6" tabindex="-1"></a>  <span class="at">fun =</span> <span class="st">&quot;event&quot;</span>, <span class="at">mark.time =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb693-7"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-7" tabindex="-1"></a>  <span class="at">main=</span><span class="st">&quot;Cum. mortality for M and F </span><span class="sc">\n</span><span class="st"> age 40&quot;</span></span>
-<span id="cb693-8"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-8" tabindex="-1"></a>  )</span>
-<span id="cb693-9"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-9" tabindex="-1"></a><span class="fu">lines</span>(</span>
-<span id="cb693-10"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-10" tabindex="-1"></a>  <span class="fu">survfit</span>(m2, <span class="at">newdata =</span> <span class="fu">subset</span>(newd, sex <span class="sc">==</span> <span class="st">&quot;Female&quot;</span> <span class="sc">&amp;</span> age <span class="sc">==</span> <span class="dv">40</span>)),</span>
-<span id="cb693-11"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-11" tabindex="-1"></a>  <span class="at">col =</span> col3, <span class="at">lty=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>),<span class="at">fun =</span> <span class="st">&quot;event&quot;</span>, <span class="at">mark.time =</span> <span class="cn">FALSE</span></span>
-<span id="cb693-12"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-12" tabindex="-1"></a>)</span>
-<span id="cb693-13"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-13" tabindex="-1"></a><span class="fu">legend</span>(<span class="dv">0</span>, <span class="fl">0.95</span>, <span class="at">title=</span><span class="st">&quot;stage&quot;</span>,<span class="at">legend=</span>leg,</span>
-<span id="cb693-14"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-14" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(col3[<span class="dv">1</span>],col3[<span class="dv">1</span>],col3[<span class="dv">2</span>],col3[<span class="dv">2</span>],col3[<span class="dv">3</span>],col3[<span class="dv">3</span>]),</span>
-<span id="cb693-15"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-15" tabindex="-1"></a>        ,<span class="at">lty=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>), <span class="at">cex=</span><span class="fl">0.6</span>)</span>
-<span id="cb693-16"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-16" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb693-17"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-17" tabindex="-1"></a>  <span class="fu">survfit</span>(m2, <span class="at">newdata =</span> <span class="fu">subset</span>(newd, sex <span class="sc">==</span> <span class="st">&quot;Male&quot;</span> <span class="sc">&amp;</span> age <span class="sc">==</span> <span class="dv">80</span>)),</span>
-<span id="cb693-18"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-18" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">col =</span> col3, <span class="at">fun =</span> <span class="st">&quot;event&quot;</span>, <span class="at">mark.time =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb693-19"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-19" tabindex="-1"></a>   <span class="at">main=</span><span class="st">&quot;Cum. mortality for M and F </span><span class="sc">\n</span><span class="st"> age 80&quot;</span></span>
-<span id="cb693-20"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-20" tabindex="-1"></a>)</span>
-<span id="cb693-21"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-21" tabindex="-1"></a><span class="fu">lines</span>(</span>
-<span id="cb693-22"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-22" tabindex="-1"></a>  <span class="fu">survfit</span>(m2, <span class="at">newdata =</span> <span class="fu">subset</span>(newd, sex <span class="sc">==</span> <span class="st">&quot;Female&quot;</span> <span class="sc">&amp;</span> age <span class="sc">==</span> <span class="dv">80</span>)  ),</span>
-<span id="cb693-23"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-23" tabindex="-1"></a>  <span class="at">col =</span> col3, <span class="at">fun =</span> <span class="st">&quot;event&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">mark.time =</span> <span class="cn">FALSE</span></span>
-<span id="cb693-24"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-24" tabindex="-1"></a>)</span>
-<span id="cb693-25"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-25" tabindex="-1"></a><span class="fu">legend</span>(<span class="dv">10</span>, <span class="fl">0.5</span>, <span class="at">title=</span><span class="st">&quot;stage&quot;</span>,<span class="at">legend=</span>leg,</span>
-<span id="cb693-26"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-26" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(col3[<span class="dv">1</span>],col3[<span class="dv">1</span>],col3[<span class="dv">2</span>],col3[<span class="dv">2</span>],col3[<span class="dv">3</span>],col3[<span class="dv">3</span>]),</span>
-<span id="cb693-27"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb693-27" tabindex="-1"></a>        ,<span class="at">lty=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>), <span class="at">cex=</span><span class="fl">0.7</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb647"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb647-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb647-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-2" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb647-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-3" tabindex="-1"></a>  <span class="fu">survfit</span>(m2, <span class="at">newdata =</span> <span class="fu">subset</span>(newd, sex <span class="sc">==</span> <span class="st">&quot;Male&quot;</span> <span class="sc">&amp;</span> age <span class="sc">==</span> <span class="dv">40</span>)),</span>
+<span id="cb647-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-4" tabindex="-1"></a>  <span class="at">col =</span> col3, </span>
+<span id="cb647-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-5" tabindex="-1"></a>  <span class="at">lty=</span> <span class="dv">1</span>,</span>
+<span id="cb647-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-6" tabindex="-1"></a>  <span class="at">fun =</span> <span class="st">&quot;event&quot;</span>, <span class="at">mark.time =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb647-7"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-7" tabindex="-1"></a>  <span class="at">main=</span><span class="st">&quot;Cum. mortality for M and F </span><span class="sc">\n</span><span class="st"> age 40&quot;</span></span>
+<span id="cb647-8"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-8" tabindex="-1"></a>  )</span>
+<span id="cb647-9"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-9" tabindex="-1"></a><span class="fu">lines</span>(</span>
+<span id="cb647-10"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-10" tabindex="-1"></a>  <span class="fu">survfit</span>(m2, <span class="at">newdata =</span> <span class="fu">subset</span>(newd, sex <span class="sc">==</span> <span class="st">&quot;Female&quot;</span> <span class="sc">&amp;</span> age <span class="sc">==</span> <span class="dv">40</span>)),</span>
+<span id="cb647-11"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-11" tabindex="-1"></a>  <span class="at">col =</span> col3, <span class="at">lty=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>),<span class="at">fun =</span> <span class="st">&quot;event&quot;</span>, <span class="at">mark.time =</span> <span class="cn">FALSE</span></span>
+<span id="cb647-12"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-12" tabindex="-1"></a>)</span>
+<span id="cb647-13"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-13" tabindex="-1"></a><span class="fu">legend</span>(<span class="dv">0</span>, <span class="fl">0.95</span>, <span class="at">title=</span><span class="st">&quot;stage&quot;</span>,<span class="at">legend=</span>leg,</span>
+<span id="cb647-14"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-14" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(col3[<span class="dv">1</span>],col3[<span class="dv">1</span>],col3[<span class="dv">2</span>],col3[<span class="dv">2</span>],col3[<span class="dv">3</span>],col3[<span class="dv">3</span>]),</span>
+<span id="cb647-15"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-15" tabindex="-1"></a>        ,<span class="at">lty=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>), <span class="at">cex=</span><span class="fl">0.6</span>)</span>
+<span id="cb647-16"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-16" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb647-17"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-17" tabindex="-1"></a>  <span class="fu">survfit</span>(m2, <span class="at">newdata =</span> <span class="fu">subset</span>(newd, sex <span class="sc">==</span> <span class="st">&quot;Male&quot;</span> <span class="sc">&amp;</span> age <span class="sc">==</span> <span class="dv">80</span>)),</span>
+<span id="cb647-18"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-18" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">col =</span> col3, <span class="at">fun =</span> <span class="st">&quot;event&quot;</span>, <span class="at">mark.time =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb647-19"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-19" tabindex="-1"></a>   <span class="at">main=</span><span class="st">&quot;Cum. mortality for M and F </span><span class="sc">\n</span><span class="st"> age 80&quot;</span></span>
+<span id="cb647-20"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-20" tabindex="-1"></a>)</span>
+<span id="cb647-21"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-21" tabindex="-1"></a><span class="fu">lines</span>(</span>
+<span id="cb647-22"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-22" tabindex="-1"></a>  <span class="fu">survfit</span>(m2, <span class="at">newdata =</span> <span class="fu">subset</span>(newd, sex <span class="sc">==</span> <span class="st">&quot;Female&quot;</span> <span class="sc">&amp;</span> age <span class="sc">==</span> <span class="dv">80</span>)  ),</span>
+<span id="cb647-23"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-23" tabindex="-1"></a>  <span class="at">col =</span> col3, <span class="at">fun =</span> <span class="st">&quot;event&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">mark.time =</span> <span class="cn">FALSE</span></span>
+<span id="cb647-24"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-24" tabindex="-1"></a>)</span>
+<span id="cb647-25"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-25" tabindex="-1"></a><span class="fu">legend</span>(<span class="dv">10</span>, <span class="fl">0.5</span>, <span class="at">title=</span><span class="st">&quot;stage&quot;</span>,<span class="at">legend=</span>leg,</span>
+<span id="cb647-26"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-26" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(col3[<span class="dv">1</span>],col3[<span class="dv">1</span>],col3[<span class="dv">2</span>],col3[<span class="dv">2</span>],col3[<span class="dv">3</span>],col3[<span class="dv">3</span>]),</span>
+<span id="cb647-27"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb647-27" tabindex="-1"></a>        ,<span class="at">lty=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>), <span class="at">cex=</span><span class="fl">0.7</span>)</span></code></pre></div>
 <p><img src="oral-s_files/figure-html/cox2cll-1.png" alt="" width="672" /></p>
 </div>
 <div id="modelling-event-specific-hazards" class="section level2 hasAnchor" number="11.7">
 <h2><span class="header-section-number">11.7</span> Modelling event-specific hazards<a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#modelling-event-specific-hazards" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <ul>
-<li>Fit the Cox model for the cause-specific hazard of cancer deaths
-with the same covariates as above. In this case
-only cancer deaths are counted as events and deaths from other causes
-are included into censorings.</li>
+<li>Fit the Cox model for the cause-specific hazard of cancer deaths with
+the same covariates as above. In this case only cancer deaths are
+counted as events and deaths from other causes are included into
+censorings.</li>
 </ul>
-<div class="sourceCode" id="cb694"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb694-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb694-1" tabindex="-1"></a>m2haz1 <span class="ot">&lt;-</span> </span>
-<span id="cb694-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb694-2" tabindex="-1"></a>  <span class="fu">coxph</span>(</span>
-<span id="cb694-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb694-3" tabindex="-1"></a>    <span class="fu">Surv</span>(time, event <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">~</span> sex <span class="sc">+</span> <span class="fu">I</span>((age <span class="sc">-</span> <span class="dv">65</span>) <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> st3, </span>
-<span id="cb694-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb694-4" tabindex="-1"></a>    <span class="at">data =</span> orca2</span>
-<span id="cb694-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb694-5" tabindex="-1"></a>  )</span>
-<span id="cb694-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb694-6" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(m2haz1), <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb648"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb648-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb648-1" tabindex="-1"></a>m2haz1 <span class="ot">&lt;-</span> </span>
+<span id="cb648-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb648-2" tabindex="-1"></a>  <span class="fu">coxph</span>(</span>
+<span id="cb648-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb648-3" tabindex="-1"></a>    <span class="fu">Surv</span>(time, event <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">~</span> sex <span class="sc">+</span> <span class="fu">I</span>((age <span class="sc">-</span> <span class="dv">65</span>) <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> st3, </span>
+<span id="cb648-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb648-4" tabindex="-1"></a>    <span class="at">data =</span> orca2</span>
+<span id="cb648-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb648-5" tabindex="-1"></a>  )</span>
+<span id="cb648-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb648-6" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(m2haz1), <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>##                  exp(Est.)  2.5% 97.5%
 ## sexFemale            0.983 0.642  1.51
 ## I((age - 65)/10)     1.426 1.204  1.69
 ## st3III               1.514 0.901  2.54
 ## st3IV                3.181 1.985  5.10</code></pre>
-<div class="sourceCode" id="cb696"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb696-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb696-1" tabindex="-1"></a><span class="fu">cox.zph</span>(m2haz1)</span></code></pre></div>
+<div class="sourceCode" id="cb650"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb650-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb650-1" tabindex="-1"></a><span class="fu">cox.zph</span>(m2haz1)</span></code></pre></div>
 <pre><code>##                   chisq df     p
 ## sex              0.0724  1 0.788
 ## I((age - 65)/10) 5.7620  1 0.016
 ## st3              3.4195  2 0.181
 ## GLOBAL           9.1216  4 0.058</code></pre>
-<p>Compare the results with those of model <code>m2</code>. What are the major differences?</p>
+<p>Compare the results with those of model <code>m2</code>. What are the major
+differences?</p>
 <ul>
-<li>Fit a similar model for deaths from other causes and compare the results.</li>
+<li>Fit a similar model for deaths from other causes and compare the
+results.</li>
 </ul>
-<div class="sourceCode" id="cb698"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb698-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb698-1" tabindex="-1"></a>m2haz2 <span class="ot">&lt;-</span> </span>
-<span id="cb698-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb698-2" tabindex="-1"></a>  <span class="fu">coxph</span>(</span>
-<span id="cb698-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb698-3" tabindex="-1"></a>    <span class="fu">Surv</span>(time, event <span class="sc">==</span> <span class="dv">2</span>) <span class="sc">~</span> sex <span class="sc">+</span> <span class="fu">I</span>((age <span class="sc">-</span> <span class="dv">65</span>) <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> st3, </span>
-<span id="cb698-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb698-4" tabindex="-1"></a>    <span class="at">data =</span> orca2</span>
-<span id="cb698-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb698-5" tabindex="-1"></a>  )</span>
-<span id="cb698-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb698-6" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(m2haz2), <span class="dv">4</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb652"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb652-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb652-1" tabindex="-1"></a>m2haz2 <span class="ot">&lt;-</span> </span>
+<span id="cb652-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb652-2" tabindex="-1"></a>  <span class="fu">coxph</span>(</span>
+<span id="cb652-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb652-3" tabindex="-1"></a>    <span class="fu">Surv</span>(time, event <span class="sc">==</span> <span class="dv">2</span>) <span class="sc">~</span> sex <span class="sc">+</span> <span class="fu">I</span>((age <span class="sc">-</span> <span class="dv">65</span>) <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> st3, </span>
+<span id="cb652-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb652-4" tabindex="-1"></a>    <span class="at">data =</span> orca2</span>
+<span id="cb652-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb652-5" tabindex="-1"></a>  )</span>
+<span id="cb652-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb652-6" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(m2haz2), <span class="dv">4</span>)</span></code></pre></div>
 <pre><code>##                  exp(Est.)  2.5% 97.5%
 ## sexFemale            0.552 0.352 0.868
 ## I((age - 65)/10)     1.488 1.249 1.772
 ## st3III               1.230 0.749 2.021
 ## st3IV                1.641 0.952 2.827</code></pre>
-<div class="sourceCode" id="cb700"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb700-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb700-1" tabindex="-1"></a><span class="fu">cox.zph</span>(m2haz2)</span></code></pre></div>
+<div class="sourceCode" id="cb654"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb654-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb654-1" tabindex="-1"></a><span class="fu">cox.zph</span>(m2haz2)</span></code></pre></div>
 <pre><code>##                   chisq df    p
 ## sex              0.4071  1 0.52
 ## I((age - 65)/10) 0.2435  1 0.62
 ## st3              0.0443  2 0.98
 ## GLOBAL           0.6444  4 0.96</code></pre>
-<!-- % -  -->
-<!-- % Finally, fit the Fine--Gray model for the hazard of the subdistribution -->
-<!-- % for cancer deaths with the same covariates as above. For this you have to -->
-<!-- % first load package `cmprsk`, containing the necessary function -->
-<!-- % `crr()`, and attach the data frame. -->
-<!-- % ```{r fg1, echo=T,eval=TRUE} -->
-<!-- % library(cmprsk) -->
-<!-- % attach(orca2) -->
-<!-- % m2fg1 <- crr(time, event, cov1 = model.matrix(m2), failcode=1) -->
-<!-- % summary(m2fg1, Exp=T) -->
-<!-- % @ -->
-<!-- %  -->
-<!-- % Compare the results with those of model `m2` and `m2haz1`. -->
-<!-- %  -->
-<!-- % -  -->
-<!-- %  Fit a similar model for deaths from other causes and compare the results. -->
-<!-- % ```{r fg2, echo=T,eval=TRUE} -->
-<!-- % m2fg2 <- crr(time, event, cov1 = model.matrix(m2), failcode=2) -->
-<!-- % summary(m2fg2, Exp=T) -->
-<!-- % @ -->
+<!--
+% -
+
+% Finally, fit the Fine--Gray model for the hazard of the subdistribution
+
+% for cancer deaths with the same covariates as above. For this you have to
+
+% first load package `cmprsk`, containing the necessary function
+
+% `crr()`, and attach the data frame.
+
+% ```{r fg1, echo=T,eval=TRUE}
+
+% library(cmprsk)
+
+% attach(orca2)
+
+% m2fg1 <- crr(time, event, cov1 = model.matrix(m2), failcode=1)
+
+% summary(m2fg1, Exp=T)
+
+% @
+
+%
+
+% Compare the results with those of model `m2` and `m2haz1`.
+
+%
+
+% -
+
+%  Fit a similar model for deaths from other causes and compare the results.
+
+% ```{r fg2, echo=T,eval=TRUE}
+
+% m2fg2 <- crr(time, event, cov1 = model.matrix(m2), failcode=2)
+
+% summary(m2fg2, Exp=T)
+
+% @ -->
 </div>
 <div id="lexis-object-with-multi-state-set-up" class="section level2 hasAnchor" number="11.8">
 <h2><span class="header-section-number">11.8</span> Lexis object with multi-state set-up<a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#lexis-object-with-multi-state-set-up" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Before entering to multi-state analyses, it might be instructive to apply some Lexis tools to illustrate the competing-risks set-up.
-More detailed explanation of these tools will be given by Bendix later.</p>
+<p>Before entering to multi-state analyses, it might be instructive to
+apply some Lexis tools to illustrate the competing-risks set-up. More
+detailed explanation of these tools will be given by Bendix later.</p>
 <ul>
-<li>Form a <code>Lexis</code> object from the data frame and
-print a summary of it. We shall name the main (and only) time axis
-in this object as <code>stime</code>.</li>
+<li>Form a <code>Lexis</code> object from the data frame and print a summary of it.
+We shall name the main (and only) time axis in this object as <code>stime</code>.</li>
 </ul>
-<div class="sourceCode" id="cb702"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb702-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb702-1" tabindex="-1"></a>orca.lex <span class="ot">&lt;-</span> <span class="fu">Lexis</span>(</span>
-<span id="cb702-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb702-2" tabindex="-1"></a>  <span class="at">exit =</span> <span class="fu">list</span>(<span class="at">stime =</span> time),</span>
-<span id="cb702-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb702-3" tabindex="-1"></a>  <span class="at">exit.status =</span> <span class="fu">factor</span>(event,</span>
-<span id="cb702-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb702-4" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;Alive&quot;</span>, <span class="st">&quot;Oral ca. death&quot;</span>, <span class="st">&quot;Other death&quot;</span>)</span>
-<span id="cb702-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb702-5" tabindex="-1"></a>  ),</span>
-<span id="cb702-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb702-6" tabindex="-1"></a>  <span class="at">data =</span> orca</span>
-<span id="cb702-7"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb702-7" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb656"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb656-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb656-1" tabindex="-1"></a>orca.lex <span class="ot">&lt;-</span> <span class="fu">Lexis</span>(</span>
+<span id="cb656-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb656-2" tabindex="-1"></a>  <span class="at">exit =</span> <span class="fu">list</span>(<span class="at">stime =</span> time),</span>
+<span id="cb656-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb656-3" tabindex="-1"></a>  <span class="at">exit.status =</span> <span class="fu">factor</span>(event,</span>
+<span id="cb656-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb656-4" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;Alive&quot;</span>, <span class="st">&quot;Oral ca. death&quot;</span>, <span class="st">&quot;Other death&quot;</span>)</span>
+<span id="cb656-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb656-5" tabindex="-1"></a>  ),</span>
+<span id="cb656-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb656-6" tabindex="-1"></a>  <span class="at">data =</span> orca</span>
+<span id="cb656-7"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb656-7" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>## NOTE: entry.status has been set to &quot;Alive&quot; for all.
 ## NOTE: entry is assumed to be 0 on the stime timescale.</code></pre>
-<div class="sourceCode" id="cb704"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb704-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb704-1" tabindex="-1"></a><span class="fu">summary</span>(orca.lex)</span></code></pre></div>
+<div class="sourceCode" id="cb658"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb658-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb658-1" tabindex="-1"></a><span class="fu">summary</span>(orca.lex)</span></code></pre></div>
 <pre><code>##        
 ## Transitions:
 ##      To
 ## From    Alive Oral ca. death Other death Records: Events: Risk time: Persons:
 ##   Alive   109            122         107      338     229       1914      338</code></pre>
 <ul>
-<li>Draw a box diagram of the two-state set-up of competing transitions. Run first th e following command line</li>
+<li>Draw a box diagram of the two-state set-up of competing transitions.
+Run first th e following command line</li>
 </ul>
-<div class="sourceCode" id="cb706"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb706-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb706-1" tabindex="-1"></a><span class="fu">boxes</span>(orca.lex,<span class="at">boxpos =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<p><img src="oral-s_files/figure-html/lexis-1.png" alt="" width="672" />
-Now, move the cursor to the point in the graphics window, at which you wish to put the box for <em>Alive</em>, and click. Next, move
-the cursor to the point at which you wish to have the box for <em>Oral ca. death</em>, and click. Finally, do the same with the box for <em>Other death</em>.
-If you are not happy with the outcome, run the command line again and repeat the necessary mouse moves and clicks.</p>
-<!-- ## Optional: Poisson regression as an alternative to Cox model -->
-<!-- It can be shown that the Cox model with an unspecified form for the -->
-<!-- baseline hazard $\lambda_0(t)$ is mathematically equivalent -->
-<!-- to the following kind of Poisson regression model. -->
-<!-- Time is treated as a categorical factor with -->
-<!-- a dense division of the time axis -->
-<!-- into disjoint intervals or *timebands* such that -->
-<!-- only one outcome event occurs in each timeband. -->
-<!-- The model formula contains this time factor plus the desired -->
-<!-- explanatory terms. -->
-<!-- A sufficient division of time axis is obtained by -->
-<!-- first setting the break points -->
-<!-- between adjacent timebands to be those time points at which an outcome event has been observed to occur. Then, -->
-<!-- the pertinent `lexis` object is created -->
-<!-- and after that it will be split according to those breakpoints. -->
-<!-- Finally, the Poisson regression model is fitted -->
-<!-- on the splitted `lexis` object using function `glm()` with appropriate specifications. -->
-<!-- We shall now demonstrate the numerical equivalence of the Cox model -->
-<!-- `m2haz1` for oral cancer mortality that was fitted above, -->
-<!--  and the corresponding Poisson regression. -->
-<!-- -  First we form the necessary `lexis` object by just taking -->
-<!--  the relevant subset of the already available `orca.lex` object. -->
-<!--  Upon that the three-level stage factor `st3` is created -->
-<!--  as above. -->
-<!-- ```{r split, echo=T,eval=TRUE} -->
-<!-- orca2.lex <- subset(orca.lex, stage != "unkn") -->
-<!-- orca2.lex$st3 <- Relevel(orca2.lex$stage, list(1:2, 3, 4:5)) -->
-<!-- levels(orca2.lex$st3) <- c("I-II", "III", "IV") -->
-<!-- ``` -->
-<!--  Then, the break points of time axis are taken from -->
-<!--  the sorted event times, and the `lexis` object is -->
-<!--  split by those breakpoints. The `timeband` factor -->
-<!--  is defined according to the splitted survival times -->
-<!--  stored in variable `stime`. -->
-<!-- ```{r split b, echo=T,eval=TRUE} -->
-<!-- cuts <- sort(orca2.lex$time[orca2.lex$event == 1]) -->
-<!-- orca2.spl <-  -->
-<!--   splitLexis(orca2.lex, br = cuts, time.scale = "stime") -->
-<!-- orca2.spl$timeband <- as.factor(orca2.spl$stime) -->
-<!-- ``` -->
-<!-- As a result we now have an expanded -->
-<!--  `lexis` object in which each subject has several rows; -->
-<!--  as many rows as there are such timebands -->
-<!--  during which he/she is still at risk. -->
-<!--  The outcome status `lex.Xst` has value 0 in all those -->
-<!--  timebands, over which the subject stays alive, but assumes -->
-<!--  the value 1 or 2 at his/her last interval ending at the time of death. -->
-<!--  -- See now the structure of the splitted object. -->
-<!-- ```{r strsplit, echo=T,eval=TRUE} -->
-<!-- str(orca2.spl) -->
-<!-- head(orca2.spl) -->
-<!-- ``` -->
-<!-- -  We are ready to fit the desired Poisson model for oral cancer death -->
-<!-- as the outcome. The splitted person-years are contained in `lex.dur`, -->
-<!-- and the explanatory variables are the same as in model `m2haz1`. -->
-<!-- -- This fitting may take some time .... -->
-<!-- ```{r poisson, echo=T,eval=TRUE} -->
-<!-- m2pois1 <- glm( -->
-<!--   1 * (lex.Xst == "Oral ca. death") ~ -->
-<!--     -1 + timeband + sex + I((age - 65) / 10) + st3, -->
-<!--   family = poisson, offset = log(lex.dur), data = orca2.spl -->
-<!-- ) -->
-<!-- ``` -->
-<!-- We shall display the estimation results graphically for the baseline hazard (per 1000 person-years)  and numerically for the rate ratios associated with the covariates. -->
-<!-- Before doing that it is useful to count the length `ntb` of the -->
-<!--  block occupied by baseline hazard in the whole vector of estimated parameters. -->
-<!-- However, owing to how the splitting to timebands was done, the last regression -->
-<!-- coefficient is necessarily -->
-<!-- zero and better be omitted when displaying the results. Also, as each timeband -->
-<!-- is quantitatively -->
-<!-- named accoding to its leftmost point, it is good to compute the midpoint values `tbmid` -->
-<!-- for the timebands -->
-<!-- ```{r poissonresults, echo=T, fig=T,eval=TRUE} -->
-<!-- tb <- as.numeric(levels(orca2.spl$timeband)) -->
-<!-- ntb <- length(tb) -->
-<!-- tbmid <- (tb[-ntb] + tb[-1]) / 2 # midpoints of the intervals -->
-<!-- round(ci.exp(m2pois1), 3) -->
-<!-- par(mfrow = c(1, 1)) -->
-<!-- plot(tbmid, 1000 * exp(coef(m2pois1)[1:(ntb - 1)]), -->
-<!--   ylim = c(5, 3000), log = "xy", type = "l" -->
-<!-- ) -->
-<!-- ``` -->
-<!-- Compare the regression coefficients and their error margins -->
-<!-- to those model `m2haz1`. Do you find any differences? -->
-<!-- How does the estimated baseline hazard look like? -->
-<!-- -  The estimated baseline looks quite ragged when based on 71 separate -->
-<!-- parameters. A smoothed estimate may be obtained by spline modelling using the tools -->
-<!-- contained in package mgcv With the following code you will be able to fit a -->
-<!-- reasonable spline model for the baseline hazard and -->
-<!-- draw the estimated curve (together with a band of the 95% -->
-<!-- confidence limits about the fitted values). -->
-<!-- From the same model you should also obtain quite familiar results for the -->
-<!-- rate ratios of interest. -->
-<!-- ```{r poissonspline, echo=T, fig=T,eval=TRUE} -->
-<!-- library(mgcv) -->
-<!-- m2pspli <-  -->
-<!--   update( -->
-<!--     m2pois1,  -->
-<!--     . ~ gam(s(stime) + sex + I((age - 65) / 10) + st3)) -->
-<!-- plot(m2pspli,pages=1,type=seWithMean=T) -->
-<!-- #round(ci.exp(m2pspli), 3) -->
-<!-- #news <- data.frame( -->
-<!-- #  stime = seq(0, 25, length = 301),  -->
-<!-- #  lex.dur = 1000,  -->
-<!-- #  sex = "Female", -->
-<!-- #  age = 65,  -->
-<!-- #  st3 = "I-II" -->
-<!-- #) -->
-<!-- # blhaz <-  -->
-<!-- #   predict(m2pspli, newdata = news, se.fit = TRUE, type = "link") -->
-<!-- # blh95 <- cbind(blhaz$fit, blhaz$se.fit) %*% ci.mat() -->
-<!-- # par(mfrow = c(1, 1)) -->
-<!-- # matplot(news$stime, exp(blh95), -->
-<!-- #   type = "l", lty = c(1, 1, 1), lwd = c(2, 1, 1), -->
-<!-- #   col = rep("black", 3), log = "xy", ylim = c(5, 3000) -->
-<!-- # ) -->
-<!-- ``` -->
+<div class="sourceCode" id="cb660"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb660-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb660-1" tabindex="-1"></a><span class="fu">boxes</span>(orca.lex,<span class="at">boxpos =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p><img src="oral-s_files/figure-html/lexis-1.png" alt="" width="672" /></p>
+<p>Now, move the cursor to the point in the graphics window, at which you
+wish to put the box for <em>Alive</em>, and click. Next, move the cursor to the
+point at which you wish to have the box for <em>Oral ca. death</em>, and click.
+Finally, do the same with the box for <em>Other death</em>. If you are not
+happy with the outcome, run the command line again and repeat the
+necessary mouse moves and clicks.</p>
+<div class="sourceCode" id="cb661"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb661-1"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-1" tabindex="-1"></a><span class="co">&lt;!-- ## Optional: Poisson regression as an alternative to Cox model  --&gt;</span></span>
+<span id="cb661-2"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-2" tabindex="-1"></a></span>
+<span id="cb661-3"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-3" tabindex="-1"></a><span class="co">&lt;!-- It can be shown that the Cox model with an unspecified form for the  --&gt;</span></span>
+<span id="cb661-4"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-4" tabindex="-1"></a></span>
+<span id="cb661-5"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-5" tabindex="-1"></a><span class="co">&lt;!-- baseline hazard $\lambda_0(t)$ is mathematically equivalent --&gt;</span></span>
+<span id="cb661-6"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-6" tabindex="-1"></a></span>
+<span id="cb661-7"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-7" tabindex="-1"></a><span class="co">&lt;!-- to the following kind of Poisson regression model. --&gt;</span></span>
+<span id="cb661-8"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-8" tabindex="-1"></a></span>
+<span id="cb661-9"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-9" tabindex="-1"></a><span class="co">&lt;!-- Time is treated as a categorical factor with --&gt;</span></span>
+<span id="cb661-10"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-10" tabindex="-1"></a></span>
+<span id="cb661-11"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-11" tabindex="-1"></a><span class="co">&lt;!-- a dense division of the time axis --&gt;</span></span>
+<span id="cb661-12"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-12" tabindex="-1"></a></span>
+<span id="cb661-13"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-13" tabindex="-1"></a><span class="co">&lt;!-- into disjoint intervals or *timebands* such that --&gt;</span></span>
+<span id="cb661-14"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-14" tabindex="-1"></a></span>
+<span id="cb661-15"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-15" tabindex="-1"></a><span class="co">&lt;!-- only one outcome event occurs in each timeband. --&gt;</span></span>
+<span id="cb661-16"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-16" tabindex="-1"></a></span>
+<span id="cb661-17"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-17" tabindex="-1"></a><span class="co">&lt;!-- The model formula contains this time factor plus the desired --&gt;</span></span>
+<span id="cb661-18"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-18" tabindex="-1"></a></span>
+<span id="cb661-19"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-19" tabindex="-1"></a><span class="co">&lt;!-- explanatory terms. --&gt;</span></span>
+<span id="cb661-20"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-20" tabindex="-1"></a></span>
+<span id="cb661-21"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-21" tabindex="-1"></a><span class="co">&lt;!-- A sufficient division of time axis is obtained by --&gt;</span></span>
+<span id="cb661-22"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-22" tabindex="-1"></a></span>
+<span id="cb661-23"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-23" tabindex="-1"></a><span class="co">&lt;!-- first setting the break points --&gt;</span></span>
+<span id="cb661-24"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-24" tabindex="-1"></a></span>
+<span id="cb661-25"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-25" tabindex="-1"></a><span class="co">&lt;!-- between adjacent timebands to be those time points at which an outcome event has been observed to occur. Then, --&gt;</span></span>
+<span id="cb661-26"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-26" tabindex="-1"></a></span>
+<span id="cb661-27"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-27" tabindex="-1"></a><span class="co">&lt;!-- the pertinent `lexis` object is created --&gt;</span></span>
+<span id="cb661-28"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-28" tabindex="-1"></a></span>
+<span id="cb661-29"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-29" tabindex="-1"></a><span class="co">&lt;!-- and after that it will be split according to those breakpoints. --&gt;</span></span>
+<span id="cb661-30"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-30" tabindex="-1"></a></span>
+<span id="cb661-31"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-31" tabindex="-1"></a><span class="co">&lt;!-- Finally, the Poisson regression model is fitted --&gt;</span></span>
+<span id="cb661-32"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-32" tabindex="-1"></a></span>
+<span id="cb661-33"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-33" tabindex="-1"></a><span class="co">&lt;!-- on the splitted `lexis` object using function `glm()` with appropriate specifications. --&gt;</span></span>
+<span id="cb661-34"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-34" tabindex="-1"></a></span>
+<span id="cb661-35"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-35" tabindex="-1"></a><span class="co">&lt;!-- We shall now demonstrate the numerical equivalence of the Cox model --&gt;</span></span>
+<span id="cb661-36"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-36" tabindex="-1"></a></span>
+<span id="cb661-37"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-37" tabindex="-1"></a><span class="co">&lt;!-- `m2haz1` for oral cancer mortality that was fitted above, --&gt;</span></span>
+<span id="cb661-38"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-38" tabindex="-1"></a></span>
+<span id="cb661-39"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-39" tabindex="-1"></a><span class="co">&lt;!--  and the corresponding Poisson regression. --&gt;</span></span>
+<span id="cb661-40"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-40" tabindex="-1"></a></span>
+<span id="cb661-41"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-41" tabindex="-1"></a><span class="co">&lt;!-- -  First we form the necessary `lexis` object by just taking --&gt;</span></span>
+<span id="cb661-42"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-42" tabindex="-1"></a></span>
+<span id="cb661-43"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-43" tabindex="-1"></a><span class="co">&lt;!--  the relevant subset of the already available `orca.lex` object. --&gt;</span></span>
+<span id="cb661-44"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-44" tabindex="-1"></a></span>
+<span id="cb661-45"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-45" tabindex="-1"></a><span class="co">&lt;!--  Upon that the three-level stage factor `st3` is created --&gt;</span></span>
+<span id="cb661-46"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-46" tabindex="-1"></a></span>
+<span id="cb661-47"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-47" tabindex="-1"></a><span class="co">&lt;!--  as above. --&gt;</span></span>
+<span id="cb661-48"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-48" tabindex="-1"></a></span>
+<span id="cb661-49"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-49" tabindex="-1"></a><span class="co">&lt;!-- ```{r split, echo=T,eval=TRUE} --&gt;</span></span>
+<span id="cb661-50"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-50" tabindex="-1"></a></span>
+<span id="cb661-51"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-51" tabindex="-1"></a><span class="co">&lt;!-- orca2.lex &lt;- subset(orca.lex, stage != &quot;unkn&quot;) --&gt;</span></span>
+<span id="cb661-52"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-52" tabindex="-1"></a></span>
+<span id="cb661-53"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-53" tabindex="-1"></a><span class="co">&lt;!-- orca2.lex$st3 &lt;- Relevel(orca2.lex$stage, list(1:2, 3, 4:5)) --&gt;</span></span>
+<span id="cb661-54"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-54" tabindex="-1"></a></span>
+<span id="cb661-55"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-55" tabindex="-1"></a><span class="co">&lt;!-- levels(orca2.lex$st3) &lt;- c(&quot;I-II&quot;, &quot;III&quot;, &quot;IV&quot;) --&gt;</span></span>
+<span id="cb661-56"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-56" tabindex="-1"></a></span>
+<span id="cb661-57"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-57" tabindex="-1"></a><span class="co">&lt;!-- ``` --&gt;</span></span>
+<span id="cb661-58"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-58" tabindex="-1"></a></span>
+<span id="cb661-59"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-59" tabindex="-1"></a><span class="co">&lt;!--  Then, the break points of time axis are taken from --&gt;</span></span>
+<span id="cb661-60"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-60" tabindex="-1"></a></span>
+<span id="cb661-61"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-61" tabindex="-1"></a><span class="co">&lt;!--  the sorted event times, and the `lexis` object is --&gt;</span></span>
+<span id="cb661-62"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-62" tabindex="-1"></a></span>
+<span id="cb661-63"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-63" tabindex="-1"></a><span class="co">&lt;!--  split by those breakpoints. The `timeband` factor --&gt;</span></span>
+<span id="cb661-64"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-64" tabindex="-1"></a></span>
+<span id="cb661-65"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-65" tabindex="-1"></a><span class="co">&lt;!--  is defined according to the splitted survival times --&gt;</span></span>
+<span id="cb661-66"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-66" tabindex="-1"></a></span>
+<span id="cb661-67"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-67" tabindex="-1"></a><span class="co">&lt;!--  stored in variable `stime`. --&gt;</span></span>
+<span id="cb661-68"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-68" tabindex="-1"></a></span>
+<span id="cb661-69"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-69" tabindex="-1"></a><span class="co">&lt;!-- ```{r split b, echo=T,eval=TRUE} --&gt;</span></span>
+<span id="cb661-70"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-70" tabindex="-1"></a></span>
+<span id="cb661-71"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-71" tabindex="-1"></a><span class="co">&lt;!-- cuts &lt;- sort(orca2.lex$time[orca2.lex$event == 1]) --&gt;</span></span>
+<span id="cb661-72"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-72" tabindex="-1"></a></span>
+<span id="cb661-73"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-73" tabindex="-1"></a><span class="co">&lt;!-- orca2.spl &lt;- --&gt;</span></span>
+<span id="cb661-74"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-74" tabindex="-1"></a></span>
+<span id="cb661-75"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-75" tabindex="-1"></a><span class="co">&lt;!--   splitLexis(orca2.lex, br = cuts, time.scale = &quot;stime&quot;) --&gt;</span></span>
+<span id="cb661-76"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-76" tabindex="-1"></a></span>
+<span id="cb661-77"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-77" tabindex="-1"></a><span class="co">&lt;!-- orca2.spl$timeband &lt;- as.factor(orca2.spl$stime) --&gt;</span></span>
+<span id="cb661-78"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-78" tabindex="-1"></a></span>
+<span id="cb661-79"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-79" tabindex="-1"></a><span class="co">&lt;!-- ``` --&gt;</span></span>
+<span id="cb661-80"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-80" tabindex="-1"></a></span>
+<span id="cb661-81"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-81" tabindex="-1"></a><span class="co">&lt;!-- As a result we now have an expanded --&gt;</span></span>
+<span id="cb661-82"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-82" tabindex="-1"></a></span>
+<span id="cb661-83"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-83" tabindex="-1"></a><span class="co">&lt;!--  `lexis` object in which each subject has several rows; --&gt;</span></span>
+<span id="cb661-84"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-84" tabindex="-1"></a></span>
+<span id="cb661-85"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-85" tabindex="-1"></a><span class="co">&lt;!--  as many rows as there are such timebands --&gt;</span></span>
+<span id="cb661-86"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-86" tabindex="-1"></a></span>
+<span id="cb661-87"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-87" tabindex="-1"></a><span class="co">&lt;!--  during which he/she is still at risk. --&gt;</span></span>
+<span id="cb661-88"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-88" tabindex="-1"></a></span>
+<span id="cb661-89"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-89" tabindex="-1"></a><span class="co">&lt;!--  The outcome status `lex.Xst` has value 0 in all those --&gt;</span></span>
+<span id="cb661-90"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-90" tabindex="-1"></a></span>
+<span id="cb661-91"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-91" tabindex="-1"></a><span class="co">&lt;!--  timebands, over which the subject stays alive, but assumes --&gt;</span></span>
+<span id="cb661-92"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-92" tabindex="-1"></a></span>
+<span id="cb661-93"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-93" tabindex="-1"></a><span class="co">&lt;!--  the value 1 or 2 at his/her last interval ending at the time of death. --&gt;</span></span>
+<span id="cb661-94"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-94" tabindex="-1"></a></span>
+<span id="cb661-95"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-95" tabindex="-1"></a><span class="co">&lt;!--  -- See now the structure of the splitted object. --&gt;</span></span>
+<span id="cb661-96"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-96" tabindex="-1"></a></span>
+<span id="cb661-97"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-97" tabindex="-1"></a><span class="co">&lt;!-- ```{r strsplit, echo=T,eval=TRUE} --&gt;</span></span>
+<span id="cb661-98"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-98" tabindex="-1"></a></span>
+<span id="cb661-99"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-99" tabindex="-1"></a><span class="co">&lt;!-- str(orca2.spl) --&gt;</span></span>
+<span id="cb661-100"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-100" tabindex="-1"></a></span>
+<span id="cb661-101"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-101" tabindex="-1"></a><span class="co">&lt;!-- head(orca2.spl) --&gt;</span></span>
+<span id="cb661-102"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-102" tabindex="-1"></a></span>
+<span id="cb661-103"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-103" tabindex="-1"></a><span class="co">&lt;!-- ``` --&gt;</span></span>
+<span id="cb661-104"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-104" tabindex="-1"></a></span>
+<span id="cb661-105"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-105" tabindex="-1"></a><span class="co">&lt;!-- -  We are ready to fit the desired Poisson model for oral cancer death --&gt;</span></span>
+<span id="cb661-106"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-106" tabindex="-1"></a></span>
+<span id="cb661-107"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-107" tabindex="-1"></a><span class="co">&lt;!-- as the outcome. The splitted person-years are contained in `lex.dur`, --&gt;</span></span>
+<span id="cb661-108"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-108" tabindex="-1"></a></span>
+<span id="cb661-109"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-109" tabindex="-1"></a><span class="co">&lt;!-- and the explanatory variables are the same as in model `m2haz1`. --&gt;</span></span>
+<span id="cb661-110"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-110" tabindex="-1"></a></span>
+<span id="cb661-111"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-111" tabindex="-1"></a><span class="co">&lt;!-- -- This fitting may take some time .... --&gt;</span></span>
+<span id="cb661-112"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-112" tabindex="-1"></a></span>
+<span id="cb661-113"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-113" tabindex="-1"></a><span class="co">&lt;!-- ```{r poisson, echo=T,eval=TRUE} --&gt;</span></span>
+<span id="cb661-114"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-114" tabindex="-1"></a></span>
+<span id="cb661-115"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-115" tabindex="-1"></a><span class="co">&lt;!-- m2pois1 &lt;- glm( --&gt;</span></span>
+<span id="cb661-116"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-116" tabindex="-1"></a></span>
+<span id="cb661-117"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-117" tabindex="-1"></a><span class="co">&lt;!--   1 * (lex.Xst == &quot;Oral ca. death&quot;) ~ --&gt;</span></span>
+<span id="cb661-118"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-118" tabindex="-1"></a></span>
+<span id="cb661-119"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-119" tabindex="-1"></a><span class="co">&lt;!--     -1 + timeband + sex + I((age - 65) / 10) + st3, --&gt;</span></span>
+<span id="cb661-120"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-120" tabindex="-1"></a></span>
+<span id="cb661-121"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-121" tabindex="-1"></a><span class="co">&lt;!--   family = poisson, offset = log(lex.dur), data = orca2.spl --&gt;</span></span>
+<span id="cb661-122"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-122" tabindex="-1"></a></span>
+<span id="cb661-123"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-123" tabindex="-1"></a><span class="co">&lt;!-- ) --&gt;</span></span>
+<span id="cb661-124"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-124" tabindex="-1"></a></span>
+<span id="cb661-125"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-125" tabindex="-1"></a><span class="co">&lt;!-- ``` --&gt;</span></span>
+<span id="cb661-126"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-126" tabindex="-1"></a></span>
+<span id="cb661-127"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-127" tabindex="-1"></a><span class="co">&lt;!-- We shall display the estimation results graphically for the baseline hazard (per 1000 person-years)  and numerically for the rate ratios associated with the covariates. --&gt;</span></span>
+<span id="cb661-128"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-128" tabindex="-1"></a></span>
+<span id="cb661-129"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-129" tabindex="-1"></a><span class="co">&lt;!-- Before doing that it is useful to count the length `ntb` of the --&gt;</span></span>
+<span id="cb661-130"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-130" tabindex="-1"></a></span>
+<span id="cb661-131"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-131" tabindex="-1"></a><span class="co">&lt;!--  block occupied by baseline hazard in the whole vector of estimated parameters. --&gt;</span></span>
+<span id="cb661-132"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-132" tabindex="-1"></a></span>
+<span id="cb661-133"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-133" tabindex="-1"></a><span class="co">&lt;!-- However, owing to how the splitting to timebands was done, the last regression --&gt;</span></span>
+<span id="cb661-134"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-134" tabindex="-1"></a></span>
+<span id="cb661-135"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-135" tabindex="-1"></a><span class="co">&lt;!-- coefficient is necessarily --&gt;</span></span>
+<span id="cb661-136"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-136" tabindex="-1"></a></span>
+<span id="cb661-137"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-137" tabindex="-1"></a><span class="co">&lt;!-- zero and better be omitted when displaying the results. Also, as each timeband --&gt;</span></span>
+<span id="cb661-138"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-138" tabindex="-1"></a></span>
+<span id="cb661-139"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-139" tabindex="-1"></a><span class="co">&lt;!-- is quantitatively --&gt;</span></span>
+<span id="cb661-140"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-140" tabindex="-1"></a></span>
+<span id="cb661-141"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-141" tabindex="-1"></a><span class="co">&lt;!-- named accoding to its leftmost point, it is good to compute the midpoint values `tbmid` --&gt;</span></span>
+<span id="cb661-142"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-142" tabindex="-1"></a></span>
+<span id="cb661-143"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-143" tabindex="-1"></a><span class="co">&lt;!-- for the timebands --&gt;</span></span>
+<span id="cb661-144"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-144" tabindex="-1"></a></span>
+<span id="cb661-145"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-145" tabindex="-1"></a><span class="co">&lt;!-- ```{r poissonresults, echo=T, fig=T,eval=TRUE} --&gt;</span></span>
+<span id="cb661-146"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-146" tabindex="-1"></a></span>
+<span id="cb661-147"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-147" tabindex="-1"></a><span class="co">&lt;!-- tb &lt;- as.numeric(levels(orca2.spl$timeband)) --&gt;</span></span>
+<span id="cb661-148"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-148" tabindex="-1"></a></span>
+<span id="cb661-149"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-149" tabindex="-1"></a><span class="co">&lt;!-- ntb &lt;- length(tb) --&gt;</span></span>
+<span id="cb661-150"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-150" tabindex="-1"></a></span>
+<span id="cb661-151"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-151" tabindex="-1"></a><span class="co">&lt;!-- tbmid &lt;- (tb[-ntb] + tb[-1]) / 2 # midpoints of the intervals --&gt;</span></span>
+<span id="cb661-152"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-152" tabindex="-1"></a></span>
+<span id="cb661-153"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-153" tabindex="-1"></a><span class="co">&lt;!-- round(ci.exp(m2pois1), 3) --&gt;</span></span>
+<span id="cb661-154"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-154" tabindex="-1"></a></span>
+<span id="cb661-155"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-155" tabindex="-1"></a><span class="co">&lt;!-- par(mfrow = c(1, 1)) --&gt;</span></span>
+<span id="cb661-156"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-156" tabindex="-1"></a></span>
+<span id="cb661-157"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-157" tabindex="-1"></a><span class="co">&lt;!-- plot(tbmid, 1000 * exp(coef(m2pois1)[1:(ntb - 1)]), --&gt;</span></span>
+<span id="cb661-158"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-158" tabindex="-1"></a></span>
+<span id="cb661-159"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-159" tabindex="-1"></a><span class="co">&lt;!--   ylim = c(5, 3000), log = &quot;xy&quot;, type = &quot;l&quot; --&gt;</span></span>
+<span id="cb661-160"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-160" tabindex="-1"></a></span>
+<span id="cb661-161"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-161" tabindex="-1"></a><span class="co">&lt;!-- ) --&gt;</span></span>
+<span id="cb661-162"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-162" tabindex="-1"></a></span>
+<span id="cb661-163"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-163" tabindex="-1"></a><span class="co">&lt;!-- ``` --&gt;</span></span>
+<span id="cb661-164"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-164" tabindex="-1"></a></span>
+<span id="cb661-165"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-165" tabindex="-1"></a><span class="co">&lt;!-- Compare the regression coefficients and their error margins --&gt;</span></span>
+<span id="cb661-166"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-166" tabindex="-1"></a></span>
+<span id="cb661-167"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-167" tabindex="-1"></a><span class="co">&lt;!-- to those model `m2haz1`. Do you find any differences? --&gt;</span></span>
+<span id="cb661-168"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-168" tabindex="-1"></a></span>
+<span id="cb661-169"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-169" tabindex="-1"></a><span class="co">&lt;!-- How does the estimated baseline hazard look like? --&gt;</span></span>
+<span id="cb661-170"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-170" tabindex="-1"></a></span>
+<span id="cb661-171"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-171" tabindex="-1"></a><span class="co">&lt;!-- -  The estimated baseline looks quite ragged when based on 71 separate --&gt;</span></span>
+<span id="cb661-172"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-172" tabindex="-1"></a></span>
+<span id="cb661-173"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-173" tabindex="-1"></a><span class="co">&lt;!-- parameters. A smoothed estimate may be obtained by spline modelling using the tools --&gt;</span></span>
+<span id="cb661-174"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-174" tabindex="-1"></a></span>
+<span id="cb661-175"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-175" tabindex="-1"></a><span class="co">&lt;!-- contained in package mgcv With the following code you will be able to fit a --&gt;</span></span>
+<span id="cb661-176"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-176" tabindex="-1"></a></span>
+<span id="cb661-177"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-177" tabindex="-1"></a><span class="co">&lt;!-- reasonable spline model for the baseline hazard and --&gt;</span></span>
+<span id="cb661-178"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-178" tabindex="-1"></a></span>
+<span id="cb661-179"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-179" tabindex="-1"></a><span class="co">&lt;!-- draw the estimated curve (together with a band of the 95% --&gt;</span></span>
+<span id="cb661-180"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-180" tabindex="-1"></a></span>
+<span id="cb661-181"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-181" tabindex="-1"></a><span class="co">&lt;!-- confidence limits about the fitted values). --&gt;</span></span>
+<span id="cb661-182"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-182" tabindex="-1"></a></span>
+<span id="cb661-183"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-183" tabindex="-1"></a><span class="co">&lt;!-- From the same model you should also obtain quite familiar results for the --&gt;</span></span>
+<span id="cb661-184"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-184" tabindex="-1"></a></span>
+<span id="cb661-185"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-185" tabindex="-1"></a><span class="co">&lt;!-- rate ratios of interest. --&gt;</span></span>
+<span id="cb661-186"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-186" tabindex="-1"></a></span>
+<span id="cb661-187"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-187" tabindex="-1"></a><span class="co">&lt;!-- ```{r poissonspline, echo=T, fig=T,eval=TRUE} --&gt;</span></span>
+<span id="cb661-188"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-188" tabindex="-1"></a></span>
+<span id="cb661-189"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-189" tabindex="-1"></a><span class="co">&lt;!-- library(mgcv) --&gt;</span></span>
+<span id="cb661-190"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-190" tabindex="-1"></a></span>
+<span id="cb661-191"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-191" tabindex="-1"></a><span class="co">&lt;!-- m2pspli &lt;- --&gt;</span></span>
+<span id="cb661-192"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-192" tabindex="-1"></a></span>
+<span id="cb661-193"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-193" tabindex="-1"></a><span class="co">&lt;!--   update( --&gt;</span></span>
+<span id="cb661-194"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-194" tabindex="-1"></a></span>
+<span id="cb661-195"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-195" tabindex="-1"></a><span class="co">&lt;!--     m2pois1, --&gt;</span></span>
+<span id="cb661-196"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-196" tabindex="-1"></a></span>
+<span id="cb661-197"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-197" tabindex="-1"></a><span class="co">&lt;!--     . ~ gam(s(stime) + sex + I((age - 65) / 10) + st3)) --&gt;</span></span>
+<span id="cb661-198"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-198" tabindex="-1"></a></span>
+<span id="cb661-199"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-199" tabindex="-1"></a><span class="co">&lt;!-- plot(m2pspli,pages=1,type=seWithMean=T) --&gt;</span></span>
+<span id="cb661-200"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-200" tabindex="-1"></a></span>
+<span id="cb661-201"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-201" tabindex="-1"></a><span class="co">&lt;!-- #round(ci.exp(m2pspli), 3) --&gt;</span></span>
+<span id="cb661-202"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-202" tabindex="-1"></a></span>
+<span id="cb661-203"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-203" tabindex="-1"></a><span class="co">&lt;!-- #news &lt;- data.frame( --&gt;</span></span>
+<span id="cb661-204"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-204" tabindex="-1"></a></span>
+<span id="cb661-205"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-205" tabindex="-1"></a><span class="co">&lt;!-- #  stime = seq(0, 25, length = 301), --&gt;</span></span>
+<span id="cb661-206"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-206" tabindex="-1"></a></span>
+<span id="cb661-207"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-207" tabindex="-1"></a><span class="co">&lt;!-- #  lex.dur = 1000, --&gt;</span></span>
+<span id="cb661-208"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-208" tabindex="-1"></a></span>
+<span id="cb661-209"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-209" tabindex="-1"></a><span class="co">&lt;!-- #  sex = &quot;Female&quot;, --&gt;</span></span>
+<span id="cb661-210"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-210" tabindex="-1"></a></span>
+<span id="cb661-211"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-211" tabindex="-1"></a><span class="co">&lt;!-- #  age = 65, --&gt;</span></span>
+<span id="cb661-212"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-212" tabindex="-1"></a></span>
+<span id="cb661-213"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-213" tabindex="-1"></a><span class="co">&lt;!-- #  st3 = &quot;I-II&quot; --&gt;</span></span>
+<span id="cb661-214"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-214" tabindex="-1"></a></span>
+<span id="cb661-215"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-215" tabindex="-1"></a><span class="co">&lt;!-- #) --&gt;</span></span>
+<span id="cb661-216"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-216" tabindex="-1"></a></span>
+<span id="cb661-217"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-217" tabindex="-1"></a><span class="co">&lt;!-- # blhaz &lt;- --&gt;</span></span>
+<span id="cb661-218"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-218" tabindex="-1"></a></span>
+<span id="cb661-219"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-219" tabindex="-1"></a><span class="co">&lt;!-- #   predict(m2pspli, newdata = news, se.fit = TRUE, type = &quot;link&quot;) --&gt;</span></span>
+<span id="cb661-220"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-220" tabindex="-1"></a></span>
+<span id="cb661-221"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-221" tabindex="-1"></a><span class="co">&lt;!-- # blh95 &lt;- cbind(blhaz$fit, blhaz$se.fit) %*% ci.mat() --&gt;</span></span>
+<span id="cb661-222"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-222" tabindex="-1"></a></span>
+<span id="cb661-223"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-223" tabindex="-1"></a><span class="co">&lt;!-- # par(mfrow = c(1, 1)) --&gt;</span></span>
+<span id="cb661-224"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-224" tabindex="-1"></a></span>
+<span id="cb661-225"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-225" tabindex="-1"></a><span class="co">&lt;!-- # matplot(news$stime, exp(blh95), --&gt;</span></span>
+<span id="cb661-226"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-226" tabindex="-1"></a></span>
+<span id="cb661-227"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-227" tabindex="-1"></a><span class="co">&lt;!-- #   type = &quot;l&quot;, lty = c(1, 1, 1), lwd = c(2, 1, 1), --&gt;</span></span>
+<span id="cb661-228"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-228" tabindex="-1"></a></span>
+<span id="cb661-229"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-229" tabindex="-1"></a><span class="co">&lt;!-- #   col = rep(&quot;black&quot;, 3), log = &quot;xy&quot;, ylim = c(5, 3000) --&gt;</span></span>
+<span id="cb661-230"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-230" tabindex="-1"></a></span>
+<span id="cb661-231"><a href="survival-analysis-with-competing-risks-oral-cancer-patients.html#cb661-231" tabindex="-1"></a><span class="co">&lt;!-- ``` --&gt;</span></span></code></pre></div>
 
 </div>
 </div>
