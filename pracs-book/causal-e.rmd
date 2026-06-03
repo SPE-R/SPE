@@ -20,6 +20,7 @@ Suppose one is interested in the effect of beer-drinking on body weight. Let's *
 The task is to simulate a dataset in accordance with this model, and subsequently analyse it to see, whether the results would allow us to conclude the true association structure.
 
 - Sketch a DAG (not necessarily with R) to see, how should one generate the data
+<<<<<<< HEAD
 
 - Suppose the actual effect sizes are following:
 
@@ -31,11 +32,19 @@ The task is to simulate a dataset in accordance with this model, and subsequentl
 
 - Beer-drinking increases blood pressure by $10mmHg$ in average.
 
+=======
+- Suppose the actual effect sizes are following:
+- The probability of beer-drinking is 0.2 for females and 0.7 for males
+- Men weigh on average $10kg$ more than women.
+- One kg difference in body weight corresponds in average to $0.5mmHg$ difference in (systolic) blood pressures.
+- Beer-drinking increases blood pressure by $10mmHg$ in average.
+>>>>>>> 3617578583b6fd98e2d682055b7b776b244066df
 - Beer-drinking has **no** effect on body weight.
 
 The `R` commands to generate the data are:
 
 ```{r beerdata_1}
+set.seed(23957) 
 bdat <- data.frame(sex = c(rep(0, 500), rep(1, 500)))
 # a data frame with 500 females, 500 males
 bdat$beer <- rbinom(1000, 1, 0.2 + 0.5 * bdat$sex)
@@ -44,12 +53,18 @@ bdat$bp <-
   110 + 0.5 * bdat$weight + 10 * bdat$beer + rnorm(1000, 0, 10)
 ```
 
+<<<<<<< HEAD
 - Now fit the following models for body weight as dependent variable and beer-drinking as independent variable. Look, what is the estimated effect size:
 
 - Unadjusted (just simple linear regression)
 
 - Adjusted for sex
 
+=======
+- Now fit the following models for body weight as dependent variable and beer-drinking as independent variable. Look, what is the estimated effect size
+- Unadjusted (just simple linear regression)
+- Adjusted for sex
+>>>>>>> 3617578583b6fd98e2d682055b7b776b244066df
 - Adjusted for sex and blood pressure
 
 ```{r beermodels_1, eval=TRUE, solution=TRUE}
@@ -62,7 +77,11 @@ ci.lin(m2a)
 ci.lin(m3a)
 ```
 
+<<<<<<< HEAD
 - What would be the conclusions on the effect of beer on weight, based on the three models? Do they agree? Which (if any) of the models gives an unbiased estimate of the actual causal effect of interest?
+=======
+- What would be the conclusions on the effect of beer on weight, based on the three models? Do they agree? Which (if any) of the models gives an unbiased estimate of the actual causal effect of interest? (Note - for the estimated coefficient of beer, 0 should be included in the confidence interval - there is just one model where that is true)
+>>>>>>> 3617578583b6fd98e2d682055b7b776b244066df
 
 - How can the answer be seen from the graph?
 
@@ -87,17 +106,60 @@ ci.lin(m3b)
 - Suppose one is interested in the effect of beer-drinking on blood pressure instead. Remember, the data was generated to assume that beer drinking increases blood pressure by 10mmHg, on average. Fit: a) an unadjusted model for blood pressure, with beer as an only covariate; b) a model with beer and weight as covariates; c) a model with beer and sex as covariates. Which model (if any) gives an unbiased estimate for the effect?
 
 *Note! Now it is important that we allow the effect of beer on body weight -- thus add the corresponding arrow to the DAG.*
+<<<<<<< HEAD
+=======
+
+::: solution
+>>>>>>> 3617578583b6fd98e2d682055b7b776b244066df
 
 ```{r bpmodel, eval=TRUE, solution=TRUE}
 m1bp <- lm(bp ~ beer, data = bdat) # not correct 
 ci.lin(m1bp)
 m2bp <- lm(bp ~ beer + weight, data = bdat) 
 ci.lin(m2bp) # the correct model (check whether 10 is in the confidence interval) 
+<<<<<<< HEAD
 m2bp <- lm(bp ~ beer + sex, data = bdat) 
 ci.lin(m3bp) # the correct model for the total effect 
 ```
 
 *See the file with solutions for correct solutions and explanations!*
+=======
+m3bp <- lm(bp ~ beer + sex, data = bdat) 
+ci.lin(m3bp) # the correct model for the total effect 
+```
+
+*** Solution via regression equations ***
+
+With $W$, $B$, $S$ and $BP$ the variables for weight, beer, sex (0-female, 1-male) and blood pressure, respectively, we can write:
+$$E(B|S) = P(B=1|S) = \alpha_0 + \alpha_1 S  $$
+(the data is generated with $\alpha_0=0.2$ and $\alpha_1=0.5$),
+$$W = \beta_0 + \beta_1 B + \beta_2S + \epsilon_W$$
+and
+$$BP = \gamma_0 + \gamma_1 B + \gamma_2W + \epsilon_{BP},$$
+where $\epsilon_W$ is independent of $B$ and $S$, and $\epsilon_{BP}$ is independent of $B$, $W$ and $S$ (as there is no arrow from $S$ to $BP$ on the DAG).
+
+First we see that fitting a linear model for $W$ with $B$ as the only covariate, estimates: $$E(W|B)= \beta_0 + \beta_1 B + \beta_2E(S|B).$$ As $S$ and $B$ are not independent, $E(S|B)$ will depend on $B$ -- for instance $E(S|B)=\delta_0 + \delta_1B$ for some $\delta_0$ and $\delta_1$. Thus, instead of $\beta_1$ we estimate $\beta_1+ \beta_2\delta_1$ and get a biased estimate.
+
+If we also adjust for $S$, we estimate both $\beta_1$ and $\beta_2$, thus fit the correct model.
+
+What happens if we adjust for blood pressure? We estimate:
+$$E(W|S,B,BP) = \beta_0 + \beta_1 B + \beta_2S + E(\epsilon_W|S,B,BP)$$
+As blood pressure depends on $B$ and $W$, $E(\epsilon_W|S,B,BP) \ne 0$ and the estimate of $\beta_1$ will be biased.
+
+**Models for blood pressure ($BP$)**
+
+Note that the parameter $\gamma_1$ corresponds to the *direct effect* of beer-drinking ($B$) - to estimate it, we have to fit the model that was used for data generation, thus the model including both $B$ and $W$ as covariates. Adjusting additionally for $S$ is not needed, but would also create no bias.
+
+From the DAG we see that the *total* effect of beer-drinking on blood pressure has two components: 1) the direct effect and 2) the effect via weight. To see what the true total effect parameter is, let's combine the two models:
+
+$$BP = \gamma_0 + \gamma_1 B + \gamma_2W + \epsilon_{BP} = 
+\gamma_0 + \gamma_1 B + \gamma_2(\beta_0 + \beta_1 B + \beta_2S + \epsilon_W) + \epsilon_{BP} = \gamma_0^* + (\gamma_1 + \gamma_2\beta_1)B + \gamma_2\beta_2S + \epsilon_{BP}^*.$$
+We see that the true total effect parameter is $\gamma_1 + \gamma_2\beta_1 = 10 + 0.5\cdot 2 =11$, and that the model also includes $S$ as a confounder.
+
+*Check, whether for the fitted model `m3bp`, 11 is included in the confidence interval for the parameter for beer!*
+
+::: 
+>>>>>>> 3617578583b6fd98e2d682055b7b776b244066df
 
 ## DAG tools in the package `dagitty`
 
@@ -191,9 +253,44 @@ paths(bg, "BEER", "WEIGHT")
 
 - Will you get the same recommendation for the adjustment variable selection as you found before?
 
+<<<<<<< HEAD
+=======
+::: solution
+
+>>>>>>> 3617578583b6fd98e2d682055b7b776b244066df
 ```{r dagitty8, eval=TRUE, solution=TRUE}
 adjustmentSets(bg, exposure = "BEER", outcome = "WEIGHT")
 ```
+
+**Effect of beer on blood pressure?**
+
+Let's first add the effect of beer on weight to the DAG, then look at the recommended adjustment sets.
+
+```{r dagitty9, eval=TRUE, solution=TRUE}
+bg2 <- dagitty("dag {
+  SEX -> BEER -> BP
+  SEX -> WEIGHT -> BP
+  BEER -> WEIGHT
+  }")
+coordinates(bg2) <- 
+  list(
+    x = c(BEER = 1, SEX = 2, BP = 2, WEIGHT = 3), 
+    y = c(SEX = 1, BEER = 2, WEIGHT = 2, BP = 3)
+  )
+plot(bg2)
+```
+
+```{r adjustbp, eval=TRUE, solution=TRUE}
+adjustmentSets(bg2, exposure = "BEER", outcome = "BP", effect="direct")
+adjustmentSets(bg2, exposure = "BEER", outcome = "BP", effect="total")
+```
+
+Conclusions:
+
+- *To identify the direct effect, adjust for weight*
+- *To identify the total effect, adjust for sex*
+
+:::
 
 ## Identifying the true DAG for the data
 
@@ -240,28 +337,91 @@ source("data/gendata.r")
 head(dat)
 ```
 
+<<<<<<< HEAD
 *Exercise:* Using linear models, try to identify, which of the three DAGs has been used to generate the data.
 
 ```{r adjust1, results=TRUE}
+=======
+**Exercise:** Using linear models, try to identify, which of the three DAGs has been used to generate the data.
+
+::: solution 
+
+*Idea:* If you adjust for appropriate confounders for a given DAG, you should see no effect of X on Y.
+
+```{r adjust1, eval=TRUE, solution=TRUE}
+>>>>>>> 3617578583b6fd98e2d682055b7b776b244066df
 adjustmentSets(g1,"X","Y", effect="direct")
 summary(lm(Y~X+W+Z,data=dat))
 ```
 
+<<<<<<< HEAD
 The DAG would be possible, if there is not effect of X.
 
 ```{r adjust2, results=TRUE}
+=======
+*Apparently no effect of X: this DAG "g1" (a) is possible*
+
+```{r adjust2, eval=TRUE, solution=TRUE}
+>>>>>>> 3617578583b6fd98e2d682055b7b776b244066df
 adjustmentSets(g2,"X","Y", effect="direct")
 summary(lm(Y~X+Z,data=dat))
 ```
 
+<<<<<<< HEAD
 ```{r adjust3, results=TRUE}
+=======
+*A clear effect of X: this DAG "g2" (b) is not likely*
+
+```{r adjust3, eval=TRUE, solution=TRUE}
+>>>>>>> 3617578583b6fd98e2d682055b7b776b244066df
 adjustmentSets(g3,"X","Y", effect="direct")
 summary(lm(Y~X+Q+W+Z,data=dat))
 ```
 
+<<<<<<< HEAD
 You have probably seen that one of the three DAGs is definitely wrong for the data. But what about two others? If you are unsure, try to think of a different model to fit - you may use another dependent variable than Y (see solutions for one option).
 
 If you have made your decision, you may check the script 'gendata.r' to see, whether your guess was right.
+=======
+*Apparently no effect of X: this DAG "g3" (c) is possible*
+
+**Problem:** Both (a) and (c) are possible, based on the fitted models. How to make a distinction?
+
+*Answer 1:* If (c)/`g3` was the correct model, we could have seen a non-zero effect of X in the first model (based on g1) that was adjusted for Z and W, but not for Q. The fact that we did not see it, rather suggests (a) as the correct model. However - absence of statistical significance is not equivalent to absence of an effect.
+
+**Another idea:** Let's find something else that helps to distinguish between (a) and (c) - can we clearly reject one of the two? For instance, let's consider the effect of Q on X. In (a)/`g1`, Q has an indirect effect on X via W, thus the unadjusted model would show an effect, but not the adjusted model. In (c)/`g3`, W is a collider -- thus an unadjusted analysis should show no effect (but adjusting for W might lead to a non-zero parameter estimate). In both cases, the other paths contain a collider (Y). Let's confirm that with *dagitty* and fit the appropriate models.
+
+```{r adjust4, eval=TRUE, solution=TRUE}
+adjustmentSets(g1,"Q","X", effect="direct")
+adjustmentSets(g3,"Q","X", effect="direct")
+summary(lm(Q~X,data=dat))
+summary(lm(Q~X+W,data=dat))
+```
+
+*Conclusion: unadjusted model shows a clear effect, disappearing after adjustment for W. Thus we can reject (c)/`g3` and conclude that (a)/`g1` is the correct model.*
+:::
+
+If you have made your decision, you may check the script 'gendata.r' to see, whether your guess was right.
+
+::: solution 
+```{r, eval=TRUE, solution=TRUE}
+### The contents of gendat.r
+### 
+set.seed(202406)
+n=2000
+U = rnorm(n)    
+dat = data.frame(Q = rnorm(n))
+dat$W = 2*dat$Q+rnorm(n)        #  Q -> W
+dat$X = -2*dat$W +3*U+ rnorm(n) #  W -> X,  U -> X
+dat$Z = -2*U+rnorm(n)           #  U -> Z 
+dat$Y = dat$Z-3*dat$W+dat$Q+rnorm(n) # Z -> Y, W -> Y, Q -> Y  
+rm(U)
+dat<- round(dat,3)
+```
+
+*Correct answer: the data was generated to follow DAG g1 (a)*.
+:::
+>>>>>>> 3617578583b6fd98e2d682055b7b776b244066df
 
 ## Instrumental variables estimation: Mendelian randomization
 
