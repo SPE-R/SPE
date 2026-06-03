@@ -79,7 +79,11 @@ ci.lin(m3a)
 ## bp           0.2327287 0.02009792 11.579736 5.220635e-31  0.1933374  0.2721199
 ```
 
-- What would be the conclusions on the effect of beer on weight, based on the three models? Do they agree? Which (if any) of the models gives an unbiased estimate of the actual causal effect of interest? (Note - for the estimated coefficient of beer, 0 should be included in the confidence interval - there is just one model where that is true)
+- What would be the conclusions on the effect of beer on weight, based on the three models? Do they agree? Which (if any) of the models gives an unbiased estimate of the actual causal effect of interest? 
+
+::: solution
+(Note - for the estimated coefficient of beer, 0 should be included in the confidence interval - there is just one model where that is true)
+:::
 
 - How can the answer be seen from the graph?
 
@@ -474,8 +478,6 @@ head(dat)
 
 **Exercise:** Using linear models, try to identify, which of the three DAGs has been used to generate the data.
 
-::: solution 
-
 *Idea:* If you adjust for appropriate confounders for a given DAG, you should see no effect of X on Y.
 
 
@@ -515,7 +517,11 @@ summary(lm(Y~X+W+Z,data=dat))
 ## F-statistic: 2.054e+04 on 3 and 1996 DF,  p-value: < 2.2e-16
 ```
 
+The DAG would be possible, if there is not effect of X.
+
+::: solution
 *Apparently no effect of X: this DAG "g1" (a) is possible*
+:::
 
 
 ``` r
@@ -553,7 +559,10 @@ summary(lm(Y~X+Z,data=dat))
 ## F-statistic:  6387 on 2 and 1997 DF,  p-value: < 2.2e-16
 ```
 
+::: solution
 *A clear effect of X: this DAG "g2" (b) is not likely*
+:::
+
 
 
 ``` r
@@ -592,6 +601,12 @@ summary(lm(Y~X+Q+W+Z,data=dat))
 ## Multiple R-squared:  0.9745,	Adjusted R-squared:  0.9744 
 ## F-statistic: 1.902e+04 on 4 and 1995 DF,  p-value: < 2.2e-16
 ```
+
+You have probably seen that one of the three DAGs is definitely wrong for the data. But what about two others? If you are unsure, try to think of a different model to fit - you may use another dependent variable than Y (see solutions for one option).
+
+If you have made your decision, you may check the script 'gendata.r' to see, whether your guess was right.
+
+::: solution
 
 *Apparently no effect of X: this DAG "g3" (c) is possible*
 

@@ -427,11 +427,11 @@ Read in the cohort data file and name
 the resulting data frame as <code>oc</code>.
 See its structure and print the univariate summaries.</li>
 </ul>
-<div class="sourceCode" id="cb800"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb800-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb800-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
-<span id="cb800-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb800-2" tabindex="-1"></a><span class="fu">library</span>(survival)</span>
-<span id="cb800-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb800-3" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">&quot;https://raw.githubusercontent.com/SPE-R/SPE/master/pracs-book/data&quot;</span></span>
-<span id="cb800-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb800-4" tabindex="-1"></a>oc <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="fu">paste</span>(url, <span class="st">&quot;occoh.txt&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>), <span class="at">header =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb800-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb800-5" tabindex="-1"></a><span class="fu">str</span>(oc)</span></code></pre></div>
+<div class="sourceCode" id="cb802"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb802-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb802-1" tabindex="-1"></a><span class="fu">library</span>(Epi)</span>
+<span id="cb802-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb802-2" tabindex="-1"></a><span class="fu">library</span>(survival)</span>
+<span id="cb802-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb802-3" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">&quot;https://raw.githubusercontent.com/SPE-R/SPE/master/pracs-book/data&quot;</span></span>
+<span id="cb802-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb802-4" tabindex="-1"></a>oc <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="fu">paste</span>(url, <span class="st">&quot;occoh.txt&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>), <span class="at">header =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb802-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb802-5" tabindex="-1"></a><span class="fu">str</span>(oc)</span></code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    1501 obs. of  6 variables:
 ##  $ id     : int  1 2 3 4 5 6 7 8 9 10 ...
 ##  $ birth  : chr  &quot;1943-02-19&quot; &quot;1934-07-06&quot; &quot;1939-03-05&quot; &quot;1939-07-03&quot; ...
@@ -439,7 +439,7 @@ See its structure and print the univariate summaries.</li>
 ##  $ exit   : chr  &quot;2009-12-31&quot; &quot;2009-12-31&quot; &quot;2009-12-31&quot; &quot;2009-12-31&quot; ...
 ##  $ death  : int  0 0 0 0 1 1 1 1 0 0 ...
 ##  $ chdeath: int  0 0 0 0 0 0 0 1 0 0 ...</code></pre>
-<div class="sourceCode" id="cb802"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb802-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb802-1" tabindex="-1"></a><span class="fu">summary</span>(oc)</span></code></pre></div>
+<div class="sourceCode" id="cb804"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb804-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb804-1" tabindex="-1"></a><span class="fu">summary</span>(oc)</span></code></pre></div>
 <pre><code>##        id             birth            entry             exit     
 ##  Min.   :   1   Length   :1501   Length   :1501   Length   :1501  
 ##  1st Qu.: 376   N.unique :1349   N.unique : 302   N.unique : 290  
@@ -457,29 +457,29 @@ See its structure and print the univariate summaries.</li>
 <ul>
 <li>It is convenient to change all the dates into fractional calendar years</li>
 </ul>
-<div class="sourceCode" id="cb804"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb804-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb804-1" tabindex="-1"></a>oc<span class="sc">$</span>ybirth <span class="ot">&lt;-</span> <span class="fu">cal.yr</span>(oc<span class="sc">$</span>birth)</span>
-<span id="cb804-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb804-2" tabindex="-1"></a>oc<span class="sc">$</span>yentry <span class="ot">&lt;-</span> <span class="fu">cal.yr</span>(oc<span class="sc">$</span>entry)</span>
-<span id="cb804-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb804-3" tabindex="-1"></a>oc<span class="sc">$</span>yexit <span class="ot">&lt;-</span> <span class="fu">cal.yr</span>(oc<span class="sc">$</span>exit)</span></code></pre></div>
+<div class="sourceCode" id="cb806"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb806-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb806-1" tabindex="-1"></a>oc<span class="sc">$</span>ybirth <span class="ot">&lt;-</span> <span class="fu">cal.yr</span>(oc<span class="sc">$</span>birth)</span>
+<span id="cb806-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb806-2" tabindex="-1"></a>oc<span class="sc">$</span>yentry <span class="ot">&lt;-</span> <span class="fu">cal.yr</span>(oc<span class="sc">$</span>entry)</span>
+<span id="cb806-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb806-3" tabindex="-1"></a>oc<span class="sc">$</span>yexit <span class="ot">&lt;-</span> <span class="fu">cal.yr</span>(oc<span class="sc">$</span>exit)</span></code></pre></div>
 <p>We shall also compute the age at entry and at exit, respectively,
 as age will be the main time scale in our analyses.</p>
-<div class="sourceCode" id="cb805"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb805-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb805-1" tabindex="-1"></a>oc<span class="sc">$</span>agentry <span class="ot">&lt;-</span> oc<span class="sc">$</span>yentry <span class="sc">-</span> oc<span class="sc">$</span>ybirth</span>
-<span id="cb805-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb805-2" tabindex="-1"></a>oc<span class="sc">$</span>agexit <span class="ot">&lt;-</span> oc<span class="sc">$</span>yexit <span class="sc">-</span> oc<span class="sc">$</span>ybirth</span></code></pre></div>
+<div class="sourceCode" id="cb807"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb807-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb807-1" tabindex="-1"></a>oc<span class="sc">$</span>agentry <span class="ot">&lt;-</span> oc<span class="sc">$</span>yentry <span class="sc">-</span> oc<span class="sc">$</span>ybirth</span>
+<span id="cb807-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb807-2" tabindex="-1"></a>oc<span class="sc">$</span>agexit <span class="ot">&lt;-</span> oc<span class="sc">$</span>yexit <span class="sc">-</span> oc<span class="sc">$</span>ybirth</span></code></pre></div>
 <ul>
 <li>As the next step we shall create a <code>lexis</code> object
 from the data frame along the calendar period and age axes,
 and as the outcome event we specify the coronary death.</li>
 </ul>
-<div class="sourceCode" id="cb806"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb806-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb806-1" tabindex="-1"></a>oc.lex <span class="ot">&lt;-</span> <span class="fu">Lexis</span>(</span>
-<span id="cb806-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb806-2" tabindex="-1"></a>  <span class="at">entry =</span> <span class="fu">list</span>(</span>
-<span id="cb806-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb806-3" tabindex="-1"></a>    <span class="at">per =</span> yentry,</span>
-<span id="cb806-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb806-4" tabindex="-1"></a>    <span class="at">age =</span> yentry <span class="sc">-</span> ybirth</span>
-<span id="cb806-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb806-5" tabindex="-1"></a>  ),</span>
-<span id="cb806-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb806-6" tabindex="-1"></a>  <span class="at">exit =</span> <span class="fu">list</span>(<span class="at">per =</span> yexit),</span>
-<span id="cb806-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb806-7" tabindex="-1"></a>  <span class="at">exit.status =</span> chdeath,</span>
-<span id="cb806-8"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb806-8" tabindex="-1"></a>  <span class="at">id =</span> id, <span class="at">data =</span> oc</span>
-<span id="cb806-9"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb806-9" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb808"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb808-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb808-1" tabindex="-1"></a>oc.lex <span class="ot">&lt;-</span> <span class="fu">Lexis</span>(</span>
+<span id="cb808-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb808-2" tabindex="-1"></a>  <span class="at">entry =</span> <span class="fu">list</span>(</span>
+<span id="cb808-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb808-3" tabindex="-1"></a>    <span class="at">per =</span> yentry,</span>
+<span id="cb808-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb808-4" tabindex="-1"></a>    <span class="at">age =</span> yentry <span class="sc">-</span> ybirth</span>
+<span id="cb808-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb808-5" tabindex="-1"></a>  ),</span>
+<span id="cb808-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb808-6" tabindex="-1"></a>  <span class="at">exit =</span> <span class="fu">list</span>(<span class="at">per =</span> yexit),</span>
+<span id="cb808-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb808-7" tabindex="-1"></a>  <span class="at">exit.status =</span> chdeath,</span>
+<span id="cb808-8"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb808-8" tabindex="-1"></a>  <span class="at">id =</span> id, <span class="at">data =</span> oc</span>
+<span id="cb808-9"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb808-9" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>## NOTE: entry.status has been set to 0 for all.</code></pre>
-<div class="sourceCode" id="cb808"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb808-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb808-1" tabindex="-1"></a><span class="fu">str</span>(oc.lex)</span></code></pre></div>
+<div class="sourceCode" id="cb810"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb810-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb810-1" tabindex="-1"></a><span class="fu">str</span>(oc.lex)</span></code></pre></div>
 <pre><code>## Classes &#39;Lexis&#39; and &#39;data.frame&#39;:    1501 obs. of  17 variables:
 ##  $ per    : &#39;cal.yr&#39; num  1991 1991 1991 1991 1991 ...
 ##  $ age    : &#39;cal.yr&#39; num  47.5 56.1 51.4 51.1 55.5 ...
@@ -503,7 +503,7 @@ and as the outcome event we specify the coronary death.</li>
 ##  - attr(*, &quot;breaks&quot;)=List of 2
 ##   ..$ per: NULL
 ##   ..$ age: NULL</code></pre>
-<div class="sourceCode" id="cb810"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb810-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb810-1" tabindex="-1"></a><span class="fu">summary</span>(oc.lex)</span></code></pre></div>
+<div class="sourceCode" id="cb812"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb812-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb812-1" tabindex="-1"></a><span class="fu">summary</span>(oc.lex)</span></code></pre></div>
 <pre><code>##     
 ## Transitions:
 ##      To
@@ -516,9 +516,9 @@ Lexis diagram. Make use of the <code>plot</code> method for <code>Lexis</code> o
 Gray lifelines are drawn and a bullet is put at the exit point of those lifelines
 that end with the outcome event.</li>
 </ul>
-<div class="sourceCode" id="cb812"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb812-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb812-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span>
-<span id="cb812-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb812-2" tabindex="-1"></a><span class="fu">plot</span>(oc.lex, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">1990</span>, <span class="dv">2010</span>), <span class="at">grid =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb812-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb812-3" tabindex="-1"></a><span class="fu">points</span>(oc.lex, <span class="at">pch =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="dv">16</span>)[oc.lex<span class="sc">$</span>lex.Xst <span class="sc">+</span> <span class="dv">1</span>])</span></code></pre></div>
+<div class="sourceCode" id="cb814"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb814-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb814-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb814-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb814-2" tabindex="-1"></a><span class="fu">plot</span>(oc.lex, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">1990</span>, <span class="dv">2010</span>), <span class="at">grid =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb814-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb814-3" tabindex="-1"></a><span class="fu">points</span>(oc.lex, <span class="at">pch =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="dv">16</span>)[oc.lex<span class="sc">$</span>lex.Xst <span class="sc">+</span> <span class="dv">1</span>])</span></code></pre></div>
 <p><img src="occoh-caco-s_files/figure-html/plotlexis-1.png" alt="" width="672" /></p>
 <ul>
 <li>As age is here the main time axis,
@@ -533,34 +533,34 @@ to sort the data frame and the <code>Lexis</code> object
 jointly by age at exit &amp; age at entry,
 and to give a new ID number according to that order.</li>
 </ul>
-<div class="sourceCode" id="cb813"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb813-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb813-1" tabindex="-1"></a>oc.ord <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="at">ID =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">1501</span>, oc[<span class="fu">order</span>(oc<span class="sc">$</span>agexit, oc<span class="sc">$</span>agentry), ])</span>
-<span id="cb813-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb813-2" tabindex="-1"></a>oc.lexord <span class="ot">&lt;-</span> <span class="fu">Lexis</span>(</span>
-<span id="cb813-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb813-3" tabindex="-1"></a>  <span class="at">entry =</span> <span class="fu">list</span>(<span class="at">age =</span> agentry),</span>
-<span id="cb813-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb813-4" tabindex="-1"></a>  <span class="at">exit =</span> <span class="fu">list</span>(<span class="at">age =</span> agexit),</span>
-<span id="cb813-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb813-5" tabindex="-1"></a>  <span class="at">exit.status =</span> chdeath,</span>
-<span id="cb813-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb813-6" tabindex="-1"></a>  <span class="at">id =</span> ID, <span class="at">data =</span> oc.ord</span>
-<span id="cb813-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb813-7" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb815"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb815-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb815-1" tabindex="-1"></a>oc.ord <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="at">ID =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">1501</span>, oc[<span class="fu">order</span>(oc<span class="sc">$</span>agexit, oc<span class="sc">$</span>agentry), ])</span>
+<span id="cb815-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb815-2" tabindex="-1"></a>oc.lexord <span class="ot">&lt;-</span> <span class="fu">Lexis</span>(</span>
+<span id="cb815-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb815-3" tabindex="-1"></a>  <span class="at">entry =</span> <span class="fu">list</span>(<span class="at">age =</span> agentry),</span>
+<span id="cb815-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb815-4" tabindex="-1"></a>  <span class="at">exit =</span> <span class="fu">list</span>(<span class="at">age =</span> agexit),</span>
+<span id="cb815-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb815-5" tabindex="-1"></a>  <span class="at">exit.status =</span> chdeath,</span>
+<span id="cb815-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb815-6" tabindex="-1"></a>  <span class="at">id =</span> ID, <span class="at">data =</span> oc.ord</span>
+<span id="cb815-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb815-7" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>## NOTE: entry.status has been set to 0 for all.</code></pre>
-<div class="sourceCode" id="cb815"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb815-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb815-1" tabindex="-1"></a><span class="fu">plot</span>(oc.lexord, <span class="st">&quot;age&quot;</span>)</span>
-<span id="cb815-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb815-2" tabindex="-1"></a><span class="fu">points</span>(oc.lexord, <span class="at">pch =</span> <span class="fu">ifelse</span>(oc.lexord<span class="sc">$</span>lex.Xst <span class="sc">==</span> <span class="dv">1</span>, <span class="dv">16</span>, <span class="cn">NA</span>))</span>
-<span id="cb815-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb815-3" tabindex="-1"></a><span class="fu">with</span>(</span>
-<span id="cb815-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb815-4" tabindex="-1"></a>  <span class="fu">subset</span>(oc.lexord, lex.Xst <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb815-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb815-5" tabindex="-1"></a>  <span class="fu">abline</span>(<span class="at">v =</span> agexit, <span class="at">lty =</span> <span class="dv">3</span>)</span>
-<span id="cb815-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb815-6" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb817"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb817-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb817-1" tabindex="-1"></a><span class="fu">plot</span>(oc.lexord, <span class="st">&quot;age&quot;</span>)</span>
+<span id="cb817-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb817-2" tabindex="-1"></a><span class="fu">points</span>(oc.lexord, <span class="at">pch =</span> <span class="fu">ifelse</span>(oc.lexord<span class="sc">$</span>lex.Xst <span class="sc">==</span> <span class="dv">1</span>, <span class="dv">16</span>, <span class="cn">NA</span>))</span>
+<span id="cb817-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb817-3" tabindex="-1"></a><span class="fu">with</span>(</span>
+<span id="cb817-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb817-4" tabindex="-1"></a>  <span class="fu">subset</span>(oc.lexord, lex.Xst <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb817-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb817-5" tabindex="-1"></a>  <span class="fu">abline</span>(<span class="at">v =</span> agexit, <span class="at">lty =</span> <span class="dv">3</span>)</span>
+<span id="cb817-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb817-6" tabindex="-1"></a>)</span></code></pre></div>
 <p><img src="occoh-caco-s_files/figure-html/plotlexage-1.png" alt="" width="672" />
 - For a closer look, we now
 zoom the graphical illustration of the risk sets into
 event times occurring between 50 to 58 years. –
 Copy the last four lines from the previous item and add arguments <code>xlim</code> and <code>ylim</code>
 to the call of <code>plot()</code>.</p>
-<div class="sourceCode" id="cb816"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb816-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb816-1" tabindex="-1"></a><span class="fu">plot</span>(oc.lexord, <span class="st">&quot;age&quot;</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">58</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">65</span>))</span>
-<span id="cb816-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb816-2" tabindex="-1"></a><span class="fu">points</span>(</span>
-<span id="cb816-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb816-3" tabindex="-1"></a>  oc.lexord, <span class="st">&quot;age&quot;</span>, <span class="at">pch =</span> <span class="fu">ifelse</span>(oc.lexord<span class="sc">$</span>lex.Xst <span class="sc">==</span> <span class="dv">1</span>, <span class="dv">16</span>, <span class="cn">NA</span>)</span>
-<span id="cb816-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb816-4" tabindex="-1"></a>)</span>
-<span id="cb816-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb816-5" tabindex="-1"></a><span class="fu">with</span>(</span>
-<span id="cb816-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb816-6" tabindex="-1"></a>  <span class="fu">subset</span>(oc.lexord, lex.Xst <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb816-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb816-7" tabindex="-1"></a>  <span class="fu">abline</span>(<span class="at">v =</span> agexit, <span class="at">lty =</span> <span class="dv">3</span>)</span>
-<span id="cb816-8"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb816-8" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb818"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb818-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb818-1" tabindex="-1"></a><span class="fu">plot</span>(oc.lexord, <span class="st">&quot;age&quot;</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">58</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">65</span>))</span>
+<span id="cb818-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb818-2" tabindex="-1"></a><span class="fu">points</span>(</span>
+<span id="cb818-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb818-3" tabindex="-1"></a>  oc.lexord, <span class="st">&quot;age&quot;</span>, <span class="at">pch =</span> <span class="fu">ifelse</span>(oc.lexord<span class="sc">$</span>lex.Xst <span class="sc">==</span> <span class="dv">1</span>, <span class="dv">16</span>, <span class="cn">NA</span>)</span>
+<span id="cb818-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb818-4" tabindex="-1"></a>)</span>
+<span id="cb818-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb818-5" tabindex="-1"></a><span class="fu">with</span>(</span>
+<span id="cb818-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb818-6" tabindex="-1"></a>  <span class="fu">subset</span>(oc.lexord, lex.Xst <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb818-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb818-7" tabindex="-1"></a>  <span class="fu">abline</span>(<span class="at">v =</span> agexit, <span class="at">lty =</span> <span class="dv">3</span>)</span>
+<span id="cb818-8"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb818-8" tabindex="-1"></a>)</span></code></pre></div>
 <p><img src="occoh-caco-s_files/figure-html/plotlexage2-1.png" alt="" width="672" /></p>
 </div>
 <div id="nested-case-control-study" class="section level2 hasAnchor" number="13.2">
@@ -574,7 +574,7 @@ within the cohort.</p>
 For this purpose we first generate a categorical variable
 <code>agen2</code> for age at entry</li>
 </ul>
-<div class="sourceCode" id="cb817"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb817-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb817-1" tabindex="-1"></a>oc.lex<span class="sc">$</span>agen2 <span class="ot">&lt;-</span> <span class="fu">cut</span>(oc.lex<span class="sc">$</span>agentry, <span class="at">br =</span> <span class="fu">seq</span>(<span class="dv">40</span>, <span class="dv">62</span>, <span class="dv">1</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb819"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb819-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb819-1" tabindex="-1"></a>oc.lex<span class="sc">$</span>agen2 <span class="ot">&lt;-</span> <span class="fu">cut</span>(oc.lex<span class="sc">$</span>agentry, <span class="at">br =</span> <span class="fu">seq</span>(<span class="dv">40</span>, <span class="dv">62</span>, <span class="dv">1</span>))</span></code></pre></div>
 <p>Matched sampling from risk sets may be carried out using
 function <code>ccwc()</code> found in the <code>Epi</code> package.
 Its main arguments are the times
@@ -588,17 +588,17 @@ make a call of this function and see
 the structure of the resulting data frame <code>cactrl</code>
 containing the cases and the chosen individual controls.</li>
 </ul>
-<div class="sourceCode" id="cb818"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb818-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb818-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">98623</span>)</span>
-<span id="cb818-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb818-2" tabindex="-1"></a>cactrl <span class="ot">&lt;-</span></span>
-<span id="cb818-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb818-3" tabindex="-1"></a>  <span class="fu">ccwc</span>(</span>
-<span id="cb818-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb818-4" tabindex="-1"></a>    <span class="at">entry =</span> agentry, <span class="at">exit =</span> agexit, <span class="at">fail =</span> chdeath,</span>
-<span id="cb818-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb818-5" tabindex="-1"></a>    <span class="at">controls =</span> <span class="dv">2</span>, <span class="at">match =</span> agen2,</span>
-<span id="cb818-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb818-6" tabindex="-1"></a>    <span class="at">include =</span> <span class="fu">list</span>(id, agentry),</span>
-<span id="cb818-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb818-7" tabindex="-1"></a>    <span class="at">data =</span> oc.lex, <span class="at">silent =</span> <span class="cn">FALSE</span></span>
-<span id="cb818-8"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb818-8" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb820"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb820-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb820-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">98623</span>)</span>
+<span id="cb820-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb820-2" tabindex="-1"></a>cactrl <span class="ot">&lt;-</span></span>
+<span id="cb820-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb820-3" tabindex="-1"></a>  <span class="fu">ccwc</span>(</span>
+<span id="cb820-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb820-4" tabindex="-1"></a>    <span class="at">entry =</span> agentry, <span class="at">exit =</span> agexit, <span class="at">fail =</span> chdeath,</span>
+<span id="cb820-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb820-5" tabindex="-1"></a>    <span class="at">controls =</span> <span class="dv">2</span>, <span class="at">match =</span> agen2,</span>
+<span id="cb820-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb820-6" tabindex="-1"></a>    <span class="at">include =</span> <span class="fu">list</span>(id, agentry),</span>
+<span id="cb820-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb820-7" tabindex="-1"></a>    <span class="at">data =</span> oc.lex, <span class="at">silent =</span> <span class="cn">FALSE</span></span>
+<span id="cb820-8"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb820-8" tabindex="-1"></a>  )</span></code></pre></div>
 <pre><code>## 
 ## Sampling risk sets: ........................................................................................................................</code></pre>
-<div class="sourceCode" id="cb820"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb820-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb820-1" tabindex="-1"></a><span class="fu">str</span>(cactrl)</span></code></pre></div>
+<div class="sourceCode" id="cb822"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb822-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb822-1" tabindex="-1"></a><span class="fu">str</span>(cactrl)</span></code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    360 obs. of  7 variables:
 ##  $ Set    : num  1 1 1 2 2 2 3 3 3 4 ...
 ##  $ Map    : num  8 1423 1 95 381 ...
@@ -647,11 +647,11 @@ values of the following variables.</li>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb822"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb822-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb822-1" tabindex="-1"></a>ocX <span class="ot">&lt;-</span> </span>
-<span id="cb822-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb822-2" tabindex="-1"></a>  <span class="fu">read.table</span>(</span>
-<span id="cb822-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb822-3" tabindex="-1"></a>    <span class="fu">paste</span>(url, <span class="st">&quot;occoh-Xdata.txt&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>), <span class="at">header =</span> <span class="cn">TRUE</span></span>
-<span id="cb822-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb822-4" tabindex="-1"></a>  )</span>
-<span id="cb822-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb822-5" tabindex="-1"></a><span class="fu">str</span>(ocX)</span></code></pre></div>
+<div class="sourceCode" id="cb824"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb824-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb824-1" tabindex="-1"></a>ocX <span class="ot">&lt;-</span> </span>
+<span id="cb824-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb824-2" tabindex="-1"></a>  <span class="fu">read.table</span>(</span>
+<span id="cb824-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb824-3" tabindex="-1"></a>    <span class="fu">paste</span>(url, <span class="st">&quot;occoh-Xdata.txt&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;/&quot;</span>), <span class="at">header =</span> <span class="cn">TRUE</span></span>
+<span id="cb824-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb824-4" tabindex="-1"></a>  )</span>
+<span id="cb824-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb824-5" tabindex="-1"></a><span class="fu">str</span>(ocX)</span></code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    1501 obs. of  6 variables:
 ##  $ id   : int  1 2 3 4 5 6 7 8 9 10 ...
 ##  $ birth: chr  &quot;1943-02-19&quot; &quot;1934-07-06&quot; &quot;1939-03-05&quot; &quot;1939-07-03&quot; ...
@@ -671,10 +671,10 @@ these into a single file (see exercise 1.1, subsection 1.1.8, where
 The <code>id</code> variable in both files is used as the key to link each
 individual case or control with his own data on risk factors.</li>
 </ul>
-<div class="sourceCode" id="cb824"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb824-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb824-1" tabindex="-1"></a>oc.ncc <span class="ot">&lt;-</span> <span class="fu">merge</span>(cactrl, ocX[, <span class="fu">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;smok&quot;</span>, <span class="st">&quot;tchol&quot;</span>, <span class="st">&quot;sbp&quot;</span>)],</span>
-<span id="cb824-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb824-2" tabindex="-1"></a>  <span class="at">by =</span> <span class="st">&quot;id&quot;</span></span>
-<span id="cb824-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb824-3" tabindex="-1"></a>)</span>
-<span id="cb824-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb824-4" tabindex="-1"></a><span class="fu">str</span>(oc.ncc)</span></code></pre></div>
+<div class="sourceCode" id="cb826"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb826-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb826-1" tabindex="-1"></a>oc.ncc <span class="ot">&lt;-</span> <span class="fu">merge</span>(cactrl, ocX[, <span class="fu">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;smok&quot;</span>, <span class="st">&quot;tchol&quot;</span>, <span class="st">&quot;sbp&quot;</span>)],</span>
+<span id="cb826-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb826-2" tabindex="-1"></a>  <span class="at">by =</span> <span class="st">&quot;id&quot;</span></span>
+<span id="cb826-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb826-3" tabindex="-1"></a>)</span>
+<span id="cb826-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb826-4" tabindex="-1"></a><span class="fu">str</span>(oc.ncc)</span></code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    360 obs. of  10 variables:
 ##  $ id     : int  1 8 10 12 14 28 37 41 41 42 ...
 ##  $ Set    : num  1 1 77 9 44 50 5 5 7 9 ...
@@ -715,9 +715,9 @@ latter will be divided by 10 to get more interpretable effect estimates.</li>
 </tbody>
 </table>
 <p>Convert the smoking variable into a factor.</p>
-<div class="sourceCode" id="cb826"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb826-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb826-1" tabindex="-1"></a>oc.ncc<span class="sc">$</span>smok <span class="ot">&lt;-</span> <span class="fu">factor</span>(oc.ncc<span class="sc">$</span>smok,</span>
-<span id="cb826-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb826-2" tabindex="-1"></a>  <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;never&quot;</span>, <span class="st">&quot;ex&quot;</span>, <span class="st">&quot;1-14/d&quot;</span>, <span class="st">&quot;&gt;14/d&quot;</span>)</span>
-<span id="cb826-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb826-3" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb828"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb828-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb828-1" tabindex="-1"></a>oc.ncc<span class="sc">$</span>smok <span class="ot">&lt;-</span> <span class="fu">factor</span>(oc.ncc<span class="sc">$</span>smok,</span>
+<span id="cb828-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb828-2" tabindex="-1"></a>  <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;never&quot;</span>, <span class="st">&quot;ex&quot;</span>, <span class="st">&quot;1-14/d&quot;</span>, <span class="st">&quot;&gt;14/d&quot;</span>)</span>
+<span id="cb828-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb828-3" tabindex="-1"></a>)</span></code></pre></div>
 <ul>
 <li>It is useful to start the analysis of case-control data by
 simple tabulations by the categorized risk factors.
@@ -727,12 +727,12 @@ in which matching is ignored, can be obtained as follows.
 <!-- %% on Poisson and logistic models on Saturday 23 May.  -->
 We shall focus on smoking</li>
 </ul>
-<div class="sourceCode" id="cb827"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb827-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb827-1" tabindex="-1"></a><span class="fu">stat.table</span>(</span>
-<span id="cb827-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb827-2" tabindex="-1"></a>  <span class="at">index =</span> <span class="fu">list</span>(smok, Fail),</span>
-<span id="cb827-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb827-3" tabindex="-1"></a>  <span class="at">contents =</span> <span class="fu">list</span>(<span class="fu">count</span>(), <span class="fu">percent</span>(smok)),</span>
-<span id="cb827-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb827-4" tabindex="-1"></a>  <span class="at">margins =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb827-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb827-5" tabindex="-1"></a>  <span class="at">data =</span> oc.ncc</span>
-<span id="cb827-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb827-6" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb829"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb829-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb829-1" tabindex="-1"></a><span class="fu">stat.table</span>(</span>
+<span id="cb829-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb829-2" tabindex="-1"></a>  <span class="at">index =</span> <span class="fu">list</span>(smok, Fail),</span>
+<span id="cb829-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb829-3" tabindex="-1"></a>  <span class="at">contents =</span> <span class="fu">list</span>(<span class="fu">count</span>(), <span class="fu">percent</span>(smok)),</span>
+<span id="cb829-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb829-4" tabindex="-1"></a>  <span class="at">margins =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb829-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb829-5" tabindex="-1"></a>  <span class="at">data =</span> oc.ncc</span>
+<span id="cb829-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb829-6" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>##  --------------------------------- 
 ##          ----------Fail----------- 
 ##  smok           0       1   Total  
@@ -753,8 +753,8 @@ We shall focus on smoking</li>
 ##  Total        240     120     360  
 ##             100.0   100.0   100.0  
 ##  ---------------------------------</code></pre>
-<div class="sourceCode" id="cb829"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb829-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb829-1" tabindex="-1"></a>smok.crncc <span class="ot">&lt;-</span> <span class="fu">glm</span>(Fail <span class="sc">~</span> smok, <span class="at">family =</span> binomial, <span class="at">data =</span> oc.ncc)</span>
-<span id="cb829-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb829-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(smok.crncc), <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb831"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb831-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb831-1" tabindex="-1"></a>smok.crncc <span class="ot">&lt;-</span> <span class="fu">glm</span>(Fail <span class="sc">~</span> smok, <span class="at">family =</span> binomial, <span class="at">data =</span> oc.ncc)</span>
+<span id="cb831-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb831-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(smok.crncc), <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##             exp(Est.)  2.5% 97.5%
 ## (Intercept)     0.365 0.242 0.550
 ## smokex          0.854 0.442 1.651
@@ -769,9 +769,9 @@ Also, adjustment for the other risk factors is desirable.
 In this analysis function <code>clogit()</code> in <code>survival</code> package is
 utilized. It is in fact a wrapper of function <code>coxph()</code>.</li>
 </ul>
-<div class="sourceCode" id="cb831"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb831-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb831-1" tabindex="-1"></a>m.clogit <span class="ot">&lt;-</span> <span class="fu">clogit</span>(Fail <span class="sc">~</span> smok <span class="sc">+</span> <span class="fu">I</span>(sbp <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> tchol <span class="sc">+</span></span>
-<span id="cb831-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb831-2" tabindex="-1"></a>  <span class="fu">strata</span>(Set), <span class="at">data =</span> oc.ncc)</span>
-<span id="cb831-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb831-3" tabindex="-1"></a><span class="fu">summary</span>(m.clogit)</span></code></pre></div>
+<div class="sourceCode" id="cb833"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb833-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb833-1" tabindex="-1"></a>m.clogit <span class="ot">&lt;-</span> <span class="fu">clogit</span>(Fail <span class="sc">~</span> smok <span class="sc">+</span> <span class="fu">I</span>(sbp <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> tchol <span class="sc">+</span></span>
+<span id="cb833-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb833-2" tabindex="-1"></a>  <span class="fu">strata</span>(Set), <span class="at">data =</span> oc.ncc)</span>
+<span id="cb833-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb833-3" tabindex="-1"></a><span class="fu">summary</span>(m.clogit)</span></code></pre></div>
 <pre><code>## Call:
 ## coxph(formula = Surv(rep(1, 360L), Fail) ~ smok + I(sbp/10) + 
 ##     tchol + strata(Set), data = oc.ncc, method = &quot;exact&quot;)
@@ -798,7 +798,7 @@ utilized. It is in fact a wrapper of function <code>coxph()</code>.</li>
 ## Likelihood ratio test= 28.81  on 5 df,   p=3e-05
 ## Wald test            = 24.31  on 5 df,   p=2e-04
 ## Score (logrank) test = 27.31  on 5 df,   p=5e-05</code></pre>
-<div class="sourceCode" id="cb833"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb833-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb833-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(m.clogit), <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb835"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb835-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb835-1" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">ci.exp</span>(m.clogit), <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##            exp(Est.)  2.5% 97.5%
 ## smokex         0.802 0.403 1.595
 ## smok1-14/d     1.807 1.006 3.247
@@ -819,11 +819,11 @@ The <code>id</code>-numbers of the individuals that are
 selected will be stored in vector <code>subcids</code>, and
 <code>subcind</code> is an indicator for inclusion to the subcohort.</li>
 </ul>
-<div class="sourceCode" id="cb835"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb835-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb835-1" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">1501</span></span>
-<span id="cb835-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb835-2" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">260</span></span>
-<span id="cb835-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb835-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">15792</span>)</span>
-<span id="cb835-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb835-4" tabindex="-1"></a>subcids <span class="ot">&lt;-</span> <span class="fu">sample</span>(N, n)</span>
-<span id="cb835-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb835-5" tabindex="-1"></a>oc.lexord<span class="sc">$</span>subcind <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">*</span> (oc.lexord<span class="sc">$</span>id <span class="sc">%in%</span> subcids)</span></code></pre></div>
+<div class="sourceCode" id="cb837"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb837-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb837-1" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">1501</span></span>
+<span id="cb837-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb837-2" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">260</span></span>
+<span id="cb837-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb837-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">15792</span>)</span>
+<span id="cb837-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb837-4" tabindex="-1"></a>subcids <span class="ot">&lt;-</span> <span class="fu">sample</span>(N, n)</span>
+<span id="cb837-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb837-5" tabindex="-1"></a>oc.lexord<span class="sc">$</span>subcind <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">*</span> (oc.lexord<span class="sc">$</span>id <span class="sc">%in%</span> subcids)</span></code></pre></div>
 <ul>
 <li>We form the data frame <code>oc.cc</code>
 to be used in the subsequent
@@ -832,11 +832,11 @@ and the case group from the data frame of the full cohort.
 After that we collect the data of the risk factors from the
 data storehouse for the subjects in the case-cohort data</li>
 </ul>
-<div class="sourceCode" id="cb836"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb836-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb836-1" tabindex="-1"></a>oc.cc <span class="ot">&lt;-</span> <span class="fu">subset</span>(oc.lexord, subcind <span class="sc">==</span> <span class="dv">1</span> <span class="sc">|</span> chdeath <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb836-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb836-2" tabindex="-1"></a>oc.cc <span class="ot">&lt;-</span> <span class="fu">merge</span>(oc.cc, ocX[, <span class="fu">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;smok&quot;</span>, <span class="st">&quot;tchol&quot;</span>, <span class="st">&quot;sbp&quot;</span>)],</span>
-<span id="cb836-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb836-3" tabindex="-1"></a>  <span class="at">by =</span> <span class="st">&quot;id&quot;</span></span>
-<span id="cb836-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb836-4" tabindex="-1"></a>)</span>
-<span id="cb836-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb836-5" tabindex="-1"></a><span class="fu">str</span>(oc.cc)</span></code></pre></div>
+<div class="sourceCode" id="cb838"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb838-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb838-1" tabindex="-1"></a>oc.cc <span class="ot">&lt;-</span> <span class="fu">subset</span>(oc.lexord, subcind <span class="sc">==</span> <span class="dv">1</span> <span class="sc">|</span> chdeath <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb838-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb838-2" tabindex="-1"></a>oc.cc <span class="ot">&lt;-</span> <span class="fu">merge</span>(oc.cc, ocX[, <span class="fu">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;smok&quot;</span>, <span class="st">&quot;tchol&quot;</span>, <span class="st">&quot;sbp&quot;</span>)],</span>
+<span id="cb838-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb838-3" tabindex="-1"></a>  <span class="at">by =</span> <span class="st">&quot;id&quot;</span></span>
+<span id="cb838-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb838-4" tabindex="-1"></a>)</span>
+<span id="cb838-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb838-5" tabindex="-1"></a><span class="fu">str</span>(oc.cc)</span></code></pre></div>
 <pre><code>## Classes &#39;Lexis&#39; and &#39;data.frame&#39;:    362 obs. of  21 variables:
 ##  $ id     : int  8 10 34 40 41 42 43 45 51 62 ...
 ##  $ age    : num  47.7 59.5 51.9 45.2 40.2 ...
@@ -871,20 +871,20 @@ those for subcohort cases are blue with blue bullet at exit, and
 for cases outside the subcohort the lines are red and dotted with
 red bullets at exit.</li>
 </ul>
-<div class="sourceCode" id="cb838"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb838-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb838-1" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">subset</span>(oc.cc, chdeath <span class="sc">==</span> <span class="dv">0</span>), <span class="st">&quot;age&quot;</span>)</span>
-<span id="cb838-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb838-2" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">subset</span>(oc.cc, chdeath <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> subcind <span class="sc">==</span> <span class="dv">1</span>), <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>)</span>
-<span id="cb838-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb838-3" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">subset</span>(oc.cc, chdeath <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> subcind <span class="sc">==</span> <span class="dv">0</span>), <span class="at">col =</span> <span class="st">&quot;red&quot;</span>)</span>
-<span id="cb838-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb838-4" tabindex="-1"></a><span class="fu">points</span>(<span class="fu">subset</span>(oc.cc, chdeath <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb838-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb838-5" tabindex="-1"></a>  <span class="at">pch =</span> <span class="dv">16</span>,</span>
-<span id="cb838-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb838-6" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>)[oc.cc<span class="sc">$</span>subcind <span class="sc">+</span> <span class="dv">1</span>]</span>
-<span id="cb838-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb838-7" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb840"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb840-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb840-1" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">subset</span>(oc.cc, chdeath <span class="sc">==</span> <span class="dv">0</span>), <span class="st">&quot;age&quot;</span>)</span>
+<span id="cb840-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb840-2" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">subset</span>(oc.cc, chdeath <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> subcind <span class="sc">==</span> <span class="dv">1</span>), <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>)</span>
+<span id="cb840-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb840-3" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">subset</span>(oc.cc, chdeath <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> subcind <span class="sc">==</span> <span class="dv">0</span>), <span class="at">col =</span> <span class="st">&quot;red&quot;</span>)</span>
+<span id="cb840-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb840-4" tabindex="-1"></a><span class="fu">points</span>(<span class="fu">subset</span>(oc.cc, chdeath <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb840-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb840-5" tabindex="-1"></a>  <span class="at">pch =</span> <span class="dv">16</span>,</span>
+<span id="cb840-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb840-6" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;red&quot;</span>)[oc.cc<span class="sc">$</span>subcind <span class="sc">+</span> <span class="dv">1</span>]</span>
+<span id="cb840-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb840-7" tabindex="-1"></a>)</span></code></pre></div>
 <p><img src="occoh-caco-s_files/figure-html/casecoh-lines-1.png" alt="" width="672" /></p>
 <ul>
 <li>Define the categorical smoking variable again.</li>
 </ul>
-<div class="sourceCode" id="cb839"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb839-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb839-1" tabindex="-1"></a>oc.cc<span class="sc">$</span>smok <span class="ot">&lt;-</span> <span class="fu">factor</span>(oc.cc<span class="sc">$</span>smok,</span>
-<span id="cb839-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb839-2" tabindex="-1"></a>  <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;never&quot;</span>, <span class="st">&quot;ex&quot;</span>, <span class="st">&quot;1-14/d&quot;</span>, <span class="st">&quot;&gt;14/d&quot;</span>)</span>
-<span id="cb839-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb839-3" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb841"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb841-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb841-1" tabindex="-1"></a>oc.cc<span class="sc">$</span>smok <span class="ot">&lt;-</span> <span class="fu">factor</span>(oc.cc<span class="sc">$</span>smok,</span>
+<span id="cb841-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb841-2" tabindex="-1"></a>  <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;never&quot;</span>, <span class="st">&quot;ex&quot;</span>, <span class="st">&quot;1-14/d&quot;</span>, <span class="st">&quot;&gt;14/d&quot;</span>)</span>
+<span id="cb841-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb841-3" tabindex="-1"></a>)</span></code></pre></div>
 <!-- oc.cc$cholgrp <- cut( oc.cc$tchol, br = c(2.4, 5, 6.5, 13),  -->
 <!--           include.lowest = T, right = F ) -->
 <!-- oc.cc$sbpgrp <- cut( oc.cc$sbp, br = c(95, 130, 150, 170, 240),  -->
@@ -894,13 +894,13 @@ vs. non-smokers (<span class="math inline">\(k=1\)</span>) can be obtained by t
 in the subcohort by smoking and then computing the
 relevant exposure odds ratio for each category:
 <span class="math display">\[ \text{HR}_k ^{\text{crude}} = \frac{D_k/D_1}{y_k/y_1} \]</span></p>
-<div class="sourceCode" id="cb840"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb840-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb840-1" tabindex="-1"></a>sm.cc <span class="ot">&lt;-</span> <span class="fu">stat.table</span>(</span>
-<span id="cb840-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb840-2" tabindex="-1"></a>  <span class="at">index =</span> smok,</span>
-<span id="cb840-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb840-3" tabindex="-1"></a>  <span class="at">contents =</span> <span class="fu">list</span>(<span class="at">Cases =</span> <span class="fu">sum</span>(lex.Xst), <span class="at">Pyrs =</span> <span class="fu">sum</span>(lex.dur)),</span>
-<span id="cb840-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb840-4" tabindex="-1"></a>  <span class="at">margins =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb840-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb840-5" tabindex="-1"></a>  <span class="at">data =</span> oc.cc</span>
-<span id="cb840-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb840-6" tabindex="-1"></a>)</span>
-<span id="cb840-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb840-7" tabindex="-1"></a><span class="fu">print</span>(sm.cc, <span class="at">digits =</span> <span class="fu">c</span>(<span class="at">sum =</span> <span class="dv">0</span>, <span class="at">ratio =</span> <span class="dv">1</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb842"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb842-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb842-1" tabindex="-1"></a>sm.cc <span class="ot">&lt;-</span> <span class="fu">stat.table</span>(</span>
+<span id="cb842-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb842-2" tabindex="-1"></a>  <span class="at">index =</span> smok,</span>
+<span id="cb842-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb842-3" tabindex="-1"></a>  <span class="at">contents =</span> <span class="fu">list</span>(<span class="at">Cases =</span> <span class="fu">sum</span>(lex.Xst), <span class="at">Pyrs =</span> <span class="fu">sum</span>(lex.dur)),</span>
+<span id="cb842-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb842-4" tabindex="-1"></a>  <span class="at">margins =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb842-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb842-5" tabindex="-1"></a>  <span class="at">data =</span> oc.cc</span>
+<span id="cb842-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb842-6" tabindex="-1"></a>)</span>
+<span id="cb842-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb842-7" tabindex="-1"></a><span class="fu">print</span>(sm.cc, <span class="at">digits =</span> <span class="fu">c</span>(<span class="at">sum =</span> <span class="dv">0</span>, <span class="at">ratio =</span> <span class="dv">1</span>))</span></code></pre></div>
 <pre><code>##  ------------------------- 
 ##  smok       Cases    Pyrs  
 ##  ------------------------- 
@@ -911,9 +911,9 @@ relevant exposure odds ratio for each category:
 ##                            
 ##  Total        120    5489  
 ##  -------------------------</code></pre>
-<div class="sourceCode" id="cb842"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb842-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb842-1" tabindex="-1"></a>HRcc <span class="ot">&lt;-</span> </span>
-<span id="cb842-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb842-2" tabindex="-1"></a>  (sm.cc[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">5</span>] <span class="sc">/</span> sm.cc[<span class="dv">1</span>, <span class="dv">1</span>]) <span class="sc">/</span> (sm.cc[<span class="dv">2</span>, <span class="sc">-</span><span class="dv">5</span>] <span class="sc">/</span> sm.cc[<span class="dv">2</span>, <span class="dv">1</span>])</span>
-<span id="cb842-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb842-3" tabindex="-1"></a><span class="fu">round</span>(HRcc, <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb844"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb844-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb844-1" tabindex="-1"></a>HRcc <span class="ot">&lt;-</span> </span>
+<span id="cb844-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb844-2" tabindex="-1"></a>  (sm.cc[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">5</span>] <span class="sc">/</span> sm.cc[<span class="dv">1</span>, <span class="dv">1</span>]) <span class="sc">/</span> (sm.cc[<span class="dv">2</span>, <span class="sc">-</span><span class="dv">5</span>] <span class="sc">/</span> sm.cc[<span class="dv">2</span>, <span class="dv">1</span>])</span>
+<span id="cb844-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb844-3" tabindex="-1"></a><span class="fu">round</span>(HRcc, <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##  never     ex 1-14/d  &gt;14/d 
 ##  1.000  1.081  2.006  2.211</code></pre>
 <p>Do these estimates resemble those obtained from nested case-control data?</p>
@@ -925,13 +925,13 @@ presented by Ling &amp; Ying (1993) and Barlow (1994).
 This analysis can be done using function <code>cch()</code>
 in package <code>survival</code> with <code>method = "LinYing"</code></li>
 </ul>
-<div class="sourceCode" id="cb844"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb844-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb844-1" tabindex="-1"></a>oc.cc<span class="sc">$</span>survobj <span class="ot">&lt;-</span> <span class="fu">with</span>(oc.cc, <span class="fu">Surv</span>(agentry, agexit, chdeath))</span>
-<span id="cb844-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb844-2" tabindex="-1"></a>cch.LY <span class="ot">&lt;-</span> <span class="fu">cch</span>(survobj <span class="sc">~</span> smok <span class="sc">+</span> <span class="fu">I</span>(sbp <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> tchol,</span>
-<span id="cb844-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb844-3" tabindex="-1"></a>  <span class="at">stratum =</span> <span class="cn">NULL</span>,</span>
-<span id="cb844-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb844-4" tabindex="-1"></a>  <span class="at">subcoh =</span> <span class="sc">~</span>subcind, <span class="at">id =</span> <span class="sc">~</span>id, <span class="at">cohort.size =</span> N, <span class="at">data =</span> oc.cc,</span>
-<span id="cb844-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb844-5" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;LinYing&quot;</span></span>
-<span id="cb844-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb844-6" tabindex="-1"></a>)</span>
-<span id="cb844-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb844-7" tabindex="-1"></a><span class="fu">summary</span>(cch.LY)</span></code></pre></div>
+<div class="sourceCode" id="cb846"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb846-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb846-1" tabindex="-1"></a>oc.cc<span class="sc">$</span>survobj <span class="ot">&lt;-</span> <span class="fu">with</span>(oc.cc, <span class="fu">Surv</span>(agentry, agexit, chdeath))</span>
+<span id="cb846-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb846-2" tabindex="-1"></a>cch.LY <span class="ot">&lt;-</span> <span class="fu">cch</span>(survobj <span class="sc">~</span> smok <span class="sc">+</span> <span class="fu">I</span>(sbp <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> tchol,</span>
+<span id="cb846-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb846-3" tabindex="-1"></a>  <span class="at">stratum =</span> <span class="cn">NULL</span>,</span>
+<span id="cb846-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb846-4" tabindex="-1"></a>  <span class="at">subcoh =</span> <span class="sc">~</span>subcind, <span class="at">id =</span> <span class="sc">~</span>id, <span class="at">cohort.size =</span> N, <span class="at">data =</span> oc.cc,</span>
+<span id="cb846-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb846-5" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;LinYing&quot;</span></span>
+<span id="cb846-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb846-6" tabindex="-1"></a>)</span>
+<span id="cb846-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb846-7" tabindex="-1"></a><span class="fu">summary</span>(cch.LY)</span></code></pre></div>
 <pre><code>## Case-cohort analysis,x$method, LinYing 
 ##  with subcohort of 260 from cohort of 1501 
 ## 
@@ -955,21 +955,21 @@ data on risk factors from the storehouse for the whole cohort.</p>
 <li>Let us form the data frame corresponding to the full cohort design
 and convert again smoking to be categorical.</li>
 </ul>
-<div class="sourceCode" id="cb846"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb846-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb846-1" tabindex="-1"></a>oc.full <span class="ot">&lt;-</span> <span class="fu">merge</span>(oc.lex, ocX[, <span class="fu">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;smok&quot;</span>, <span class="st">&quot;tchol&quot;</span>, <span class="st">&quot;sbp&quot;</span>)],</span>
-<span id="cb846-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb846-2" tabindex="-1"></a>  <span class="at">by.x =</span> <span class="st">&quot;id&quot;</span>, <span class="at">by.y =</span> <span class="st">&quot;id&quot;</span></span>
-<span id="cb846-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb846-3" tabindex="-1"></a>)</span>
-<span id="cb846-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb846-4" tabindex="-1"></a>oc.full<span class="sc">$</span>smok <span class="ot">&lt;-</span> <span class="fu">factor</span>(oc.full<span class="sc">$</span>smok,</span>
-<span id="cb846-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb846-5" tabindex="-1"></a>  <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;never&quot;</span>, <span class="st">&quot;ex&quot;</span>, <span class="st">&quot;1-14/d&quot;</span>, <span class="st">&quot;&gt;14/d&quot;</span>)</span>
-<span id="cb846-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb846-6" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb848"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb848-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb848-1" tabindex="-1"></a>oc.full <span class="ot">&lt;-</span> <span class="fu">merge</span>(oc.lex, ocX[, <span class="fu">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;smok&quot;</span>, <span class="st">&quot;tchol&quot;</span>, <span class="st">&quot;sbp&quot;</span>)],</span>
+<span id="cb848-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb848-2" tabindex="-1"></a>  <span class="at">by.x =</span> <span class="st">&quot;id&quot;</span>, <span class="at">by.y =</span> <span class="st">&quot;id&quot;</span></span>
+<span id="cb848-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb848-3" tabindex="-1"></a>)</span>
+<span id="cb848-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb848-4" tabindex="-1"></a>oc.full<span class="sc">$</span>smok <span class="ot">&lt;-</span> <span class="fu">factor</span>(oc.full<span class="sc">$</span>smok,</span>
+<span id="cb848-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb848-5" tabindex="-1"></a>  <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;never&quot;</span>, <span class="st">&quot;ex&quot;</span>, <span class="st">&quot;1-14/d&quot;</span>, <span class="st">&quot;&gt;14/d&quot;</span>)</span>
+<span id="cb848-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb848-6" tabindex="-1"></a>)</span></code></pre></div>
 <p>Juts for comparison with the corresponding analysis in case-cohort data
 perform a similar crude estimation of hazard ratios associated with smoking.</p>
-<div class="sourceCode" id="cb847"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb847-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb847-1" tabindex="-1"></a>sm.coh <span class="ot">&lt;-</span> <span class="fu">stat.table</span>(</span>
-<span id="cb847-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb847-2" tabindex="-1"></a>  <span class="at">index =</span> smok,</span>
-<span id="cb847-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb847-3" tabindex="-1"></a>  <span class="at">contents =</span> <span class="fu">list</span>(<span class="at">Cases =</span> <span class="fu">sum</span>(lex.Xst), <span class="at">Pyrs =</span> <span class="fu">sum</span>(lex.dur)),</span>
-<span id="cb847-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb847-4" tabindex="-1"></a>  <span class="at">margins =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb847-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb847-5" tabindex="-1"></a>  <span class="at">data =</span> oc.full</span>
-<span id="cb847-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb847-6" tabindex="-1"></a>)</span>
-<span id="cb847-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb847-7" tabindex="-1"></a><span class="fu">print</span>(sm.coh, <span class="at">digits =</span> <span class="fu">c</span>(<span class="at">sum =</span> <span class="dv">0</span>, <span class="at">ratio =</span> <span class="dv">1</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb849"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb849-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb849-1" tabindex="-1"></a>sm.coh <span class="ot">&lt;-</span> <span class="fu">stat.table</span>(</span>
+<span id="cb849-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb849-2" tabindex="-1"></a>  <span class="at">index =</span> smok,</span>
+<span id="cb849-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb849-3" tabindex="-1"></a>  <span class="at">contents =</span> <span class="fu">list</span>(<span class="at">Cases =</span> <span class="fu">sum</span>(lex.Xst), <span class="at">Pyrs =</span> <span class="fu">sum</span>(lex.dur)),</span>
+<span id="cb849-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb849-4" tabindex="-1"></a>  <span class="at">margins =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb849-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb849-5" tabindex="-1"></a>  <span class="at">data =</span> oc.full</span>
+<span id="cb849-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb849-6" tabindex="-1"></a>)</span>
+<span id="cb849-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb849-7" tabindex="-1"></a><span class="fu">print</span>(sm.coh, <span class="at">digits =</span> <span class="fu">c</span>(<span class="at">sum =</span> <span class="dv">0</span>, <span class="at">ratio =</span> <span class="dv">1</span>))</span></code></pre></div>
 <pre><code>##  ------------------------- 
 ##  smok       Cases    Pyrs  
 ##  ------------------------- 
@@ -980,18 +980,18 @@ perform a similar crude estimation of hazard ratios associated with smoking.</p>
 ##                            
 ##  Total        120   25281  
 ##  -------------------------</code></pre>
-<div class="sourceCode" id="cb849"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb849-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb849-1" tabindex="-1"></a>HRcoh <span class="ot">&lt;-</span> </span>
-<span id="cb849-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb849-2" tabindex="-1"></a>  (sm.coh[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">5</span>] <span class="sc">/</span> sm.coh[<span class="dv">1</span>, <span class="dv">1</span>]) <span class="sc">/</span> (sm.coh[<span class="dv">2</span>, <span class="sc">-</span><span class="dv">5</span>] <span class="sc">/</span> sm.coh[<span class="dv">2</span>, <span class="dv">1</span>])</span>
-<span id="cb849-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb849-3" tabindex="-1"></a><span class="fu">round</span>(HRcoh, <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb851"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb851-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb851-1" tabindex="-1"></a>HRcoh <span class="ot">&lt;-</span> </span>
+<span id="cb851-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb851-2" tabindex="-1"></a>  (sm.coh[<span class="dv">1</span>, <span class="sc">-</span><span class="dv">5</span>] <span class="sc">/</span> sm.coh[<span class="dv">1</span>, <span class="dv">1</span>]) <span class="sc">/</span> (sm.coh[<span class="dv">2</span>, <span class="sc">-</span><span class="dv">5</span>] <span class="sc">/</span> sm.coh[<span class="dv">2</span>, <span class="dv">1</span>])</span>
+<span id="cb851-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb851-3" tabindex="-1"></a><span class="fu">round</span>(HRcoh, <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##  never     ex 1-14/d  &gt;14/d 
 ##  1.000  1.302  2.248  2.468</code></pre>
 <ul>
 <li>Fit now the ordinary Cox model to the full cohort. There is no need
 to employ extra tricks upon the ordinary <code>coxph()</code> fit.</li>
 </ul>
-<div class="sourceCode" id="cb851"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb851-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb851-1" tabindex="-1"></a>cox.coh <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(agentry, agexit, chdeath) <span class="sc">~</span></span>
-<span id="cb851-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb851-2" tabindex="-1"></a>  smok <span class="sc">+</span> <span class="fu">I</span>(sbp <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> tchol, <span class="at">data =</span> oc.full)</span>
-<span id="cb851-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb851-3" tabindex="-1"></a><span class="fu">summary</span>(cox.coh)</span></code></pre></div>
+<div class="sourceCode" id="cb853"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb853-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb853-1" tabindex="-1"></a>cox.coh <span class="ot">&lt;-</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(agentry, agexit, chdeath) <span class="sc">~</span></span>
+<span id="cb853-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb853-2" tabindex="-1"></a>  smok <span class="sc">+</span> <span class="fu">I</span>(sbp <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> tchol, <span class="at">data =</span> oc.full)</span>
+<span id="cb853-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb853-3" tabindex="-1"></a><span class="fu">summary</span>(cox.coh)</span></code></pre></div>
 <pre><code>## Call:
 ## coxph(formula = Surv(agentry, agexit, chdeath) ~ smok + I(sbp/10) + 
 ##     tchol, data = oc.full)
@@ -1022,22 +1022,22 @@ to employ extra tricks upon the ordinary <code>coxph()</code> fit.</li>
 <li>Lastly, a comparison of the point estimates and standard errors between
 the different designs, including variants of analysis for the case-cohort design, can be performed.</li>
 </ul>
-<div class="sourceCode" id="cb853"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb853-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb853-1" tabindex="-1"></a>betas <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="fu">coef</span>(cox.coh), <span class="fu">coef</span>(m.clogit), <span class="fu">coef</span>(cch.LY))</span>
-<span id="cb853-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb853-2" tabindex="-1"></a><span class="fu">colnames</span>(betas) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;coh&quot;</span>, <span class="st">&quot;ncc&quot;</span>, <span class="st">&quot;cch.LY&quot;</span>)</span>
-<span id="cb853-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb853-3" tabindex="-1"></a><span class="fu">round</span>(betas, <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb855"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb855-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb855-1" tabindex="-1"></a>betas <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="fu">coef</span>(cox.coh), <span class="fu">coef</span>(m.clogit), <span class="fu">coef</span>(cch.LY))</span>
+<span id="cb855-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb855-2" tabindex="-1"></a><span class="fu">colnames</span>(betas) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;coh&quot;</span>, <span class="st">&quot;ncc&quot;</span>, <span class="st">&quot;cch.LY&quot;</span>)</span>
+<span id="cb855-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb855-3" tabindex="-1"></a><span class="fu">round</span>(betas, <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##              coh    ncc cch.LY
 ## smokex     0.110 -0.221 -0.096
 ## smok1-14/d 0.726  0.592  0.769
 ## smok&gt;14/d  0.951  0.566  1.085
 ## I(sbp/10)  0.144  0.112  0.218
 ## tchol      0.265  0.401  0.350</code></pre>
-<div class="sourceCode" id="cb855"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb855-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb855-1" tabindex="-1"></a>SEs <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
-<span id="cb855-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb855-2" tabindex="-1"></a>  <span class="fu">sqrt</span>(<span class="fu">diag</span>(cox.coh<span class="sc">$</span>var)),</span>
-<span id="cb855-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb855-3" tabindex="-1"></a>  <span class="fu">sqrt</span>(<span class="fu">diag</span>(m.clogit<span class="sc">$</span>var)),</span>
-<span id="cb855-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb855-4" tabindex="-1"></a>  <span class="fu">sqrt</span>(<span class="fu">diag</span>(cch.LY<span class="sc">$</span>var))</span>
-<span id="cb855-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb855-5" tabindex="-1"></a>)</span>
-<span id="cb855-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb855-6" tabindex="-1"></a><span class="fu">colnames</span>(SEs) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(betas)</span>
-<span id="cb855-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb855-7" tabindex="-1"></a><span class="fu">round</span>(SEs, <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb857"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb857-1"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb857-1" tabindex="-1"></a>SEs <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
+<span id="cb857-2"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb857-2" tabindex="-1"></a>  <span class="fu">sqrt</span>(<span class="fu">diag</span>(cox.coh<span class="sc">$</span>var)),</span>
+<span id="cb857-3"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb857-3" tabindex="-1"></a>  <span class="fu">sqrt</span>(<span class="fu">diag</span>(m.clogit<span class="sc">$</span>var)),</span>
+<span id="cb857-4"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb857-4" tabindex="-1"></a>  <span class="fu">sqrt</span>(<span class="fu">diag</span>(cch.LY<span class="sc">$</span>var))</span>
+<span id="cb857-5"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb857-5" tabindex="-1"></a>)</span>
+<span id="cb857-6"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb857-6" tabindex="-1"></a><span class="fu">colnames</span>(SEs) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(betas)</span>
+<span id="cb857-7"><a href="nested-case-control-study-and-case-cohort-study-risk-factors-of-coronary-heart-disease.html#cb857-7" tabindex="-1"></a><span class="fu">round</span>(SEs, <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##              coh   ncc cch.LY
 ## smokex     0.292 0.351  0.350
 ## smok1-14/d 0.237 0.299  0.308

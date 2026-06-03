@@ -146,7 +146,7 @@
 \makeatother
 \subtitle{SPE practicals}
 \author{Krista Fischer\footnote{Estonian Genome Center, University of Tartu, Estonia, \href{mailto:Krista.Fischer@ut.ee}{\nolinkurl{Krista.Fischer@ut.ee}}} \and Martyn Plummer\footnote{University of Warwick, UK, \href{mailto:martyn.plummer@warwick.ac.uk}{\nolinkurl{martyn.plummer@warwick.ac.uk}}} \and Janne Pitkäniemi\footnote{Finnish Cancer Registry, Helsinki, Finland, \href{mailto:janne.pitkaniemi@cancer.fi}{\nolinkurl{janne.pitkaniemi@cancer.fi}}} \and Bendix Carstensen\footnote{Steno Diabetes Center Copenhagen, Gentofte, Denmark, Dept. of Biostatistics, University of Copenhagen, Denmark, \href{mailto:b@bxc.dk}{\nolinkurl{b@bxc.dk}}, \url{http://BendixCarstensen.com}} \and Damien Georges\footnote{International Agency for Research on Cancer, Lyon, France, \href{mailto:georgesd@iarc.who.int}{\nolinkurl{georgesd@iarc.who.int}}} \and Esa Läärä\footnote{Department of Mathematical Sciences, University of Oulu, Finland, \href{mailto:Esa.Laara@oulu.fi}{\nolinkurl{Esa.Laara@oulu.fi}}, \url{http://www.oulu.fi/university/researcher/esa-laara}}}
-\date{1-5 June 2026 (built 03 June 2026 14:12 UTC)}
+\date{1-5 June 2026 (built 03 June 2026 15:52 UTC)}
 
 \begin{document}
 \maketitle
@@ -5014,7 +5014,10 @@ The \texttt{R} commands to generate the data are:
 \item
   Adjusted for sex and blood pressure
 \item
-  What would be the conclusions on the effect of beer on weight, based on the three models? Do they agree? Which (if any) of the models gives an unbiased estimate of the actual causal effect of interest? (Note - for the estimated coefficient of beer, 0 should be included in the confidence interval - there is just one model where that is true)
+  What would be the conclusions on the effect of beer on weight, based on the three models? Do they agree? Which (if any) of the models gives an unbiased estimate of the actual causal effect of interest?
+\end{itemize}
+
+\begin{itemize}
 \item
   How can the answer be seen from the graph?
 \item
@@ -5190,6 +5193,146 @@ Now, the following script generates a dataset:
 \end{Shaded}
 
 \textbf{Exercise:} Using linear models, try to identify, which of the three DAGs has been used to generate the data.
+
+\emph{Idea:} If you adjust for appropriate confounders for a given DAG, you should see no effect of X on Y.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{adjustmentSets}\NormalTok{(g1,}\StringTok{"X"}\NormalTok{,}\StringTok{"Y"}\NormalTok{, }\AttributeTok{effect=}\StringTok{"direct"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\#\# \{ W, Z \}}
+\NormalTok{\#\# \{ U, W \}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(}\FunctionTok{lm}\NormalTok{(Y}\SpecialCharTok{\textasciitilde{}}\NormalTok{X}\SpecialCharTok{+}\NormalTok{W}\SpecialCharTok{+}\NormalTok{Z,}\AttributeTok{data=}\NormalTok{dat))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\#\# }
+\NormalTok{\#\# Call:}
+\NormalTok{\#\# lm(formula = Y \textasciitilde{} X + W + Z, data = dat)}
+\NormalTok{\#\# }
+\NormalTok{\#\# Residuals:}
+\NormalTok{\#\#    Min     1Q Median     3Q    Max }
+\NormalTok{\#\# {-}3.989 {-}0.744  0.010  0.766  3.593 }
+\NormalTok{\#\# }
+\NormalTok{\#\# Coefficients:}
+\NormalTok{\#\#             Estimate Std. Error t value Pr(\textgreater{}|t|)    }
+\NormalTok{\#\# (Intercept)  0.03317    0.02455    1.35     0.18    }
+\NormalTok{\#\# X           {-}0.00169    0.01488   {-}0.11     0.91    }
+\NormalTok{\#\# W           {-}2.59961    0.03199  {-}81.27   \textless{}2e{-}16 ***}
+\NormalTok{\#\# Z            1.01417    0.02120   47.85   \textless{}2e{-}16 ***}
+\NormalTok{\#\# {-}{-}{-}}
+\NormalTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
+\NormalTok{\#\# }
+\NormalTok{\#\# Residual standard error: 1.1 on 1996 degrees of freedom}
+\NormalTok{\#\# Multiple R{-}squared:  0.969,  Adjusted R{-}squared:  0.969 }
+\NormalTok{\#\# F{-}statistic: 2.05e+04 on 3 and 1996 DF,  p{-}value: \textless{}2e{-}16}
+\end{Highlighting}
+\end{Shaded}
+
+The DAG would be possible, if there is not effect of X.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{adjustmentSets}\NormalTok{(g2,}\StringTok{"X"}\NormalTok{,}\StringTok{"Y"}\NormalTok{, }\AttributeTok{effect=}\StringTok{"direct"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\#\# \{ Z \}}
+\NormalTok{\#\# \{ U \}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(}\FunctionTok{lm}\NormalTok{(Y}\SpecialCharTok{\textasciitilde{}}\NormalTok{X}\SpecialCharTok{+}\NormalTok{Z,}\AttributeTok{data=}\NormalTok{dat))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\#\# }
+\NormalTok{\#\# Call:}
+\NormalTok{\#\# lm(formula = Y \textasciitilde{} X + Z, data = dat)}
+\NormalTok{\#\# }
+\NormalTok{\#\# Residuals:}
+\NormalTok{\#\#    Min     1Q Median     3Q    Max }
+\NormalTok{\#\# {-}7.480 {-}1.568 {-}0.107  1.580  8.730 }
+\NormalTok{\#\# }
+\NormalTok{\#\# Coefficients:}
+\NormalTok{\#\#             Estimate Std. Error t value Pr(\textgreater{}|t|)    }
+\NormalTok{\#\# (Intercept)   0.1007     0.0509    1.98    0.048 *  }
+\NormalTok{\#\# X             1.1314     0.0108  105.04   \textless{}2e{-}16 ***}
+\NormalTok{\#\# Z             2.3803     0.0268   88.83   \textless{}2e{-}16 ***}
+\NormalTok{\#\# {-}{-}{-}}
+\NormalTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
+\NormalTok{\#\# }
+\NormalTok{\#\# Residual standard error: 2.28 on 1997 degrees of freedom}
+\NormalTok{\#\# Multiple R{-}squared:  0.865,  Adjusted R{-}squared:  0.865 }
+\NormalTok{\#\# F{-}statistic: 6.39e+03 on 2 and 1997 DF,  p{-}value: \textless{}2e{-}16}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{adjustmentSets}\NormalTok{(g3,}\StringTok{"X"}\NormalTok{,}\StringTok{"Y"}\NormalTok{, }\AttributeTok{effect=}\StringTok{"direct"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\#\# \{ Q, W, Z \}}
+\NormalTok{\#\# \{ Q, U, W \}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(}\FunctionTok{lm}\NormalTok{(Y}\SpecialCharTok{\textasciitilde{}}\NormalTok{X}\SpecialCharTok{+}\NormalTok{Q}\SpecialCharTok{+}\NormalTok{W}\SpecialCharTok{+}\NormalTok{Z,}\AttributeTok{data=}\NormalTok{dat))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\#\# }
+\NormalTok{\#\# Call:}
+\NormalTok{\#\# lm(formula = Y \textasciitilde{} X + Q + W + Z, data = dat)}
+\NormalTok{\#\# }
+\NormalTok{\#\# Residuals:}
+\NormalTok{\#\#    Min     1Q Median     3Q    Max }
+\NormalTok{\#\# {-}3.721 {-}0.642  0.003  0.660  3.199 }
+\NormalTok{\#\# }
+\NormalTok{\#\# Coefficients:}
+\NormalTok{\#\#             Estimate Std. Error t value Pr(\textgreater{}|t|)    }
+\NormalTok{\#\# (Intercept)  0.01958    0.02217    0.88     0.38    }
+\NormalTok{\#\# X           {-}0.00604    0.01343   {-}0.45     0.65    }
+\NormalTok{\#\# Q            1.07188    0.05024   21.33   \textless{}2e{-}16 ***}
+\NormalTok{\#\# W           {-}3.03339    0.03531  {-}85.90   \textless{}2e{-}16 ***}
+\NormalTok{\#\# Z            1.00354    0.01914   52.44   \textless{}2e{-}16 ***}
+\NormalTok{\#\# {-}{-}{-}}
+\NormalTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
+\NormalTok{\#\# }
+\NormalTok{\#\# Residual standard error: 0.99 on 1995 degrees of freedom}
+\NormalTok{\#\# Multiple R{-}squared:  0.974,  Adjusted R{-}squared:  0.974 }
+\NormalTok{\#\# F{-}statistic: 1.9e+04 on 4 and 1995 DF,  p{-}value: \textless{}2e{-}16}
+\end{Highlighting}
+\end{Shaded}
+
+You have probably seen that one of the three DAGs is definitely wrong for the data. But what about two others? If you are unsure, try to think of a different model to fit - you may use another dependent variable than Y (see solutions for one option).
+
+If you have made your decision, you may check the script `gendata.r' to see, whether your guess was right.
 
 If you have made your decision, you may check the script `gendata.r' to see, whether your guess was right.
 
@@ -5668,8 +5811,8 @@ The dataset contains the following variables:
 
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.3194}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.6806}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Variable
@@ -5893,8 +6036,8 @@ Now, plot Kaplan--Meier curves jointly classified by sex and age.
 \end{Highlighting}
 \end{Shaded}
 
-In each age band the mortality curve for males is on a higher level than
-that for females.
+In each age band the mortality curve for males is on a higher level
+than that for females.
 
 \section{Event-specific cumulative mortality curves}\label{event-specific-cumulative-mortality-curves}
 
@@ -6224,6 +6367,7 @@ detailed explanation of these tools will be given by Bendix later.
 \NormalTok{  ),}
   \AttributeTok{data =}\NormalTok{ orca}
 \NormalTok{)}
+\FunctionTok{summary}\NormalTok{(orca.lex)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6236,7 +6380,7 @@ detailed explanation of these tools will be given by Bendix later.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{boxes}\NormalTok{(orca.lex,}\AttributeTok{boxpos =} \ConstantTok{TRUE}\NormalTok{,}\AttributeTok{show.BE =} \ConstantTok{TRUE}\NormalTok{,}\AttributeTok{scale.R=}\DecValTok{1000}\NormalTok{)}
+\FunctionTok{boxes}\NormalTok{(orca.lex,}\AttributeTok{boxpos =} \ConstantTok{TRUE}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8044,33 +8188,6 @@ variables with linear effects in the models.
   below.
 \end{enumerate}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{diagram }\OtherTok{\textless{}{-}}
-  \FunctionTok{dagitty}\NormalTok{(}\StringTok{"dag \{}
-\StringTok{  Z2 {-}\textgreater{} Z3 {-}\textgreater{} Y}
-\StringTok{  Z2 {-}\textgreater{} Z4 {-}\textgreater{} Y}
-\StringTok{  Z2 {-}\textgreater{} Y}
-\StringTok{  Z2 {-}\textgreater{} Z3 {-}\textgreater{} X}
-\StringTok{  Z2 {-}\textgreater{} Z4 {-}\textgreater{} X}
-\StringTok{  Z2 {-}\textgreater{} X}
-\StringTok{  Z1 {-}\textgreater{} Z3 {-}\textgreater{} Y}
-\StringTok{  Z1 {-}\textgreater{} Z4 {-}\textgreater{} Y}
-\StringTok{  Z1 {-}\textgreater{} Y}
-\StringTok{  Z1 {-}\textgreater{} Z3 {-}\textgreater{} X}
-\StringTok{  Z1 {-}\textgreater{} Z4 {-}\textgreater{} X}
-\StringTok{\}"}\NormalTok{)}
-
-\FunctionTok{coordinates}\NormalTok{(diagram) }\OtherTok{\textless{}{-}}
-  \FunctionTok{list}\NormalTok{(}
-    \AttributeTok{x =} \FunctionTok{c}\NormalTok{(}\AttributeTok{X =} \DecValTok{1}\NormalTok{, }\AttributeTok{Y =} \DecValTok{5}\NormalTok{, }\AttributeTok{Z1 =} \DecValTok{5}\NormalTok{, }\AttributeTok{Z2 =} \DecValTok{1}\NormalTok{, }\AttributeTok{Z3 =} \DecValTok{4}\NormalTok{, }\AttributeTok{Z4 =} \DecValTok{2}\NormalTok{),}
-    \AttributeTok{y =} \FunctionTok{c}\NormalTok{(}\AttributeTok{X =} \DecValTok{2}\NormalTok{, }\AttributeTok{Y =} \DecValTok{2}\NormalTok{, }\AttributeTok{Z1 =} \DecValTok{0}\NormalTok{, }\AttributeTok{Z2 =} \DecValTok{0}\NormalTok{, }\AttributeTok{Z3 =} \DecValTok{1}\NormalTok{, }\AttributeTok{Z4 =} \DecValTok{1}\NormalTok{)}
-\NormalTok{  )}
-
-\FunctionTok{plot}\NormalTok{(diagram)}
-\end{Highlighting}
-\end{Shaded}
-
 \pandocbounded{\includegraphics[keepaspectratio]{SPE-R-2026-practicals_files/SPE-R-2026-practicals_files/figure-latex/dagitty-1.pdf}}
 
 \begin{enumerate}
@@ -8120,18 +8237,6 @@ effect of which appears weaker in the outcome model.
   all backdoor paths between \(X\) and \(Y\) and thus remove confounding?
 \item
   Look what dagitty offers for sufficient sets:
-\end{enumerate}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{adjustmentSets}\NormalTok{(diagram, }\AttributeTok{exposure=}\StringTok{"X"}\NormalTok{, }\AttributeTok{outcome=}\StringTok{"Y"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{2}
-\tightlist
 \item
   Even though we have a sufficient set as claimed above, why it still
   might be useful to include covariate \(Z_1\), too, when modelling the
@@ -8333,7 +8438,7 @@ those estimands.
 The group sizes are very different; only 16 \% of the patients were
 exposed to radiotherapy only.
 
-The statistical precision in any comparison between the exposure groups
+The Statistical precision in any comparison between the exposure groups
 based on the sample data is very much dominated by the smallest count in
 this fourfold table, i.e.~the number of non-cases among the exposed,
 which is not very big.
@@ -8349,16 +8454,13 @@ or counterfactual risks \(E(Y^{X=x}), x=0,1\), are marginal expectations
 of the above quantities, standardized over the joint distribution of the
 confounders \(Z\) in the target population.
 \[ E(Y^{X=x}) = E_Z[E(Y|X=x,Z)]
-       = \sum_z P(Y=1|X=x, Z=z)P(Z=z), \quad x=0,1, \]
-in which \(E_Z[\dots]\) is a general expression for the marginal
-expectation and \(\sum_z \dots\) provides the formula for the special
-case of a binary outcome \(Y\) and a categorical covariate \(Z\).
+       = \int E(Y|X=x, Z=z)dF_Z(z), \quad x=0,1. \]
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  Assume now a \textbf{slightly misspecified} model \texttt{mY} for the outcome,
+  Assume now a \emph{slightly misspecified} model \texttt{mY} for the outcome,
   which contains only the main effect terms of the explanatory
   variables:
   \[ \pi_i = E(Y_i|X_i=x_i, Z_{i1}=z_{i1}, \dots, Z_{i4}=z_{i4}) =
@@ -8385,23 +8487,22 @@ ignored the product term \(Z_2 Z_4\).
 \tightlist
 \item
   For each subject \(i\), compute the \textbf{fitted individual risk}
-  \(\widehat{Y_i}\) saved into variable \texttt{yh} (actually these will not be
-  needed until the end of this practical!) as well as the
-  \textbf{predicted potential (counterfactual) risks}
-  \(\widetilde{Y_i}^{X_i=x}\) saved into \texttt{yp1} and \texttt{yp0} for exposure
-  levels \(x=0,1\), respectively, keeping the individual values of the
-  \(Z\)-variables as they are in the observed data.
+  \(\widehat{Y_i}\) (which actually will be needed not until the end of
+  this practical!) as well as the \textbf{predicted potential
+  (counterfactual) risks} \(\widetilde{Y_i}^{X_i=x}\) for both exposure
+  levels \(x=0,1\) separately, keeping the individual values of the
+  \(Z\)-variables as they are observed.
 \end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{pop}\SpecialCharTok{$}\NormalTok{yh }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(mY, }\AttributeTok{type =} \StringTok{"response"}\NormalTok{)  }\CommentTok{\#  fitted risk}
+\NormalTok{pop}\SpecialCharTok{$}\NormalTok{yh }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(mY, }\AttributeTok{type =} \StringTok{"response"}\NormalTok{) }\CommentTok{\#  fitted values}
 \NormalTok{pop}\SpecialCharTok{$}\NormalTok{yp1 }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(mY, }\AttributeTok{newdata =} \FunctionTok{data.frame}\NormalTok{(}
-  \AttributeTok{x =} \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, N),      }\CommentTok{\# predicted risk assuming x=1, i.e. "if exposed"}
+  \AttributeTok{x =} \FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, N), }\CommentTok{\# x=1}
 \NormalTok{  pop[, }\FunctionTok{c}\NormalTok{(}\StringTok{"z1"}\NormalTok{, }\StringTok{"z2"}\NormalTok{, }\StringTok{"z3"}\NormalTok{, }\StringTok{"z4"}\NormalTok{)]}
 \NormalTok{), }\AttributeTok{type =} \StringTok{"response"}\NormalTok{)}
 \NormalTok{pop}\SpecialCharTok{$}\NormalTok{yp0 }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(mY, }\AttributeTok{newdata =} \FunctionTok{data.frame}\NormalTok{(}
-  \AttributeTok{x =} \FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, N),      }\CommentTok{\# predicted risk assuming x=0, i.e. "if unexposed"}
+  \AttributeTok{x =} \FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, N), }\CommentTok{\# x=0}
 \NormalTok{  pop[, }\FunctionTok{c}\NormalTok{(}\StringTok{"z1"}\NormalTok{, }\StringTok{"z2"}\NormalTok{, }\StringTok{"z3"}\NormalTok{, }\StringTok{"z4"}\NormalTok{)]}
 \NormalTok{), }\AttributeTok{type =} \StringTok{"response"}\NormalTok{)}
 \end{Highlighting}
@@ -8429,11 +8530,11 @@ ignored the product term \(Z_2 Z_4\).
 \end{Shaded}
 
 \emph{Comment}: The joint distribution of the confounders \(Z\) in the target
-population is here manifested in the actual distribution of the data in
+population is here represented by the actual distribution of the data in
 that population. Thus, marginal expectations \(E_Z[E(X=x, Z)]\) are
 obtained by simple computation of the arithmetic means of the
 individually predicted values \(\widetilde{Y_i}^{X_i=x}\) of the outcome
-for the two exposure levels in this population.
+for the two exposure levels.
 
 Compare the estimated contrasts with those obtained from applying the
 true model (RD = 0.1743) in item 4.4 above. How big is the bias due to
@@ -8458,8 +8559,8 @@ the logistic model. Which one is closer to 1?
   results are saved into a list, for which we give the name \texttt{mY.std}.
 \end{enumerate}
 
-The main results are shown in four small windows
-after applying the \texttt{print} method on \texttt{mY.std}
+The main results are shown in four small windows\\
+after applying the basic print method on \texttt{mY.std}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -8479,8 +8580,7 @@ The point estimates seem to be well within a resonable error margin when
 compared to those, which you got by explicit computations for the whole
 population data (e.g.~RD=0.1828) in the previous item. (You could also
 run \texttt{standardize\_glm()} with \texttt{data=pop} to convince yourself that
-\texttt{stdReg2} indeed provides the same point estimates as obtained above
-for the whole population from model\texttt{mY}).
+\texttt{stdReg2\textquotesingle{}\ indeed\ provides\ the\ same\ point\ estimates\ \ as\ obtained\ above\ for\ the\ whole\ population\ from\ model}mY`).
 
 In \texttt{stdReg2}, the standard errors are obtained by the multivariate delta
 method built upon M-estimation (\href{https://doi.org/10.1198/000313002753631330}{Stefanski \& Boos
@@ -8563,8 +8663,8 @@ and they are introduced in the next section.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{pop}\SpecialCharTok{$}\NormalTok{w }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(pop}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{==} \DecValTok{1}\NormalTok{, }\DecValTok{1} \SpecialCharTok{/}\NormalTok{ pop}\SpecialCharTok{$}\NormalTok{PS, }
-                            \DecValTok{1} \SpecialCharTok{/}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ pop}\SpecialCharTok{$}\NormalTok{PS))}
+\NormalTok{pop}\SpecialCharTok{$}\NormalTok{w }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(pop}\SpecialCharTok{$}\NormalTok{x }\SpecialCharTok{==} \DecValTok{1}\NormalTok{, }
+                     \DecValTok{1} \SpecialCharTok{/}\NormalTok{ pop}\SpecialCharTok{$}\NormalTok{PS, }\DecValTok{1} \SpecialCharTok{/}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ pop}\SpecialCharTok{$}\NormalTok{PS))}
 \FunctionTok{with}\NormalTok{(pop, }\FunctionTok{tapply}\NormalTok{(w, x, sum))}
 \end{Highlighting}
 \end{Shaded}
@@ -8598,8 +8698,7 @@ and they are introduced in the next section.
 These results seem to be practically equal to the true values (e.g.~true
 RD=0.1743).
 
-\emph{Comment}: If you apply the package \texttt{PSweight} introduced in the next
-section but
+\emph{Comment}: If you apply the methods introduced in the next section but
 use the whole population data, i.e.~putting \texttt{data=pop}, you would see
 that the estimates of the causal contrasts would be the same as obtained
 here.
@@ -8609,8 +8708,8 @@ here.
 We shall now try IPW-estimation with a misspecified model, such that we
 include all \(Z\)-variables but none of their pairwise interactions. We do
 this on the sample data only. In computations we utilize the R package
-\texttt{PSweight}
-(see \href{https://cran.rstudio.com/web//packages/PSweight/vignettes/Software_vig.pdf}{PSweight vignette}).
+\texttt{PSweight} (see \href{https://cran.rstudio.com/web//packages/PSweight/vignettes/Software_vig.pdf}{PSweight
+vignette}).
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -8646,7 +8745,7 @@ overlap (or equipoise) population'' (ATO).
   the distribution of the propensity scores. First we draw density
   plots showing, how well the distributions of propensity scores (and
   1 - PS, too) are overlapping between the exposure groups -- \textbf{NB.}
-  You may get a warning about usage of a
+  You may get a warning about usage of a\\
   \texttt{ggplot2} aesthetic in the density plot implemented in \texttt{PSweight},
   this feature being now outdated in the newest version of \texttt{ggplot2}.
   Nonetheless, the density plot will after all be drawn, if you go
@@ -8687,8 +8786,8 @@ Are the distributions of the propensity scores very different?
 
 In this plot, it would be desirable that the horisontal values of the
 standardized mean differences for a given type of weights are less than
-0.1. -- There seems to be some issue with the balance with regard to
-the estimation of our target parameters based on this exposure model.
+0.1. -- There seems to be some issue with the balance in the estimation
+of our target parameters based on this exposure model.
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -8699,7 +8798,7 @@ the estimation of our target parameters based on this exposure model.
   \texttt{IPW} when estimating the causal effect generalized to the whole
   target population. For relative contrasts, the summary method
   provides the results on the log-scale; therefore
-  exp-transformation.
+  \(\exp\)-transformation.
 \end{enumerate}
 
 \begin{Shaded}
@@ -8816,14 +8915,14 @@ and with the true contrasts above.
 
 We may try to reduce the bias in the estimation of the target
 parameters, which would be caused by possible specification error either
-in the outcome model or in the exposure model using some
-\textbf{double robust} (DR) approach. These methods combine the principle of
+in the outcome model or in the exposure model using some \textbf{double
+robust} (DR) approach. These methods combine the principle of
 regression standardization with that of IPW/propensity scores.
 
-A classical DR method is \textbf{augmented IPW estimation} (AIPW), in which the
-estimator can be expressed in two alternative ways: either a
-regression-standardized estimator corrected by IPW, or
-an IPW-estimator corrected by standardization.
+A classical DR method is \emph{augmented IPW estimation} (AIPW), in which the
+estimator can be expressed in two alternative ways: either an
+IPW-corrected g-formula estimator, or an IPW-estimator corrected by
+standardization.
 
 \[\begin{aligned}
  \widehat{E}_a(Y^{X=x}) 
@@ -8926,8 +9025,8 @@ when applying AIPW estimation.
 
 It may not be easy to specify a conventional generalized linear models
 or even a generalized additive model for exposure and outcome, which
-would be
-sufficiently realistic, but not suffering from overfitting. Modern
+would be\\
+sufficiently realistic, yet not suffering from overfitting. Modern
 approaches of \textbf{statistical learning}, a.k.a. ``machine learning''
 provide tools for flexible modelling, which may be used to reduce the
 risk of misspecification, if thoughtfully applied.
@@ -8993,7 +9092,7 @@ target population.
   from the original outcome model \texttt{mY}:
   \(\widehat{\eta}_i = \text{logit}(\widehat Y_i)\) based on the
   observed exposure \(X_i=x\) for each subject \(i\), where the fitted
-  values \(\widehat Y_i\) were saved into vector \texttt{yh} already in item
+  values \(\widehat Y_i\) were saved into vector \texttt{d\$yh} already in item
   5.2 above. Moreover, the intercept is removed from the model.
 \end{enumerate}
 
@@ -10010,7 +10109,7 @@ occurrence rate of remission itself.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{   user  system elapsed }
-\NormalTok{   2.69    3.08    2.02 }
+\NormalTok{   1.85    2.42    1.49 }
 \end{Highlighting}
 \end{Shaded}
 
