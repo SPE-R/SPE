@@ -22,7 +22,7 @@ until 31 December 2008.
 The dataset contains the following variables:
 
 | Variable | Description |
-|:----------------------|:------------------------------------------------|
+|:-----------------------------------|:-----------------------------------|
 | `sex` | sex, a factor with categories; `1 = "Female", 2 = "Male"` |
 | `age` | age (years) at the date of diagnosing the cancer |
 | `stage` | TNM stage of the tumour (factor): `1 = "I", ..., 4 = "IV", 5 = "unkn"` |
@@ -307,8 +307,8 @@ legend(10,0.35, legend=names(s.agrx$strata),
 
 ![](oral-s_files/figure-epub3/cdfsexage-1.png)<!-- -->
 
-In each age band the mortality curve for males is on a higher level
-than that for females.
+In each age band the mortality curve for males is on a higher level than
+that for females.
 
 ## Event-specific cumulative mortality curves
 
@@ -886,24 +886,12 @@ orca.lex <- Lexis(
 ## NOTE: entry is assumed to be 0 on the stime timescale.
 ```
 
-``` r
-summary(orca.lex)
-```
-
-```
-##        
-## Transitions:
-##      To
-## From    Alive Oral ca. death Other death Records: Events: Risk time: Persons:
-##   Alive   109            122         107      338     229       1914      338
-```
-
 - Draw a box diagram of the two-state set-up of competing transitions.
   Run first th e following command line
 
 
 ``` r
-boxes(orca.lex,boxpos = TRUE)
+boxes(orca.lex,boxpos = TRUE,show.BE = TRUE,scale.R=1000)
 ```
 
 ![](oral-s_files/figure-epub3/lexis-1.png)<!-- -->

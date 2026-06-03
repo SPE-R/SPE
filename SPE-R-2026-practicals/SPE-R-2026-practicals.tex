@@ -146,7 +146,7 @@
 \makeatother
 \subtitle{SPE practicals}
 \author{Krista Fischer\footnote{Estonian Genome Center, University of Tartu, Estonia, \href{mailto:Krista.Fischer@ut.ee}{\nolinkurl{Krista.Fischer@ut.ee}}} \and Martyn Plummer\footnote{University of Warwick, UK, \href{mailto:martyn.plummer@warwick.ac.uk}{\nolinkurl{martyn.plummer@warwick.ac.uk}}} \and Janne Pitkäniemi\footnote{Finnish Cancer Registry, Helsinki, Finland, \href{mailto:janne.pitkaniemi@cancer.fi}{\nolinkurl{janne.pitkaniemi@cancer.fi}}} \and Bendix Carstensen\footnote{Steno Diabetes Center Copenhagen, Gentofte, Denmark, Dept. of Biostatistics, University of Copenhagen, Denmark, \href{mailto:b@bxc.dk}{\nolinkurl{b@bxc.dk}}, \url{http://BendixCarstensen.com}} \and Damien Georges\footnote{International Agency for Research on Cancer, Lyon, France, \href{mailto:georgesd@iarc.who.int}{\nolinkurl{georgesd@iarc.who.int}}} \and Esa Läärä\footnote{Department of Mathematical Sciences, University of Oulu, Finland, \href{mailto:Esa.Laara@oulu.fi}{\nolinkurl{Esa.Laara@oulu.fi}}, \url{http://www.oulu.fi/university/researcher/esa-laara}}}
-\date{1-5 June 2026 (built 03 June 2026 11:10 UTC)}
+\date{1-5 June 2026 (built 03 June 2026 12:31 UTC)}
 
 \begin{document}
 \maketitle
@@ -4954,18 +4954,12 @@ an age-cohort-period model utilizing function \texttt{apc.fit()} in \texttt{Epi}
 
 \section{Proper adjustment for confounding in regression models}\label{proper-adjustment-for-confounding-in-regression-models}
 
-The first exercise of this session will ask you to simulate some data
-according to pre-specified causal structure (don't take the particular
-example too seriously) and see how you should adjust the analysis to
-obtain correct estimates of the causal effects.
+The first exercise of this session will ask you to simulate some data according to pre-specified causal structure (don't take the particular example too seriously) and see how you should adjust the analysis to obtain correct estimates of the causal effects.
 
-Suppose one is interested in the effect of beer-drinking on body weight.
-Let's \emph{assume} that in addition to the potential effect of beer on weight, the following is true in reality:
+Suppose one is interested in the effect of beer-drinking on body weight. Let's \emph{assume} that in addition to the potential effect of beer on weight, the following is true in reality:
 
 \begin{itemize}
 \tightlist
-\item
-  Beer-drinking has an effect on the body weight.
 \item
   Men drink more beer than women
 \item
@@ -4976,11 +4970,10 @@ Let's \emph{assume} that in addition to the potential effect of beer on weight, 
   Beer-drinking increases blood pressure
 \end{itemize}
 
-The task is to simulate a dataset in accordance with this model, and
-subsequently analyse it to see, whether the results would allow us to
-conclude the true association structure.
+The task is to simulate a dataset in accordance with this model, and subsequently analyse it to see, whether the results would allow us to conclude the true association structure.
 
 \begin{itemize}
+\tightlist
 \item
   Sketch a DAG (not necessarily with R) to see, how should one generate the data
 \item
@@ -4990,8 +4983,7 @@ conclude the true association structure.
 \item
   Men weigh on average \(10kg\) more than women.
 \item
-  One kg difference in body weight corresponds in
-  average to \(0.5mmHg\) difference in (systolic) blood pressures.
+  One kg difference in body weight corresponds in average to \(0.5mmHg\) difference in (systolic) blood pressures.
 \item
   Beer-drinking increases blood pressure by \(10mmHg\) in average.
 \item
@@ -5002,6 +4994,7 @@ The \texttt{R} commands to generate the data are:
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{23957}\NormalTok{) }
 \NormalTok{bdat }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{sex =} \FunctionTok{c}\NormalTok{(}\FunctionTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{500}\NormalTok{), }\FunctionTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{500}\NormalTok{)))}
 \CommentTok{\# a data frame with 500 females, 500 males}
 \NormalTok{bdat}\SpecialCharTok{$}\NormalTok{beer }\OtherTok{\textless{}{-}} \FunctionTok{rbinom}\NormalTok{(}\DecValTok{1000}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{0.2} \SpecialCharTok{+} \FloatTok{0.5} \SpecialCharTok{*}\NormalTok{ bdat}\SpecialCharTok{$}\NormalTok{sex)}
@@ -5013,9 +5006,7 @@ The \texttt{R} commands to generate the data are:
 
 \begin{itemize}
 \item
-  Now fit the following models for body weight as dependent
-  variable and beer-drinking as independent variable. Look, what is
-  the estimated effect size:
+  Now fit the following models for body weight as dependent variable and beer-drinking as independent variable. Look, what is the estimated effect size
 \item
   Unadjusted (just simple linear regression)
 \item
@@ -5023,16 +5014,11 @@ The \texttt{R} commands to generate the data are:
 \item
   Adjusted for sex and blood pressure
 \item
-  What would be the conclusions on the effect of beer on weight, based on the three models? Do they agree?
-  Which (if any) of the models gives an unbiased estimate of the
-  actual causal effect of interest?
+  What would be the conclusions on the effect of beer on weight, based on the three models? Do they agree? Which (if any) of the models gives an unbiased estimate of the actual causal effect of interest? (Note - for the estimated coefficient of beer, 0 should be included in the confidence interval - there is just one model where that is true)
 \item
   How can the answer be seen from the graph?
 \item
-  Now change the data-generation algorithm so, that in fact beer-drinking
-  does increase the body weight by 2kg. Look, what are
-  the conclusions in the above models now.
-  Thus the data is generated as before, but the weight variable is computed as:
+  Now change the data-generation algorithm so, that in fact beer-drinking does increase the body weight by 2kg. Look, what are the conclusions in the above models now. Thus the data is generated as before, but the weight variable is computed as:
 \end{itemize}
 
 \begin{Shaded}
@@ -5045,8 +5031,10 @@ The \texttt{R} commands to generate the data are:
 \begin{itemize}
 \tightlist
 \item
-  Suppose one is interested in the effect of beer-drinking on blood pressure instead, and is fitting a) an unadjusted model for blood pressure, with beer as an only covariate; b) a model with beer and sex as covariates. Would either a) or b) give an unbiased estimate for the effect? (You may double-check whether the simulated data is consistent with your answer).
+  Suppose one is interested in the effect of beer-drinking on blood pressure instead. Remember, the data was generated to assume that beer drinking increases blood pressure by 10mmHg, on average. Fit: a) an unadjusted model for blood pressure, with beer as an only covariate; b) a model with beer and weight as covariates; c) a model with beer and sex as covariates. Which model (if any) gives an unbiased estimate for the effect?
 \end{itemize}
+
+\emph{Note! Now it is important that we allow the effect of beer on body weight -- thus add the corresponding arrow to the DAG.}
 
 \section{\texorpdfstring{DAG tools in the package \texttt{dagitty}}{DAG tools in the package dagitty}}\label{dag-tools-in-the-package-dagitty}
 
@@ -5127,7 +5115,7 @@ Thus, for total effect estimation one should adjust for \(X\) and either \(Y\) o
 
 You can verify that, these are the variables that will block all open paths from \(C\) to \(D\).
 
-\textbf{Now try to do the \emph{beer-weight} exercise using \emph{dagitty}: }
+\textbf{Now try to do the \emph{beer-weight} exercise using \emph{dagitty}:}
 
 \begin{itemize}
 \item
@@ -5201,242 +5189,13 @@ Now, the following script generates a dataset:
 \end{Highlighting}
 \end{Shaded}
 
-\emph{Exercise:} Using linear models, try to identify, which of the three DAGs has been used to generate the data.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{adjustmentSets}\NormalTok{(g1,}\StringTok{"X"}\NormalTok{,}\StringTok{"Y"}\NormalTok{, }\AttributeTok{effect=}\StringTok{"direct"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\#\# \{ W, Z \}}
-\NormalTok{\#\# \{ U, W \}}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{summary}\NormalTok{(}\FunctionTok{lm}\NormalTok{(Y}\SpecialCharTok{\textasciitilde{}}\NormalTok{X}\SpecialCharTok{+}\NormalTok{W}\SpecialCharTok{+}\NormalTok{Z,}\AttributeTok{data=}\NormalTok{dat))}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\#\# }
-\NormalTok{\#\# Call:}
-\NormalTok{\#\# lm(formula = Y \textasciitilde{} X + W + Z, data = dat)}
-\NormalTok{\#\# }
-\NormalTok{\#\# Residuals:}
-\NormalTok{\#\#    Min     1Q Median     3Q    Max }
-\NormalTok{\#\# {-}3.989 {-}0.744  0.010  0.766  3.593 }
-\NormalTok{\#\# }
-\NormalTok{\#\# Coefficients:}
-\NormalTok{\#\#             Estimate Std. Error t value Pr(\textgreater{}|t|)    }
-\NormalTok{\#\# (Intercept)  0.03317    0.02455    1.35     0.18    }
-\NormalTok{\#\# X           {-}0.00169    0.01488   {-}0.11     0.91    }
-\NormalTok{\#\# W           {-}2.59961    0.03199  {-}81.27   \textless{}2e{-}16 ***}
-\NormalTok{\#\# Z            1.01417    0.02120   47.85   \textless{}2e{-}16 ***}
-\NormalTok{\#\# {-}{-}{-}}
-\NormalTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
-\NormalTok{\#\# }
-\NormalTok{\#\# Residual standard error: 1.1 on 1996 degrees of freedom}
-\NormalTok{\#\# Multiple R{-}squared:  0.969,  Adjusted R{-}squared:  0.969 }
-\NormalTok{\#\# F{-}statistic: 2.05e+04 on 3 and 1996 DF,  p{-}value: \textless{}2e{-}16}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# no X effect: this DAG is possible}
-
-\FunctionTok{adjustmentSets}\NormalTok{(g2,}\StringTok{"X"}\NormalTok{,}\StringTok{"Y"}\NormalTok{, }\AttributeTok{effect=}\StringTok{"direct"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\#\# \{ Z \}}
-\NormalTok{\#\# \{ U \}}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{summary}\NormalTok{(}\FunctionTok{lm}\NormalTok{(Y}\SpecialCharTok{\textasciitilde{}}\NormalTok{X}\SpecialCharTok{+}\NormalTok{Z,}\AttributeTok{data=}\NormalTok{dat))}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\#\# }
-\NormalTok{\#\# Call:}
-\NormalTok{\#\# lm(formula = Y \textasciitilde{} X + Z, data = dat)}
-\NormalTok{\#\# }
-\NormalTok{\#\# Residuals:}
-\NormalTok{\#\#    Min     1Q Median     3Q    Max }
-\NormalTok{\#\# {-}7.480 {-}1.568 {-}0.107  1.580  8.730 }
-\NormalTok{\#\# }
-\NormalTok{\#\# Coefficients:}
-\NormalTok{\#\#             Estimate Std. Error t value Pr(\textgreater{}|t|)    }
-\NormalTok{\#\# (Intercept)   0.1007     0.0509    1.98    0.048 *  }
-\NormalTok{\#\# X             1.1314     0.0108  105.04   \textless{}2e{-}16 ***}
-\NormalTok{\#\# Z             2.3803     0.0268   88.83   \textless{}2e{-}16 ***}
-\NormalTok{\#\# {-}{-}{-}}
-\NormalTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
-\NormalTok{\#\# }
-\NormalTok{\#\# Residual standard error: 2.28 on 1997 degrees of freedom}
-\NormalTok{\#\# Multiple R{-}squared:  0.865,  Adjusted R{-}squared:  0.865 }
-\NormalTok{\#\# F{-}statistic: 6.39e+03 on 2 and 1997 DF,  p{-}value: \textless{}2e{-}16}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# X effect is significant: this DAG is not likely}
-
-\FunctionTok{adjustmentSets}\NormalTok{(g3,}\StringTok{"X"}\NormalTok{,}\StringTok{"Y"}\NormalTok{, }\AttributeTok{effect=}\StringTok{"direct"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\#\# \{ Q, W, Z \}}
-\NormalTok{\#\# \{ Q, U, W \}}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{summary}\NormalTok{(}\FunctionTok{lm}\NormalTok{(Y}\SpecialCharTok{\textasciitilde{}}\NormalTok{X}\SpecialCharTok{+}\NormalTok{Q}\SpecialCharTok{+}\NormalTok{W}\SpecialCharTok{+}\NormalTok{Z,}\AttributeTok{data=}\NormalTok{dat))}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\#\# }
-\NormalTok{\#\# Call:}
-\NormalTok{\#\# lm(formula = Y \textasciitilde{} X + Q + W + Z, data = dat)}
-\NormalTok{\#\# }
-\NormalTok{\#\# Residuals:}
-\NormalTok{\#\#    Min     1Q Median     3Q    Max }
-\NormalTok{\#\# {-}3.721 {-}0.642  0.003  0.660  3.199 }
-\NormalTok{\#\# }
-\NormalTok{\#\# Coefficients:}
-\NormalTok{\#\#             Estimate Std. Error t value Pr(\textgreater{}|t|)    }
-\NormalTok{\#\# (Intercept)  0.01958    0.02217    0.88     0.38    }
-\NormalTok{\#\# X           {-}0.00604    0.01343   {-}0.45     0.65    }
-\NormalTok{\#\# Q            1.07188    0.05024   21.33   \textless{}2e{-}16 ***}
-\NormalTok{\#\# W           {-}3.03339    0.03531  {-}85.90   \textless{}2e{-}16 ***}
-\NormalTok{\#\# Z            1.00354    0.01914   52.44   \textless{}2e{-}16 ***}
-\NormalTok{\#\# {-}{-}{-}}
-\NormalTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
-\NormalTok{\#\# }
-\NormalTok{\#\# Residual standard error: 0.99 on 1995 degrees of freedom}
-\NormalTok{\#\# Multiple R{-}squared:  0.974,  Adjusted R{-}squared:  0.974 }
-\NormalTok{\#\# F{-}statistic: 1.9e+04 on 4 and 1995 DF,  p{-}value: \textless{}2e{-}16}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# no X effect: this DAG is possible}
-
-\FunctionTok{adjustmentSets}\NormalTok{(g1,}\StringTok{"Z"}\NormalTok{,}\StringTok{"W"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\#\#  \{\}}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{summary}\NormalTok{(}\FunctionTok{lm}\NormalTok{(W}\SpecialCharTok{\textasciitilde{}}\NormalTok{Z,}\AttributeTok{data=}\NormalTok{dat))}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\#\# }
-\NormalTok{\#\# Call:}
-\NormalTok{\#\# lm(formula = W \textasciitilde{} Z, data = dat)}
-\NormalTok{\#\# }
-\NormalTok{\#\# Residuals:}
-\NormalTok{\#\#    Min     1Q Median     3Q    Max }
-\NormalTok{\#\# {-}9.506 {-}1.554  0.004  1.453  8.007 }
-\NormalTok{\#\# }
-\NormalTok{\#\# Coefficients:}
-\NormalTok{\#\#             Estimate Std. Error t value Pr(\textgreater{}|t|)}
-\NormalTok{\#\# (Intercept)  {-}0.0215     0.0492   {-}0.44     0.66}
-\NormalTok{\#\# Z             0.0191     0.0224    0.85     0.39}
-\NormalTok{\#\# }
-\NormalTok{\#\# Residual standard error: 2.2 on 1998 degrees of freedom}
-\NormalTok{\#\# Multiple R{-}squared:  0.000364,   Adjusted R{-}squared:  {-}0.000137 }
-\NormalTok{\#\# F{-}statistic: 0.727 on 1 and 1998 DF,  p{-}value: 0.394}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# no Z effect: this DAG is possible}
-
-\FunctionTok{adjustmentSets}\NormalTok{(g3,}\StringTok{"Z"}\NormalTok{,}\StringTok{"W"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\#\# \{ X \}}
-\NormalTok{\#\# \{ U \}}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{summary}\NormalTok{(}\FunctionTok{lm}\NormalTok{(W}\SpecialCharTok{\textasciitilde{}}\NormalTok{Z}\SpecialCharTok{+}\NormalTok{X,}\AttributeTok{data=}\NormalTok{dat))}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{\#\# }
-\NormalTok{\#\# Call:}
-\NormalTok{\#\# lm(formula = W \textasciitilde{} Z + X, data = dat)}
-\NormalTok{\#\# }
-\NormalTok{\#\# Residuals:}
-\NormalTok{\#\#     Min      1Q  Median      3Q     Max }
-\NormalTok{\#\# {-}2.5471 {-}0.4981  0.0016  0.5336  2.3622 }
-\NormalTok{\#\# }
-\NormalTok{\#\# Coefficients:}
-\NormalTok{\#\#             Estimate Std. Error t value Pr(\textgreater{}|t|)    }
-\NormalTok{\#\# (Intercept) {-}0.02596    0.01717   {-}1.51     0.13    }
-\NormalTok{\#\# Z           {-}0.52552    0.00903  {-}58.18   \textless{}2e{-}16 ***}
-\NormalTok{\#\# X           {-}0.43586    0.00363 {-}120.04   \textless{}2e{-}16 ***}
-\NormalTok{\#\# {-}{-}{-}}
-\NormalTok{\#\# Signif. codes:  0 \textquotesingle{}***\textquotesingle{} 0.001 \textquotesingle{}**\textquotesingle{} 0.01 \textquotesingle{}*\textquotesingle{} 0.05 \textquotesingle{}.\textquotesingle{} 0.1 \textquotesingle{} \textquotesingle{} 1}
-\NormalTok{\#\# }
-\NormalTok{\#\# Residual standard error: 0.768 on 1997 degrees of freedom}
-\NormalTok{\#\# Multiple R{-}squared:  0.878,  Adjusted R{-}squared:  0.878 }
-\NormalTok{\#\# F{-}statistic: 7.21e+03 on 2 and 1997 DF,  p{-}value: \textless{}2e{-}16}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# significant Z effect: this DAG is possible}
-\end{Highlighting}
-\end{Shaded}
+\textbf{Exercise:} Using linear models, try to identify, which of the three DAGs has been used to generate the data.
 
 If you have made your decision, you may check the script `gendata.r' to see, whether your guess was right.
 
 \section{Instrumental variables estimation: Mendelian randomization}\label{instrumental-variables-estimation-mendelian-randomization}
 
-Suppose you want to estimate the effect of Body Mass Index (BMI) on blood glucose level (associated with the risk of diabetes).
-Let's conduct a simulation study to verify that when the exposure-outcome association is confounded, but there is a valid instrument (genotype), one obtains an unbiased estimate of the causal effect.
+Suppose you want to estimate the effect of Body Mass Index (BMI) on blood glucose level (associated with the risk of diabetes). Let's conduct a simulation study to verify that when the exposure-outcome association is confounded, but there is a valid instrument (genotype), one obtains an unbiased estimate of the causal effect.
 
 \begin{itemize}
 \tightlist
@@ -5467,8 +5226,7 @@ Let's conduct a simulation study to verify that when the exposure-outcome associ
 \begin{itemize}
 \tightlist
 \item
-  Generate a continuous (normally distributed) exposure variable \(BMI\) so that it depends on \(G\) and \(U\).
-  Check with linear regression, whether there is enough power to get significant parameter estimates.\\
+  Generate a continuous (normally distributed) exposure variable \(BMI\) so that it depends on \(G\) and \(U\). Check with linear regression, whether there is enough power to get significant parameter estimates.\\
   For instance:
 \end{itemize}
 
@@ -5494,20 +5252,16 @@ Let's conduct a simulation study to verify that when the exposure-outcome associ
 \begin{itemize}
 \tightlist
 \item
-  Verify, that simple regression model for \(Y\), with \(BMI\) as a covariate, results in a biased
-  estimate of the causal effect (parameter estimate is different from what was generated)
+  Verify, that simple regression model for \(Y\), with \(BMI\) as a covariate, results in a biased estimate of the causal effect (parameter estimate is different from what was generated)
 \end{itemize}
 
 How different is the estimate from 0.1?
 
 \begin{itemize}
 \item
-  Estimate a regression model for \(Y\) with two covariates, \(G\) and \(BMI\). Do you see a significant effect of \(G\)?
-  Could you explain analytically, why one may see a significant parameter estimate for \(G\) there?
+  Estimate a regression model for \(Y\) with two covariates, \(G\) and \(BMI\). Do you see a significant effect of \(G\)? Could you explain analytically, why one may see a significant parameter estimate for \(G\) there?
 \item
-  Find an IV (instrumental variables) estimate, using G as an instrument, by following the algorithm
-  in the lecture notes (use two linear models and find a ratio of the parameter estimates).
-  Does the estimate get closer to the generated effect size?
+  Find an IV (instrumental variables) estimate, using G as an instrument, by following the algorithm in the lecture notes (use two linear models and find a ratio of the parameter estimates). Does the estimate get closer to the generated effect size?
 \end{itemize}
 
 \begin{Shaded}
@@ -5526,8 +5280,7 @@ How different is the estimate from 0.1?
 \begin{itemize}
 \tightlist
 \item
-  A proper simulation study would require the analysis to be run several times, to see the extent of variability in the parameter estimates.
-  A simple way to do it here would be using a \texttt{for}-loop. Modify the code as follows (exactly the same commands as executed so far, adding a few lines of code to the beginning and to the end):
+  A proper simulation study would require the analysis to be run several times, to see the extent of variability in the parameter estimates. A simple way to do it here would be using a \texttt{for}-loop. Modify the code as follows (exactly the same commands as executed so far, adding a few lines of code to the beginning and to the end):
 \end{itemize}
 
 \begin{Shaded}
@@ -5600,9 +5353,7 @@ Repeat the simulation study to see, what is the bias in the average estimated ca
 
 \section{Why are simulation exercises useful for causal inference?}\label{why-are-simulation-exercises-useful-for-causal-inference}
 
-If we simulate the data, we know the data-generating mechanism and the \emph{true} causal effects. So this is a way to check, whether
-an analysis approach will lead to estimates that correspond to what is generated. One could expect to see similar phenomena in real
-data analysis, if the data-generation mechanism is similar to what was used in simulations.
+If we simulate the data, we know the data-generating mechanism and the \emph{true} causal effects. So this is a way to check, whether an analysis approach will lead to estimates that correspond to what is generated. One could expect to see similar phenomena in real data analysis, if the data-generation mechanism is similar to what was used in simulations.
 
 \chapter{Graphics with ggplot2}\label{graphics-with-ggplot2}
 
@@ -5917,8 +5668,8 @@ The dataset contains the following variables:
 
 {\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.3194}}
-  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.6806}}@{}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
 \toprule\noalign{}
 \begin{minipage}[b]{\linewidth}\raggedright
 Variable
@@ -6142,8 +5893,8 @@ Now, plot Kaplan--Meier curves jointly classified by sex and age.
 \end{Highlighting}
 \end{Shaded}
 
-In each age band the mortality curve for males is on a higher level
-than that for females.
+In each age band the mortality curve for males is on a higher level than
+that for females.
 
 \section{Event-specific cumulative mortality curves}\label{event-specific-cumulative-mortality-curves}
 
@@ -6473,7 +6224,6 @@ detailed explanation of these tools will be given by Bendix later.
 \NormalTok{  ),}
   \AttributeTok{data =}\NormalTok{ orca}
 \NormalTok{)}
-\FunctionTok{summary}\NormalTok{(orca.lex)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6486,7 +6236,7 @@ detailed explanation of these tools will be given by Bendix later.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\FunctionTok{boxes}\NormalTok{(orca.lex,}\AttributeTok{boxpos =} \ConstantTok{TRUE}\NormalTok{)}
+\FunctionTok{boxes}\NormalTok{(orca.lex,}\AttributeTok{boxpos =} \ConstantTok{TRUE}\NormalTok{,}\AttributeTok{show.BE =} \ConstantTok{TRUE}\NormalTok{,}\AttributeTok{scale.R=}\DecValTok{1000}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -10215,7 +9965,7 @@ occurrence rate of remission itself.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{   user  system elapsed }
-\NormalTok{   2.51    3.06    2.00 }
+\NormalTok{   2.35    3.11    1.91 }
 \end{Highlighting}
 \end{Shaded}
 

@@ -1,42 +1,33 @@
 
+
 # Causal inference
 
 ## Proper adjustment for confounding in regression models
 
-The first exercise of this session will ask you to simulate some data
-according to pre-specified causal structure (don't take the particular
-example too seriously) and see how you should adjust the analysis to
-obtain correct estimates of the causal effects.
+The first exercise of this session will ask you to simulate some data according to pre-specified causal structure (don't take the particular example too seriously) and see how you should adjust the analysis to obtain correct estimates of the causal effects.
 
-Suppose one is interested in the effect of beer-drinking on body weight.
-Let's *assume* that in addition to the potential effect of beer on weight, the following is true in reality:
+Suppose one is interested in the effect of beer-drinking on body weight. Let's *assume* that in addition to the potential effect of beer on weight, the following is true in reality:
 
--  Beer-drinking has an effect on the body weight.
--  Men drink more beer than women
--  Men have higher body weight than women
--  People with higher body weight tend to have higher blood pressure
--  Beer-drinking increases blood pressure
+- Men drink more beer than women
+- Men have higher body weight than women
+- People with higher body weight tend to have higher blood pressure
+- Beer-drinking increases blood pressure
 
+The task is to simulate a dataset in accordance with this model, and subsequently analyse it to see, whether the results would allow us to conclude the true association structure.
 
-The task is to simulate a dataset in accordance with this model, and
-subsequently analyse it to see, whether the results would allow us to
-conclude the true association structure.
-
-
--  Sketch a DAG (not necessarily with R) to see, how should one generate the data
--  Suppose the actual effect sizes are following:
-
--  The probability of beer-drinking is 0.2 for females and 0.7 for males
--  Men weigh on average $10kg$ more than women.
--  One kg difference in body weight corresponds in
-average to $0.5mmHg$ difference in (systolic) blood pressures.
--  Beer-drinking increases blood pressure by $10mmHg$ in average.
--  Beer-drinking has **no** effect on body weight.
-
+- Sketch a DAG (not necessarily with R) to see, how should one generate the data
+- Suppose the actual effect sizes are following:
+- The probability of beer-drinking is 0.2 for females and 0.7 for males
+- Men weigh on average $10kg$ more than women.
+- One kg difference in body weight corresponds in average to $0.5mmHg$ difference in (systolic) blood pressures.
+- Beer-drinking increases blood pressure by $10mmHg$ in average.
+- Beer-drinking has **no** effect on body weight.
 
 The `R` commands to generate the data are:
 
+
 ``` r
+set.seed(23957) 
 bdat <- data.frame(sex = c(rep(0, 500), rep(1, 500)))
 # a data frame with 500 females, 500 males
 bdat$beer <- rbinom(1000, 1, 0.2 + 0.5 * bdat$sex)
@@ -44,13 +35,11 @@ bdat$weight <- 60 + 10 * bdat$sex + rnorm(1000, 0, 7)
 bdat$bp <- 
   110 + 0.5 * bdat$weight + 10 * bdat$beer + rnorm(1000, 0, 10)
 ```
--  Now fit the following models for body weight as dependent
-  variable and beer-drinking as independent variable. Look, what is
-  the estimated effect size:
 
--  Unadjusted (just simple linear regression)
--  Adjusted for sex
--  Adjusted for sex and blood pressure
+- Now fit the following models for body weight as dependent variable and beer-drinking as independent variable. Look, what is the estimated effect size
+- Unadjusted (just simple linear regression)
+- Adjusted for sex
+- Adjusted for sex and blood pressure
 
 
 ``` r
@@ -62,9 +51,9 @@ ci.lin(m1a)
 ```
 
 ```
-##              Estimate    StdErr        z            P      2.5%     97.5%
-## (Intercept) 62.399839 0.3498768 178.3480 0.000000e+00 61.714093 63.085585
-## beer         5.895313 0.5204104  11.3282 9.513979e-30  4.875328  6.915299
+##              Estimate    StdErr         z            P      2.5%     97.5%
+## (Intercept) 62.269170 0.3470984 179.39919 0.000000e+00 61.588870 62.949470
+## beer         5.296786 0.5256653  10.07635 7.029082e-24  4.266501  6.327072
 ```
 
 ``` r
@@ -72,10 +61,10 @@ ci.lin(m2a)
 ```
 
 ```
-##               Estimate    StdErr         z            P       2.5%     97.5%
-## (Intercept) 59.8517512 0.3306430 181.01622 0.000000e+00 59.2037028 60.499800
-## beer         0.6549487 0.5285426   1.23916 2.152864e-01 -0.3809759  1.690873
-## sex          9.8334649 0.5261015  18.69119 5.839135e-78  8.8023250 10.864605
+##               Estimate    StdErr           z            P      2.5%      97.5%
+## (Intercept) 59.4647612 0.3248236 183.0678546 0.000000e+00 58.828119 60.1014038
+## beer        -0.1263823 0.5198915  -0.2430936 8.079329e-01 -1.145351  0.8925863
+## sex         10.3378209 0.5156149  20.0494980 2.038922e-89  9.327234 11.3484076
 ```
 
 ``` r
@@ -84,22 +73,18 @@ ci.lin(m3a)
 
 ```
 ##               Estimate     StdErr         z            P       2.5%      97.5%
-## (Intercept) 24.8465704 2.72969696  9.102318 8.842391e-20 19.4964626 30.1966781
-## beer        -2.0908694 0.53371031 -3.917611 8.943084e-05 -3.1369224 -1.0448164
-## sex          8.8834098 0.49273574 18.028751 1.158806e-72  7.9176655  9.8491541
-## bp           0.2495476 0.01933686 12.905283 4.202691e-38  0.2116481  0.2874471
+## (Intercept) 26.9076970 2.82806033  9.514541 1.825162e-21 21.3648006 32.4505934
+## beer        -2.5165947 0.53015283 -4.746923 2.065344e-06 -3.5556752 -1.4775143
+## sex          9.1700486 0.49469045 18.536943 1.039662e-76  8.2004732 10.1396241
+## bp           0.2327287 0.02009792 11.579736 5.220635e-31  0.1933374  0.2721199
 ```
 
--  What would be the conclusions on the effect of beer on weight, based on the three models? Do they agree? 
-Which (if any) of the models gives an unbiased estimate of the
-  actual causal effect of interest?
+- What would be the conclusions on the effect of beer on weight, based on the three models? Do they agree? Which (if any) of the models gives an unbiased estimate of the actual causal effect of interest? (Note - for the estimated coefficient of beer, 0 should be included in the confidence interval - there is just one model where that is true)
 
--  How can the answer be seen from the graph?
+- How can the answer be seen from the graph?
 
--  Now change the data-generation algorithm so, that in fact beer-drinking
-  does increase the body weight by 2kg. Look, what are
-  the conclusions in the above models now. 
-Thus the data is generated as before, but the weight variable is computed as:
+- Now change the data-generation algorithm so, that in fact beer-drinking does increase the body weight by 2kg. Look, what are the conclusions in the above models now. Thus the data is generated as before, but the weight variable is computed as:
+
 
 ``` r
 bdat$weight <- 
@@ -117,9 +102,9 @@ ci.lin(m1b)
 ```
 
 ```
-##              Estimate    StdErr         z           P      2.5%     97.5%
-## (Intercept) 62.082196 0.3551152 174.82270 0.00000e+00 61.386183 62.778209
-## beer         8.179108 0.5282020  15.48481 4.39353e-54  7.143851  9.214365
+##              Estimate    StdErr         z            P      2.5%     97.5%
+## (Intercept) 62.689286 0.3478584 180.21493 0.000000e+00 62.007496 63.371076
+## beer         7.586091 0.5268164  14.39988 5.183711e-47  6.553549  8.618632
 ```
 
 ``` r
@@ -128,9 +113,9 @@ ci.lin(m2b) # the correct model
 
 ```
 ##              Estimate    StdErr          z            P      2.5%     97.5%
-## (Intercept) 59.510392 0.3362472 176.984046 0.000000e+00 58.851360 60.169425
-## beer         2.889968 0.5375011   5.376674 7.587450e-08  1.836485  3.943451
-## sex          9.924990 0.5350186  18.550741 8.043601e-77  8.876373 10.973608
+## (Intercept) 59.974727 0.3299117 181.790229 0.000000e+00 59.328112 60.621342
+## beer         2.336675 0.5280352   4.425225 9.634179e-06  1.301745  3.371604
+## sex         10.006608 0.5236917  19.107823 2.173473e-81  8.980191 11.033025
 ```
 
 ``` r
@@ -138,54 +123,100 @@ ci.lin(m3b)
 ```
 
 ```
-##                Estimate     StdErr          z            P       2.5%
-## (Intercept) 24.70812964 2.86087584  8.6365613 5.793031e-18 19.1009160
-## beer         0.07987794 0.55146267  0.1448474 8.848313e-01 -1.0009690
-## sex          8.53890407 0.51176295 16.6852720 1.677404e-62  7.5358671
-## bp           0.24994876 0.02042286 12.2386759 1.931581e-34  0.2099207
-##                  97.5%
-## (Intercept) 30.3153433
-## beer         1.1607249
-## sex          9.5419410
-## bp           0.2899768
+##                Estimate     StdErr           z            P       2.5%
+## (Intercept) 27.57739544 2.78408360  9.90537619 3.944826e-23 22.1206919
+## beer         0.03253439 0.53296590  0.06104403 9.513241e-01 -1.0120596
+## sex          8.59746481 0.50576032 16.99908923 8.340570e-65  7.6061928
+## bp           0.23151022 0.01977168 11.70918365 1.143755e-31  0.1927584
+##                 97.5%
+## (Intercept) 33.034099
+## beer         1.077128
+## sex          9.588737
+## bp           0.270262
 ```
 
--  Suppose one is interested in the effect of beer-drinking on blood pressure instead, and is fitting a) an unadjusted model  for blood pressure, with beer as an only covariate; b) a model with beer and sex as covariates. Would either a) or b) give an unbiased estimate for the effect? (You may double-check whether the simulated data is consistent with your answer).
+- Suppose one is interested in the effect of beer-drinking on blood pressure instead. Remember, the data was generated to assume that beer drinking increases blood pressure by 10mmHg, on average. Fit: a) an unadjusted model for blood pressure, with beer as an only covariate; b) a model with beer and weight as covariates; c) a model with beer and sex as covariates. Which model (if any) gives an unbiased estimate for the effect?
+
+*Note! Now it is important that we allow the effect of beer on body weight -- thus add the corresponding arrow to the DAG.*
+
+::: solution
 
 
 ``` r
-m1bp <- lm(bp ~ beer, data = bdat)
-m2bp <- lm(bp ~ beer + weight + sex, data = bdat)
+m1bp <- lm(bp ~ beer, data = bdat) # not correct 
 ci.lin(m1bp)
 ```
 
 ```
 ##              Estimate    StdErr         z            P      2.5%     97.5%
-## (Intercept) 140.67456 0.4541688 309.74072 0.000000e+00 139.78440 141.56471
-## beer         14.19791 0.6755353  21.01728 4.558089e-98  12.87389  15.52194
+## (Intercept) 141.59029 0.4603861 307.54686 0.000000e+00 140.68795 142.49263
+## beer         13.14572 0.6972346  18.85409 2.719774e-79  11.77917  14.51228
 ```
 
 ``` r
-ci.lin(m2bp) # the correct model
+m2bp <- lm(bp ~ beer + weight, data = bdat) 
+ci.lin(m2bp) # the correct model (check whether 10 is in the confidence interval) 
 ```
 
 ```
-##                Estimate     StdErr          z            P        2.5%
-## (Intercept) 108.1127234 2.58331273 41.8504202 0.000000e+00 103.0495235
-## beer          9.7311661 0.73572233 13.2266831 6.154397e-40   8.2891769
-## weight        0.5230156 0.04273466 12.2386759 1.931581e-34   0.4392573
-## sex           0.3545569 0.83730662  0.4234493 6.719675e-01  -1.2865339
-##                  97.5%
-## (Intercept) 113.175923
-## beer         11.173155
-## weight        0.606774
-## sex           1.995648
+##                Estimate     StdErr        z            P        2.5%
+## (Intercept) 107.3868573 2.43047152 44.18355 0.000000e+00 102.6232207
+## beer          9.0067338 0.69846074 12.89512 4.795268e-38   7.6377759
+## weight        0.5456025 0.03818783 14.28734 2.624437e-46   0.4707557
+##                   97.5%
+## (Intercept) 112.1504940
+## beer         10.3756917
+## weight        0.6204493
 ```
 
+``` r
+m3bp <- lm(bp ~ beer + sex, data = bdat) 
+ci.lin(m3bp) # the correct model for the total effect 
+```
+
+```
+##               Estimate    StdErr         z            P       2.5%      97.5%
+## (Intercept) 139.939097 0.4957002 282.30590 0.000000e+00 138.967542 140.910651
+## beer          9.952650 0.7933855  12.54453 4.259197e-36   8.397643  11.507657
+## sex           6.086742 0.7868592   7.73549 1.030054e-14   4.544526   7.628957
+```
+
+*** Solution via regression equations ***
+
+With $W$, $B$, $S$ and $BP$ the variables for weight, beer, sex (0-female, 1-male) and blood pressure, respectively, we can write:
+$$E(B|S) = P(B=1|S) = \alpha_0 + \alpha_1 S  $$
+(the data is generated with $\alpha_0=0.2$ and $\alpha_1=0.5$),
+$$W = \beta_0 + \beta_1 B + \beta_2S + \epsilon_W$$
+and
+$$BP = \gamma_0 + \gamma_1 B + \gamma_2W + \epsilon_{BP},$$
+where $\epsilon_W$ is independent of $B$ and $S$, and $\epsilon_{BP}$ is independent of $B$, $W$ and $S$ (as there is no arrow from $S$ to $BP$ on the DAG).
+
+First we see that fitting a linear model for $W$ with $B$ as the only covariate, estimates: $$E(W|B)= \beta_0 + \beta_1 B + \beta_2E(S|B).$$ As $S$ and $B$ are not independent, $E(S|B)$ will depend on $B$ -- for instance $E(S|B)=\delta_0 + \delta_1B$ for some $\delta_0$ and $\delta_1$. Thus, instead of $\beta_1$ we estimate $\beta_1+ \beta_2\delta_1$ and get a biased estimate.
+
+If we also adjust for $S$, we estimate both $\beta_1$ and $\beta_2$, thus fit the correct model.
+
+What happens if we adjust for blood pressure? We estimate:
+$$E(W|S,B,BP) = \beta_0 + \beta_1 B + \beta_2S + E(\epsilon_W|S,B,BP)$$
+As blood pressure depends on $B$ and $W$, $E(\epsilon_W|S,B,BP) \ne 0$ and the estimate of $\beta_1$ will be biased.
+
+**Models for blood pressure ($BP$)**
+
+Note that the parameter $\gamma_1$ corresponds to the *direct effect* of beer-drinking ($B$) - to estimate it, we have to fit the model that was used for data generation, thus the model including both $B$ and $W$ as covariates. Adjusting additionally for $S$ is not needed, but would also create no bias.
+
+From the DAG we see that the *total* effect of beer-drinking on blood pressure has two components: 1) the direct effect and 2) the effect via weight. To see what the true total effect parameter is, let's combine the two models:
+
+$$BP = \gamma_0 + \gamma_1 B + \gamma_2W + \epsilon_{BP} = 
+\gamma_0 + \gamma_1 B + \gamma_2(\beta_0 + \beta_1 B + \beta_2S + \epsilon_W) + \epsilon_{BP} = \gamma_0^* + (\gamma_1 + \gamma_2\beta_1)B + \gamma_2\beta_2S + \epsilon_{BP}^*.$$
+We see that the true total effect parameter is $\gamma_1 + \gamma_2\beta_1 = 10 + 0.5\cdot 2 =11$, and that the model also includes $S$ as a confounder.
+
+*Check, whether for the fitted model `m3bp`, 11 is included in the confidence interval for the parameter for beer!*
+
+::: 
 
 ## DAG tools in the package `dagitty`
 
-There is a software *DAGitty* ([http://www.dagitty.net/](http://www.dagitty.net/)) and also an R package *dagitty* that can be helpful in dealing with DAGs. Let's try to get the answer to the previous exercise using this package. 
+There is a software *DAGitty* (<http://www.dagitty.net/>) and also an R package *dagitty* that can be helpful in dealing with DAGs. Let's try to get the answer to the previous exercise using this package.
+
 
 ``` r
 if (!("dagitty" %in% installed.packages())){
@@ -205,8 +236,8 @@ library(dagitty)
 ##     paths
 ```
 
-
 Let's recreate the graph on the lecture slide 28 (but omitting the direct causal effect of interest, $C \rightarrow D$):
+
 
 ``` r
 g <- dagitty("dag {
@@ -244,6 +275,7 @@ plot(g)
 
 Let's look at all possible paths from $C$ to $D$:
 
+
 ``` r
 paths(g, "C", "D")
 ```
@@ -256,7 +288,8 @@ paths(g, "C", "D")
 ## $open
 ## [1]  TRUE FALSE  TRUE  TRUE  TRUE
 ```
-As you see, one path contains a collider and is therefore a *closed* path and the others are *open*.   
+
+As you see, one path contains a collider and is therefore a *closed* path and the others are *open*.
 
 Let's identify the minimal sets of variables needed to adjust the model for $D$ for, to obtain an unbiased estimate of the effect of $C$. You can specify, whether you want to estimate direct or total effect of $C$:
 
@@ -285,11 +318,12 @@ adjustmentSets(
 
 Thus, for total effect estimation one should adjust for $X$ and either $Y$ or $S$, whereas for direct effect estimation, one would also need to adjust for $Z$.
 
-You can verify that, these are the variables that will block all open paths from $C$ to $D$. 
+You can verify that, these are the variables that will block all open paths from $C$ to $D$.
 
-**Now try to do the *beer-weight* exercise using *dagitty*: **
+**Now try to do the *beer-weight* exercise using *dagitty*:**
 
--  Create the DAG and plot it
+- Create the DAG and plot it
+
 
 ``` r
 bg <- dagitty("dag {
@@ -305,7 +339,9 @@ plot(bg)
 ```
 
 ![](causal-e_files/figure-epub3/dagitty6-1.png)<!-- -->
--  What are the paths from WEIGHT to BEER?
+
+- What are the paths from WEIGHT to BEER?
+
 
 ``` r
 paths(bg, "BEER", "WEIGHT")
@@ -318,7 +354,11 @@ paths(bg, "BEER", "WEIGHT")
 ## $open
 ## [1] FALSE  TRUE
 ```
--  Will you get the same recommendation for the adjustment variable selection as you found before?
+
+- Will you get the same recommendation for the adjustment variable selection as you found before?
+
+::: solution
+
 
 ``` r
 adjustmentSets(bg, exposure = "BEER", outcome = "WEIGHT")
@@ -328,7 +368,53 @@ adjustmentSets(bg, exposure = "BEER", outcome = "WEIGHT")
 ## { SEX }
 ```
 
+**Effect of beer on blood pressure?**
+
+Let's first add the effect of beer on weight to the DAG, then look at the recommended adjustment sets.
+
+
+``` r
+bg2 <- dagitty("dag {
+  SEX -> BEER -> BP
+  SEX -> WEIGHT -> BP
+  BEER -> WEIGHT
+  }")
+coordinates(bg2) <- 
+  list(
+    x = c(BEER = 1, SEX = 2, BP = 2, WEIGHT = 3), 
+    y = c(SEX = 1, BEER = 2, WEIGHT = 2, BP = 3)
+  )
+plot(bg2)
+```
+
+![](causal-e_files/figure-epub3/dagitty9-1.png)<!-- -->
+
+
+``` r
+adjustmentSets(bg2, exposure = "BEER", outcome = "BP", effect="direct")
+```
+
+```
+## { WEIGHT }
+```
+
+``` r
+adjustmentSets(bg2, exposure = "BEER", outcome = "BP", effect="total")
+```
+
+```
+## { SEX }
+```
+
+Conclusions:
+
+- *To identify the direct effect, adjust for weight*
+- *To identify the total effect, adjust for sex*
+
+:::
+
 ## Identifying the true DAG for the data
+
 The following code creates three DAGs
 
 
@@ -386,7 +472,11 @@ head(dat)
 ## 6  1.895  3.272 -3.900 -2.313  -9.871
 ```
 
-*Exercise:* Using linear models, try to identify, which of the three DAGs has been used to generate the data.  
+**Exercise:** Using linear models, try to identify, which of the three DAGs has been used to generate the data.
+
+::: solution 
+
+*Idea:* If you adjust for appropriate confounders for a given DAG, you should see no effect of X on Y.
 
 
 ``` r
@@ -425,9 +515,10 @@ summary(lm(Y~X+W+Z,data=dat))
 ## F-statistic: 2.054e+04 on 3 and 1996 DF,  p-value: < 2.2e-16
 ```
 
-``` r
-# no X effect: this DAG is possible
+*Apparently no effect of X: this DAG "g1" (a) is possible*
 
+
+``` r
 adjustmentSets(g2,"X","Y", effect="direct")
 ```
 
@@ -462,9 +553,10 @@ summary(lm(Y~X+Z,data=dat))
 ## F-statistic:  6387 on 2 and 1997 DF,  p-value: < 2.2e-16
 ```
 
-``` r
-# X effect is significant: this DAG is not likely
+*A clear effect of X: this DAG "g2" (b) is not likely*
 
+
+``` r
 adjustmentSets(g3,"X","Y", effect="direct")
 ```
 
@@ -501,10 +593,25 @@ summary(lm(Y~X+Q+W+Z,data=dat))
 ## F-statistic: 1.902e+04 on 4 and 1995 DF,  p-value: < 2.2e-16
 ```
 
-``` r
-# no X effect: this DAG is possible
+*Apparently no effect of X: this DAG "g3" (c) is possible*
 
-adjustmentSets(g1,"Z","W")
+**Problem:** Both (a) and (c) are possible, based on the fitted models. How to make a distinction?
+
+*Answer 1:* If (c)/`g3` was the correct model, we could have seen a non-zero effect of X in the first model (based on g1) that was adjusted for Z and W, but not for Q. The fact that we did not see it, rather suggests (a) as the correct model. However - absence of statistical significance is not equivalent to absence of an effect.
+
+**Another idea:** Let's find something else that helps to distinguish between (a) and (c) - can we clearly reject one of the two? For instance, let's consider the effect of Q on X. In (a)/`g1`, Q has an indirect effect on X via W, thus the unadjusted model would show an effect, but not the adjusted model. In (c)/`g3`, W is a collider -- thus an unadjusted analysis should show no effect (but adjusting for W might lead to a non-zero parameter estimate). In both cases, the other paths contain a collider (Y). Let's confirm that with *dagitty* and fit the appropriate models.
+
+
+``` r
+adjustmentSets(g1,"Q","X", effect="direct")
+```
+
+```
+## { W }
+```
+
+``` r
+adjustmentSets(g3,"Q","X", effect="direct")
 ```
 
 ```
@@ -512,76 +619,87 @@ adjustmentSets(g1,"Z","W")
 ```
 
 ``` r
-summary(lm(W~Z,data=dat))
+summary(lm(Q~X,data=dat))
 ```
 
 ```
 ## 
 ## Call:
-## lm(formula = W ~ Z, data = dat)
+## lm(formula = Q ~ X, data = dat)
 ## 
 ## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -9.5057 -1.5539  0.0044  1.4534  8.0072 
+##      Min       1Q   Median       3Q      Max 
+## -2.09466 -0.43545 -0.00958  0.44366  2.19727 
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value Pr(>|t|)
-## (Intercept) -0.02154    0.04919  -0.438    0.661
-## Z            0.01908    0.02238   0.852    0.394
-## 
-## Residual standard error: 2.2 on 1998 degrees of freedom
-## Multiple R-squared:  0.0003635,	Adjusted R-squared:  -0.0001368 
-## F-statistic: 0.7266 on 1 and 1998 DF,  p-value: 0.3941
-```
-
-``` r
-# no Z effect: this DAG is possible
-
-adjustmentSets(g3,"Z","W")
-```
-
-```
-## { X }
-## { U }
-```
-
-``` r
-summary(lm(W~Z+X,data=dat))
-```
-
-```
-## 
-## Call:
-## lm(formula = W ~ Z + X, data = dat)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -2.5471 -0.4981  0.0016  0.5336  2.3622 
-## 
-## Coefficients:
-##              Estimate Std. Error  t value Pr(>|t|)    
-## (Intercept) -0.025965   0.017165   -1.513    0.131    
-## Z           -0.525522   0.009033  -58.178   <2e-16 ***
-## X           -0.435859   0.003631 -120.044   <2e-16 ***
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  0.006720   0.014824   0.453     0.65    
+## X           -0.131401   0.002712 -48.458   <2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 0.7676 on 1997 degrees of freedom
-## Multiple R-squared:  0.8783,	Adjusted R-squared:  0.8782 
-## F-statistic:  7208 on 2 and 1997 DF,  p-value: < 2.2e-16
+## Residual standard error: 0.663 on 1998 degrees of freedom
+## Multiple R-squared:  0.5403,	Adjusted R-squared:  0.5401 
+## F-statistic:  2348 on 1 and 1998 DF,  p-value: < 2.2e-16
 ```
 
 ``` r
-# significant Z effect: this DAG is possible
+summary(lm(Q~X+W,data=dat))
 ```
 
-If you have made your decision, you may check the script 'gendata.r' to see, whether your guess was right. 
+```
+## 
+## Call:
+## lm(formula = Q ~ X + W, data = dat)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.65026 -0.29964 -0.00512  0.31558  1.40692 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  0.012290   0.009867   1.246    0.213    
+## X           -0.001856   0.003152  -0.589    0.556    
+## W            0.392835   0.007836  50.134   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.4412 on 1997 degrees of freedom
+## Multiple R-squared:  0.7965,	Adjusted R-squared:  0.7963 
+## F-statistic:  3907 on 2 and 1997 DF,  p-value: < 2.2e-16
+```
+
+*Conclusion: unadjusted model shows a clear effect, disappearing after adjustment for W. Thus we can reject (c)/`g3` and conclude that (a)/`g1` is the correct model.*
+:::
+
+If you have made your decision, you may check the script 'gendata.r' to see, whether your guess was right.
+
+::: solution 
+
+``` r
+### The contents of gendat.r
+### 
+set.seed(202406)
+n=2000
+U = rnorm(n)    
+dat = data.frame(Q = rnorm(n))
+dat$W = 2*dat$Q+rnorm(n)        #  Q -> W
+dat$X = -2*dat$W +3*U+ rnorm(n) #  W -> X,  U -> X
+dat$Z = -2*U+rnorm(n)           #  U -> Z 
+dat$Y = dat$Z-3*dat$W+dat$Q+rnorm(n) # Z -> Y, W -> Y, Q -> Y  
+rm(U)
+dat<- round(dat,3)
+```
+
+*Correct answer: the data was generated to follow DAG g1 (a)*.
+:::
 
 ## Instrumental variables estimation: Mendelian randomization
-Suppose you want to estimate the effect of Body Mass Index (BMI) on blood glucose level (associated with the risk of diabetes).
- Let's conduct a simulation study to verify that when the exposure-outcome association is confounded, but there is a valid instrument (genotype), one obtains an unbiased estimate of the causal effect. 
 
--  Start by generating the genotype variable as *Binomial(2,p)*, with $p=0.2$ (and look at the resulting genotype frequencies):
+Suppose you want to estimate the effect of Body Mass Index (BMI) on blood glucose level (associated with the risk of diabetes). Let's conduct a simulation study to verify that when the exposure-outcome association is confounded, but there is a valid instrument (genotype), one obtains an unbiased estimate of the causal effect.
+
+- Start by generating the genotype variable as *Binomial(2,p)*, with $p=0.2$ (and look at the resulting genotype frequencies):
+
 
 ``` r
 n <- 10000
@@ -594,27 +712,32 @@ table(mrdat$G)
 ##    0    1    2 
 ## 6394 3243  363
 ```
--  Also generate the confounder variable U 
+
+- Also generate the confounder variable U
+
 
 ``` r
 mrdat$U <- rnorm(n)
 ```
 
--  Generate a continuous (normally distributed) exposure variable $BMI$ so that it depends on $G$ and $U$. 
-Check with linear regression, whether there is enough power to get significant parameter estimates.  
-For instance:
+- Generate a continuous (normally distributed) exposure variable $BMI$ so that it depends on $G$ and $U$. Check with linear regression, whether there is enough power to get significant parameter estimates.\
+  For instance:
+
 
 ``` r
 mrdat$BMI <- with(mrdat, 25 + 0.7 * G + 2 * U + rnorm(n))
 ```
--  Finally generate $Y$ ("Blood glucose level") so that it depends on $BMI$ and $U$ (but not on $G$).
+
+- Finally generate $Y$ ("Blood glucose level") so that it depends on $BMI$ and $U$ (but not on $G$).
+
 
 ``` r
 mrdat$Y <- 
   with(mrdat, 3 + 0.1 * BMI - 1.5 * U + rnorm(n, 0, 0.5))
 ```
--  Verify, that simple regression model for $Y$, with $BMI$ as a covariate, results in a biased 
-estimate of the causal effect (parameter estimate is different from what was generated) 
+
+- Verify, that simple regression model for $Y$, with $BMI$ as a covariate, results in a biased estimate of the causal effect (parameter estimate is different from what was generated)
+
 
 ``` r
 mxy <- lm(Y ~ BMI, data = mrdat)
@@ -626,10 +749,11 @@ ci.lin(mxy)
 ## (Intercept) 17.814562 0.097792556  182.1668 0 17.6228919 18.0062316
 ## BMI         -0.486091 0.003850138 -126.2529 0 -0.4936372 -0.4785449
 ```
-How different is the estimate from 0.1?  
 
--   Estimate a regression model for $Y$ with two covariates, $G$ and $BMI$. Do you see a significant effect of $G$?
-Could you explain analytically, why one may see a significant parameter estimate for $G$ there?
+How different is the estimate from 0.1?
+
+- Estimate a regression model for $Y$ with two covariates, $G$ and $BMI$. Do you see a significant effect of $G$? Could you explain analytically, why one may see a significant parameter estimate for $G$ there?
+
 
 ``` r
 mxyg <- lm(Y ~ G + BMI, data = mrdat)
@@ -647,9 +771,8 @@ ci.lin(mxyg)
 ## BMI         -0.4964359
 ```
 
--  Find an IV (instrumental variables) estimate, using G as an instrument, by following the algorithm 
-in the lecture notes (use two linear models and find a ratio of the parameter estimates). 
-Does the estimate get closer to the generated effect size?
+- Find an IV (instrumental variables) estimate, using G as an instrument, by following the algorithm in the lecture notes (use two linear models and find a ratio of the parameter estimates). Does the estimate get closer to the generated effect size?
+
 
 ``` r
 mgx <- lm(BMI ~ G, data = mrdat)
@@ -685,8 +808,8 @@ causeff # closer to 0.1?
 ## 0.1434702
 ```
 
--   A proper simulation study would require the analysis to be run several times, to see the extent of variability in the parameter estimates. 
-A simple way to do it here would be using a `for`-loop. Modify the code as follows (exactly the same commands as executed so far, adding a few lines of code to the beginning and to the end):
+- A proper simulation study would require the analysis to be run several times, to see the extent of variability in the parameter estimates. A simple way to do it here would be using a `for`-loop. Modify the code as follows (exactly the same commands as executed so far, adding a few lines of code to the beginning and to the end):
+
 
 ``` r
 n <- 10000
@@ -710,7 +833,9 @@ for (i in 1:nsim) { # start the loop
   mr[i] <- bgy / bgx
 } # end the loop
 ```
+
 Now look at the distribution of the parameter estimate:
+
 
 ``` r
 summary(mr)
@@ -721,7 +846,8 @@ summary(mr)
 ## 0.03929 0.07114 0.09158 0.09942 0.12628 0.18344
 ```
 
--  (*optional*) Change the code of simulations so that the assumptions are violated: add a weak direct effect of the genotype G to the equation that generates $Y$:
+- (*optional*) Change the code of simulations so that the assumptions are violated: add a weak direct effect of the genotype G to the equation that generates $Y$:
+
 
 ``` r
 mrdat$Y <- 
@@ -730,10 +856,12 @@ mrdat$Y <-
     3 + 0.1 * BMI - 1.5 * U + 0.05 * G + rnorm(n, 0, 0.5)
   )
 ```
+
 Repeat the simulation study to see, what is the bias in the average estimated causal effect of $BMI$ on $Y$.
 
--  (*optional*) Using library `sem`  and function `tsls`, one can obtain a two-stage least squares estimate for the  
-causal effect and also the proper standard error. Do you get the same estimate as before? 
+- (*optional*) Using library `sem` and function `tsls`, one can obtain a two-stage least squares estimate for the\
+  causal effect and also the proper standard error. Do you get the same estimate as before?
+
 
 ``` r
 if (!("sem" %in% installed.packages())) install.packages("sem")
@@ -761,15 +889,9 @@ summary(tsls(Y ~ BMI, ~G, data = mrdat))
 ## 
 ## Residual standard error: 1.6870674 on 9998 degrees of freedom
 ```
+
 (There are also several other R packages for IV estimation and Mendelian Randomization (*MendelianRandomization* for instance))
-
-
-
 
 ## Why are simulation exercises useful for causal inference?
 
-If we simulate the data, we know the data-generating mechanism and the *true* causal effects. So this is a way to check, whether 
-an analysis approach will lead to estimates that correspond to what is generated. One could expect to see similar phenomena in real
-data analysis, if the data-generation mechanism is similar to what was used in simulations.
-
-
+If we simulate the data, we know the data-generating mechanism and the *true* causal effects. So this is a way to check, whether an analysis approach will lead to estimates that correspond to what is generated. One could expect to see similar phenomena in real data analysis, if the data-generation mechanism is similar to what was used in simulations.
