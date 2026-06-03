@@ -152,7 +152,7 @@ the event occurs in a short
  interval $(t, t+\Delta]$, given that it does not
 occur before $t$, divided by interval length which gets smaller $\Delta$  
 \end{itemize}
-
+\vspace*{0.5cm}
 During a short interval
  \begin{center}
  risk of event $\approx$ hazard $\times$ interval length 
@@ -297,23 +297,19 @@ cB8  <- c("#000000", "#E69F00", "#56B4E9", "#009E73",
           "#F0E442", "#0072B2", "#D55E00", "#CC79A7") #colors chosen
 @
 
-{\scriptsize
-<<or1, echo=TRUE,eval=TRUE>>=
-suob <- Surv(orca$time, 1*(orca$event > 0) )
-suob[1:7]   #  + indicates censored observation
-@
-}
 
 {\scriptsize
 <<or1, echo=TRUE,eval=TRUE>>=
-km1 <- survfit( suob ~ 1, data = orca)
+km1 <- survfit( Surv(time, 1*(event > 0) ) ~ 1, data = orca)
+Surv(orca$time, 1*(orca$event > 0))[1:7]
 km1              #  brief  summary
 @
 }
 
 {\scriptsize
 <<or1, echo=TRUE,eval=TRUE>>=
-summary(km1)     #  detailed KM-estimate
+res<-summary(km1,data.frame=TRUE)     #  detailed KM-estimate
+round(res[1:10,c(1:7,9:10)],3)
 @
 }
 
@@ -326,7 +322,8 @@ summary(km1)     #  detailed KM-estimate
 
 <<km,echo=FALSE,eval=TRUE,fig=TRUE,height=4>>=
 par(mfcol=c(1,1))
-plot(survfit(suob~orca$sex), ylab="Proportion",xlab="Time since diagnosis (years)",lwd=c(2,1.5,1.5,2,1.5,1.5),lty=c(1,3,3,1,3,3),conf.int = T,col=c("#CC79A7","#56B4E9"),main="Estimated survival (95% CI)")
+plot(survfit(Surv(orca$time, 1*(orca$event > 0) )~orca$sex), 
+     ylab="Proportion",xlab="Time since diagnosis (years)",lwd=c(2,1.5,1.5,2,1.5,1.5),lty=c(1,3,3,1,3,3),conf.int = T,col=c("#CC79A7","#56B4E9"),main="Estimated survival (95% CI)")
 text(3,0.9,"KM for S(t)")
 legend(x=10, y=1,
             c("Female","Male"),
@@ -648,13 +645,13 @@ should be used
 
 {\scriptsize 
 <<boxplot,echo=FALSE,eval=TRUE,fig=TRUE,height=4>>=
-library(Epi)
-knitr::opts_chunk$set(message = FALSE)
- orca.lex <- Lexis(exit = list(stime = time), 
+#library(Epi)
+#knitr::opts_chunk$set(message = FALSE)
+ orca.lex <- Epi::Lexis(exit = list(stime = time), 
             exit.status = factor(event, 
     labels = c("Alive", "Oral ca. death", "Other death") ),
                   data = orca)
-boxes(orca.lex,show.Y = TRUE,show.R=FALSE,boxpos=TRUE,fill.arr=TRUE)
+Epi::boxes(orca.lex,show.Y = TRUE,show.R=TRUE,scale.R=1000,boxpos=TRUE,show.BE=TRUE)
 
 @
 
@@ -810,14 +807,14 @@ Fitting Cox models with sex and sex + age.
 \small
 
 <<>>=
-cm0 <- coxph( suob ~ sex, data = orca)
+cm0 <- coxph( Surv(time, 1*(event > 0) ) ~ sex, data = orca)
 ci.exp(cm0)
 @
 
 Total mortality in males is 13\% higher in male than females, but not significant.
 
 <<>>=
-cm0 <- coxph( suob ~ age+sex, data = orca)
+cm0 <- coxph( Surv(time, 1*(event > 0) ) ~ age+sex, data = orca)
 ci.exp(cm0)
 @
 
