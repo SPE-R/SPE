@@ -24,7 +24,7 @@ until 31 December 2008.
 The dataset contains the following variables:
 
 | Variable | Description |
-|:-----------------------------------|:-----------------------------------|
+|:---|:---|
 | `sex` | sex, a factor with categories; `1 = "Female", 2 = "Male"` |
 | `age` | age (years) at the date of diagnosing the cancer |
 | `stage` | TNM stage of the tumour (factor): `1 = "I", ..., 4 = "IV", 5 = "unkn"` |
@@ -35,7 +35,7 @@ The dataset contains the following variables:
 
 - Load the R packages `Epi`, and `survival` needed in this exercise.
 
-```{r packages}
+```{r packages, echo=T,eval=TRUE}
 library(Epi)
 library(survival)
 cB8  <- c("#000000", "#E69F00", "#56B4E9", "#009E73", 
@@ -50,7 +50,7 @@ options(digits=3)
   from oral cancer and other causes, respectively, from the `event`
   variable.
 
-```{r dinput}
+```{r dinput, echo=T,eval=TRUE}
 orca <-  read.table(file = 'https://raw.githubusercontent.com/SPE-R/SPE/master/pracs-book/data/oralca2.txt', header = TRUE, sep = " ",row.names = 1 )
 head(orca)
 orca$stage<-as.factor(orca$stage)
@@ -66,7 +66,7 @@ summary(orca)
   `orca$suob` from the event variable and the follow-up time using
   function `Surv()`. Look at the structure and summary of `suob` .
 
-```{r Survobject}
+```{r Survobject, echo=T,eval=TRUE}
 suob <- Surv(orca$time, 1 * (orca$event > 0))
 str(suob)
 summary(suob)
@@ -75,14 +75,14 @@ summary(suob)
 - Create a `survfit` object `s.all`, which does the default calculations
   for a Kaplan--Meier analysis of the overall (marginal) survival curve.
 
-```{r surv1}
+```{r surv1, echo=T,eval=TRUE}
 s.all <- survfit(suob ~ 1, data = orca)
 ```
 
 See the structure of this object and apply `print()` method on it, too.
 Look at the results; what do you find?
 
-```{r surv2}
+```{r surv2, echo=T,eval=TRUE}
 s.all
 str(s.all)
 ```
@@ -160,7 +160,7 @@ legend(3, -2, title="stage",legend=levels(orca$stage),col = col5,lty=rep(1,5), c
   categories by function `cut()` using suitable breakpoints, like 55 and
   75 years, and cross-tabulate sex and age group:
 
-```{r sexage}
+```{r sexage, echo=T,eval=TRUE}
 orca$agegr <- cut(orca$age, br = c(0, 55, 75, 95))
 stat.table(list(sex, agegr), list(count(), percent(agegr)),
   margins = TRUE, 
@@ -193,7 +193,7 @@ death separately, first overall and then by prognostic factors.
 - Use the `survfit`-function in `survival` package with option
   `type="mstate"`.
 
-```{r cif1a}
+```{r cif1a, echo=T,eval=TRUE}
 library(survival)
 cif1 <- survfit(Surv(time, event, type = "mstate") ~ 1,
   data = orca
@@ -261,7 +261,7 @@ on the two causes of death?
   curves describes the cumulative mortality from other causes. You can
   also add some colours for the different zones:
 
-```{r stackedcif1, fig=TRUE}
+```{r stackedcif1, echo=TRUE, fig=TRUE, eval=TRUE}
 par(mfrow=c(1,1),xaxs="i", yaxs="i") # make plot start 0,0
 stackedCIF(cif1,xlim=c(0,20),
            col = c("black"),
@@ -280,7 +280,7 @@ text( 10, 0.80, " Alive ", pos = 4)
   estimated rate ratios and their confidence intervals can also here be
   displayed by applying `ci.lin()` on the fitted model object.
 
-```{r cox1}
+```{r cox1, echo=T,eval=TRUE}
 options(show.signif.stars = FALSE)
 m1 <- coxph(suob ~ sex + I((age - 65) / 10) + stage, data = orca)
 summary(m1)
@@ -293,7 +293,7 @@ Look at the results. What are the main findings?
   of proportional hazards with respect to each of the variables
   separately as well as globally, using the `cox.zph()` function.
 
-```{r coxzph}
+```{r coxzph, echo=T,eval=TRUE}
 cox.zph(m1)
 ```
 
@@ -305,7 +305,7 @@ cox.zph(m1)
   first two stage groups into one. After that fit a model in the reduced
   data with the new stage variable.
 
-```{r cox2}
+```{r cox2, echo=T,eval=TRUE}
 orca2 <- subset(orca, stage != "unkn")
 orca2$st3 <- Relevel(orca2$stage, list(1:2, 3, 4:5))
 levels(orca2$st3) <- c("I-II", "III", "IV")
@@ -321,7 +321,7 @@ round(ci.exp(m2), 3)
   create a new artificial data frame containing the desired values for
   the covariates.
 
-```{r cox2cll}
+```{r cox2cll, echo=T,eval=TRUE}
 newd <- data.frame(
   sex = c(rep("Male", 6), rep("Female", 6)),
   age = rep(c(rep(40, 3), rep(80, 3)), 2),
@@ -366,7 +366,7 @@ legend(10, 0.5, title="stage",legend=leg,
   counted as events and deaths from other causes are included into
   censorings.
 
-```{r coxhaz1}
+```{r coxhaz1, echo=T,eval=TRUE}
 m2haz1 <- 
   coxph(
     Surv(time, event == 1) ~ sex + I((age - 65) / 10) + st3, 
@@ -382,7 +382,7 @@ differences?
 - Fit a similar model for deaths from other causes and compare the
   results.
 
-```{r coxhaz2}
+```{r coxhaz2, echo=T,eval=TRUE}
 m2haz2 <- 
   coxph(
     Surv(time, event == 2) ~ sex + I((age - 65) / 10) + st3, 
@@ -404,7 +404,7 @@ cox.zph(m2haz2)
 
 % `crr()`, and attach the data frame.
 
-% ```{r fg1}
+% ```{r fg1, echo=T,eval=TRUE}
 
 % library(cmprsk)
 
@@ -426,7 +426,7 @@ cox.zph(m2haz2)
 
 %  Fit a similar model for deaths from other causes and compare the results.
 
-% ```{r fg2}
+% ```{r fg2, echo=T,eval=TRUE}
 
 % m2fg2 <- crr(time, event, cov1 = model.matrix(m2), failcode=2)
 
@@ -457,7 +457,7 @@ orca.lex <- Lexis(
 - Draw a box diagram of the two-state set-up of competing transitions.
   Run first th e following command line
 
-```{r lexis}
+```{r lexis, echo=T,eval=TRUE}
 boxes(orca.lex,boxpos = TRUE,show.BE = TRUE,scale.R=1000)
 ```
 
@@ -493,7 +493,7 @@ necessary mouse moves and clicks.
 <!--  the relevant subset of the already available `orca.lex` object. -->
 <!--  Upon that the three-level stage factor `st3` is created -->
 <!--  as above. -->
-<!-- ```{r split} -->
+<!-- ```{r split, echo=T,eval=TRUE} -->
 <!-- orca2.lex <- subset(orca.lex, stage != "unkn") -->
 <!-- orca2.lex$st3 <- Relevel(orca2.lex$stage, list(1:2, 3, 4:5)) -->
 <!-- levels(orca2.lex$st3) <- c("I-II", "III", "IV") -->
@@ -503,7 +503,7 @@ necessary mouse moves and clicks.
 <!--  split by those breakpoints. The `timeband` factor -->
 <!--  is defined according to the splitted survival times -->
 <!--  stored in variable `stime`. -->
-<!-- ```{r split b} -->
+<!-- ```{r split b, echo=T,eval=TRUE} -->
 <!-- cuts <- sort(orca2.lex$time[orca2.lex$event == 1]) -->
 <!-- orca2.spl <- -->
 <!--   splitLexis(orca2.lex, br = cuts, time.scale = "stime") -->
@@ -517,7 +517,7 @@ necessary mouse moves and clicks.
 <!--  timebands, over which the subject stays alive, but assumes -->
 <!--  the value 1 or 2 at his/her last interval ending at the time of death. -->
 <!--  -- See now the structure of the splitted object. -->
-<!-- ```{r strsplit} -->
+<!-- ```{r strsplit, echo=T,eval=TRUE} -->
 <!-- str(orca2.spl) -->
 <!-- head(orca2.spl) -->
 <!-- ``` -->
@@ -525,7 +525,7 @@ necessary mouse moves and clicks.
 <!-- as the outcome. The splitted person-years are contained in `lex.dur`, -->
 <!-- and the explanatory variables are the same as in model `m2haz1`. -->
 <!-- -- This fitting may take some time .... -->
-<!-- ```{r poisson} -->
+<!-- ```{r poisson, echo=T,eval=TRUE} -->
 <!-- m2pois1 <- glm( -->
 <!--   1 * (lex.Xst == "Oral ca. death") ~ -->
 <!--     -1 + timeband + sex + I((age - 65) / 10) + st3, -->
