@@ -54,7 +54,11 @@ ci.lin(m2a)
 ci.lin(m3a)
 ```
 
-- What would be the conclusions on the effect of beer on weight, based on the three models? Do they agree? Which (if any) of the models gives an unbiased estimate of the actual causal effect of interest? (Note - for the estimated coefficient of beer, 0 should be included in the confidence interval - there is just one model where that is true)
+- What would be the conclusions on the effect of beer on weight, based on the three models? Do they agree? Which (if any) of the models gives an unbiased estimate of the actual causal effect of interest? 
+
+::: solution
+(Note - for the estimated coefficient of beer, 0 should be included in the confidence interval - there is just one model where that is true)
+:::
 
 - How can the answer be seen from the graph?
 
@@ -298,28 +302,39 @@ head(dat)
 
 **Exercise:** Using linear models, try to identify, which of the three DAGs has been used to generate the data.
 
-::: solution 
-
 *Idea:* If you adjust for appropriate confounders for a given DAG, you should see no effect of X on Y.
 
-```{r adjust1, eval=TRUE, solution=TRUE}
+```{r adjust1, results = TRUE}
 adjustmentSets(g1,"X","Y", effect="direct")
 summary(lm(Y~X+W+Z,data=dat))
 ```
 
-*Apparently no effect of X: this DAG "g1" (a) is possible*
+The DAG would be possible, if there is not effect of X.
 
-```{r adjust2, eval=TRUE, solution=TRUE}
+::: solution
+*Apparently no effect of X: this DAG "g1" (a) is possible*
+:::
+
+```{r adjust2, results = TRUE}
 adjustmentSets(g2,"X","Y", effect="direct")
 summary(lm(Y~X+Z,data=dat))
 ```
 
+::: solution
 *A clear effect of X: this DAG "g2" (b) is not likely*
+:::
 
-```{r adjust3, eval=TRUE, solution=TRUE}
+
+```{r adjust3, results=TRUE}
 adjustmentSets(g3,"X","Y", effect="direct")
 summary(lm(Y~X+Q+W+Z,data=dat))
 ```
+
+You have probably seen that one of the three DAGs is definitely wrong for the data. But what about two others? If you are unsure, try to think of a different model to fit - you may use another dependent variable than Y (see solutions for one option).
+
+If you have made your decision, you may check the script 'gendata.r' to see, whether your guess was right.
+
+::: solution
 
 *Apparently no effect of X: this DAG "g3" (c) is possible*
 
