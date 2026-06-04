@@ -903,7 +903,7 @@ summary(orca.lex)
 
 
 ``` r
-boxes(orca.lex,boxpos = TRUE)
+boxes(orca.lex,boxpos = TRUE,show.BE = TRUE,scale.R=1000)
 ```
 
 ![](oral-s_files/figure-epub3/lexis-1.png)<!-- -->
