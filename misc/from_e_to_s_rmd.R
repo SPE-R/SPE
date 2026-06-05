@@ -65,17 +65,17 @@ files.in <-
     ##                is NOT auto-derived here.
     ## "graph-intro-e.rmd", -- migrated
     ## "rates-rrrd-e.rmd", -- migrated to single source
-    "effects-e.rmd",
-    "cont-eff-e.rmd",
-    "causal-e.rmd",
+    # "effects-e.rmd",
+    # "cont-eff-e.rmd",
+    # "causal-e.rmd",
     ## "graphics-e.rmd" -- moved to pracs-book/_unused/, no longer rendered
     ## "ggplot2-e.rmd"  -- migrated to single-source; included directly in
     ##                    both _bookdown.yml and _bookdown-sol.yml.
-    "oral-e.rmd",
-    "DMDK-e.rmd",
-    "occoh-caco-e.rmd",
-    "causInf2-e.rmd",
-    "renal-e.rmd"
+    # "oral-e.rmd",
+    # "DMDK-e.rmd",
+    # "occoh-caco-e.rmd",
+    # "causInf2-e.rmd",
+    # "renal-e.rmd"
   )
 
 files.out <- stringr::str_replace(files.in, "-e.rmd", "-s.rmd")
