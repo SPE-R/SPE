@@ -1,16 +1,13 @@
----
-title: "Tartu 2026 edition post mortem"
-format: html
----
+# Tartu 2026 edition post mortem
 
-## 
+## General notes
 
 - 2027 edition at IARC (DG to contact LCB team asap to see availabilities)
 
 - proposition to split the course in 3 parts:
-    - build basic R skills
-    - basic epi
-    - more adcanced epi
+    - build basic R skills (day 1)
+    - basic epi (day 2/3)
+    - more adcanced epi (day 4/5)
 
 Here a proposal:
 
@@ -21,7 +18,7 @@ Here a proposal:
 - day 5 (and/or 4): Causal inference
 
 
-**Misc**
+## Misc notes
 
 - introduce immortal time bias in the course, left truncation
 - intoduction to interaction and model definition, stratification
