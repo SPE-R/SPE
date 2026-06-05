@@ -200,7 +200,7 @@ plot(oc.lex, xlim = c(1990, 2010), grid = TRUE)
 points(oc.lex, pch = c(NA, 16)[oc.lex$lex.Xst + 1])
 ```
 
-![](occoh-caco-s_files/figure-epub3/plotlexis-1.png)<!-- -->
+![](occoh-caco-e_files/figure-epub3/plotlexis-1.png)<!-- -->
 
 -  As age is here the main time axis, 
 we shall graphically illustrate the **study base**, *i.e.* 
@@ -237,7 +237,7 @@ with(
 )
 ```
 
-![](occoh-caco-s_files/figure-epub3/plotlexage-1.png)<!-- -->
+![](occoh-caco-e_files/figure-epub3/plotlexage-1.png)<!-- -->
 - For a closer look, we now
  zoom the graphical illustration of the risk sets into
 event times occurring between 50 to 58 years. -- 
@@ -255,7 +255,7 @@ with(
 )
 ```
 
-![](occoh-caco-s_files/figure-epub3/plotlexage2-1.png)<!-- -->
+![](occoh-caco-e_files/figure-epub3/plotlexage2-1.png)<!-- -->
 
 ## Nested case-control study
 
@@ -599,7 +599,7 @@ points(subset(oc.cc, chdeath == 1),
 )
 ```
 
-![](occoh-caco-s_files/figure-epub3/casecoh-lines-1.png)<!-- -->
+![](occoh-caco-e_files/figure-epub3/casecoh-lines-1.png)<!-- -->
 
 -  Define the categorical smoking variable again.
 

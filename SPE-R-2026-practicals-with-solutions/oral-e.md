@@ -194,14 +194,14 @@ plot(s.all,main="KM estimate of the survival
      xlab="years", ylab="Survival")
 ```
 
-![](oral-s_files/figure-epub3/survcdf1-1.png)
+![](oral-e_files/figure-epub3/survcdf1-1.png)
 
 ``` r
 plot(s.all)
 lines(s.all, fun = "event", mark.time = F, conf.int = FALSE)
 ```
 
-![](oral-s_files/figure-epub3/survcdf1-2.png)
+![](oral-e_files/figure-epub3/survcdf1-2.png)
 
 The effect of option `mark.time=F` is to omit marking the times when
 censorings occurred.
@@ -227,7 +227,7 @@ plot(s.stg, col = col5, fun = "event", main="Cum. mortality by stage",mark.time 
 legend(15, 0.6, title="stage",legend=levels(orca$stage),col = col5,lty=rep(1,5))
 ```
 
-![](oral-s_files/figure-epub3/cdfstage-1.png)<!-- -->
+![](oral-e_files/figure-epub3/cdfstage-1.png)<!-- -->
 
 - Create now two parallel plots of which the first one describes the
   cumulative hazards and the second one graphs the log-cumulative
@@ -243,7 +243,7 @@ plot(s.stg, col = col5, fun = "cloglog",main = "cloglog: log cum.haz")
 legend(3, -2, title="stage",legend=levels(orca$stage),col = col5,lty=rep(1,5), cex=0.7)
 ```
 
-![](oral-s_files/figure-epub3/chstage-1.png)<!-- -->
+![](oral-e_files/figure-epub3/chstage-1.png)<!-- -->
 
 - If the survival times were *exponentially* distributed in a given
   (sub)population the corresponding cloglog-curve should follow an
@@ -305,7 +305,7 @@ legend(10,0.35, legend=names(s.agrx$strata),
        col=rep(c(cB8[6], cB8[7]),3), lty=c(2,2, 1,1, 6,6),cex=0.65)
 ```
 
-![](oral-s_files/figure-epub3/cdfsexage-1.png)<!-- -->
+![](oral-e_files/figure-epub3/cdfsexage-1.png)<!-- -->
 
 In each age band the mortality curve for males is on a higher level
 than that for females.
@@ -413,7 +413,7 @@ plotCIF(cif1, 1, main = "Cancer death",xlab="Time since oral cancer diagnosis (y
 plotCIF(cif1, 2, main = "Other deaths",xlab="Time since oral cancer diagnosis (years)")
 ```
 
-![](oral-s_files/figure-epub3/plotcif1-1.png)<!-- -->
+![](oral-e_files/figure-epub3/plotcif1-1.png)<!-- -->
 
 - Compute the estimated cumulative incidences by stage for both causes
   of death. Now you have to add variable `stage` to survfit-function.
@@ -514,7 +514,7 @@ plotCIF(cif2, 2,
 legend(3, 0.7, title="stage",legend=levels(orca$stage),col = col5,lty=rep(1,5), cex=0.7)
 ```
 
-![](oral-s_files/figure-epub3/plotcif2-1.png)<!-- -->
+![](oral-e_files/figure-epub3/plotcif2-1.png)<!-- -->
 
 Compare the two plots. What would you conclude about the effect of stage
 on the two causes of death?
@@ -537,7 +537,7 @@ text( 10, 0.5, " Other death ", pos = 4)
 text( 10, 0.80, " Alive ", pos = 4)
 ```
 
-![](oral-s_files/figure-epub3/stackedcif1-1.png)<!-- -->
+![](oral-e_files/figure-epub3/stackedcif1-1.png)<!-- -->
 
 ## Regression modelling of overall mortality.
 
@@ -743,7 +743,7 @@ legend(10, 0.5, title="stage",legend=leg,
         ,lty=c(2,1,2,1,2,1), cex=0.7)
 ```
 
-![](oral-s_files/figure-epub3/cox2cll-1.png)<!-- -->
+![](oral-e_files/figure-epub3/cox2cll-1.png)<!-- -->
 
 ## Modelling event-specific hazards
 
@@ -830,7 +830,7 @@ cox.zph(m2haz2)
 
 % `crr()`, and attach the data frame.
 
-% ```{r fg1, echo=T,eval=TRUE}
+% ```{r fg1}
 
 % library(cmprsk)
 
@@ -852,7 +852,7 @@ cox.zph(m2haz2)
 
 %  Fit a similar model for deaths from other causes and compare the results.
 
-% ```{r fg2, echo=T,eval=TRUE}
+% ```{r fg2}
 
 % m2fg2 <- crr(time, event, cov1 = model.matrix(m2), failcode=2)
 
@@ -906,7 +906,7 @@ summary(orca.lex)
 boxes(orca.lex,boxpos = TRUE,show.BE = TRUE,scale.R=1000)
 ```
 
-![](oral-s_files/figure-epub3/lexis-1.png)<!-- -->
+![](oral-e_files/figure-epub3/lexis-1.png)<!-- -->
 
 Now, move the cursor to the point in the graphics window, at which you
 wish to put the box for *Alive*, and click. Next, move the cursor to the
@@ -940,7 +940,7 @@ necessary mouse moves and clicks.
 <!--  the relevant subset of the already available `orca.lex` object. -->
 <!--  Upon that the three-level stage factor `st3` is created -->
 <!--  as above. -->
-<!-- ```{r split, echo=T,eval=TRUE} -->
+<!-- ```{r split} -->
 <!-- orca2.lex <- subset(orca.lex, stage != "unkn") -->
 <!-- orca2.lex$st3 <- Relevel(orca2.lex$stage, list(1:2, 3, 4:5)) -->
 <!-- levels(orca2.lex$st3) <- c("I-II", "III", "IV") -->
@@ -950,7 +950,7 @@ necessary mouse moves and clicks.
 <!--  split by those breakpoints. The `timeband` factor -->
 <!--  is defined according to the splitted survival times -->
 <!--  stored in variable `stime`. -->
-<!-- ```{r split b, echo=T,eval=TRUE} -->
+<!-- ```{r split b} -->
 <!-- cuts <- sort(orca2.lex$time[orca2.lex$event == 1]) -->
 <!-- orca2.spl <- -->
 <!--   splitLexis(orca2.lex, br = cuts, time.scale = "stime") -->
@@ -964,7 +964,7 @@ necessary mouse moves and clicks.
 <!--  timebands, over which the subject stays alive, but assumes -->
 <!--  the value 1 or 2 at his/her last interval ending at the time of death. -->
 <!--  -- See now the structure of the splitted object. -->
-<!-- ```{r strsplit, echo=T,eval=TRUE} -->
+<!-- ```{r strsplit} -->
 <!-- str(orca2.spl) -->
 <!-- head(orca2.spl) -->
 <!-- ``` -->
@@ -972,7 +972,7 @@ necessary mouse moves and clicks.
 <!-- as the outcome. The splitted person-years are contained in `lex.dur`, -->
 <!-- and the explanatory variables are the same as in model `m2haz1`. -->
 <!-- -- This fitting may take some time .... -->
-<!-- ```{r poisson, echo=T,eval=TRUE} -->
+<!-- ```{r poisson} -->
 <!-- m2pois1 <- glm( -->
 <!--   1 * (lex.Xst == "Oral ca. death") ~ -->
 <!--     -1 + timeband + sex + I((age - 65) / 10) + st3, -->

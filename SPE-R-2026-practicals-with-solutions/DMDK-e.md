@@ -290,7 +290,7 @@ the help page:
     ```
     
     <div class="figure">
-    <img src="DMDK-s_files/figure-epub3/unnamed-chunk-12-1.png" alt="Age-specific mortality for men and women"  />
+    <img src="DMDK-e_files/figure-epub3/unnamed-chunk-12-1.png" alt="Age-specific mortality for men and women"  />
     <p class="caption">(\#fig:unnamed-chunk-12)Age-specific mortality for men and women</p>
     </div>
     The  `axis` statement is a trick to get the labels on the $y$-axis
@@ -317,7 +317,7 @@ the help page:
          labels = ll)
     ```
     
-    ![](DMDK-s_files/figure-epub3/unnamed-chunk-13-1.png)<!-- -->
+    ![](DMDK-e_files/figure-epub3/unnamed-chunk-13-1.png)<!-- -->
 
     ## Further time scales: period and duration
 
@@ -424,7 +424,7 @@ the help page:
     plot(Fcr, ylim = c(-3, 3), col = "red" , lwd = 2)
     ```
     
-    ![](DMDK-s_files/figure-epub3/unnamed-chunk-16-1.png)<!-- -->
+    ![](DMDK-e_files/figure-epub3/unnamed-chunk-16-1.png)<!-- -->
     What is the absolute scale for these effects?
 
 7.  Compare the fit of the naive model with just age and the
@@ -537,7 +537,7 @@ the help page:
     plot(Fcr, ylim = c(-3, 3), col = "red" , lwd = 2)
     ```
     
-    ![](DMDK-s_files/figure-epub3/unnamed-chunk-20-1.png)<!-- -->
+    ![](DMDK-e_files/figure-epub3/unnamed-chunk-20-1.png)<!-- -->
     What do you conclude from the plots?
 
 ## SMR
@@ -776,7 +776,7 @@ table.
     plot(Fsmr, ylim = c(-3, 3), col = "red" , lwd = 2)
     ```
     
-    ![](DMDK-s_files/figure-epub3/unnamed-chunk-27-1.png)<!-- -->
+    ![](DMDK-e_files/figure-epub3/unnamed-chunk-27-1.png)<!-- -->
 
 13. Plot the predicted SMRs from the models for men and women
     diagnosed in ages 50, 60 and 70 as you did for the rates. What do
@@ -815,7 +815,7 @@ table.
     abline(v = 50 + 0:5, lty = 3, col = "gray")
     ```
     
-    ![](DMDK-s_files/figure-epub3/unnamed-chunk-28-1.png)<!-- -->
+    ![](DMDK-e_files/figure-epub3/unnamed-chunk-28-1.png)<!-- -->
     Describe the shapes of the curves. What aspects of the shapes are
     induced by the model ?
 
@@ -876,7 +876,7 @@ table.
     abline(h = 1:5, lty = 3, col = "gray")
     ```
     
-    ![](DMDK-s_files/figure-epub3/unnamed-chunk-30-1.png)<!-- -->
+    ![](DMDK-e_files/figure-epub3/unnamed-chunk-30-1.png)<!-- -->
     What is your conclusion about SMR for diabetes patients relative to the
     general popuation?
 

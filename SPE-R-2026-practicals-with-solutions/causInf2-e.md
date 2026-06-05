@@ -116,7 +116,7 @@ coordinates(diagram) <-
 plot(diagram)
 ```
 
-![](causInf2-s_files/figure-epub3/dagitty-1.png)<!-- -->
+![](causInf2-e_files/figure-epub3/dagitty-1.png)<!-- -->
 
 3.  For a more generic notation, the risk of death, i.e. the probability
     of $Y=1$, will be expressed as the expected value of the binary
@@ -717,8 +717,6 @@ plot(psw2, type = "density")
 ## generated.
 ```
 
-![](causInf2-s_files/figure-epub3/distributions of the scores-1.png)
-
 ```
 ## Propensity score for group 0
 ```
@@ -726,8 +724,6 @@ plot(psw2, type = "density")
 ```
 ## Press [enter] to continue
 ```
-
-![](causInf2-s_files/figure-epub3/distributions of the scores-2.png)
 
 ```
 ## Propensity score for group 1
@@ -742,8 +738,6 @@ Are the distributions of the propensity scores very different?
 ``` r
 plot(psw2, type = "balance")
 ```
-
-![](causInf2-s_files/figure-epub3/check balance-1.png)<!-- -->
 
 In this plot, it would be desirable that the horisontal values of the
 standardized mean differences for a given type of weights are less than

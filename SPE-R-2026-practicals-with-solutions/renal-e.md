@@ -69,6 +69,16 @@ the study at death or kidney failure (dialysis or transplant).
     renal$sex <- factor(renal$sex, labels = c("M", "F"))
     head(renal)
     ```
+    
+    ```
+      id sex      dob      doe      dor      dox event
+    1 17   M 1967.944 1996.013       NA 1997.094     2
+    2 26   F 1959.306 1989.535 1989.814 1996.136     1
+    3 27   F 1962.014 1987.846       NA 1993.239     3
+    4 33   M 1950.747 1995.243 1995.717 2003.993     0
+    5 42   F 1961.296 1987.884 1996.650 2003.955     0
+    6 46   F 1952.374 1983.419       NA 1991.484     2
+    ```
 2.  Use the `Lexis` function to declare the data as
     survival data with age, calendar time and time since entry into
     the study as timescales. Label any event $>0$ as *ESRD*,
@@ -140,7 +150,7 @@ the study at death or kidney failure (dialysis or transplant).
     plot(Lr, col = "black", lwd = 3)
     ```
     
-    ![](renal-s_files/figure-epub3/Lexis-ups-1.png)<!-- -->
+    ![](renal-e_files/figure-epub3/Lexis-ups-1.png)<!-- -->
     
     ``` r
     subset(Lr, age < 0)
@@ -173,7 +183,7 @@ the study at death or kidney failure (dialysis or transplant).
     plot(Lr, col = "black", lwd = 3)
     ```
     
-    ![](renal-s_files/figure-epub3/Lexis-def-1.png)<!-- -->
+    ![](renal-e_files/figure-epub3/Lexis-def-1.png)<!-- -->
 
 5.  Now make a Cox-regression analysis of ESRD occurrence with
     the variables sex and age at entry into the study, using time
@@ -260,7 +270,7 @@ the study at death or kidney failure (dialysis or transplant).
     boxes(Lc, boxpos = TRUE, scale.R = 100, show.BE = TRUE, hm = 1.5, wm = 1.5)
     ```
     
-    ![](renal-s_files/figure-epub3/Lc-boxes-1.png)<!-- -->
+    ![](renal-e_files/figure-epub3/Lc-boxes-1.png)<!-- -->
 
     You may even be tempted to read the help page for
     `boxes.Lexis` ...
@@ -294,7 +304,7 @@ the study at death or kidney failure (dialysis or transplant).
                col = "black", lwd = 2)
     ```
     
-    ![](renal-s_files/figure-epub3/Lexis-rem-1.png)<!-- -->
+    ![](renal-e_files/figure-epub3/Lexis-rem-1.png)<!-- -->
     
 10. Make a Cox-regression of mortality rates (i.e. endpoint `ESRD` or
     `ESRD(Rem)`) with sex, age at entry and remission as
@@ -518,7 +528,7 @@ the study at death or kidney failure (dialysis or transplant).
     plot(mx)
     ```
     
-    ![](renal-s_files/figure-epub3/unnamed-chunk-13-1.png)<!-- -->
+    ![](renal-e_files/figure-epub3/unnamed-chunk-13-1.png)<!-- -->
 
     Is this a useful plot?
     
@@ -557,7 +567,7 @@ the study at death or kidney failure (dialysis or transplant).
              ylab = "ESRD rate (per 100 PY) for 50 year old men")
     ```
     
-    ![](renal-s_files/figure-epub3/pred-1.png)<!-- -->
+    ![](renal-e_files/figure-epub3/pred-1.png)<!-- -->
     Try to overlay with the corresponding prediction from the
     `glm` model using `Ns`.
     
@@ -760,29 +770,31 @@ the study at death or kidney failure (dialysis or transplant).
     
     ```
      lex.id     per   age  tfi lex.dur lex.Cst   lex.Xst id sex  dob  doe cens
-          1 2000.00 50.00 0.00    5.80     NRA      ESRD NA   M 1950 2000 2020
-          2 2000.00 50.00 0.00    5.73     NRA      ESRD NA   M 1950 2000 2020
-          3 2000.00 50.00 0.00    6.16     NRA      ESRD NA   M 1950 2000 2020
-          4 2000.00 50.00 0.00    7.61     NRA      ESRD NA   M 1950 2000 2020
-          5 2000.00 50.00 0.00   14.11     NRA      ESRD NA   M 1950 2000 2020
-          6 2000.00 50.00 0.00    0.08     NRA      ESRD NA   M 1950 2000 2020
-          7 2000.00 50.00 0.00    5.50     NRA      ESRD NA   M 1950 2000 2020
-          8 2000.00 50.00 0.00    5.23     NRA      ESRD NA   M 1950 2000 2020
-          9 2000.00 50.00 0.00    6.65     NRA      ESRD NA   M 1950 2000 2020
-         10 2000.00 50.00 0.00    6.57     NRA      ESRD NA   M 1950 2000 2020
-         11 2000.00 50.00 0.00   11.85     NRA      ESRD NA   F 1950 2000 2020
-         12 2000.00 50.00 0.00    0.64     NRA      ESRD NA   F 1950 2000 2020
-         13 2000.00 50.00 0.00    3.04     NRA      ESRD NA   F 1950 2000 2020
-         14 2000.00 50.00 0.00    5.73     NRA      ESRD NA   F 1950 2000 2020
-         15 2000.00 50.00 0.00    3.51     NRA      ESRD NA   F 1950 2000 2020
-         16 2000.00 50.00 0.00   11.88     NRA      ESRD NA   F 1950 2000 2020
-         17 2000.00 50.00 0.00    2.47     NRA       Rem NA   F 1950 2000 2020
-         17 2002.47 52.47 2.47   17.53     Rem       Rem NA   F 1950 2000 2020
-         18 2000.00 50.00 0.00    6.05     NRA      ESRD NA   F 1950 2000 2020
-         19 2000.00 50.00 0.00    0.11     NRA       Rem NA   F 1950 2000 2020
-         19 2000.11 50.11 0.11   17.39     Rem ESRD(Rem) NA   F 1950 2000 2020
-         20 2000.00 50.00 0.00    7.77     NRA       Rem NA   F 1950 2000 2020
-         20 2007.77 57.77 7.77    4.65     Rem ESRD(Rem) NA   F 1950 2000 2020
+          1 2000.00 50.00 0.00    4.14     NRA      ESRD NA   M 1950 2000 2020
+          2 2000.00 50.00 0.00    4.47     NRA      ESRD NA   M 1950 2000 2020
+          3 2000.00 50.00 0.00    4.10     NRA      ESRD NA   M 1950 2000 2020
+          4 2000.00 50.00 0.00    3.68     NRA      ESRD NA   M 1950 2000 2020
+          5 2000.00 50.00 0.00   10.43     NRA      ESRD NA   M 1950 2000 2020
+          6 2000.00 50.00 0.00    3.28     NRA      ESRD NA   M 1950 2000 2020
+          7 2000.00 50.00 0.00   14.14     NRA      ESRD NA   M 1950 2000 2020
+          8 2000.00 50.00 0.00    3.44     NRA       Rem NA   M 1950 2000 2020
+          8 2003.44 53.44 3.44   11.94     Rem ESRD(Rem) NA   M 1950 2000 2020
+          9 2000.00 50.00 0.00    7.68     NRA      ESRD NA   M 1950 2000 2020
+         10 2000.00 50.00 0.00   11.18     NRA      ESRD NA   M 1950 2000 2020
+         11 2000.00 50.00 0.00    3.51     NRA       Rem NA   F 1950 2000 2020
+         11 2003.51 53.51 3.51   16.49     Rem       Rem NA   F 1950 2000 2020
+         12 2000.00 50.00 0.00    1.06     NRA      ESRD NA   F 1950 2000 2020
+         13 2000.00 50.00 0.00    2.58     NRA      ESRD NA   F 1950 2000 2020
+         14 2000.00 50.00 0.00    1.21     NRA      ESRD NA   F 1950 2000 2020
+         15 2000.00 50.00 0.00   11.01     NRA      ESRD NA   F 1950 2000 2020
+         16 2000.00 50.00 0.00    8.21     NRA      ESRD NA   F 1950 2000 2020
+         17 2000.00 50.00 0.00    4.90     NRA       Rem NA   F 1950 2000 2020
+         17 2004.90 54.90 4.90   12.37     Rem ESRD(Rem) NA   F 1950 2000 2020
+         18 2000.00 50.00 0.00    3.83     NRA       Rem NA   F 1950 2000 2020
+         18 2003.83 53.83 3.83   16.17     Rem       Rem NA   F 1950 2000 2020
+         19 2000.00 50.00 0.00    4.22     NRA      ESRD NA   F 1950 2000 2020
+         20 2000.00 50.00 0.00    4.35     NRA       Rem NA   F 1950 2000 2020
+         20 2004.35 54.35 4.35   10.74     Rem ESRD(Rem) NA   F 1950 2000 2020
     ```
     
     ``` r
@@ -795,16 +807,18 @@ the study at death or kidney failure (dialysis or transplant).
     Transitions:
          To
     From  NRA Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:
-      NRA   0   0   10         0       10      10      63.44       10
+      NRA   0   1    9         0       10      10      66.55       10
+      Rem   0   0    0         1        1       1      11.94        1
+      Sum   0   1    9         1       11      11      78.48       10
     
     $F
          
     Transitions:
          To
     From  NRA Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:
-      NRA   0   3    7         0       10      10      53.06       10
-      Rem   0   1    0         2        3       2      39.57        3
-      Sum   0   4    7         2       13      12      92.63       10
+      NRA   0   4    6         0       10      10      44.90       10
+      Rem   0   2    0         2        4       2      55.77        4
+      Sum   0   6    6         2       14      12     100.66       10
     ```
     What type of object have you got as `iL`?
     
@@ -818,7 +832,7 @@ the study at death or kidney failure (dialysis or transplant).
     
     ```
        user  system elapsed 
-      2.556   3.436   2.066 
+      2.538   3.297   2.042 
     ```
     
     ``` r
@@ -831,18 +845,18 @@ the study at death or kidney failure (dialysis or transplant).
     Transitions:
          To
     From  NRA Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:
-      NRA  34  70  396         0      500     466    2643.78      500
-      Rem   0  48    0        22       70      22     499.02       70
-      Sum  34 118  396        22      570     488    3142.80      500
+      NRA  32  74  394         0      500     468    2710.97      500
+      Rem   0  49    0        25       74      25     450.67       74
+      Sum  32 123  394        25      574     493    3161.64      500
     
     $F
          
     Transitions:
          To
     From  NRA Rem ESRD ESRD(Rem) Records: Events: Risk time: Persons:
-      NRA  16 151  333         0      500     484    2327.52      500
-      Rem   0 104    0        47      151      47    1095.99      151
-      Sum  16 255  333        47      651     531    3423.51      500
+      NRA  27 159  314         0      500     473    2409.35      500
+      Rem   0  98    0        61      159      61    1083.35      159
+      Sum  27 257  314        61      659     534    3492.71      500
     ```
     Why are there so many ESRD-events in the resulting data set?
     
@@ -864,20 +878,20 @@ the study at death or kidney failure (dialysis or transplant).
           State
     when   NRA Rem ESRD ESRD(Rem)
       50   500   0    0         0
-      50.1 498   2    0         0
-      50.2 497   2    1         0
-      50.3 490   8    2         0
-      50.4 483  14    3         0
-      50.5 477  16    7         0
-      50.6 471  19   10         0
-      50.7 467  21   12         0
-      50.8 461  25   14         0
-      50.9 457  27   16         0
-      51   455  29   16         0
-      51.1 451  31   18         0
-      51.2 446  33   21         0
-      51.3 445  33   22         0
-      51.4 440  36   24         0
+      50.1 492   4    4         0
+      50.2 485   8    7         0
+      50.3 483   9    8         0
+      50.4 478  12   10         0
+      50.5 472  13   15         0
+      50.6 467  17   16         0
+      50.7 457  23   20         0
+      50.8 454  25   21         0
+      50.9 445  31   24         0
+      51   438  36   26         0
+      51.1 435  37   28         0
+      51.2 432  38   29         1
+      51.3 429  40   30         1
+      51.4 423  46   30         1
     ```
     What is in the object `nStf`?
     
@@ -895,11 +909,11 @@ the study at death or kidney failure (dialysis or transplant).
           State
     when     Rem   NRA ESRD ESRD(Rem)
       50   0.000 1.000    1         1
-      50.1 0.004 1.000    1         1
-      50.2 0.004 0.998    1         1
-      50.3 0.016 0.996    1         1
-      50.4 0.028 0.994    1         1
-      50.5 0.032 0.986    1         1
+      50.1 0.008 0.992    1         1
+      50.2 0.016 0.986    1         1
+      50.3 0.018 0.984    1         1
+      50.4 0.024 0.980    1         1
+      50.5 0.026 0.970    1         1
     ```
     
     ``` r
@@ -909,12 +923,12 @@ the study at death or kidney failure (dialysis or transplant).
     ```
           State
     when     Rem   NRA  ESRD ESRD(Rem)
-      59.5 0.236 0.312 0.946         1
-      59.6 0.234 0.310 0.944         1
-      59.7 0.234 0.310 0.944         1
-      59.8 0.232 0.308 0.942         1
-      59.9 0.230 0.304 0.938         1
-      60   0.230 0.302 0.938         1
+      59.5 0.210 0.344 0.914         1
+      59.6 0.210 0.338 0.912         1
+      59.7 0.208 0.330 0.910         1
+      59.8 0.208 0.328 0.910         1
+      59.9 0.204 0.324 0.906         1
+      60   0.206 0.324 0.906         1
     ```
     What do the entries in `ppf` represent?
     
@@ -925,7 +939,7 @@ the study at death or kidney failure (dialysis or transplant).
     plot(ppf)
     ```
     
-    ![](renal-s_files/figure-epub3/plot-pp-1.png)<!-- -->
+    ![](renal-e_files/figure-epub3/plot-pp-1.png)<!-- -->
 
     Is this useful?
     
@@ -949,7 +963,7 @@ the study at death or kidney failure (dialysis or transplant).
     axis(side = 2, at = 1:99 / 100, labels = NA, tck = -0.01)
     ```
     
-    ![](renal-s_files/figure-epub3/new-nState-1.png)<!-- -->
+    ![](renal-e_files/figure-epub3/new-nState-1.png)<!-- -->
   
     What is the 10-year risk of remission for men and women respectively?
   
